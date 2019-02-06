@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true">
+    <TextView
+        android:paddingLeft="12dp"
+        android:gravity="center_vertical"
+        android:id="@+id/blank_cell_text"
+        style="@style/tblCellTextViewBlank"
+        android:layout_weight=".50"
+        android:layout_column="0" />
+</TableRow>

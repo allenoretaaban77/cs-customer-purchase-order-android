@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:id="@+id/outer_liner_layout"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent">
+        <LinearLayout
+            style="@style/layoutStyleCheckList"
+            android:background="@drawable/background_round_border"
+            android:orientation="vertical"
+            android:padding="7dp">
+
+            <RelativeLayout
+                style="@style/mHeader">
+                <LinearLayout
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent">
+                    <TextView
+                        android:id="@+id/headertitle"
+                        android:gravity="center"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:textFontWeight="700"
+                        android:text="Transactions"
+                        android:textStyle="bold"
+                        android:textSize="19sp"
+                        android:textColor="@color/blue_3"
+                        android:fontFamily="sans-serif-medium" />
+                </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="left"
+                    android:layout_weight="1">
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+                        <ImageButton
+                            android:id="@+id/btn_back"
+                            android:layout_width="55dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="left"
+                            android:alpha="1.0"
+                            android:background="@android:color/transparent"
+                            android:src="@drawable/baseline_arrow_back_ios_24"/>
+                    </com.balysv.materialripple.MaterialRippleLayout>
+                </RelativeLayout>
+                <RelativeLayout
+                    android:visibility="gone"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="right"
+                    android:layout_weight="1">
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+                        <ImageButton
+                            android:id="@+id/btn_menu"
+                            android:layout_width="55dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="left"
+                            android:alpha="1.0"
+                            android:backgroundTint="@color/blue_2"
+                            android:background="@android:color/transparent"
+                            android:src="@drawable/baseline_menu_24"/>
+                    </com.balysv.materialripple.MaterialRippleLayout>
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:background="@drawable/background_gradient_round_a"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:padding="3dp"
+                android:orientation="vertical">
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

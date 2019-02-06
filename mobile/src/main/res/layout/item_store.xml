@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="7dp"
+    android:paddingLeft="7dp"
+    android:paddingRight="7dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/btn_container"
+        style="@style/btnTransparentStyle">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <Button
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:background="@android:color/transparent"
+                android:id="@+id/storetitle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/action_log_in_short"
+                android:textAlignment="textStart"
+                android:textColor="@color/green_3"
+                android:textAllCaps="false"/>
+        </com.balysv.materialripple.MaterialRippleLayout>
+        <TextView
+            android:visibility="gone"
+            android:textSize="11dp"
+            android:layout_marginLeft="13dp"
+            android:layout_marginBottom="14dp"
+            android:layout_marginTop="-18dp"
+            android:id="@+id/tv_remarks"
+            android:textColor="@color/gold_1"
+            android:text="Remarks"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp">
+        <TextView
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:layout_marginRight="12dp"
+            android:id="@+id/dr_record_count"
+            android:textColor="@color/gold_1"
+            android:text="7"
+            android:gravity="center_vertical"
+            android:layout_height="fill_parent"
+            android:layout_width="wrap_content"/>
+    </LinearLayout>
+
+    <TextView
+        android:background="@android:color/transparent"
+        android:id="@+id/storeempty"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</RelativeLayout>

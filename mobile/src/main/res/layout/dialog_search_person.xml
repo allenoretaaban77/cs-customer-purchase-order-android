@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_gravity="center"
+    android:background="@android:color/transparent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        style="@style/layoutStyleMenu"
+        android:orientation="vertical"
+        android:background="@color/transparent"
+        android:padding="7dp">
+
+        <LinearLayout
+            style="@style/mHeader">
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="100dp">
+                <TextView
+                    android:gravity="center"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:textColor="@color/brown_5"
+                    android:text="Name:"
+                    android:textSize="21sp"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+            <FrameLayout
+                android:id="@+id/layout_calendar"
+                android:background="@drawable/background_input_round_border"
+                android:orientation="horizontal"
+                android:layout_width="320dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp">
+                <EditText
+                    android:hint="Person Full Name"
+                    android:digits="@string/required_digits"
+                    android:id="@+id/et_person_name"
+                    android:background="@color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="16sp"
+                    android:maxLines="1"
+                    android:lines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
+                    android:textColorHint="@color/brown_1"
+                    android:textColor="@color/brown_5"
+                    android:paddingLeft="17dp"/>
+                <RelativeLayout
+                    android:layout_margin="2dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_width="37dp"
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:backgroundTint="@color/brown_1"
+                        android:background="@drawable/baseline_person_24"
+                        android:id="@+id/hide_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="3dp"
+                        />
+                </RelativeLayout>
+            </FrameLayout>
+            <LinearLayout
+                android:layout_marginTop="7dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="7dp"
+                style="@style/btnTransparentStyleSmallWrap">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:padding="3dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp">
+                    <Button
+                        android:backgroundTint="@color/white"
+                        android:background="@drawable/baseline_search_24"
+                        android:id="@+id/btn_search"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:background="@drawable/background_gradient_round_a"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="horizontal">
+            <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/personlistview"
+                android:divider="#00000000"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

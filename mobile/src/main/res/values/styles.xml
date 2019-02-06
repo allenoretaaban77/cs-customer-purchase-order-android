@@ -1,0 +1,199 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="BaseTheme">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="AppTheme.App" parent="ThemeOverlay.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!--<style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">#FF777777</item>
+    </style>
+
+    <style name="customProgress" parent="@android:style/Widget.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/loading</item>
+        <item name="android:indeterminate">true</item>
+        <item name="android:duration">40</item>
+        <item name="android:animationCache">true</item>
+        <item name="android:drawingCacheQuality">low</item>
+        <item name="android:persistentDrawingCache">animation</item>
+    </style>
+
+    <style name="caclulatorButton" parent="@android:style/Widget.ProgressBar">
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">30dp</item>
+    </style>
+
+    <style name="caclulatorButtonAssertive" parent="@android:style/Widget.ProgressBar">
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:backgroundTint">@android:color/holo_red_dark</item>
+    </style>
+
+    <style name="caclulatorButtonWarning" parent="@android:style/Widget.ProgressBar">
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:backgroundTint">@color/orange_1</item>
+    </style>
+
+    <style name="caclulatorButtonPassive" parent="@android:style/Widget.ProgressBar">
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:backgroundTint">@color/gray_6</item>
+    </style>
+
+    <style name="ProgressSpinnerTheme" parent="android:Theme.Holo.Dialog">
+        <item name="android:alertDialogStyle">@style/CustomSpinnerDialogStyle</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="CustomSpinnerDialogStyle">
+        <item name="android:bottomBright">@android:color/transparent</item>
+        <item name="android:bottomDark">@android:color/transparent</item>
+        <item name="android:bottomMedium">@android:color/transparent</item>
+        <item name="android:centerBright">@android:color/transparent</item>
+        <item name="android:centerDark">@android:color/transparent</item>
+        <item name="android:centerMedium">@android:color/transparent</item>
+        <item name="android:fullBright">@android:color/transparent</item>
+        <item name="android:fullDark">@android:color/transparent</item>
+        <item name="android:topBright">@android:color/transparent</item>
+        <item name="android:topDark">@android:color/transparent</item>
+    </style>
+
+    <style name="dropdownItem" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">20dp</item>
+        <item name="android:background">@color/green_2</item>
+        <item name="android:textColor">#FF000000</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="btnTransparentStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/background_gradient_round</item>
+    </style>
+
+    <style name="btnTransparentStyleSmallWrap">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/background_gradient_round</item>
+    </style>
+
+    <style name="layoutStyleMenu">
+        <item name="android:layout_width">500dp</item>
+        <item name="android:layout_height">650dp</item>
+        <!--<item name="android:paddingLeft">250dp</item>-->
+        <!--<item name="android:paddingRight">250dp</item>-->
+        <!--<item name="android:paddingTop">50dp</item>-->
+        <!--<item name="android:paddingBottom">50dp</item>-->
+        <!--<item name="android:background">@drawable/background_gradient_green</item>-->
+    </style>
+
+    <style name="layoutStyleStoreList">
+        <item name="android:layout_width">700dp</item>
+        <item name="android:layout_height">700dp</item>
+        <item name="android:background">@drawable/background_gradient_green</item>
+    </style>
+
+    <style name="layoutStyleCheckList">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="tblInnerCellTextView">
+        <item name="android:textSize">17dp</item>
+        <item name="android:color">@color/solid_black</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/background_round_border_inner</item>
+    </style>
+
+    <style name="tblCellTextView">
+        <item name="android:textSize">16dp</item>
+        <item name="android:textColor">@color/brown_4</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:background">@drawable/cell_background</item>
+    </style>
+
+    <style name="tblCellTextViewBlank">
+        <item name="android:color">@color/green_1</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/cell_background_gray</item>
+    </style>
+
+    <style name="tblCellTextViewHeader">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/cell_background_green</item>
+    </style>
+
+    <style name="mHeader">
+        <item name="android:background">@drawable/background_green_3_border</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+
+</resources>

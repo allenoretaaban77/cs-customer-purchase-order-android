@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#c4da75</color>
+    <color name="brown_0">#F5F5DC</color>
+    <color name="brown_1">#EDC9AF</color>
+    <color name="brown_2">#F4A460</color>
+    <color name="brown_3">#CD853F</color>
+    <color name="brown_5">#80461B</color>
+    <color name="brown_4">#483C32</color>
+    <color name="blue_0">#c7e6f5</color>
+    <color name="blue_1">#74a9f8</color>
+    <color name="blue_2">#0666d5</color>
+    <color name="blue_3">#021f5f</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray_2">#fefefe</color>
+    <color name="gray_1">#e5e5e5</color>
+    <color name="gray_3">#e7e7e7</color>
+    <color name="gray_4">#c7c7c7</color>
+    <color name="gray_5">#888888</color>
+    <color name="gray_6">#555555</color>
+    <color name="bg_green">#c4da75</color>
+    <color name="green_1">#284e38</color>
+    <color name="green_2">#E2F5A0</color>
+    <color name="green_3">#f2f7e0</color>
+    <color name="green_4">#5eb484</color>
+    <color name="gold_1">#ffcf40</color>
+    <color name="gold_2">#fae299</color>
+    <color name="orange_1">#f79500</color>
+    <color name="red_1">#ff0000</color>
+
+    <!--table reference-->
+    <color name="header_line_color">@android:color/holo_red_light</color>
+</resources>

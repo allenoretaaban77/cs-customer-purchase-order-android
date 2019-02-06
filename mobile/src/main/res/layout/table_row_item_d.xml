@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true">
+    <TextView
+        android:maxLines="1"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:gravity="center_vertical"
+        android:id="@+id/cell_tally"
+        style="@style/tblCellTextView"
+        android:layout_weight="1"
+        android:layout_column="0"
+        android:singleLine="true"/>
+    <TextView
+        android:gravity="center"
+        android:id="@+id/cell_actual"
+        style="@style/tblCellTextView"
+        android:layout_width="70dp"
+        android:layout_column="1" />
+    <TextView
+        android:gravity="right|center"
+        android:paddingRight="10dp"
+        android:id="@+id/cell_qty"
+        style="@style/tblCellTextView"
+        android:layout_width="70dp"
+        android:layout_column="2" />
+    <TextView
+        android:gravity="center_vertical"
+        android:paddingLeft="12dp"
+        android:id="@+id/cell_unit"
+        style="@style/tblCellTextView"
+        android:layout_width="70dp"
+        android:layout_column="3" />
+    <TextView
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:gravity="center_vertical"
+        android:id="@+id/cell_description"
+        style="@style/tblCellTextView"
+        android:layout_width="300dp"
+        android:layout_column="4" />
+</TableRow>

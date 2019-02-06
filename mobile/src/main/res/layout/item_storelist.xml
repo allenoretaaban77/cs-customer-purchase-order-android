@@ -1,0 +1,100 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/listitem_box"
+    android:paddingBottom="5dp">
+
+    <RelativeLayout
+        android:background="@drawable/background_green_3_border"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/listitem_box_inner_2"
+                android:background="@color/transparent"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                    <TextView
+                        android:text="A"
+                        android:lineHeight="10dp"
+                        android:textSize="18dp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tv_storeorder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <TextView
+                        android:text="b"
+                        android:textStyle="bold"
+                        android:textSize="16dp"
+                        android:lineHeight="14dp"
+                        android:textColor="@color/gray_5"
+                        android:id="@+id/tv_foodservice"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <View
+                        android:layout_marginTop="7dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:layout_alignParentBottom="true"
+                        android:background="@color/gray_4"/>
+                    <TextView
+                        android:paddingTop="5dp"
+                        android:textColor="@color/orange_1"
+                        android:lineHeight="10dp"
+                        android:textSize="16dp"
+                        android:id="@+id/tv_refid"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                    <TextView
+                        android:id="@+id/tv_remarks"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+            </LinearLayout>
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="17dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_alignParentRight="true"
+            android:textSize="13dp"
+            android:text="longdate"
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="15dp"
+            android:textSize="13dp"
+            android:text="longtime"
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <TextView
+        android:background="@android:color/transparent"
+        android:id="@+id/storeempty"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</RelativeLayout>
