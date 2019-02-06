@@ -8,11 +8,11 @@
         android:bottomLeftRadius="3dp" />
     <stroke
         android:width="0.5dp"
-        android:color="@color/brown_1" />
+        android:color="@color/gray_7" />
     <gradient
         android:angle="180"
-        android:startColor="@color/green_1"
-        android:centerColor="@color/brown_4"
-        android:endColor="@color/green_1"
+        android:startColor="@color/gold_3"
+        android:centerColor="@color/gold_3"
+        android:endColor="@color/gold_3"
         android:type="linear" />
 </shape>

@@ -13,7 +13,8 @@ public enum SharedKey {
     CURRENT_INCLUDEDPO("current_includedpo"),
     CURRENT_CUSTOMER_ID("current_customerid"),
     DATA_CHECKLIST("dtchecklist"),
-    DATA_STORELIST("dtstorelist");
+    DATA_STORELIST("dtstorelist"),
+    SEARCHED_ITEMS("searched_items");
 
     private String key;
     SharedKey(String key) { this.key = key; }

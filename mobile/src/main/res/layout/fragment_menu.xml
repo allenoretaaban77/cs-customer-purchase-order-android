@@ -19,7 +19,7 @@
             <TextView
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-smallc"
-                android:textColor="@color/green_1"
+                android:textColor="@color/white"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
                             android:inputType="text"
                             android:imeOptions="actionSearch"
                             android:textColorHint="@color/gray_4"
-                            android:textColor="@color/green_1"
+                            android:textColor="@color/gray_6"
                             android:nextFocusUp="@id/ll_dummy"
                             android:nextFocusLeft="@id/ll_dummy"
                             android:paddingLeft="17dp"/>
