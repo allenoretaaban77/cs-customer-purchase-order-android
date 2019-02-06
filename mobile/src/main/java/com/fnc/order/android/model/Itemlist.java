@@ -17,6 +17,7 @@ public class Itemlist implements Serializable {
     private String unitMeasurementDesc;
     private String unitMeasurementQty;
     private String unitName;
+    private Boolean is_checked;
 
     public Integer getRecidOld() {
         return recid_old;
@@ -56,5 +57,10 @@ public class Itemlist implements Serializable {
         return unitName;
     }
     public void setUnitName(String unitName) { this.unitName = unitName; }
+
+    public Boolean getIsChecked() {
+        return is_checked;
+    }
+    public void setIsChecked(Boolean is_checked) { this.is_checked = is_checked; }
 
 }

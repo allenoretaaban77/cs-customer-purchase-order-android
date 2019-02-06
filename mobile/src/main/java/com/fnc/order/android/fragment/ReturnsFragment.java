@@ -171,7 +171,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
 
             initCalc(rootView);
 
-            requestDrivers(rootView);
+//            requestDrivers(rootView);
         }
 
         return rootView;
@@ -205,7 +205,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
                 }else {
                     Drivers refLst = driverList.get(position-1);
                     refDriverId = refLst.getEmployeeNumber();
-                    tv.setTextColor(getResources().getColor(R.color.brown_5));
+                    tv.setTextColor(getResources().getColor(R.color.red_2));
                 }
             }
             @Override
@@ -220,6 +220,11 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
         bsBh = BottomSheetBehavior.from(bsCalc);
         bsBh.setHideable(true);
         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bsCalc.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
         btn_back.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
                 if(isBacked == false) {
@@ -277,12 +282,12 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
                                 errFlag = true;
                                 TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
                                 TextView tvQty = (TextView) trx.getChildAt(0);
-                                tvQty.setTextColor(getResources().getColor(R.color.red_1));
+                                tvQty.setTextColor(getResources().getColor(R.color.red_2));
                                 TextView tvUnit = (TextView) trx.getChildAt(1);
-                                tvUnit.setTextColor(getResources().getColor(R.color.red_1));
+                                tvUnit.setTextColor(getResources().getColor(R.color.red_2));
                                 LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
                                 TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
-                                tvDesc.setTextColor(getResources().getColor(R.color.red_1));
+                                tvDesc.setTextColor(getResources().getColor(R.color.red_2));
                             }
                         }
 
@@ -398,89 +403,70 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
             case ITEM_DIALOG_FRAGMENT:
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle extras = data.getExtras();
-                    Itemlist il = (Itemlist) extras.get(ItemlistKey.ITEM_RECORD.getKey());
+                    ArrayList<Itemlist> arrayList = new ArrayList<Itemlist>();
+                    arrayList = (ArrayList) extras.get(SharedKey.SEARCHED_ITEMS.getKey());
 
-                    LinkedList<Return> rlx = DcReturn.getInstance(ctx).getReturnlist(il.getRecid());
-                    if(rlx.size() == 0) {
-                        TableRow trx = (TableRow) getLayoutInflater().inflate(R.layout.table_row_item_list, null);
-                        trx.setId(il.getRecid());
-                        trx.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                isItemClicked = true;
-                                onTableItemClick(v);
-                            }
-                        });
-                        trx.setOnLongClickListener(new View.OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View v) {
-                                showMenuPopup(v);
-                                return true;
-                            }
-                        });
+                    for(Itemlist il : arrayList){
+                        LinkedList<Return> rlx = DcReturn.getInstance(ctx).getReturnlist(il.getRecid());
+                        if(rlx.size() == 0) {
+                            TableRow trx = (TableRow) getLayoutInflater().inflate(R.layout.table_row_item_list, null);
+                            trx.setId(il.getRecid());
+                            trx.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    isItemClicked = true;
+                                    onTableItemClick(v);
+                                }
+                            });
+                            trx.setOnLongClickListener(new View.OnLongClickListener() {
+                                @Override
+                                public boolean onLongClick(View v) {
+                                    showMenuPopup(v);
+                                    return true;
+                                }
+                            });
 
-                        TextView tvQty = (TextView) trx.findViewById(R.id.cell_qty);
-                        tvQty.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                View vx = (View) v.getParent();
-                                onTableItemClick(vx);
-                            }
-                        });
-//                        tvQty.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//                            @Override
-//                            public void onFocusChange(View view, boolean hasFocus) {
-//                                TableRow trx = (TableRow) view.getParent();
-//                                if (hasFocus) {
-//                                    calcRefId = trx.getId();
-//                                    EditText tvQty = (EditText) trx.getChildAt(0);
-//                                    tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-//                                    TextView tvUnit = (TextView) trx.getChildAt(1);
-//                                    tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-//                                    LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-//                                    tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-//                                } else {
-//                                    EditText tvQty = (EditText) trx.getChildAt(0);
-//                                    tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-//                                    TextView tvUnit = (TextView) trx.getChildAt(1);
-//                                    tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-//                                    LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-//                                    tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-//                                }
-//                            }
-//                        });
-                        tvQty.addTextChangedListener(new TextWatcher() {
-                            public void afterTextChanged(Editable s) {
-                                DcReturn.getInstance(ctx).updateReturnlistTallyString(
-                                        calcRefId.toString(), s.toString(),false);
-                            }
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                                TableRow trx = (TableRow) tl.findViewById(calcRefId);
-                                TextView tvQty = (TextView) trx.getChildAt(0);
-                                tvQty.setTextColor(getResources().getColor(R.color.brown_4));
-                                TextView tvUnit = (TextView) trx.getChildAt(1);
-                                tvUnit.setTextColor(getResources().getColor(R.color.brown_4));
-                                LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-                                TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
-                                tvDesc.setTextColor(getResources().getColor(R.color.brown_4));}
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                        });
+                            TextView tvQty = (TextView) trx.findViewById(R.id.cell_qty);
+                            tvQty.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    View vx = (View) v.getParent();
+                                    onTableItemClick(vx);
+                                }
+                            });
+                            tvQty.addTextChangedListener(new TextWatcher() {
+                                public void afterTextChanged(Editable s) {
+                                    DcReturn.getInstance(ctx).updateReturnlistTallyString(
+                                            calcRefId.toString(), s.toString(),false);
+                                }
+                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                                    TableRow trx = (TableRow) tl.findViewById(calcRefId);
+                                    TextView tvQty = (TextView) trx.getChildAt(0);
+                                    tvQty.setTextColor(getResources().getColor(R.color.brown_4));
+                                    TextView tvUnit = (TextView) trx.getChildAt(1);
+                                    tvUnit.setTextColor(getResources().getColor(R.color.brown_4));
+                                    LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
+                                    TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
+                                    tvDesc.setTextColor(getResources().getColor(R.color.brown_4));}
+                                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                            });
 
-                        TextView etDesc = (TextView) trx.findViewById(R.id.cell_description);
-                        etDesc.setText(il.getItemName());
-                        TextView etUnit = (TextView) trx.findViewById(R.id.cell_unit);
-                        etUnit.setText(il.getUnitName());
+                            TextView etDesc = (TextView) trx.findViewById(R.id.cell_description);
+                            etDesc.setText(il.getItemName());
+                            TextView etUnit = (TextView) trx.findViewById(R.id.cell_unit);
+                            etUnit.setText(il.getUnitName());
 
-                        tl.addView(trx);
-                        Return rowR = new Return();
-                        rowR.setQuantity("");
-                        rowR.setItemRecid(String.valueOf(il.getRecid()));
-                        rowR.setItemName(String.valueOf(il.getItemName()));
-                        rowR.setUnitName(String.valueOf(il.getUnitName()));
-                        rowR.setRemarks("");
-                        DcReturn.getInstance(ctx).insertReturnlist(rowR);
-                    }else{
-                        Toast.makeText(ctx, "The item is already exist on the list", Toast.LENGTH_SHORT).show();
+                            tl.addView(trx);
+                            Return rowR = new Return();
+                            rowR.setQuantity("");
+                            rowR.setItemRecid(String.valueOf(il.getRecid()));
+                            rowR.setItemName(String.valueOf(il.getItemName()));
+                            rowR.setUnitName(String.valueOf(il.getUnitName()));
+                            rowR.setRemarks("");
+                            DcReturn.getInstance(ctx).insertReturnlist(rowR);
+                        }else{
+                            Toast.makeText(ctx, "Some item is already exist on the list", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
                 if (resultCode == Activity.RESULT_CANCELED){ }
@@ -489,6 +475,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
     }
 
     private void onTableItemClick(View v) {
+        Helper.hideSoftKeyboard(getActivity());
         bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
         calcRefId = v.getId();
         try {
@@ -511,7 +498,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
             TableRow trx = (TableRow) v;
             TextView tvQty = (TextView) trx.getChildAt(0);
             tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-            tvQty.setTextColor(getResources().getColor(R.color.green_4));
+            tvQty.setTextColor(getResources().getColor(R.color.green_5));
             TextView tvUnit = (TextView) trx.getChildAt(1);
             tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
             LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
@@ -550,7 +537,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
                             View view = super.getDropDownView(position, convertView, parent);
                             TextView tv = (TextView) view;
                             if(position == 0){ tv.setTextColor(Color.LTGRAY); }
-                            else { tv.setTextColor(getResources().getColor(R.color.brown_5)); }
+                            else { tv.setTextColor(getResources().getColor(R.color.red_2)); }
                             return view;
                         }
                     };
@@ -583,7 +570,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
 
     private void backItNow(final View v) {
         dismissSpinnerDialog();
-        hideKeyboard(getActivity());
+        Helper.hideSoftKeyboard(getActivity());
         getActivity().onBackPressed();
     }
 
@@ -596,15 +583,6 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
         if (loader != null && loader.isShowing()) {
             loader.dismiss();
         }
-    }
-
-    private static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = activity.getCurrentFocus();
-        if (view == null) {
-            view = new View(activity);
-        }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private void initCalc(View v) {

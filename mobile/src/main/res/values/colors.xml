@@ -21,15 +21,20 @@
     <color name="gray_4">#c7c7c7</color>
     <color name="gray_5">#888888</color>
     <color name="gray_6">#555555</color>
+    <color name="gray_7">#DFDCE3</color>
+    <color name="gray_8">#404040</color>
     <color name="bg_green">#c4da75</color>
     <color name="green_1">#284e38</color>
     <color name="green_2">#E2F5A0</color>
     <color name="green_3">#f2f7e0</color>
     <color name="green_4">#5eb484</color>
+    <color name="green_5">#4ABDAC</color>
     <color name="gold_1">#ffcf40</color>
     <color name="gold_2">#fae299</color>
+    <color name="gold_3">#F7B733</color>
     <color name="orange_1">#f79500</color>
     <color name="red_1">#ff0000</color>
+    <color name="red_2">#FC4A1A</color>
 
     <!--table reference-->
     <color name="header_line_color">@android:color/holo_red_light</color>

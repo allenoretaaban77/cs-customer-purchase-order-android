@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FNC Item Return</string>
+    <string name="app_name">FNC Customer Order</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -22,4 +22,14 @@
     <string name="required_digits">1234567890abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <string name="the_quick">The quick brown fox jumps over the lazy dog and dog chase the cat.</string>
     <string name="waiting_checklist_error_msg">You cannot start a dispatch to this checklist because another checklist is pending for posting.</string>
+    <string-array name="sports_array">
+        <item>Shuttle Badminton</item>
+        <item>Tennis</item>
+        <item>Table Tennis</item>
+        <item>Basket Ball</item>
+        <item>Foot Ball</item>
+        <item>Volley Ball</item>
+        <item>Hockey</item>
+        <item>Swimming</item>
+    </string-array>
 </resources>
