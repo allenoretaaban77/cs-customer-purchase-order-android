@@ -60,6 +60,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
     private RecyclerView rvItems;
     private Boolean flagItemClicked = false;
     private ItemlistAdapterRv adapter;
+    private TextView tv_no_data;
 
     public static SearchItemFragment searchInstance(){
         SearchItemFragment dialogFragment = new SearchItemFragment();
@@ -86,7 +87,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         btn_close = (Button) v.findViewById(R.id.btn_close);
         btn_add_to_list = (Button) v.findViewById(R.id.btn_add_to_list);
         et_item_name = (EditText) v.findViewById(R.id.et_item_name);
-//        et_item_name.setText("siomai");
+        tv_no_data = (TextView) v.findViewById(R.id.tv_no_data);
         rvItems = (RecyclerView) v.findViewById(R.id.itemrecyclerview);
     }
 
@@ -177,8 +178,9 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
             response = response.replace("\r\n ", "");
             JSONArray objArr = new JSONArray(response);
             List<Itemlist> iRs = new ArrayList<Itemlist>();
-//            final LinkedList<Itemlist> iRs = new LinkedList<Itemlist>();
             if(objArr.length() > 0) {
+                tv_no_data.setVisibility(View.GONE);
+                rvItems.setVisibility(View.VISIBLE);
                 for (int i = 0; i < objArr.length(); i++) {
                     JSONObject rowObj = objArr.getJSONObject(i);
                     Itemlist irsx = new Itemlist();
@@ -190,10 +192,8 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                     iRs.add(irsx);
                 }
             }else{
-                Itemlist irsx = new Itemlist();
-                irsx.setItemName("none");
-                irsx.setUnitName("");
-                iRs.add(irsx);
+                tv_no_data.setVisibility(View.VISIBLE);
+                rvItems.setVisibility(View.GONE);
             }
 
             adapter = new ItemlistAdapterRv(ctx, iRs);
