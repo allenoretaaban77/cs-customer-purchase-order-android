@@ -91,7 +91,6 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Itemlist f = filtered_items.get(position);
 
-        String strItemName = f.getItemName();
         if(!f.getItemName().equals("none")) {
             if(f.getIsChecked()){
                 holder.cb_select.setChecked(true);
@@ -99,13 +98,8 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
                 holder.cb_select.setChecked(false);
             }
             holder.tvName.setText(f.getItemName());
-        }else{
-            holder.cb_select.setVisibility(View.GONE);
-            holder.tvName.setText("No record found....");
-        }
-        holder.tvUnit.setText(f.getUnitName());
+            holder.tvUnit.setText(f.getUnitName());
 
-        if(!f.getItemName().equals("none")) {
             holder.item_box.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

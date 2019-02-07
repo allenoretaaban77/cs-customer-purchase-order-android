@@ -115,12 +115,22 @@
             android:layout_width="match_parent"
             android:orientation="horizontal">
             <android.support.v7.widget.RecyclerView
+                android:visibility="gone"
                 android:id="@+id/itemrecyclerview"
                 android:scrollingCache="false"
                 android:cacheColorHint="#0000"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scrollbars="vertical"/>
+            <TextView
+                android:visibility="gone"
+                android:textColor="@color/gray_5"
+                android:textAlignment="center"
+                android:padding="40dp"
+                android:id="@+id/tv_no_data"
+                android:text="No record found..."
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <RelativeLayout

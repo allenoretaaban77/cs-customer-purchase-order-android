@@ -171,7 +171,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
 
             initCalc(rootView);
 
-//            requestDrivers(rootView);
+            requestDrivers(rootView);
         }
 
         return rootView;
@@ -268,7 +268,10 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
             public final void onClick(final View v) {
                 Helper.hideSoftKeyboard(getActivity());
 
-                String strDriver = et_driver.getSelectedItem().toString().trim();
+                String strDriver = "";
+                if(et_driver.getSelectedItem() != null) {
+                    strDriver = et_driver.getSelectedItem().toString().trim();
+                }
                 if(strDriver.equals("") || strDriver.equals("Select driver name here....")) {
                     Toast.makeText(ctx, "Please select driver.", Toast.LENGTH_LONG).show();
                 }else{
