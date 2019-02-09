@@ -2,7 +2,7 @@ package com.fnc.order.android.model;
 
 import java.io.Serializable;
 
-public class Return implements Serializable {
+public class Order implements Serializable {
     private String quantity;
     private String item_recid;
     private String itemname;
@@ -29,5 +29,4 @@ public class Return implements Serializable {
 
     public String getOldSku() { return old_sku; }
     public void setOldSku(String old_sku) { this.old_sku = old_sku; }
-
 }

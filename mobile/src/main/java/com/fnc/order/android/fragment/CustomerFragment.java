@@ -183,7 +183,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 @Override
                 public void onItemClick(View view,  int aid) {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container,
-                        new ReturnsFragment()).addToBackStack("returns").commit();
+                        new OrderFragment()).addToBackStack("order").commit();
                 }
             });
         }

@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Itemlist implements Serializable {
     private int recid_old;
     private int recid;
+    private String old_sku;
     private int itemNo;
     private int itemBarcodeNo;
     private int parent_baseitem_recid;
@@ -24,10 +25,11 @@ public class Itemlist implements Serializable {
     }
     public void setRecidOld(int recid_old) { this.recid_old = recid_old; }
 
-    public Integer getRecid() {
-        return recid;
-    }
+    public Integer getRecid() { return recid; }
     public void setRecid(int recid) { this.recid = recid; }
+
+    public String getOldSku() { return old_sku; }
+    public void setOldSku(String old_sku) { this.old_sku = old_sku; }
 
     public Integer getItemNo() {
         return itemNo;

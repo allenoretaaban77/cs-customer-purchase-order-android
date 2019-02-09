@@ -11,7 +11,7 @@ import android.support.v7.app.AlertDialog;
 
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.fragment.CustomerFragment;
-import com.fnc.order.android.fragment.ReturnsFragment;
+import com.fnc.order.android.fragment.OrderFragment;
 import com.fnc.order.android.fragment.TransactionFragment;
 import com.fnc.order.android.R;
 
@@ -26,8 +26,8 @@ public class MainActivity extends BaseActivity {
 
         setContentView(R.layout.activity_main);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        openFragment(new CustomerFragment(), "customer");
-//        openFragment(new ReturnsFragment(), "customer");
+        openFragment(new OrderFragment(), "order");
+//        openFragment(new CustomerFragment(), "customer");
     }
 
     private void openFragment(Fragment fragment, String tag) {
@@ -39,7 +39,7 @@ public class MainActivity extends BaseActivity {
                 transaction.replace(R.id.container, new CustomerFragment()).commit();
                 break;
             case 2:
-                transaction.replace(R.id.container, new ReturnsFragment()).commit();
+                transaction.replace(R.id.container, new OrderFragment()).commit();
                 break;
             case 3:
                 transaction.replace(R.id.container, new TransactionFragment()).commit();
@@ -66,12 +66,12 @@ public class MainActivity extends BaseActivity {
             String fragmentTag = fm.getBackStackEntryAt(sbec - 1).getName();
             fm.popBackStackImmediate();
             switch(fragmentTag){
-                case "returns":
+                case "order":
                     fm.beginTransaction().replace(R.id.container, new CustomerFragment()).commit();
                     fm.executePendingTransactions();
                     break;
                 case "transactionlist":
-                    fm.beginTransaction().replace(R.id.container, new ReturnsFragment()).commit();
+                    fm.beginTransaction().replace(R.id.container, new OrderFragment()).commit();
                     fm.executePendingTransactions();
                     break;
                 case "customer":
@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity {
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        openFragment(new ReturnsFragment(), "menu");
+                        openFragment(new OrderFragment(), "menu");
                     }
                 })
                 .show();
