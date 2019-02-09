@@ -2,7 +2,9 @@ package com.fnc.order.android.database;
 
 import android.content.ContentValues;
 
+import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.ReturnKey;
+import com.fnc.order.android.model.Order;
 
 import java.util.LinkedList;
 
@@ -21,15 +23,15 @@ public class QueryBuilder {
 
     private static String getFieldName(Object field) {
         String fieldName = null;
-        if(field instanceof ReturnKey)
-            fieldName = ((ReturnKey)field).getKey();
+        if(field instanceof OrderKey)
+            fieldName = ((OrderKey)field).getKey();
         return fieldName;
     }
 
     private static String getDataType(Object field) {
         String dataType = null;
-        if(field instanceof ReturnKey)
-            dataType = ((ReturnKey)field).getDataType();
+        if(field instanceof OrderKey)
+            dataType = ((OrderKey)field).getDataType();
         return dataType;
     }
 

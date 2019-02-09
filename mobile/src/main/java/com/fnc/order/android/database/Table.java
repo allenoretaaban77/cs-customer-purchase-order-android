@@ -1,6 +1,7 @@
 package com.fnc.order.android.database;
 
 public enum Table {
+    ORDER("order"),
     RETURN("return"),
     PREPAREDLIST("preparedlist"),
     MENULIST("menulist"),

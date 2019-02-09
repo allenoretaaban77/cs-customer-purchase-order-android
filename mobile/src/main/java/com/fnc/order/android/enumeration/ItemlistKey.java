@@ -28,7 +28,8 @@ public enum ItemlistKey {
     UNIT_QTY_MEASUREMENT("unit_qty_measurement",DataType.TEXT),
     UNIT_MESUREMENT_DESC("unitMeasurementDesc",DataType.TEXT),
     UNIT_MEASUREMENT_QTY("unitMeasurementQty",DataType.TEXT),
-    UNIT_NAME("unitName",DataType.TEXT);
+    UNIT_NAME("unitName",DataType.TEXT),
+    OLD_SKU("old_sku",DataType.TEXT);
 
     private String key;
     private String dataType;

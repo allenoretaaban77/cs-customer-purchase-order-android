@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -24,13 +23,9 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -38,18 +33,16 @@ import android.widget.Toast;
 
 import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
-import com.fnc.order.android.datacontroller.DcReturn;
 import com.fnc.order.android.enumeration.API;
-import com.fnc.order.android.enumeration.DriversKey;
-import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
-import com.fnc.order.android.model.Drivers;
+import com.fnc.order.android.listeners.DatePickerListener;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.Return;
+import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
-import com.fnc.order.android.utilities.PopupCalc;
 import com.fnc.order.android.utilities.PopupMenu;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
@@ -63,17 +56,16 @@ import com.fnc.order.android.utilities.RelativePopupWindow;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.Console;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
-public class ReturnsFragment extends Fragment implements VolleyCallback {
+public class OrderFragment extends Fragment implements VolleyCallback {
 
     private static final int PERSON_DIALOG_FRAGMENT = 7;
     private static final int ITEM_DIALOG_FRAGMENT = 8;
@@ -87,17 +79,15 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
     private MaterialRippleLayout btn_menu;
     private MaterialRippleLayout btn_back;
     private TextView tv_name;
+    private EditText et_date;
     private CoordinatorLayout rl_content_box;
     private EditText et_remarks;
-    private Spinner et_driver;
     private DroppyMenuPopup.Builder pageMenu;
-    private DroppyMenuPopup.Builder driverMenu;
     private LinearLayout mainTableBox;
     private Integer maintableViewHeight = 0;
     private Integer maintableViewWidth = 0;
     private LinearLayout tblContentBox;
     private TableLayout tl;
-    private PopupCalc calcPop;
     private Integer calcRefId = 0;
     private String refPersonIdentityId = "";
     private static AlertDialog alertDialog;
@@ -106,15 +96,12 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
     private BottomSheetBehavior bsBh;
     private PopupMenu menuPop;
     private String refPassword;
-    private String refDriverId;
-    private JSONArray driverArray;
     private VolleyInteractor vi;
-    private ArrayAdapter<String> spinneradapter;
     private Boolean isItemClicked = false;
-    private ArrayList<Drivers> driverList;
+    private String refDate;
+    private String refStringDate;
 
-
-    public ReturnsFragment() {
+    public OrderFragment() {
         // Required empty public constructor
     }
 
@@ -122,7 +109,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_returns, container, false);
+        rootView = inflater.inflate(R.layout.fragment_order, container, false);
         ctx = rootView.getContext();
         thisFragment = this;
 
@@ -133,9 +120,6 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
                 maintableViewHeight = mainTableBox.getHeight();
                 maintableViewWidth = mainTableBox.getWidth();
                 try {
-//                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-//                    LinearLayout hScrlVw = new LinearLayout(ctx);
-//                    mainTableBox.addView(hScrlVw);
                     tblContentBox = new LinearLayout(ctx);
                     tblContentBox.setLayoutParams(new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -170,8 +154,6 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
             DcReturn.getInstance(ctx).emptyReturnlist();
 
             initCalc(rootView);
-
-            requestDrivers(rootView);
         }
 
         return rootView;
@@ -184,34 +166,15 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
         SharedData sd = SharedData.getInstance(ctx);
         tv_name.setText(sd.getData(SharedKey.CURRENT_STORE.getKey()));
         rl_content_box = (CoordinatorLayout) v.findViewById(R.id.content_box);
-
+        et_date = (EditText) v.findViewById(R.id.et_date);
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
         pageMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         pageMenu.setXOffset(8).setYOffset(0);
         pageMenu.addMenuItem(new DroppyMenuItem("  View Transactions  "))
                 .addSeparator()
                 .addMenuItem(new DroppyMenuItem("  Log-out  "));
-
         btn_submit = (MaterialRippleLayout) v.findViewById(R.id.btn_submit);
         et_remarks = (EditText) v.findViewById(R.id.et_remarks);
-
-        et_driver = (Spinner) v.findViewById(R.id.et_driver);
-        et_driver.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                TextView tv = (TextView) parentView.getChildAt(0);
-                if(position == 0) {
-                    tv.setTextColor(getResources().getColor(R.color.gray_5));
-                }else {
-                    Drivers refLst = driverList.get(position-1);
-                    refDriverId = refLst.getEmployeeNumber();
-                    tv.setTextColor(getResources().getColor(R.color.red_2));
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) { }
-        });
-
         bsCalc = (LinearLayout) v.findViewById(R.id.bs_calculator);
         bsCalc.setVisibility(View.VISIBLE);
     }
@@ -220,6 +183,12 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
         bsBh = BottomSheetBehavior.from(bsCalc);
         bsBh.setHideable(true);
         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+        et_date.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+//                Toast.makeText(ctx, "date", Toast.LENGTH_SHORT).show();
+                showDatePicker(v);
+            }
+        });
         bsCalc.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
                 bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -268,69 +237,43 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
             public final void onClick(final View v) {
                 Helper.hideSoftKeyboard(getActivity());
 
-                String strDriver = "";
-                if(et_driver.getSelectedItem() != null) {
-                    strDriver = et_driver.getSelectedItem().toString().trim();
-                }
-                if(strDriver.equals("") || strDriver.equals("Select driver name here....")) {
-                    Toast.makeText(ctx, "Please select driver.", Toast.LENGTH_LONG).show();
-                }else{
-                    LinkedList<Return> rl =  DcReturn.getInstance(ctx).getReturnlistAsc();
-                    final ArrayList<HashMap> detailsArrayList = new ArrayList();
-                    if(rl.size() > 0) {
-                        Boolean errFlag = false;
-                        for (int i = 0; i < rl.size(); i++) {
-                            Return rowRl = rl.get(i);
-                            if(rowRl.getQuantity().equals("") || rowRl.getQuantity().equals("0")) {
-                                errFlag = true;
-                                TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
-                                TextView tvQty = (TextView) trx.getChildAt(0);
-                                tvQty.setTextColor(getResources().getColor(R.color.red_2));
-                                TextView tvUnit = (TextView) trx.getChildAt(1);
-                                tvUnit.setTextColor(getResources().getColor(R.color.red_2));
-                                LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-                                TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
-                                tvDesc.setTextColor(getResources().getColor(R.color.red_2));
-                            }
+                LinkedList<Return> rl =  DcReturn.getInstance(ctx).getReturnlistAsc();
+                final ArrayList<HashMap> detailsArrayList = new ArrayList();
+                if(rl.size() > 0) {
+                    Boolean errFlag = false;
+                    for (int i = 0; i < rl.size(); i++) {
+                        Return rowRl = rl.get(i);
+                        if(rowRl.getQuantity().equals("") || rowRl.getQuantity().equals("0")) {
+                            errFlag = true;
+                            TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
+                            TextView tvQty = (TextView) trx.getChildAt(0);
+                            tvQty.setTextColor(getResources().getColor(R.color.red_2));
+                            TextView tvUnit = (TextView) trx.getChildAt(1);
+                            tvUnit.setTextColor(getResources().getColor(R.color.red_2));
+                            LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
+                            TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
+                            tvDesc.setTextColor(getResources().getColor(R.color.red_2));
                         }
+                    }
 
-                        if(errFlag) {
-                            isPosted = false;
-                            dismissSpinnerDialog();
-                            Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
-                        }else{
-                            alertDialog = okCancelInputDialogBuilder(ctx,
+                    if(errFlag) {
+                        isPosted = false;
+                        dismissSpinnerDialog();
+                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
+                    }else{
+                        alertDialog = okCancelInputDialogBuilder(ctx,
                                 "Please input your password to proceed the request.",
                                 "Proceed",
                                 null,
                                 "Cancel",
                                 cancelCallback
-                            );
-                        }
-                    }else{
-                        Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
+                        );
                     }
+                }else{
+                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
                 }
             }
         });
-    }
-
-    private void requestDrivers(View v) {
-        showSpinnerDialog(v);
-        vi = new VolleyInteractor();
-        vi.registerCallback(this);
-        HashMap<String, String> params = new HashMap<>();
-        params.put("cn", ServerConstants.CN);
-        params.put("jobtitle", ServerConstants.DRIVER);
-
-        Iterator it = params.entrySet().iterator();
-        String strParams = "";
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
-            it.remove();
-        }
-        vi.getDrivers(v.getContext(), params, strParams);
     }
 
     View.OnClickListener cancelCallback = new View.OnClickListener() {
@@ -361,6 +304,7 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
                     detailMap.put("quantity", rowRl.getQuantity().equals("") ? "0" : rowRl.getQuantity() );
                     detailMap.put("item_recid", rowRl.getItemRecid());
                     detailMap.put("remarks", rowRl.getRemarks());
+                    detailMap.put("old_sku", rowRl.getRemarks());
                     detailsArrayList.add(detailMap);
                 }
             }
@@ -371,14 +315,12 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
                 HashMap<String, String> headersMap = new HashMap();
                 headersMap.put("companydb", ServerConstants.CN);
                 headersMap.put("customer_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
-                headersMap.put("return_date", Helper.getPostingDate());
+                headersMap.put("deliver_date", "");
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
                 headersMap.put("createdby", sp.getData(API.IDENTITY_ID.getApi()));
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(),
                         Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
-                headersMap.put("pwd", refPassword);
-                headersMap.put("drivername", refDriverId);
                 paramsArray.put("header", headersMap);
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
@@ -516,36 +458,6 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
             response = response.replace("\r\n", "");
             JSONArray objArr = new JSONArray(response);
             if(type.equals("searchemployee")) {
-                if(objArr.length() > 0) {
-                    driverList = new ArrayList<Drivers>();
-                    List<String> list = new ArrayList<String>();
-                    list.add("Select driver name here....");
-                    for (int i = 0; i < objArr.length(); i++) {
-                        JSONObject obj = objArr.getJSONObject(i);
-                        list.add(obj.getString(DriversKey.EMPLOYEE_NAME.getKey()));
-
-                        Drivers rsDrv = new Drivers();
-                        rsDrv.setEmployeeName(obj.getString(DriversKey.EMPLOYEE_NAME.getKey()));
-                        rsDrv.setEmployeeNumber(obj.getString(DriversKey.EMPLOYEE_NUMBER.getKey()));
-                        driverList.add(rsDrv);
-                    }
-                    spinneradapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_driver_item, list) {
-                        @Override
-                        public boolean isEnabled(int position) {
-                            if(position == 0) { return false; }
-                            else { return true; }
-                        }
-                        @Override
-                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                            View view = super.getDropDownView(position, convertView, parent);
-                            TextView tv = (TextView) view;
-                            if(position == 0){ tv.setTextColor(Color.LTGRAY); }
-                            else { tv.setTextColor(getResources().getColor(R.color.red_2)); }
-                            return view;
-                        }
-                    };
-                    et_driver.setAdapter(spinneradapter);
-                }
             }else{
                 if(objArr.length() > 0) {
                     JSONObject obj = objArr.getJSONObject(0);
@@ -755,8 +667,8 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
     }
 
     private AlertDialog okCancelInputRemarksDialogBuilder(final Context activity, String message,
-        String okButtonCaption, View.OnClickListener onClickListener,
-        String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+                                                          String okButtonCaption, View.OnClickListener onClickListener,
+                                                          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.custom_ok_input_remarks_dialog, null);
@@ -789,8 +701,8 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
     }
 
     private AlertDialog okCancelInputDialogBuilder(final Context activity, String message,
-        String okButtonCaption, View.OnClickListener onClickListener,
-        String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+                                                   String okButtonCaption, View.OnClickListener onClickListener,
+                                                   String cancelButtonCaption, View.OnClickListener cancelClickListener) {
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.custom_ok_input_dialog, null);
@@ -813,22 +725,22 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
                 }
                 builder.setCancelable(false);
                 builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(!isPosted) {
-                                isPosted = true;
-                                submitReturns();
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if(!isPosted) {
+                                    isPosted = true;
+                                    submitReturns();
+                                }
                             }
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            isPosted = false;
-                        }
-                    })
-                    .show();
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                isPosted = false;
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -841,5 +753,43 @@ public class ReturnsFragment extends Fragment implements VolleyCallback {
         builder.create();
         builder.setCancelable(false);
         return builder.show();
+    }
+
+    private void showDatePicker(final View v) {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (!et_date.getText().toString().equals("")){
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(GlobalConstants.DATE_FORMAT);
+                c.setTime(sdf.parse(et_date.getText().toString()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            year = c.get(Calendar.YEAR); month = c.get(Calendar.MONTH); day = c.get(Calendar.DAY_OF_MONTH);
+        }
+
+        DatePickerDialogFragment calendar = new DatePickerDialogFragment();
+        calendar.setDate(year, month, day);
+        calendar.show(getFragmentManager(), "");
+        calendar.setDatePickerListener(new DatePickerListener() {
+            @Override
+            public void didPickDate(Context context, Date date) {
+                refStringDate = new SimpleDateFormat(GlobalConstants.DATE_FORMAT).format(date);
+                refDate = new SimpleDateFormat(GlobalConstants.DATE_REF_FORMAT).format(date);
+                et_date.setText(refStringDate);
+
+                Calendar c = Calendar.getInstance();
+                int curday = c.get(Calendar.DAY_OF_MONTH);
+                SimpleDateFormat sdf = new SimpleDateFormat(GlobalConstants.DATE_FORMAT);
+                try {
+                    c.setTime(sdf.parse(refStringDate));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int prevday = c.get(Calendar.DAY_OF_MONTH);
+            }
+        });
     }
 }

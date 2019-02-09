@@ -19,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(createTables(Table.RETURN, setReturnFields()));
+        db.execSQL(createTables(Table.ORDER, setOrderFields()));
         Log.i(TAG,"Database created path : "+db.getPath());
     }
 
@@ -27,12 +27,13 @@ public class DBHelper extends SQLiteOpenHelper {
         return QueryBuilder.createTables(table,list);
     }
 
-    protected LinkedList<ReturnKey> setReturnFields() {
+    protected LinkedList<ReturnKey> setOrderFields() {
         LinkedList<ReturnKey> fields = new LinkedList<>();
         fields.add(ReturnKey.QUANTITY);
         fields.add(ReturnKey.ITEM_RECID);
         fields.add(ReturnKey.ITEM_NAME);
         fields.add(ReturnKey.UNIT_NAME);
+        fields.add(ReturnKey.REMARKS);
         fields.add(ReturnKey.REMARKS);
         return fields;
     }
@@ -42,7 +43,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int version = oldVersion + 1;
         switch (version){
             case 2:
-                db.execSQL(createTables(Table.RETURN, setReturnFields()));
+                db.execSQL(createTables(Table.ORDER, setOrderFields()));
         }
     }
 }
