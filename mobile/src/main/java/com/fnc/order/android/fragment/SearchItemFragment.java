@@ -190,13 +190,15 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                     irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
                     irsx.setIsChecked(false);
                     irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
-                    iRs.add(irsx);
+                    if(!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("null") &&
+                            !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("")) {
+                        iRs.add(irsx);
+                    }
                 }
             }else{
                 tv_no_data.setVisibility(View.VISIBLE);
                 rvItems.setVisibility(View.GONE);
             }
-
 
             adapter = new ItemlistAdapterRv(ctx, iRs);
             rvItems.setAdapter(adapter);
@@ -207,7 +209,14 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
             Toast.makeText(ctx, "Something went wrong, please refresh the list.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         } finally {
-            dismissSpinnerDialog();
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            dismissSpinnerDialog();
+                        }
+                    },
+                    1000
+            );
         }
     }
 
