@@ -15,16 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.ShareActionProvider;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fnc.order.android.R;
-import com.fnc.order.android.adapters.ItemlistAdapter;
 import com.fnc.order.android.adapters.ItemlistAdapterRv;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
@@ -43,7 +40,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -200,6 +196,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                 tv_no_data.setVisibility(View.VISIBLE);
                 rvItems.setVisibility(View.GONE);
             }
+
 
             adapter = new ItemlistAdapterRv(ctx, iRs);
             rvItems.setAdapter(adapter);

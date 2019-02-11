@@ -92,61 +92,74 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
         final Itemlist f = filtered_items.get(position);
 
         if(!f.getItemName().equals("none")) {
-            if(f.getIsChecked()){
-                holder.cb_select.setChecked(true);
-            }else{
-                holder.cb_select.setChecked(false);
-            }
             holder.tvName.setText(f.getItemName());
-            holder.tvUnit.setText(f.getUnitName());
-
-            holder.item_box.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    List<Integer> positions = new ArrayList<>();
-                    positions.add(position);
-                    Integer x = 0;
-                    boolean check = false;
-                    if(!f.getIsChecked()){
-                        check = true;
-                        f.setIsChecked(true);
-                    }
-                    for(Itemlist c : original_items){
-                        if(c.getRecid().equals(f.getRecid())){
-                            positions.add(x);
-                            c.setIsChecked(check);
-                            f.setIsChecked(check);
-                        }
-                        x++;
-                    }
-                    for (int y = 0 ;y<positions.size(); y++)
-                        notifyItemChanged(positions.get(y));
+            if(f.getOldSku().trim().equals("null") || f.getOldSku().trim().equals("")) {
+                holder.cb_select.setVisibility(View.GONE);
+                holder.tvUnit.setText("Not sync to database.");
+//                holder.item_box.setBackground(ctx.getResources().getDrawable(R.color.gray_3));
+                holder.tvName.setTextColor(ctx.getResources().getColor(R.color.gray_5));
+                holder.tvUnit.setTextColor(ctx.getResources().getColor(R.color.gold_3));
+//                holder.item_box.setAlpha(0.7f);
+            }else{
+                holder.tvName.setTextColor(ctx.getResources().getColor(R.color.red_2));
+                holder.tvUnit.setTextColor(ctx.getResources().getColor(R.color.orange_1));
+//                holder.item_box.setAlpha(ctx.getResources().getDrawable(R.color.transparent));
+                holder.cb_select.setVisibility(View.VISIBLE);
+                if(f.getIsChecked()){
+                    holder.cb_select.setChecked(true);
+                }else{
+                    holder.cb_select.setChecked(false);
                 }
-            });
-            holder.cb_select.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    List<Integer> positions = new ArrayList<>();
-                    positions.add(position);
-                    Integer x = 0;
-                    boolean check = false;
-                    if(!f.getIsChecked()){
-                        check = true;
-                        f.setIsChecked(true);
-                    }
-                    for(Itemlist c : original_items){
-                        if(c.getRecid().equals(f.getRecid())){
-                            positions.add(x);
-                            c.setIsChecked(check);
-                            f.setIsChecked(check);
-                        }
-                        x++;
-                    }
-                    for (int y = 0 ;y<positions.size(); y++)
-                        notifyItemChanged(positions.get(y));
+                holder.tvUnit.setText(f.getUnitName());
 
-                }
-            });
+                holder.item_box.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        List<Integer> positions = new ArrayList<>();
+                        positions.add(position);
+                        Integer x = 0;
+                        boolean check = false;
+                        if(!f.getIsChecked()){
+                            check = true;
+                            f.setIsChecked(true);
+                        }
+                        for(Itemlist c : original_items){
+                            if(c.getRecid().equals(f.getRecid())){
+                                positions.add(x);
+                                c.setIsChecked(check);
+                                f.setIsChecked(check);
+                            }
+                            x++;
+                        }
+                        for (int y = 0 ;y<positions.size(); y++)
+                            notifyItemChanged(positions.get(y));
+                    }
+                });
+                holder.cb_select.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        List<Integer> positions = new ArrayList<>();
+                        positions.add(position);
+                        Integer x = 0;
+                        boolean check = false;
+                        if(!f.getIsChecked()){
+                            check = true;
+                            f.setIsChecked(true);
+                        }
+                        for(Itemlist c : original_items){
+                            if(c.getRecid().equals(f.getRecid())){
+                                positions.add(x);
+                                c.setIsChecked(check);
+                                f.setIsChecked(check);
+                            }
+                            x++;
+                        }
+                        for (int y = 0 ;y<positions.size(); y++)
+                            notifyItemChanged(positions.get(y));
+
+                    }
+                });
+            }
         }
     }
 
