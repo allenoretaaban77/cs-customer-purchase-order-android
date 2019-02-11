@@ -275,7 +275,7 @@ public class VolleyInteractor {
         }).start();
     }
 
-    public void postReturns(final Context ctx, final String param) {
+    public void postOrders(final Context ctx, final String param) {
         new Thread(new Runnable(){
             public void run(){
                 String urlStr = ServerConstants.SERVER_URL + API.POST_ORDER.getApi();

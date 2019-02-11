@@ -9,9 +9,7 @@ import com.fnc.order.android.database.DBHelper;
 import com.fnc.order.android.database.OrderlistQueryBuilder;
 import com.fnc.order.android.database.Table;
 import com.fnc.order.android.enumeration.OrderKey;
-import com.fnc.order.android.enumeration.ReturnKey;
 import com.fnc.order.android.model.Order;
-import com.fnc.order.android.model.Return;
 
 import java.util.LinkedList;
 
