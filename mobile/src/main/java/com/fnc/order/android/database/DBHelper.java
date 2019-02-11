@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.fnc.order.android.enumeration.OrderKey;
-import com.fnc.order.android.enumeration.ReturnKey;
 
 import java.util.LinkedList;
 

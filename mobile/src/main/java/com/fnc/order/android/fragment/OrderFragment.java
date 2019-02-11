@@ -42,7 +42,6 @@ import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.listeners.DatePickerListener;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.Order;
-import com.fnc.order.android.model.Return;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PopupMenu;
@@ -345,7 +344,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
                 Log.v("post_params_length", String.valueOf(paramsArrayStr.length()));
-                vi.postReturns(ctx, paramsArrayStr);
+                vi.postOrders(ctx, paramsArrayStr);
             }
         }else{
             dismissSpinnerDialog();
