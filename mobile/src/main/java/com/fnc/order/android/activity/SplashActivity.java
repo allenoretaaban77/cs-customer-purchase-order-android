@@ -38,12 +38,12 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void onPermissionGranted() {
                     new DBHelper(getApplicationContext());
-//                    showActivity(LoginActivity.class);
-                    if(!SharedData.getInstance(ctx).isPrefExists(API.IDENTITY_ID.getApi())) {
-                        showActivity(LoginActivity.class);
-                    }else{
-                        showActivity(MainActivity.class);
-                    }
+                    showActivity(LoginActivity.class);
+//                    if(!SharedData.getInstance(ctx).isPrefExists(API.IDENTITY_ID.getApi())) {
+//                        showActivity(LoginActivity.class);
+//                    }else{
+//                        showActivity(MainActivity.class);
+//                    }
                 }
                 @Override
                 public void onPermissionDenied(List<String> deniedPermissions) {

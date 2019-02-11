@@ -177,17 +177,17 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                             300
                     );
             } else if(type.equals("validate")) {
-//                if(response.trim().equals("True")) {
-//                    showActivity(MainActivity.class);
-//                    new android.os.Handler().postDelayed(
-//                            new Runnable() {
-//                                public void run() {
-//                                    Toast.makeText(ctx, "Your account is valid! Welcome...", Toast.LENGTH_SHORT).show();
-//                                }
-//                            },
-//                            1000
-//                    );
-//                }else{
+                if(response.trim().equals("True")) {
+                    showActivity(MainActivity.class);
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    Toast.makeText(ctx, "Your account is valid! Welcome...", Toast.LENGTH_SHORT).show();
+                                }
+                            },
+                            1000
+                    );
+                }else{
                     alertDialog = okCancelInputDialogBuilder(ctx,
                             "Please update your Employee ID to continue using this application.",
                             "Update", null,
@@ -198,7 +198,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                                     alertDialog.dismiss();
                                 }
                             } );
-//                }
+                }
             }else{
                 JSONObject obj = new JSONObject(response);
                 sp = SharedData.getInstance(ctx);
