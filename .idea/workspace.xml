@@ -18,31 +18,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a058548-7f54-4b9e-a6d9-c058180a1467" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/OrderlistQueryBuilder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/datacontroller/DcOrder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/OrderKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Order.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_order.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_dialog_default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/LoginActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/LoginActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/GlobalConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/GlobalConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/ServerConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/ServerConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DBHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DBHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DbConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DbConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/NotificationQueryBuilder.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/QueryBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/QueryBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/ReturnlistQueryBuilder.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/Table.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/Table.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/datacontroller/DcReturn.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/API.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/API.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/ItemlistKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/ItemlistKey.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/CustomerFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/CustomerFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/ReturnsFragment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Itemlist.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Itemlist.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Return.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Return.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/drawable/background_gradient_round.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/res/drawable/background_gradient_round.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/drawable/background_round_border.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/res/drawable/background_round_border.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_returns.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/res/values/colors.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/SearchItemFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/SearchItemFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/layout/activity_splash.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/res/layout/activity_splash.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_dialog.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_dialog.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_remarks_dialog.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_remarks_dialog.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_order.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_order.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -65,11 +57,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="OrderFragment.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="API.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/API.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="145">
+              <caret line="13" column="30" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OrderFragment.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-75">
-              <caret line="296" column="41" selection-start-line="296" selection-start-column="41" selection-end-line="296" selection-end-column="41" />
+            <state relative-caret-position="309">
+              <caret line="628" column="18" selection-start-line="628" selection-start-column="18" selection-end-line="628" selection-end-column="18" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#24462#24605#0" expanded="true" />
+                <element signature="e#24604#24605#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/MainActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="30" column="5" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -77,38 +92,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Return.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Return.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="16" column="16" selection-end-line="33" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReturnKey.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/ReturnKey.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Order.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Order.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="ServerConstants.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/ServerConstants.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="25" column="41" selection-start-line="25" selection-start-column="41" selection-end-line="25" selection-end-column="41" />
+            <state relative-caret-position="300">
+              <caret line="26" selection-start-line="26" selection-end-line="26" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VolleyInteractor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="167">
+              <caret line="280" column="71" selection-start-line="280" selection-start-column="71" selection-end-line="280" selection-end-column="71" />
+              <folding>
+                <element signature="method#login#0;class#VolleyInteractor#0" />
+                <element signature="method#validate#0;class#VolleyInteractor#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -118,8 +119,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="layoutResourceFile" />
         <option value="Class" />
+        <option value="layoutResourceFile" />
       </list>
     </option>
   </component>
@@ -137,6 +138,18 @@
       <find>driver</find>
       <find>return</find>
       <find>getQuantity</find>
+      <find>et_remarks</find>
+      <find>remarks_dila</find>
+      <find>cancelCallback</find>
+      <find>_default</find>
+      <find>loader</find>
+      <find>submitReturns</find>
+      <find>submitOrders</find>
+      <find>onact</find>
+      <find>mainac</find>
+      <find>refStringDate</find>
+      <find>onactiv</find>
+      <find>success</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2402,12 +2415,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/background_gradient.xml" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/LoginActivity.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/background_gradient_green.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_menu.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/background_green_3_border.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/layout/item_itemlist.xml" />
-        <option value="$PROJECT_DIR$/mobile/src/main/res/layout/activity_splash.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/cell_background_selected.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/cell_background.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/cell_background_green.xml" />
@@ -2416,34 +2427,41 @@
         <option value="$PROJECT_DIR$/mobile/src/main/res/layout/activity_login.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/SharedKey.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/layout/item_itemlist_rv.xml" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/SearchItemFragment.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/adapters/ItemlistAdapterRv.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/layout/dialog_search_item.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_returns.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DbConstants.java" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/API.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/values/strings.xml" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/ServerConstants.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/background_gradient_round.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/values/colors.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/res/drawable/background_round_border.xml" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/ReturnsFragment.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/CustomerFragment.java" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/MainActivity.java" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/SplashActivity.java" />
-        <option value="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_order.xml" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Return.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/ItemlistKey.java" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/Table.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/OrderKey.java" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DBHelper.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Order.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Itemlist.java" />
-        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/QueryBuilder.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/OrderlistQueryBuilder.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/datacontroller/DcOrder.java" />
         <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/datacontroller/DcReturn.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/res/layout/activity_splash.xml" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/QueryBuilder.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DBHelper.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/Table.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/res/layout/fragment_order.xml" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/ServerConstants.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_dialog.xml" />
+        <option value="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_remarks_dialog.xml" />
+        <option value="$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_dialog_default.xml" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/GlobalConstants.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/SearchItemFragment.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/LoginActivity.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/SplashActivity.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/API.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/MainActivity.java" />
+        <option value="$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java" />
       </list>
     </option>
   </component>
@@ -2459,7 +2477,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="AndroidView">
         <subPane>
           <expand>
@@ -2490,65 +2508,13 @@
               <item name="mobile" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="android" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="constants" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="android" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="database" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="android" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="datacontroller" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="android" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="enumeration" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="android" type="cbb59c9e:AndroidPsiDirectoryNode" />
               <item name="fragment" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="android" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="model" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="res" type="d4f16f75:AndroidResFolderNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="res" type="d4f16f75:AndroidResFolderNode" />
-              <item name="layout" type="ddeffd01:AndroidResFolderTypeNode" />
-            </path>
-            <path>
-              <item name="order" type="1abcf292:AndroidViewProjectNode" />
-              <item name="mobile" type="feadf853:AndroidModuleNode" />
-              <item name="res" type="d4f16f75:AndroidResFolderNode" />
-              <item name="values" type="ddeffd01:AndroidResFolderTypeNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane" />
     </panes>
   </component>
@@ -2694,7 +2660,6 @@
       <window_info id="Build Variants" order="3" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
-      <window_info anchor="right" id="Preview" order="4" weight="0.3297568" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Terminal" order="11" />
@@ -2702,15 +2667,16 @@
       <window_info id="Captures" order="4" weight="0.25" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25679544" />
-      <window_info anchor="bottom" id="Build" order="7" visible="true" weight="0.29177058" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25679544" />
+      <window_info anchor="bottom" id="Build" order="7" weight="0.29177058" />
       <window_info anchor="right" id="Gradle" order="6" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3990025" />
       <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="7" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.3990025" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Preview" order="4" weight="0.3297568" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -2724,81 +2690,111 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="12" />
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java</url>
+          <line>89</line>
+          <properties />
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>480</line>
+          <properties />
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>478</line>
+          <properties />
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>479</line>
+          <properties />
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>476</line>
+          <properties />
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>475</line>
+          <properties />
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>347</line>
+          <properties />
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java</url>
+          <line>286</line>
+          <properties />
+          <option name="timeStamp" value="46" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java</url>
+          <line>293</line>
+          <properties />
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java</url>
+          <line>281</line>
+          <properties />
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java</url>
+          <line>300</line>
+          <properties />
+          <option name="timeStamp" value="51" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>611</line>
+          <properties />
+          <option name="timeStamp" value="59" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>618</line>
+          <properties />
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>626</line>
+          <properties />
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java</url>
+          <line>632</line>
+          <properties />
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="64" />
     </breakpoint-manager>
   </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="setValue">
+      <expression>
+        <expression-string>&quot;{\&quot;header\&quot;:{\&quot;remarks\&quot;:\&quot;\&quot;,\&quot;createdby\&quot;:\&quot;88C7E3E5-EF72-4A8F-AFFA-642F33C3DD1D\&quot;,\&quot;pcortab_id\&quot;:\&quot;f4ba63c1950677f1\&quot;,\&quot;deliver_date\&quot;:\&quot;2\\/10\\/2019 00:00:00\&quot;,\&quot;companydb\&quot;:\&quot;backoffice\&quot;,\&quot;reference_employee_no\&quot;:\&quot;2800000010084\&quot;,\&quot;customer_recid\&quot;:\&quot;1817522605\&quot;},\&quot;details\&quot;:[{\&quot;quantity\&quot;:\&quot;1\&quot;,\&quot;old_sku\&quot;:\&quot;200000008623\&quot;,\&quot;remarks\&quot;:\&quot;\&quot;,\&quot;item_recid\&quot;:\&quot;1814494301\&quot;}]}&quot;</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/fragment_menu.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="102" column="66" selection-start-line="102" selection-start-column="66" selection-end-line="102" selection-end-column="66" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/drawable/cell_background_gray.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/drawable/cell_background_green.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="41" selection-start-line="5" selection-start-column="41" selection-end-line="5" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/drawable/cell_background_selected.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="41" selection-start-line="5" selection-start-column="30" selection-end-line="5" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/table_row_item_list.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/drawable/cell_background.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="11" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/drawable/popupbg.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="36" selection-start-line="5" selection-start-column="36" selection-end-line="5" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Android/sdk/platforms/android-28/data/res/layout/simple_list_item_multiple_choice.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Android/sdk/platforms/android-28/data/res/layout/select_dialog_multichoice.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="3" lean-forward="true" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/adapters/ItemlistAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -2854,31 +2850,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DbConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="58" selection-start-line="4" selection-start-column="58" selection-end-line="4" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/LoginActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="79" column="27" selection-start-line="79" selection-start-column="27" selection-end-line="79" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mobile/src/main/res/values/strings.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="1" column="46" selection-start-line="1" selection-start-column="46" selection-end-line="1" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/API.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
         </state>
       </provider>
     </entry>
@@ -2921,16 +2896,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/activity_splash.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" column="49" selection-start-line="23" selection-start-column="49" selection-end-line="23" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mobile/src/main/res/drawable/background_round_border.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -2948,90 +2913,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/fragment_returns.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2078">
-          <caret line="227" column="18" selection-end-line="493" />
-          <folding>
-            <element signature="e#6891#8705#0" />
-            <element signature="e#16412#19026#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/ReturnsFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="276">
-          <caret line="172" lean-forward="true" selection-end-line="845" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/CustomerFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="185" column="43" selection-start-line="185" selection-start-column="43" selection-end-line="185" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/SplashActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="46" column="16" lean-forward="true" selection-start-line="46" selection-start-column="16" selection-end-line="46" selection-end-column="16" />
-          <folding>
-            <element signature="e#1724#1725#0" expanded="true" />
-            <element signature="e#1772#1773#0" expanded="true" />
-            <element signature="e#2376#2377#0" expanded="true" />
-            <element signature="e#2408#2409#0" expanded="true" />
-            <element signature="e#2452#2453#0" expanded="true" />
-            <element signature="e#2482#2483#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/fragment_order.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="304" column="49" selection-start-line="304" selection-start-column="49" selection-end-line="304" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/MainActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="28" column="40" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/SearchItemFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
-          <caret line="188" column="25" selection-start-line="188" selection-start-column="25" selection-end-line="188" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-75">
-          <caret line="296" column="41" selection-start-line="296" selection-start-column="41" selection-end-line="296" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DBHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="382">
-          <caret line="45" column="51" selection-start-line="45" selection-start-column="51" selection-end-line="45" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/fragment_returns.xml" />
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/ReturnsFragment.java" />
     <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/ItemlistKey.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="359">
@@ -3053,27 +2936,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/Table.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/QueryBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="27" column="25" lean-forward="true" selection-start-line="27" selection-start-column="25" selection-end-line="27" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/ReturnlistQueryBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/ReturnlistQueryBuilder.java" />
     <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/datacontroller/DcOrder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1003">
@@ -3081,10 +2944,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/ServerConstants.java">
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/datacontroller/DcReturn.java" />
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/OrderKey.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="41" selection-start-line="25" selection-start-column="41" selection-end-line="25" selection-end-column="41" />
+        <state relative-caret-position="300">
+          <caret line="22" column="5" lean-forward="true" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Order.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="28" lean-forward="true" selection-start-line="7" selection-start-column="28" selection-end-line="7" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/ReturnKey.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="43" selection-start-line="14" selection-start-column="43" selection-end-line="14" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/activity_splash.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="19" column="40" selection-start-line="19" selection-start-column="40" selection-end-line="19" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DataType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DbConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="58" selection-start-line="4" selection-start-column="58" selection-end-line="4" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/NotificationQueryBuilder.java" />
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/OrderlistQueryBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="81" selection-start-line="9" selection-start-column="81" selection-end-line="9" selection-end-column="81" />
         </state>
       </provider>
     </entry>
@@ -3095,41 +3005,179 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/OrderlistQueryBuilder.java">
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/MenulistQueryBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/DBHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="34" column="39" selection-start-line="34" selection-start-column="39" selection-end-line="34" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/QueryBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
-          <caret line="9" column="51" selection-start-line="9" selection-start-column="51" selection-end-line="9" selection-end-column="51" />
+          <caret line="15" column="40" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/fragment_order.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="283" column="52" selection-start-line="283" selection-start-column="52" selection-end-line="283" selection-end-column="52" />
+          <folding>
+            <element signature="e#126#166#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_remarks_dialog.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="48" column="32" selection-start-line="48" selection-start-column="32" selection-end-line="48" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_dialog.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="241">
+          <caret line="50" column="54" selection-start-line="50" selection-start-column="54" selection-end-line="50" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/res/layout/custom_ok_input_dialog_default.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="42" column="49" selection-start-line="42" selection-start-column="49" selection-end-line="42" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/database/Table.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="23" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/SearchPersonFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="88" column="38" lean-forward="true" selection-start-line="88" selection-start-column="38" selection-end-line="88" selection-end-column="38" />
+          <folding>
+            <element signature="e#3061#3413#0" expanded="true" />
+            <element signature="e#3412#3413#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/SearchItemFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="214">
+          <caret line="160" column="29" selection-start-line="160" selection-start-column="29" selection-end-line="160" selection-end-column="29" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#4288#4298#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/LoginActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1800">
+          <caret line="161" selection-start-line="161" selection-end-line="161" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/SplashActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="327">
+          <caret line="46" column="17" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="17" />
+          <folding>
+            <element signature="e#1724#1725#0" expanded="true" />
+            <element signature="e#1772#1773#0" expanded="true" />
+            <element signature="e#2376#2377#0" expanded="true" />
+            <element signature="e#2408#2409#0" expanded="true" />
+            <element signature="e#2452#2453#0" expanded="true" />
+            <element signature="e#2482#2483#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/GlobalConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="22" column="36" selection-start-line="22" selection-start-column="25" selection-end-line="22" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/CustomerFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="117" column="29" selection-start-line="117" selection-start-column="29" selection-end-line="132" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/constants/ServerConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="26" selection-start-line="26" selection-end-line="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/utilities/VolleyInteractor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="280" column="71" selection-start-line="280" selection-start-column="71" selection-end-line="280" selection-end-column="71" />
+          <folding>
+            <element signature="method#login#0;class#VolleyInteractor#0" />
+            <element signature="method#validate#0;class#VolleyInteractor#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/API.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="13" column="30" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/activity/MainActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="30" column="5" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/datacontroller/DcReturn.java">
+    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/fragment/OrderFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
-          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/OrderKey.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="22" column="5" lean-forward="true" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/enumeration/ReturnKey.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="23" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mobile/src/main/java/com/fnc/order/android/model/Order.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        <state relative-caret-position="309">
+          <caret line="628" column="18" selection-start-line="628" selection-start-column="18" selection-end-line="628" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#24462#24605#0" expanded="true" />
+            <element signature="e#24604#24605#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

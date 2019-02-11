@@ -13,7 +13,7 @@ public class QueryBuilder {
 
     public static String createTables(Table table, LinkedList<?> list) {
         StringBuilder fields = new StringBuilder();
-        String query = "CREATE TABLE "+table.getName() +" ('id' INTEGER PRIMARY KEY AUTOINCREMENT, [fields])";
+        String query = "CREATE TABLE "+ table.getName() +" ('id' INTEGER PRIMARY KEY AUTOINCREMENT, [fields])";
         for(Object field : list) {
             fields.append("'" + getFieldName(field) + "' " + getDataType(field) + ",");
         }

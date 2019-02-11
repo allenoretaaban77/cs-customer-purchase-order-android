@@ -20,7 +20,7 @@ public class ServerConstants {
         return headers;
     }
 
-    public static final HashMap<String,String> getHeaderReturn() {
+    public static final HashMap<String,String> getHeaderOrder() {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("api_key", "ginataang_munggo");
         headers.put("api_class", "custopo");

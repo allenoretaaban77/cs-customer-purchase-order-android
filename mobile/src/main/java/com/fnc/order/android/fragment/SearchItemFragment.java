@@ -111,34 +111,38 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         });
         btn_add_to_list.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-                ArrayList<Itemlist> requestedItems = new ArrayList<Itemlist>(adapter.original_items);
-                ArrayList<Itemlist> arrayListchecked = new ArrayList<>();
-                if(requestedItems.size() > 0) {
-                    int j = 0;
-                    arrayListchecked.clear();
-                    while (requestedItems.size() > j) {
-                        Itemlist c = requestedItems.get(j);
-                        if(c.getIsChecked()){
-                            if (arrayListchecked.size()>0) {
-                                Boolean found = false;
-                                for (int x = 0; x < arrayListchecked.size(); x++) {
-                                    if (arrayListchecked.get(x).getRecid().equals(c.getRecid()))
-                                        found = true;
-                                }
-                                if (!found)
+                if(adapter != null) {
+                    ArrayList<Itemlist> requestedItems = new ArrayList<Itemlist>(adapter.original_items);
+                    ArrayList<Itemlist> arrayListchecked = new ArrayList<>();
+                    if (requestedItems.size() > 0) {
+                        int j = 0;
+                        arrayListchecked.clear();
+                        while (requestedItems.size() > j) {
+                            Itemlist c = requestedItems.get(j);
+                            if (c.getIsChecked()) {
+                                if (arrayListchecked.size() > 0) {
+                                    Boolean found = false;
+                                    for (int x = 0; x < arrayListchecked.size(); x++) {
+                                        if (arrayListchecked.get(x).getRecid().equals(c.getRecid()))
+                                            found = true;
+                                    }
+                                    if (!found)
+                                        arrayListchecked.add(c);
+                                } else
                                     arrayListchecked.add(c);
-                            }else
-                                arrayListchecked.add(c);
+                            }
+                            j++;
                         }
-                        j++;
-                    }
 
-                    if(getActivity() != null) {
-                        Intent i = getActivity().getIntent();
-                        i.putExtra(SharedKey.SEARCHED_ITEMS.getKey(), arrayListchecked);
-                        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, i);
-                        dismiss();
+                        if (getActivity() != null) {
+                            Intent i = getActivity().getIntent();
+                            i.putExtra(SharedKey.SEARCHED_ITEMS.getKey(), arrayListchecked);
+                            getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, i);
+                            dismiss();
+                        }
                     }
+                }else{
+                    Toast.makeText(ctx, "Please select items...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -189,6 +193,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                     irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
                     irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
                     irsx.setIsChecked(false);
+                    irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
                     iRs.add(irsx);
                 }
             }else{

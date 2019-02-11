@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.ReturnKey;
 
 import java.util.LinkedList;
@@ -27,14 +28,14 @@ public class DBHelper extends SQLiteOpenHelper {
         return QueryBuilder.createTables(table,list);
     }
 
-    protected LinkedList<ReturnKey> setOrderFields() {
-        LinkedList<ReturnKey> fields = new LinkedList<>();
-        fields.add(ReturnKey.QUANTITY);
-        fields.add(ReturnKey.ITEM_RECID);
-        fields.add(ReturnKey.ITEM_NAME);
-        fields.add(ReturnKey.UNIT_NAME);
-        fields.add(ReturnKey.REMARKS);
-        fields.add(ReturnKey.REMARKS);
+    protected LinkedList<OrderKey> setOrderFields() {
+        LinkedList<OrderKey> fields = new LinkedList<>();
+        fields.add(OrderKey.QUANTITY);
+        fields.add(OrderKey.ITEM_RECID);
+        fields.add(OrderKey.ITEM_NAME);
+        fields.add(OrderKey.UNIT_NAME);
+        fields.add(OrderKey.REMARKS);
+        fields.add(OrderKey.OLD_SKU);
         return fields;
     }
 

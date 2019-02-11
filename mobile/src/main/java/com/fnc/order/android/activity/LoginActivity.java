@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +22,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.error.VolleyError;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.utilities.VolleyInteractor;
 import com.fnc.order.android.utilities.Helper;
@@ -28,7 +30,9 @@ import com.fnc.order.android.utilities.PasswordVisibility;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.R;
 
+import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -36,6 +40,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class LoginActivity extends BaseActivity implements VolleyCallback {
 
@@ -81,6 +87,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
 
         usernameText.setText("7777777");
         passwordEText.setText("7777777");
+//        usernameText.setText("vhino15@gmail.com");
+//        passwordEText.setText("051295");
     }
 
     private void initListeners(){
@@ -134,24 +142,104 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         });
     }
 
+    private void updateEmployeeId(String old_employee_id) {
+        showSpinnerDialog();
+        VolleyInteractor viv = new VolleyInteractor();
+        viv.registerCallback(this);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("logdb", ServerConstants.LOGDB);
+        params.put("identityid", sp.getData(API.IDENTITY_ID.getApi()));
+        params.put("old_employeeid", old_employee_id);
+
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+            it.remove();
+        }
+        strParams = strParams.replaceAll(" ", "%20");
+        viv.updateEmployeeId(ctx, params, strParams);
+    }
+
     public void onRequestSuccess(String response, String type) {
+        final VolleyCallback refThis = this;
         dismissSpinnerDialog();
         try {
-            JSONObject obj = new JSONObject(response);
-            sp = SharedData.getInstance(ctx);
-
-            sp.saveData(API.DATA_BUSINESS.getApi(), obj.getString(API.DATA_BUSINESS.getApi()).toString());
-            sp.saveData(API.DATA_COMPANY.getApi(), obj.getString(API.DATA_COMPANY.getApi()).toString());
-            sp.saveData(API.DATA_USER.getApi(), obj.getString(API.DATA_USER.getApi()).toString());
-            JSONArray datauserArray = obj.getJSONArray(API.DATA_USER.getApi());
-            if(datauserArray.toString().equals("[]")) {
-                Toast.makeText(ctx, "Login invalid.", Toast.LENGTH_SHORT).show();
-            }else{
-                if(datauserArray.length() > 0) {
-                    JSONObject row = datauserArray.getJSONObject(0);
-                    sp.saveData(API.IDENTITY_ID.getApi(), row.getString(API.IDENTITY_ID.getApi()));
-                    Toast.makeText(ctx, "Login success...", Toast.LENGTH_SHORT).show();
+            if(type.equals("updateemployeeid")) {
                     showActivity(MainActivity.class);
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    Toast.makeText(ctx, "Employee id updated successfully! Welcome...", Toast.LENGTH_SHORT).show();
+                                }
+                            },
+                            300
+                    );
+            } else if(type.equals("validate")) {
+//                if(response.trim().equals("True")) {
+//                    showActivity(MainActivity.class);
+//                    new android.os.Handler().postDelayed(
+//                            new Runnable() {
+//                                public void run() {
+//                                    Toast.makeText(ctx, "Your account is valid! Welcome...", Toast.LENGTH_SHORT).show();
+//                                }
+//                            },
+//                            1000
+//                    );
+//                }else{
+                    alertDialog = okCancelInputDialogBuilder(ctx,
+                            "Please update your Employee ID to continue using this application.",
+                            "Update", null,
+                            "Cancel", new View.OnClickListener() {
+                                public void onClick(View v) {
+                                    Helper.hideSoftKeyboard(LoginActivity.this);
+                                    dismissSpinnerDialog();
+                                    alertDialog.dismiss();
+                                }
+                            } );
+//                }
+            }else{
+                JSONObject obj = new JSONObject(response);
+                sp = SharedData.getInstance(ctx);
+                sp.saveData(API.DATA_BUSINESS.getApi(), obj.getString(API.DATA_BUSINESS.getApi()).toString());
+                sp.saveData(API.DATA_COMPANY.getApi(), obj.getString(API.DATA_COMPANY.getApi()).toString());
+                sp.saveData(API.DATA_USER.getApi(), obj.getString(API.DATA_USER.getApi()).toString());
+                JSONArray datauserArray = obj.getJSONArray(API.DATA_USER.getApi());
+                if(datauserArray.toString().equals("[]")) {
+                    Toast.makeText(ctx, "Login invalid.", Toast.LENGTH_SHORT).show();
+                }else{
+                    if(datauserArray.length() > 0) {
+                        JSONObject row = datauserArray.getJSONObject(0);
+                        sp.saveData(API.IDENTITY_ID.getApi(), row.getString(API.IDENTITY_ID.getApi()));
+                        sp.saveData(API.EMPLOYEE_ID.getApi(), row.getString(API.EMPLOYEE_ID.getApi()));
+
+                        // validate
+                        Toast.makeText(ctx, "Login Success! Validating account...", Toast.LENGTH_SHORT).show();
+                        showSpinnerDialog();
+                        new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    VolleyInteractor viv = new VolleyInteractor();
+                                    viv.registerCallback(refThis);
+                                    HashMap<String, String> params = new HashMap<>();
+                                    params.put("cn", ServerConstants.LOGDB);
+                                    params.put("identityid", sp.getData(API.IDENTITY_ID.getApi()));
+
+                                    Iterator it = params.entrySet().iterator();
+                                    String strParams = "";
+                                    while (it.hasNext()) {
+                                        Map.Entry pair = (Map.Entry)it.next();
+                                        strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                                        it.remove();
+                                    }
+                                    strParams = strParams.replaceAll(" ", "%20");
+                                    viv.validate(ctx, params, strParams);
+                                }
+                            },
+                            500
+                        );
+                    }
                 }
             }
         } catch (JSONException e) {
@@ -231,5 +319,39 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         super.onResume();
     }
 
+
+
+    private AlertDialog okCancelInputDialogBuilder(final Context activity, String message,
+                                                          String okButtonCaption, View.OnClickListener onClickListener,
+                                                          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.custom_ok_input_dialog_default, null);
+        TextView tvMessage = (TextView) layout.findViewById(R.id.tvMessage);
+        tvMessage.setText(message);
+        tvMessage.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        final EditText etText = (EditText) layout.findViewById(R.id.et_inputtext);
+//        etText.setHint("Input Employee ID here");
+
+        Button btnOK = (Button) layout.findViewById(R.id.btnOk);
+        btnOK.setText(okButtonCaption);
+        btnOK.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                alertDialog.dismiss();
+//                Toast.makeText(activity, "ID saved updated.", Toast.LENGTH_SHORT).show();
+                updateEmployeeId(etText.getText().toString().trim());
+            }
+        });
+
+        Button btnCancel = (Button) layout.findViewById(R.id.btnCancel);
+        btnCancel.setText(cancelButtonCaption);
+        btnCancel.setOnClickListener(cancelClickListener);
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
+        builder.setView(layout);
+        builder.create();
+        builder.setCancelable(false);
+        return builder.show();
+    }
 }
 
