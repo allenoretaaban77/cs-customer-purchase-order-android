@@ -35,11 +35,13 @@ import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.listeners.DatePickerListener;
 import com.fnc.order.android.model.Itemlist;
+import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Return;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
@@ -151,7 +153,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         } finally {
             initListeners(rootView);
             // empty return table
-            DcReturn.getInstance(ctx).emptyReturnlist();
+            DcOrder.getInstance(ctx).emptyOrderlist();
 
             initCalc(rootView);
         }
@@ -237,12 +239,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public final void onClick(final View v) {
                 Helper.hideSoftKeyboard(getActivity());
 
-                LinkedList<Return> rl =  DcReturn.getInstance(ctx).getReturnlistAsc();
+                LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
                 final ArrayList<HashMap> detailsArrayList = new ArrayList();
-                if(rl.size() > 0) {
+                if(ol.size() > 0) {
                     Boolean errFlag = false;
-                    for (int i = 0; i < rl.size(); i++) {
-                        Return rowRl = rl.get(i);
+                    for (int i = 0; i < ol.size(); i++) {
+                        Order rowRl = ol.get(i);
                         if(rowRl.getQuantity().equals("") || rowRl.getQuantity().equals("0")) {
                             errFlag = true;
                             TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
@@ -261,13 +263,30 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         dismissSpinnerDialog();
                         Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
                     }else{
-                        alertDialog = okCancelInputDialogBuilder(ctx,
-                                "Please input your password to proceed the request.",
-                                "Proceed",
-                                null,
-                                "Cancel",
-                                cancelCallback
-                        );
+                        AlertDialog.Builder builder;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+                        } else {
+                            builder = new AlertDialog.Builder(ctx);
+                        }
+                        builder.setCancelable(false);
+                        builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if(!isPosted) {
+                                            isPosted = true;
+                                            submitOrders();
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        isPosted = false;
+                                    }
+                                })
+                                .show();
                     }
                 }else{
                     Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
@@ -285,7 +304,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     };
 
     private Boolean isPosted = false;
-    private void submitReturns() {
+    private void submitOrders() {
         VolleyInteractor vi = new VolleyInteractor();
         vi.registerCallback(this);
 
@@ -293,18 +312,18 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         final HashMap<String, Object> paramsArray = new HashMap();
         paramsArray.clear();
 
-        LinkedList<Return> rl =  DcReturn.getInstance(ctx).getReturnlistAsc();
+        LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
         final ArrayList<HashMap> detailsArrayList = new ArrayList();
-        if (rl.size() > 0) {
+        if (ol.size() > 0) {
             Boolean errFlag = false;
-            for (int i = 0; i < rl.size(); i++) {
-                Return rowRl = rl.get(i);
-                if(!rowRl.getQuantity().equals("") && !rowRl.getQuantity().equals("0")) {
+            for (int i = 0; i < ol.size(); i++) {
+                Order rowOl = ol.get(i);
+                if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
                     HashMap<String, Object> detailMap = new HashMap();
-                    detailMap.put("quantity", rowRl.getQuantity().equals("") ? "0" : rowRl.getQuantity() );
-                    detailMap.put("item_recid", rowRl.getItemRecid());
-                    detailMap.put("remarks", rowRl.getRemarks());
-                    detailMap.put("old_sku", rowRl.getRemarks());
+                    detailMap.put("quantity", rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity() );
+                    detailMap.put("item_recid", rowOl.getItemRecid());
+                    detailMap.put("remarks", rowOl.getRemarks());
+                    detailMap.put("old_sku", rowOl.getOldSku());
                     detailsArrayList.add(detailMap);
                 }
             }
@@ -315,12 +334,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 HashMap<String, String> headersMap = new HashMap();
                 headersMap.put("companydb", ServerConstants.CN);
                 headersMap.put("customer_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
-                headersMap.put("deliver_date", "");
+                headersMap.put("deliver_date", refStringDate);
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
                 headersMap.put("createdby", sp.getData(API.IDENTITY_ID.getApi()));
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(),
                         Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
+                headersMap.put("reference_employee_no", sp.getData(API.EMPLOYEE_ID.getApi()));
                 paramsArray.put("header", headersMap);
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
@@ -352,7 +372,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     arrayList = (ArrayList) extras.get(SharedKey.SEARCHED_ITEMS.getKey());
 
                     for(Itemlist il : arrayList){
-                        LinkedList<Return> rlx = DcReturn.getInstance(ctx).getReturnlist(il.getRecid());
+                        LinkedList<Order> rlx = DcOrder.getInstance(ctx).getOrderlist(il.getRecid());
                         if(rlx.size() == 0) {
                             TableRow trx = (TableRow) getLayoutInflater().inflate(R.layout.table_row_item_list, null);
                             trx.setId(il.getRecid());
@@ -381,7 +401,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             });
                             tvQty.addTextChangedListener(new TextWatcher() {
                                 public void afterTextChanged(Editable s) {
-                                    DcReturn.getInstance(ctx).updateReturnlistTallyString(
+                                    DcOrder.getInstance(ctx).updateOrderlistTallyString(
                                             calcRefId.toString(), s.toString(),false);
                                 }
                                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -402,13 +422,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             etUnit.setText(il.getUnitName());
 
                             tl.addView(trx);
-                            Return rowR = new Return();
-                            rowR.setQuantity("");
-                            rowR.setItemRecid(String.valueOf(il.getRecid()));
-                            rowR.setItemName(String.valueOf(il.getItemName()));
-                            rowR.setUnitName(String.valueOf(il.getUnitName()));
-                            rowR.setRemarks("");
-                            DcReturn.getInstance(ctx).insertReturnlist(rowR);
+                            Order rowO = new Order();
+                            rowO.setQuantity("");
+                            rowO.setItemRecid(String.valueOf(il.getRecid()));
+                            rowO.setItemName(String.valueOf(il.getItemName()));
+                            rowO.setUnitName(String.valueOf(il.getUnitName()));
+                            rowO.setRemarks("");
+                            rowO.setOldSku(String.valueOf(il.getOldSku()));
+                            DcOrder.getInstance(ctx).insertOrderlist(rowO);
                         }else{
                             Toast.makeText(ctx, "Some item is already exist on the list", Toast.LENGTH_SHORT).show();
                         }
@@ -424,10 +445,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
         calcRefId = v.getId();
         try {
-            LinkedList<Return> refRS = DcReturn.getInstance(ctx).getReturnlistAsc();
-            for (int i = 0; i < refRS.size(); i++) {
-                Return rlx = refRS.get(i);
-                TableRow trx = (TableRow) tblContentBox.findViewById(Integer.parseInt(rlx.getItemRecid()));
+            LinkedList<Order> refOS = DcOrder.getInstance(ctx).getOrderlistAsc();
+            for (int i = 0; i < refOS.size(); i++) {
+                Order olx = refOS.get(i);
+                TableRow trx = (TableRow) tblContentBox.findViewById(Integer.parseInt(olx.getItemRecid()));
                 if (trx != null) {
                     TextView tvQty = (TextView) trx.getChildAt(0);
                     tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
@@ -603,10 +624,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 refStr = "0.";
             }
         }else{
-            if(refStr.trim().equals("0")) {
+            if(val.trim().equals("0")) {
                 refStr = "";
+            }else{
+                refStr = refStr+val;
             }
-            refStr = refStr+val;
         }
         tvQty.setText(refStr);
     }
@@ -655,7 +677,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(ctx, "Item deleted....", Toast.LENGTH_SHORT).show();
                         tl.removeView((TableRow) tl.findViewById(calcRefId));
-                        DcReturn.getInstance(ctx).deleteReturnItemViaId(String.valueOf(calcRefId));
+                        DcOrder.getInstance(ctx).deleteOrderItemViaId(String.valueOf(calcRefId));
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -675,7 +697,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         TextView tvMessage = (TextView) layout.findViewById(R.id.tvMessage);
         tvMessage.setText(message);
         tvMessage.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        final EditText etText = (EditText) layout.findViewById(R.id.et_password);
+        final EditText etText = (EditText) layout.findViewById(R.id.et_remarks);
 
         Button btnOK = (Button) layout.findViewById(R.id.btnOk);
         btnOK.setText(okButtonCaption);
@@ -684,63 +706,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 alertDialog.dismiss();
 //                Toast.makeText(activity, etText.getText().toString(), Toast.LENGTH_SHORT).show();
                 Toast.makeText(activity, "Remarks saved successfully.", Toast.LENGTH_SHORT).show();
-                DcReturn.getInstance(activity).updateReturnlistRemarksString(calcRefId.toString(),
+                DcOrder.getInstance(activity).updateOrderlistRemarksString(calcRefId.toString(),
                         etText.getText().toString(), false);
-            }
-        });
-
-        Button btnCancel = (Button) layout.findViewById(R.id.btnCancel);
-        btnCancel.setText(cancelButtonCaption);
-        btnCancel.setOnClickListener(cancelClickListener);
-
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
-        builder.setView(layout);
-        builder.create();
-        builder.setCancelable(false);
-        return builder.show();
-    }
-
-    private AlertDialog okCancelInputDialogBuilder(final Context activity, String message,
-                                                   String okButtonCaption, View.OnClickListener onClickListener,
-                                                   String cancelButtonCaption, View.OnClickListener cancelClickListener) {
-
-        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.custom_ok_input_dialog, null);
-        TextView tvMessage = (TextView) layout.findViewById(R.id.tvMessage);
-        tvMessage.setText(message);
-        tvMessage.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        final EditText etText = (EditText) layout.findViewById(R.id.et_password);
-
-        Button btnOK = (Button) layout.findViewById(R.id.btnOk);
-        btnOK.setText(okButtonCaption);
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                refPassword = etText.getText().toString();
-                alertDialog.dismiss();
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-                } else {
-                    builder = new AlertDialog.Builder(ctx);
-                }
-                builder.setCancelable(false);
-                builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if(!isPosted) {
-                                    isPosted = true;
-                                    submitReturns();
-                                }
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                isPosted = false;
-                            }
-                        })
-                        .show();
             }
         });
 
@@ -776,9 +743,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         calendar.setDatePickerListener(new DatePickerListener() {
             @Override
             public void didPickDate(Context context, Date date) {
-                refStringDate = new SimpleDateFormat(GlobalConstants.DATE_FORMAT).format(date);
+                refStringDate = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_POST).format(date);
                 refDate = new SimpleDateFormat(GlobalConstants.DATE_REF_FORMAT).format(date);
-                et_date.setText(refStringDate);
+                et_date.setText(new SimpleDateFormat(GlobalConstants.DATE_FORMAT).format(date));
 
                 Calendar c = Calendar.getInstance();
                 int curday = c.get(Calendar.DAY_OF_MONTH);

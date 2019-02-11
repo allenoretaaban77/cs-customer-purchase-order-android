@@ -44,15 +44,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.andreabaccega.widget.FormEditText
+                    android:hint="Input Employee ID here"
                     android:textColorHint="@color/brown_4"
                     android:textColor="@color/black"
-                    android:id="@+id/et_remarks"
+                    android:id="@+id/et_inputtext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Input remarks here"
                     android:imeActionId="6"
-                    android:imeActionLabel="@string/action_log_in_short"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"/>
