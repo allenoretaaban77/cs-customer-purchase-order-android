@@ -12,6 +12,7 @@ public enum SharedKey {
     CURRENT_DATE("current_date"),
     CURRENT_INCLUDEDPO("current_includedpo"),
     CURRENT_CUSTOMER_ID("current_customerid"),
+    CURRENT_CUSTOMER_INTEGRATION_ID("customer_integ_recid"),
     DATA_CHECKLIST("dtchecklist"),
     DATA_STORELIST("dtstorelist"),
     SEARCHED_ITEMS("searched_items");

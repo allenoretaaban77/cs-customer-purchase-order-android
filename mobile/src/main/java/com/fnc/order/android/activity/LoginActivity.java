@@ -82,7 +82,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         hidePassword = (Button)findViewById(R.id.hide_password);
         showPassword = (Button)findViewById(R.id.show_password);
         loginButton = (Button)findViewById(R.id.login_button);
-
+        TextView tvVersion = (TextView) findViewById(R.id.tv_version);
+        tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
 //        usernameText.setText("7777777");
