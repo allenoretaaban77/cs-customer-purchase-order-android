@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class MenuList implements Serializable {
     private String customerid;
+    private String integration_recid;
     private String customername;
     private String remarks;
     private Integer recordcount;
@@ -11,9 +12,12 @@ public class MenuList implements Serializable {
     public String getCustomerID() {
         return customerid;
     }
-    public void setCustomerID(String customerid) {
-        this.customerid = customerid;
+    public void setCustomerID(String customerid) { this.customerid = customerid; }
+
+    public String getCustomerIntegrationId() {
+        return integration_recid;
     }
+    public void setCustomerIntegrationId(String integration_recid) { this.integration_recid = integration_recid;}
 
     public String getCustomerName() {
         return customername;

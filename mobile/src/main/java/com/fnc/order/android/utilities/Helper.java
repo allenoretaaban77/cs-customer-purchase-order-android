@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -227,6 +229,16 @@ public class Helper {
                             Activity.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(
                     activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    public static String getVersion(Context context, Activity activity) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "";
         }
     }
 }

@@ -7,22 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -154,6 +145,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         JSONObject obj = objArr.getJSONObject(i);
                         MenuList mlList = new MenuList();
                         mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
+                        mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
                         mlList.setCustomerName(obj.getString(MenulistKey.CUSTOMER_NAME.getKey()));
                         mlList.setRecordCount(0);
                         mlList.setRemarks("");
@@ -166,6 +158,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             }else{
                 MenuList mlList = new MenuList();
                 mlList.setCustomerID("0000000");
+                mlList.setCustomerIntegrationId("0000000");
                 mlList.setCustomerName("No Record Found");
                 mlList.setRecordCount(0);
                 mlList.setRemarks("");

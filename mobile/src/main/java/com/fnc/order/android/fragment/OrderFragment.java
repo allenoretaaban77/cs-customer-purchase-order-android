@@ -333,6 +333,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 HashMap<String, String> headersMap = new HashMap();
                 headersMap.put("companydb", ServerConstants.CN);
                 headersMap.put("customer_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
+                headersMap.put("customer_integ_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
                 headersMap.put("deliver_date", refStringDate);
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
                 headersMap.put("createdby", sp.getData(API.IDENTITY_ID.getApi()));
@@ -340,6 +341,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
                 headersMap.put("reference_employee_no", sp.getData(API.EMPLOYEE_ID.getApi()));
+                headersMap.put("branch_encoding", "1");
                 paramsArray.put("header", headersMap);
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
@@ -394,6 +396,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             tvQty.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    isItemClicked = true;
                                     View vx = (View) v.getParent();
                                     onTableItemClick(vx);
                                 }
@@ -483,7 +486,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     JSONObject obj = objArr.getJSONObject(0);
                     Boolean status = obj.getBoolean("error");
                     if(!status){
-                        Toast.makeText(ctx, obj.getString("tag"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(ctx, obj.getString("tag"), Toast.LENGTH_LONG).show();
                         getActivity().onBackPressed();
                     }else{
                         Toast.makeText(ctx, "Post error... "+obj.getString("error_msg"), Toast.LENGTH_SHORT).show();
@@ -611,6 +615,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         TableRow trx = (TableRow) tblContentBox.findViewById(calcRefId);
         TextView tvQty = (TextView) trx.getChildAt(0);
         String refStr = tvQty.getText().toString();
+        Log.v("isItemClicked", isItemClicked.toString());
         if(isItemClicked) {
             refStr = "";
             isItemClicked = false;
