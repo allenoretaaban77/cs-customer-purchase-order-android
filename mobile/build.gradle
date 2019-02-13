@@ -37,4 +37,5 @@ dependencies {
     implementation 'com.jaredrummler:material-spinner:1.3.1'
     implementation 'gun0912.ted:tedpermission:2.2.2'
     implementation 'com.shehabic.droppy:Droppy:0.6.0@aar'
+    implementation 'com.github.florent37:materialtextfield:1.0.7'
 }

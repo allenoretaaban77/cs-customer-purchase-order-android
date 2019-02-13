@@ -41,14 +41,31 @@
                 android:layout_height="wrap_content"
                 android:text="CUSTOMER ORDER"/>
 
+            <!--com.github.florent37.materialtextfield.MaterialTextField
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                app:mtf_openKeyboardOnFocus="true"
+                app:mtf_cardCollapsedHeight="4dp"
+                app:mtf_labelColor="@color/gray_6"
+                app:mtf_image="@drawable/baseline_account_box_24">
+                <EditText
+                    android:background="@color/red_2"
+                    android:id="@+id/username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Username"
+                    android:textColor="@color/gray_6"
+                    android:textSize="17sp" />
+            </com.github.florent37.materialtextfield.MaterialTextField-->
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.andreabaccega.widget.FormEditText
+                    android:id="@+id/username"
                     android:textColorHint="@color/gray_4"
                     android:textColor="@color/gray_6"
                     android:text=""
-                    android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_username"
