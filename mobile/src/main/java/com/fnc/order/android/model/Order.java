@@ -9,6 +9,7 @@ public class Order implements Serializable {
     private String unitName;
     private String remarks;
     private String old_sku;
+    private String selling_price;
 
     public String getQuantity() { return quantity; }
     public void setQuantity(String quantity) { this.quantity = quantity; }
@@ -29,4 +30,7 @@ public class Order implements Serializable {
 
     public String getOldSku() { return old_sku; }
     public void setOldSku(String old_sku) { this.old_sku = old_sku; }
+
+    public String getSellingPrice() { return selling_price; }
+    public void setSellingPrice(String selling_price) { this.selling_price = selling_price; }
 }

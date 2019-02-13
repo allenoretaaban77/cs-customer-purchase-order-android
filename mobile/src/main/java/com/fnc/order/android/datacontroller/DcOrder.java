@@ -106,6 +106,7 @@ public class DcOrder extends DBHelper {
         order.setUnitName(c.getString(c.getColumnIndex(OrderKey.UNIT_NAME.getKey())));
         order.setRemarks(c.getString(c.getColumnIndex(OrderKey.REMARKS.getKey())));
         order.setOldSku(c.getString(c.getColumnIndex(OrderKey.OLD_SKU.getKey())));
+        order.setSellingPrice(c.getString(c.getColumnIndex(OrderKey.SELLING_PRICE.getKey())));
         return order;
     }
 }

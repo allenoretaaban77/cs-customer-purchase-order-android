@@ -6,6 +6,7 @@ public class Itemlist implements Serializable {
     private int recid_old;
     private int recid;
     private String old_sku;
+    private String selling_price;
     private int itemNo;
     private int itemBarcodeNo;
     private int parent_baseitem_recid;
@@ -30,6 +31,9 @@ public class Itemlist implements Serializable {
 
     public String getOldSku() { return old_sku; }
     public void setOldSku(String old_sku) { this.old_sku = old_sku; }
+
+    public String getSellingPrice() { return selling_price; }
+    public void setSellingPrice(String selling_price) { this.selling_price = selling_price; }
 
     public Integer getItemNo() {
         return itemNo;

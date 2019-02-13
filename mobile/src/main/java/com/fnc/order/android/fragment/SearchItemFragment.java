@@ -190,6 +190,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                     irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
                     irsx.setIsChecked(false);
                     irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
+                    irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));
                     if(!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("null") &&
                             !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("")) {
                         iRs.add(irsx);

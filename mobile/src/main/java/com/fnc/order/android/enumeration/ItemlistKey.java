@@ -29,7 +29,8 @@ public enum ItemlistKey {
     UNIT_MESUREMENT_DESC("unitMeasurementDesc",DataType.TEXT),
     UNIT_MEASUREMENT_QTY("unitMeasurementQty",DataType.TEXT),
     UNIT_NAME("unitName",DataType.TEXT),
-    OLD_SKU("old_sku",DataType.TEXT);
+    OLD_SKU("old_sku",DataType.TEXT),
+    SELLING_PRICE("selling_price",DataType.TEXT);
 
     private String key;
     private String dataType;

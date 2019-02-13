@@ -8,7 +8,8 @@ public enum OrderKey {
     ITEM_NAME("itemname", DataType.TEXT),
     UNIT_NAME("unitName", DataType.TEXT),
     REMARKS("remarks", DataType.TEXT),
-    OLD_SKU("old_sku", DataType.TEXT);
+    OLD_SKU("old_sku", DataType.TEXT),
+    SELLING_PRICE("selling_price", DataType.TEXT);
 
     private String key;
     private String dataType;

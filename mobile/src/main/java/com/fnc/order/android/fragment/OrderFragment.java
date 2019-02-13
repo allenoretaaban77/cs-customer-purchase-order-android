@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -186,8 +187,24 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
         et_date.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-//                Toast.makeText(ctx, "date", Toast.LENGTH_SHORT).show();
-                showDatePicker(v);
+                Helper.hideSoftKeyboard(getActivity());
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        showDatePicker(v);
+                    }
+                }, 500);
+            }
+        });
+        et_remarks.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    }
+                }, 500);
             }
         });
         bsCalc.setOnClickListener(new View.OnClickListener() {
@@ -323,6 +340,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     detailMap.put("item_recid", rowOl.getItemRecid());
                     detailMap.put("remarks", rowOl.getRemarks());
                     detailMap.put("old_sku", rowOl.getOldSku());
+                    detailMap.put("selling_price", rowOl.getSellingPrice());
                     detailsArrayList.add(detailMap);
                 }
             }
@@ -381,12 +399,23 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                 @Override
                                 public void onClick(View v) {
                                     isItemClicked = true;
+                                    Helper.hideSoftKeyboard(getActivity());
                                     onTableItemClick(v);
+                                    new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                            }
+                                        }, 300
+                                    );
                                 }
                             });
                             trx.setOnLongClickListener(new View.OnLongClickListener() {
                                 @Override
                                 public boolean onLongClick(View v) {
+                                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                    onTableItemClick(v);
                                     showMenuPopup(v);
                                     return true;
                                 }
@@ -398,7 +427,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                 public void onClick(View v) {
                                     isItemClicked = true;
                                     View vx = (View) v.getParent();
+                                    Helper.hideSoftKeyboard(getActivity());
                                     onTableItemClick(vx);
+                                    new android.os.Handler().postDelayed(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                            }
+                                        }, 300
+                                    );
                                 }
                             });
                             tvQty.addTextChangedListener(new TextWatcher() {
@@ -431,6 +469,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             rowO.setUnitName(String.valueOf(il.getUnitName()));
                             rowO.setRemarks("");
                             rowO.setOldSku(String.valueOf(il.getOldSku()));
+                            rowO.setSellingPrice(String.valueOf(il.getSellingPrice()));
                             DcOrder.getInstance(ctx).insertOrderlist(rowO);
                         }else{
                             Toast.makeText(ctx, "Some item is already exist on the list", Toast.LENGTH_SHORT).show();
@@ -442,36 +481,41 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
     }
 
-    private void onTableItemClick(View v) {
-        Helper.hideSoftKeyboard(getActivity());
-        bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
-        calcRefId = v.getId();
-        try {
-            LinkedList<Order> refOS = DcOrder.getInstance(ctx).getOrderlistAsc();
-            for (int i = 0; i < refOS.size(); i++) {
-                Order olx = refOS.get(i);
-                TableRow trx = (TableRow) tblContentBox.findViewById(Integer.parseInt(olx.getItemRecid()));
-                if (trx != null) {
-                    TextView tvQty = (TextView) trx.getChildAt(0);
-                    tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-//                    tvQty.setHighlightColor(getResources().getColor(R.color.transparent));
-                    tvQty.setTextColor(getResources().getColor(R.color.black));
-                    TextView tvUnit = (TextView) trx.getChildAt(1);
-                    tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-                    LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-                    tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
+    private void onTableItemClick(final View v) {
+        new android.os.Handler().postDelayed(
+            new Runnable() {
+                @Override
+                public void run() {
+                    calcRefId = v.getId();
+                    try {
+                        LinkedList<Order> refOS = DcOrder.getInstance(ctx).getOrderlistAsc();
+                        for (int i = 0; i < refOS.size(); i++) {
+                            Order olx = refOS.get(i);
+                            TableRow trx = (TableRow) tblContentBox.findViewById(Integer.parseInt(olx.getItemRecid()));
+                            if (trx != null) {
+                                TextView tvQty = (TextView) trx.getChildAt(0);
+                                tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
+            //                    tvQty.setHighlightColor(getResources().getColor(R.color.transparent));
+                                tvQty.setTextColor(getResources().getColor(R.color.black));
+                                TextView tvUnit = (TextView) trx.getChildAt(1);
+                                tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
+                                LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
+                                tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
+                            }
+                        }
+                    } finally {
+                        TableRow trx = (TableRow) v;
+                        TextView tvQty = (TextView) trx.getChildAt(0);
+                        tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
+                        tvQty.setTextColor(getResources().getColor(R.color.green_5));
+                        TextView tvUnit = (TextView) trx.getChildAt(1);
+                        tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
+                        LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
+                        tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
+                    }
                 }
-            }
-        } finally {
-            TableRow trx = (TableRow) v;
-            TextView tvQty = (TextView) trx.getChildAt(0);
-            tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-            tvQty.setTextColor(getResources().getColor(R.color.green_5));
-            TextView tvUnit = (TextView) trx.getChildAt(1);
-            tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-            LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-            tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-        }
+            }, 300
+        );
     }
 
     public void onRequestSuccess(String response, String type) {

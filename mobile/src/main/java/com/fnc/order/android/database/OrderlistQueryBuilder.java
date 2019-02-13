@@ -15,6 +15,7 @@ public class OrderlistQueryBuilder {
         values.put(OrderKey.UNIT_NAME.getKey(), orders.getUnitName());
         values.put(OrderKey.REMARKS.getKey(), orders.getRemarks());
         values.put(OrderKey.OLD_SKU.getKey(), orders.getOldSku());
+        values.put(OrderKey.SELLING_PRICE.getKey(), orders.getSellingPrice());
         return values;
     }
 }

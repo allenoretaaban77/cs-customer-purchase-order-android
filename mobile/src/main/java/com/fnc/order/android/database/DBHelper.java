@@ -35,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(OrderKey.UNIT_NAME);
         fields.add(OrderKey.REMARKS);
         fields.add(OrderKey.OLD_SKU);
+        fields.add(OrderKey.SELLING_PRICE);
         return fields;
     }
 
