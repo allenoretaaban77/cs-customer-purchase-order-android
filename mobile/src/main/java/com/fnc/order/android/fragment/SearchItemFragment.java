@@ -150,6 +150,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
     }
 
     private void requestItem(View v) {
+        final SharedData sp = SharedData.getInstance(ctx);
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                 Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_item_name.getWindowToken(), 0);
@@ -159,6 +160,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         String searchStr = et_item_name.getText().toString().trim();
         params.put("itemname", searchStr);
         params.put("cn", ServerConstants.CN);
+        params.put("customerid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
         Iterator it = params.entrySet().iterator();
         String strParams = "";
         while (it.hasNext()) {
@@ -179,8 +181,6 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
             JSONArray objArr = new JSONArray(response);
             List<Itemlist> iRs = new ArrayList<Itemlist>();
             if(objArr.length() > 0) {
-                tv_no_data.setVisibility(View.GONE);
-                rvItems.setVisibility(View.VISIBLE);
                 for (int i = 0; i < objArr.length(); i++) {
                     JSONObject rowObj = objArr.getJSONObject(i);
                     Itemlist irsx = new Itemlist();
@@ -194,6 +194,13 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                             !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("")) {
                         iRs.add(irsx);
                     }
+                }
+                if(iRs.size() == 0) {
+                    tv_no_data.setVisibility(View.VISIBLE);
+                    rvItems.setVisibility(View.GONE);
+                }else{
+                    tv_no_data.setVisibility(View.GONE);
+                    rvItems.setVisibility(View.VISIBLE);
                 }
             }else{
                 tv_no_data.setVisibility(View.VISIBLE);
