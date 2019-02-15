@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -23,7 +25,10 @@ import com.android.volley.error.VolleyError;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.enumeration.API;
+import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.fragment.SearchItemFragment;
 import com.fnc.order.android.utilities.VolleyInteractor;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PasswordVisibility;
@@ -48,6 +53,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     PasswordVisibility passwordVisibility;
     private FormEditText usernameText;
     private FormEditText passwordEText;
+    private TextView tvVersion;
     private Button loginButton;
     private Button hidePassword, showPassword;
     private ProgressDialog loader;
@@ -67,6 +73,9 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         setContentView(R.layout.activity_login);
         vi = new VolleyInteractor();
         vi.registerCallback(this);
+        SharedData sp = SharedData.getInstance(this);
+        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
+        sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), "http://192.168.1.200:81/");
 
         ctx = this;
         initViews();
@@ -82,7 +91,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         hidePassword = (Button)findViewById(R.id.hide_password);
         showPassword = (Button)findViewById(R.id.show_password);
         loginButton = (Button)findViewById(R.id.login_button);
-        TextView tvVersion = (TextView) findViewById(R.id.tv_version);
+        tvVersion = (TextView) findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -139,6 +148,20 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                 params.put("userid", usernameText.getText().toString());
                 params.put("pass", passwordEText.getText().toString());
                 vi.login(ctx, params);
+            }
+        });
+
+        tvVersion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog = settingsDialog(ctx,
+                    "Please update your Employee ID to continue using this application.",
+                    "Update", null,
+                    "Cancel", new View.OnClickListener() {
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                        }
+                    } );
             }
         });
     }
@@ -320,8 +343,6 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         super.onResume();
     }
 
-
-
     private AlertDialog okCancelInputDialogBuilder(final Context activity, String message,
                                                           String okButtonCaption, View.OnClickListener onClickListener,
                                                           String cancelButtonCaption, View.OnClickListener cancelClickListener) {
@@ -332,14 +353,12 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         tvMessage.setText(message);
         tvMessage.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         final EditText etText = (EditText) layout.findViewById(R.id.et_inputtext);
-//        etText.setHint("Input Employee ID here");
 
         Button btnOK = (Button) layout.findViewById(R.id.btnOk);
         btnOK.setText(okButtonCaption);
         btnOK.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 alertDialog.dismiss();
-//                Toast.makeText(activity, "ID saved updated.", Toast.LENGTH_SHORT).show();
                 updateEmployeeId(etText.getText().toString().trim());
             }
         });
@@ -352,6 +371,34 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         builder.setView(layout);
         builder.create();
         builder.setCancelable(false);
+        return builder.show();
+    }
+
+    private AlertDialog settingsDialog(final Context activity, String message,
+                                                   String okButtonCaption, View.OnClickListener onClickListener,
+                                                   String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.dialog_settings, null);
+        final EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_domain_svr);
+        final EditText etLocalServerName = (EditText) layout.findViewById(R.id.et_local_svr);
+        etDomainServerName.setHint("e.g.: http://apics.fncnathaniel.com/");
+        etLocalServerName.setText("e.g.: http://192.168.1.200:81/");
+
+        Button btnOK = (Button) layout.findViewById(R.id.btn_update);
+        btnOK.setText(okButtonCaption);
+        btnOK.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                SharedData sp = SharedData.getInstance(ctx);
+                alertDialog.dismiss();
+                Toast.makeText(activity, "Server settings saved successfully.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
+        builder.setView(layout);
+        builder.create();
+        builder.setCancelable(true);
         return builder.show();
     }
 }

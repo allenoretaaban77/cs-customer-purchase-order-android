@@ -10,22 +10,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_height="wrap_content"
             style="@style/layoutStyleMenu"
             android:orientation="vertical"
             android:background="@drawable/background_round_border"
             android:padding="7dp">
             <TextView
+                android:layout_centerInParent="true"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-smallc"
-                android:textColor="@color/white"
+                android:textColor="@color/green_1"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:textSize="19dp"
                 android:text="CUSTOMER LIST"/>
-        </LinearLayout>
+            <TextView
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="5dp"
+                android:id="@+id/tv_version"
+                android:layout_alignParentRight="true"
+                android:fontFamily="sans-serif-smallc"
+                android:textColor="@color/gray_5"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="12dp"
+                android:text="1.0.1"/>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_marginTop="43dp"

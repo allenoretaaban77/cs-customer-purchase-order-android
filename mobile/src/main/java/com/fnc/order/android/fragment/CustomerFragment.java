@@ -76,6 +76,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
         etCustomerName = (EditText) v.findViewById(R.id.et_customername);
         listview = (ListView) v.findViewById(R.id.storelistview);
+
+        TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
+        tvVersion.setText(Helper.getVersion(ctx, getActivity()));
     }
 
     private void initListeners(View v) {

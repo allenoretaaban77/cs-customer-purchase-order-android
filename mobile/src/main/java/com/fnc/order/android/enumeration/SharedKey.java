@@ -2,6 +2,9 @@ package com.fnc.order.android.enumeration;
 
 public enum SharedKey {
 
+    SERVER_URL("server_url"),
+    DOMAIN_SERVER_URL("domain_server_url"),
+    LOCAL_SERVER_URL("local_server_url"),
     WAITING_FOR_POST("waiting_for_post"),
     WAITING_STORE("waiting_store"),
     WAITING_RECID("waiting_recid"),
