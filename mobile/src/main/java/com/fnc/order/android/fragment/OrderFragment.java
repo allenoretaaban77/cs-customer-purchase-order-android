@@ -179,6 +179,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         et_remarks = (EditText) v.findViewById(R.id.et_remarks);
         bsCalc = (LinearLayout) v.findViewById(R.id.bs_calculator);
         bsCalc.setVisibility(View.VISIBLE);
+
+        TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
+        tvVersion.setText(Helper.getVersion(ctx, getActivity()));
     }
 
     private void initListeners(View v) {

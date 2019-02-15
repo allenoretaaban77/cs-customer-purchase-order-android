@@ -26,12 +26,12 @@
             <ImageView
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
-                android:layout_height="150dp"
+                android:layout_height="200dp"
                 android:src="@drawable/image"
                 android:layout_centerInParent="true"/>
 
             <TextView
-                android:layout_marginTop="-20dp"
+                android:layout_marginTop="-40dp"
                 android:layout_marginBottom="30dp"
                 android:textSize="20dp"
                 android:textStyle="bold"
@@ -65,7 +65,6 @@
                     android:id="@+id/username"
                     android:textColorHint="@color/gray_4"
                     android:textColor="@color/gray_6"
-                    android:text=""
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_username"
@@ -83,9 +82,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <com.andreabaccega.widget.FormEditText
+                        android:id="@+id/password"
                         android:textColorHint="@color/gray_4"
                         android:textColor="@color/gray_6"
-                        android:id="@+id/password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_password"

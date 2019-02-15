@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/layoutStyleMenu"
+        android:orientation="vertical"
+        android:background="@drawable/background_round_border"
+        android:padding="7dp">
+
+        <RelativeLayout
+            android:paddingLeft="12dp"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            style="@style/mHeader">
+            <TextView
+                android:layout_centerVertical="true"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-smallc"
+                android:textColor="@color/gray_6"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="19dp"
+                android:text="SETTINGS"/>
+            <LinearLayout
+                android:layout_alignParentRight="true"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="8dp"
+                android:padding="3dp"
+                style="@style/btnTransparentStyleSmallWrap">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="3dp">
+                    <Button
+                        android:backgroundTint="@color/white"
+                        android:background="@drawable/baseline_close_24"
+                        android:id="@+id/btn_close"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_marginBottom="45dp"
+            android:padding="15dp"
+            android:background="@drawable/background_green_3_border"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:paddingBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_label1"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:text="Domain :"
+                    android:textColor="@color/gray_6"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/et_domain_svr"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/background_round_border_inner"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="top"
+                    android:hint="Click here to input domain server..."
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:lineHeight="14dp"
+                    android:maxLines="2"
+                    android:paddingLeft="7dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:paddingRight="5dp"
+                    android:text=""
+                    android:textColor="@color/brown_5"
+                    android:textColorHint="@color/gray_4"
+                    android:textSize="17dp" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_label2"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:text="Local :"
+                    android:textColor="@color/gray_6"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/et_local_svr"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/background_round_border_inner"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="top"
+                    android:hint="Click here to input local server..."
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:lineHeight="14dp"
+                    android:maxLines="2"
+                    android:paddingLeft="7dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:paddingRight="5dp"
+                    android:text=""
+                    android:textColor="@color/brown_5"
+                    android:textColorHint="@color/gray_4"
+                    android:textSize="17dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_height="40dp"
+            android:layout_marginTop="-40dp"
+            android:layout_gravity="bottom"
+            style="@style/btnTransparentStyle">
+            <com.balysv.materialripple.MaterialRippleLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <Button
+                    android:background="@android:color/transparent"
+                    android:id="@+id/btn_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="UPDATE"
+                    android:textColor="@color/white"
+                    android:textAllCaps="false"/>
+            </com.balysv.materialripple.MaterialRippleLayout>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
