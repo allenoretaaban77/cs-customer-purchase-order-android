@@ -676,7 +676,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
         }else{
             if(refStr.trim().equals("0")) {
-   
+
             }else{
                 refStr = refStr+val;
             }

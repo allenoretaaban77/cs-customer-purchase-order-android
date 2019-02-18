@@ -49,6 +49,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
         // each data item is just a string in this case
         public TextView tvName;
         public TextView tvUnit;
+        public TextView tvPrice;
         public CheckBox cb_select;
         public LinearLayout item_box;
 
@@ -56,6 +57,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
             super(v);
             tvName = (TextView) v.findViewById(R.id.tv_itemname);
             tvUnit = (TextView) v.findViewById(R.id.tv_itemunit);
+            tvPrice = (TextView) v.findViewById(R.id.tv_itemprice);
             cb_select = (CheckBox) v.findViewById(R.id.cb_select);
             item_box = (LinearLayout) v.findViewById(R.id.item_box);
         }
@@ -111,6 +113,11 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
                     holder.cb_select.setChecked(false);
                 }
                 holder.tvUnit.setText(f.getUnitName());
+                if(f.getSellingPrice().trim().equals("null") || f.getSellingPrice().trim().equals("null")) {
+                    holder.tvPrice.setText("(0.00)");
+                }else{
+                    holder.tvPrice.setText("("+f.getSellingPrice()+")");
+                }
 
                 holder.item_box.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -37,16 +37,33 @@
                     android:textSize="15sp"
                     android:textStyle="normal" />
 
-                <TextView
-                    android:text="Item Unit"
-                    android:id="@+id/tv_itemunit"
-                    android:layout_width="wrap_content"
+                <LinearLayout
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:lineSpacingMultiplier="1.15"
-                    android:lineSpacingExtra="15sp"
-                    android:textColor="@color/orange_1"
-                    android:textStyle="normal" />
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:text="Item Unit"
+                        android:id="@+id/tv_itemunit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:lineSpacingMultiplier="1.15"
+                        android:lineSpacingExtra="15sp"
+                        android:textColor="@color/orange_1"
+                        android:textStyle="normal" />
+                    <TextView
+                        android:layout_marginLeft="7dp"
+                        android:text="(Item Price)"
+                        android:id="@+id/tv_itemprice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:lineSpacingMultiplier="1.15"
+                        android:lineSpacingExtra="15sp"
+                        android:textColor="@color/gray_5"
+                        android:textStyle="normal" />
+                </LinearLayout>
+
             </LinearLayout>
             <CheckBox
                 android:checked="true"
