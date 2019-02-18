@@ -191,6 +191,9 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         dismissSpinnerDialog();
         try {
             if(type.equals("updateemployeeid")) {
+                if(!response.trim().equals("") && !response.trim().equals("null")) {
+                    sp = SharedData.getInstance(ctx);
+                    sp.saveData(API.EMPLOYEE_ID.getApi(), response.trim());
                     showActivity(MainActivity.class);
                     new android.os.Handler().postDelayed(
                             new Runnable() {
@@ -200,6 +203,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                             },
                             300
                     );
+                }
             } else if(type.equals("validate")) {
                 if(response.trim().equals("True")) {
                     showActivity(MainActivity.class);
