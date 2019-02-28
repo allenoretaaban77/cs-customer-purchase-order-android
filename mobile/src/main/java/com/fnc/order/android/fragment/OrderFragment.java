@@ -98,7 +98,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private LinearLayout bsCalc;
     private BottomSheetBehavior bsBh;
     private PopupMenu menuPop;
-    private String refPassword;
     private VolleyInteractor vi;
     private Boolean isItemClicked = false;
     private String refDate;
