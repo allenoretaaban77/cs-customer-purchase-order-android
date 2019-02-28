@@ -16,10 +16,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.utilities.Helper;
-import com.android.volley.error.VolleyError;
 
 public class TransactionFragment extends Fragment implements VolleyCallback {
 

@@ -1,23 +1,32 @@
 package com.fnc.order.android.utilities;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
-import com.android.volley.error.AuthFailureError;
-import com.android.volley.error.VolleyError;
-import com.android.volley.request.StringRequest;
+//import com.android.volley.error.AuthFailureError;
+//import com.android.volley.error.VolleyError;
+//import com.android.volley.request.StringRequest;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.API;
+import com.github.yangweigbh.volleyx.VolleyX;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class VolleyInteractor {
 
@@ -240,21 +249,7 @@ public class VolleyInteractor {
             public void run(){
                 StringRequest strRequest = new StringRequest( Request.Method.GET,
                         ServerConstants.SERVER_URL + API.GET_ITEMLIST.getApi()+ "?" + strParams,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                if(callback != null) {
-                                    callback.onRequestSuccess(response, "searchitem");
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if(callback != null) {
-                            callback.onRequestFail(volleyError, "searchitem");
-                        }
-                    }
-                }) {
+                        null, null) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         return ServerConstants.getHeaderOrder();
@@ -271,6 +266,27 @@ public class VolleyInteractor {
                 strRequest.setRetryPolicy(policy);
                 requestQueue.getCache().clear();
                 requestQueue.add(strRequest);
+                VolleyX.init(ctx);
+                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+                        @Override
+                        public void onCompleted() {
+                            Log.d("getitemlist", "onCompleted");
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            VolleyError ve = new VolleyError();
+                            callback.onRequestFail(ve, "searchitem");
+                        }
+
+                        @Override
+                        public void onNext(String response) {
+                            callback.onRequestSuccess(response, "searchitem");
+                        }
+                    });
+                VolleyX.setRequestQueue(requestQueue);
             }
         }).start();
     }

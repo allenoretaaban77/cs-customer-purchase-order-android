@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
 import com.fnc.order.android.adapters.PersonAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
@@ -29,7 +30,6 @@ import com.fnc.order.android.model.Person;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
-import com.android.volley.error.VolleyError;
 
 import org.json.JSONArray;
 import org.json.JSONException;

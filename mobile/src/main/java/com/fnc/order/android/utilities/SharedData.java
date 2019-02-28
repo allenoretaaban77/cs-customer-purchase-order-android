@@ -26,7 +26,7 @@ public class SharedData {
     }
 
     private SharedData(Context context) {
-        sharedPreferences = context.getSharedPreferences("FNCOrderSharedData",Context.MODE_PRIVATE);
+        sharedPreferences = context.getSharedPreferences("FNCOrderSharedData", Context.MODE_PRIVATE);
     }
 
     public void saveData(String key, String value) {

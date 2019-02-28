@@ -17,7 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.error.VolleyError;
+import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
