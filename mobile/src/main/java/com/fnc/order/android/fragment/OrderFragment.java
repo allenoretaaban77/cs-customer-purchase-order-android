@@ -32,6 +32,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
@@ -48,7 +49,6 @@ import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PopupMenu;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
-import com.android.volley.error.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.shehabic.droppy.DroppyClickCallbackInterface;
 import com.shehabic.droppy.DroppyMenuItem;
@@ -59,6 +59,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -274,6 +275,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
                             TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
                             tvDesc.setTextColor(getResources().getColor(R.color.red_2));
+                            TextView tvPrice = (TextView) trx.getChildAt(3);
+                            tvPrice.setTextColor(getResources().getColor(R.color.red_2));
+                            TextView tvTotal = (TextView) trx.getChildAt(4);
+                            tvTotal.setTextColor(getResources().getColor(R.color.red_2));
                         }
                     }
 
@@ -463,6 +468,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             etDesc.setText(il.getItemName());
                             TextView etUnit = (TextView) trx.findViewById(R.id.cell_unit);
                             etUnit.setText(il.getUnitName());
+                            TextView etPrice = (TextView) trx.findViewById(R.id.cell_price);
+                            if(!il.getSellingPrice().equals("null")) {
+                                double u_price = Double.parseDouble(il.getSellingPrice());
+                                DecimalFormat df = new DecimalFormat("#.00");
+                                etPrice.setText(df.format(u_price));
+                            }else{
+                                etPrice.setText("0.00");
+                            }
+                            TextView etTotal = (TextView) trx.findViewById(R.id.cell_total);
+                            etTotal.setText("0.00");
 
                             tl.addView(trx);
                             Order rowO = new Order();
@@ -504,6 +519,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                 tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
                                 LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
                                 tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
+                                TextView tvPrice = (TextView) trx.getChildAt(3);
+                                tvPrice.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
+                                TextView tvTotal = (TextView) trx.getChildAt(4);
+                                tvTotal.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
                             }
                         }
                     } finally {
@@ -515,6 +534,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
                         LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
                         tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
+                        TextView tvPrice = (TextView) trx.getChildAt(3);
+                        tvPrice.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
+                        TextView tvTotal = (TextView) trx.getChildAt(4);
+                        tvTotal.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
                     }
                 }
             }, 300
@@ -661,6 +684,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private void recomputeTally(String val) {
         TableRow trx = (TableRow) tblContentBox.findViewById(calcRefId);
         TextView tvQty = (TextView) trx.getChildAt(0);
+        TextView tvPrice = (TextView) trx.getChildAt(3);
+        double u_price = Double.parseDouble(tvPrice.getText().toString());
+        TextView tvTotal = (TextView) trx.getChildAt(4);
         String refStr = tvQty.getText().toString();
         Log.v("isItemClicked", isItemClicked.toString());
         if(isItemClicked) {
@@ -682,6 +708,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
         }
         tvQty.setText(refStr);
+        double u_quantity = Double.parseDouble(refStr);
+        double u_total = u_quantity * u_price;
+        DecimalFormat df = new DecimalFormat("#.00");
+        if(u_total == 0.0) {
+            tvTotal.setText("0.00");
+        }else{
+            tvTotal.setText(df.format(u_total));
+        }
     }
 
     private void showMenuPopup(View v) {

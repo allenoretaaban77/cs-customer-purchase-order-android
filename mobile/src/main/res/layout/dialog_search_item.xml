@@ -67,11 +67,12 @@
                 </FrameLayout>
             </LinearLayout>
             <LinearLayout
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
                 android:layout_marginRight="47dp"
+                android:layout_alignParentRight="true"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="4dp"
                 android:padding="3dp"
                 style="@style/btnTransparentStyleSmallWrap">
                 <com.balysv.materialripple.MaterialRippleLayout

@@ -15,14 +15,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.error.AuthFailureError;
-import com.android.volley.error.NetworkError;
-import com.android.volley.error.NoConnectionError;
-import com.android.volley.error.ParseError;
-import com.android.volley.error.ServerError;
-import com.android.volley.error.TimeoutError;
-import com.android.volley.error.VolleyError;
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
+import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.enumeration.API;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +34,8 @@ import org.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -43,6 +48,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -240,5 +247,31 @@ public class Helper {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static void syncData(Context ctx, VolleyCallback volleycb) {
+        VolleyInteractor v = new VolleyInteractor();
+        v.registerCallback(volleycb);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cn", ServerConstants.CN);
+        params.put("customer", "");
+
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+            it.remove();
+        }
+        strParams = strParams.replaceAll(" ", "%20");
+        v.getCustomers(ctx, params, strParams);
+    }
+
+    public static double roundTo(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

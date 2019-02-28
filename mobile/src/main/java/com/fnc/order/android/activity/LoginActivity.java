@@ -21,7 +21,7 @@ import android.widget.Button;
 
 import com.andreabaccega.widget.FormEditText;
 import com.android.volley.RequestQueue;
-import com.android.volley.error.VolleyError;
+import com.android.volley.VolleyError;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;

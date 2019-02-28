@@ -143,9 +143,21 @@
                                 <TextView
                                     android:id="@+id/ref_desc_elem"
                                     style="@style/tblCellTextViewHeader"
-                                    android:layout_width="480dp"
+                                    android:layout_width="300dp"
                                     android:layout_column="2"
                                     android:text="Description" />
+
+                                <TextView
+                                    style="@style/tblCellTextViewHeader"
+                                    android:layout_width="80dp"
+                                    android:layout_column="3"
+                                    android:text="Price" />
+
+                                <TextView
+                                    style="@style/tblCellTextViewHeader"
+                                    android:layout_width="80dp"
+                                    android:layout_column="4"
+                                    android:text="Total" />
                             </TableRow>
                         </TableLayout>
                     </LinearLayout>
