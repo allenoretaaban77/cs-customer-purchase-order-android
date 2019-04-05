@@ -152,7 +152,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             initViews(rootView);
         } finally {
             initListeners(rootView);
-            // empty return table
+            // empty order table
             DcOrder.getInstance(ctx).emptyOrderlist();
 
             initCalc(rootView);

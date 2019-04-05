@@ -191,10 +191,11 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                     irsx.setIsChecked(false);
                     irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
                     irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));
-                    if(!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("null") &&
-                            !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("")) {
-                        iRs.add(irsx);
-                    }
+//                    if(!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("null") &&
+//                            !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("")) {
+//                        iRs.add(irsx);
+//                    }
+                    iRs.add(irsx);
                 }
                 if(iRs.size() == 0) {
                     tv_no_data.setVisibility(View.VISIBLE);
