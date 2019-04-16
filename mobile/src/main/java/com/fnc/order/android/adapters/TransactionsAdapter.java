@@ -1,0 +1,66 @@
+package com.fnc.order.android.adapters;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+
+import com.fnc.order.android.R;
+import com.fnc.order.android.model.Ordered;
+import java.util.List;
+
+public class TransactionsAdapter extends ArrayAdapter<Ordered> {
+
+    private final Context context;
+    private final List<Ordered> item_values;
+
+    public TransactionsAdapter(Context context, List<Ordered> values) {
+        super(context, -1, values);
+        this.context = context;
+        this.item_values = values;
+    }
+
+    private TransactionsAdapter.OnItemClickListener onListenerClickListener;
+    public interface OnItemClickListener {
+        void onItemClick(View view, int actionId);
+    }
+    public void setOnItemClickListener(final TransactionsAdapter.OnItemClickListener onListenerClickListener) {
+        this.onListenerClickListener = onListenerClickListener;
+    }
+
+    private class ViewHolder {
+        private TextView tv_date;
+        private TextView tv_name;
+        private TextView tv_remarks;
+        public ViewHolder(View v) {
+            tv_date = (TextView) v.findViewById(R.id.tv_date);
+            tv_name = (TextView) v.findViewById(R.id.tv_name);
+            tv_remarks = (TextView) v.findViewById(R.id.tv_remarks);
+        }
+    }
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        TransactionsAdapter.ViewHolder holder;
+
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        Ordered od = item_values.get(position);
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.item_itemlist_tr, parent, false);
+            holder = new TransactionsAdapter.ViewHolder(convertView);
+            convertView.setTag(holder);
+        } else {
+            holder = (TransactionsAdapter.ViewHolder) convertView.getTag();
+        }
+
+        holder.tv_date.setText(od.getDeliveryDate().replace(" 00:00:00", ""));
+        holder.tv_name.setText(od.getCustomerName());
+        holder.tv_remarks.setText(od.getRemarks());
+
+        return convertView;
+    }
+}

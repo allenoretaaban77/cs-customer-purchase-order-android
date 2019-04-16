@@ -3,6 +3,7 @@ package com.fnc.order.android.database;
 import android.content.ContentValues;
 
 import com.fnc.order.android.enumeration.OrderKey;
+import com.fnc.order.android.enumeration.OrderedKey;
 
 import java.util.LinkedList;
 
@@ -23,6 +24,8 @@ public class QueryBuilder {
         String fieldName = null;
         if(field instanceof OrderKey)
             fieldName = ((OrderKey)field).getKey();
+        if(field instanceof OrderedKey)
+            fieldName = ((OrderedKey)field).getKey();
         return fieldName;
     }
 
@@ -30,6 +33,8 @@ public class QueryBuilder {
         String dataType = null;
         if(field instanceof OrderKey)
             dataType = ((OrderKey)field).getDataType();
+        if(field instanceof OrderedKey)
+            dataType = ((OrderedKey)field).getDataType();
         return dataType;
     }
 

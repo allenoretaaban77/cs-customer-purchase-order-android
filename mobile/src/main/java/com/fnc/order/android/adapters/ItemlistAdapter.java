@@ -2,22 +2,18 @@ package com.fnc.order.android.adapters;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.daimajia.swipe.SwipeLayout;
 import com.fnc.order.android.R;
-import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.model.Itemlist;
 
-import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -48,6 +44,14 @@ public class ItemlistAdapter extends ArrayAdapter<Itemlist> {
         this.onListenerClickListener = onListenerClickListener;
     }
 
+    private ItemlistAdapter.OnItemClickListener onRemarksClickListener;
+    public interface OnRemarksClickListener {
+        void onItemClick(View view, int actionId);
+    }
+    public void setOnRemarksClickListener(final ItemlistAdapter.OnItemClickListener onRemarksClickListener) {
+        this.onRemarksClickListener = onRemarksClickListener;
+    }
+
     private class ViewHolder {
         private TextView cell_qty;
         private TextView cell_description;
@@ -71,7 +75,7 @@ public class ItemlistAdapter extends ArrayAdapter<Itemlist> {
             btn_remarks = (MaterialRippleLayout) v.findViewById(R.id.btn_remarks);
             item_box = (LinearLayout) v.findViewById(R.id.item_box);
 
-            swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+            swipeLayout.setShowMode(SwipeLayout.ShowMode.PullOut);
         }
     }
 
@@ -106,7 +110,14 @@ public class ItemlistAdapter extends ArrayAdapter<Itemlist> {
 
         holder.cell_total.setText("0.00");
 
-        holder.btn_remarks.setOnClickListener(onDeleteListener(position, holder));
+        holder.btn_remarks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (onRemarksClickListener != null) {
+                    onRemarksClickListener.onItemClick(v, position);
+                }
+            }
+        });
         holder.btn_delete.setOnClickListener(onDeleteListener(position, holder));
         holder.item_box.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -39,12 +39,14 @@ import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcOrder;
+import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.listeners.DatePickerListener;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.Order;
+import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PopupMenu;
@@ -293,20 +295,23 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         }
                     }
 
-                    if(errFlag) {
+                    if (errFlag) {
                         isPosted = false;
                         dismissSpinnerDialog();
                         adapter.notifyDataSetChanged();
                         Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
-                    }else{
-                        AlertDialog.Builder builder;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+                    } else {
+                        if (refStringDate == null) {
+                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
                         } else {
-                            builder = new AlertDialog.Builder(ctx);
-                        }
-                        builder.setCancelable(false);
-                        builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
+                            AlertDialog.Builder builder;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+                            } else {
+                                builder = new AlertDialog.Builder(ctx);
+                            }
+                            builder.setCancelable(false);
+                            builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -323,6 +328,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                     }
                                 })
                                 .show();
+                        }
                     }
                 }else{
                     Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
@@ -365,9 +371,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
             }
             if(!errFlag) {
+                SharedData sp = SharedData.getInstance(ctx);
+
                 paramsArray.put("details", detailsArrayList);
 
-                SharedData sp = SharedData.getInstance(ctx);
                 HashMap<String, String> headersMap = new HashMap();
                 headersMap.put("companydb", ServerConstants.CN);
                 headersMap.put("customer_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
@@ -383,14 +390,65 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 paramsArray.put("header", headersMap);
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
-                Log.v("post_params_length", String.valueOf(paramsArrayStr.length()));
-                vi.postOrders(ctx, paramsArrayStr);
+
+                Ordered ol = new Ordered();
+                ol.setCustomerIntegRecid(sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
+                ol.setCustomerRecid(sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
+                ol.setCustomerName(sp.getData(SharedKey.CURRENT_STORE.getKey()));
+                ol.setDeliveryDate(refStringDate);
+                ol.setCreatedBy(sp.getData(API.IDENTITY_ID.getApi()));
+                ol.setRemarks(et_remarks.getText().toString().trim());
+                ol.setReferenceEmployeeNo(sp.getData(API.EMPLOYEE_ID.getApi()));
+                ol.setJson(paramsArrayStr);
+                ol.setDateTime(Helper.getPostingDate());
+                ol.setStatus(0);
+                DcOrdered.getInstance(ctx).insertOrderedlist(ol);
+
+                Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
+                getActivity().onBackPressed();
+                dismissSpinnerDialog();
+
+//                Log.v("post_params_length", String.valueOf(paramsArrayStr.length()));
+//                vi.postOrders(ctx, paramsArrayStr);
             }
         }else{
             dismissSpinnerDialog();
             Toast.makeText(ctx, "Error request. Please try again.", Toast.LENGTH_SHORT).show();
             isPosted = false;
         }
+    }
+
+    public void onRequestSuccess(String response, String type) {
+        isPosted = false;
+        dismissSpinnerDialog();
+        try {
+            response = response.replace("\r\n", "");
+            JSONArray objArr = new JSONArray(response);
+            if(type.equals("searchemployee")) {
+            }else{
+                if(objArr.length() > 0) {
+                    JSONObject obj = objArr.getJSONObject(0);
+                    Boolean status = obj.getBoolean("error");
+                    if(!status){
+                        Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(ctx, obj.getString("tag"), Toast.LENGTH_LONG).show();
+                        getActivity().onBackPressed();
+                    }else{
+                        Toast.makeText(ctx, "Post error... "+obj.getString("error_msg"), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(ctx, "Post error... Please try again.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onRequestFail(VolleyError volleyError, String type) {
+        isPosted = false;
+        dismissSpinnerDialog();
+        Toast.makeText(ctx, Helper.getVolleyError(volleyError), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -436,6 +494,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             adapter.notifyDataSetChanged();
                             bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
                             curRefPos = adapter.getCurPos();
+                        }
+                    });
+                    adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
+                        @Override
+                        public void onItemClick(View view,  int position) {
+                            adapter.setCurPos(position);
+                            alertDialog = okCancelInputRemarksDialogBuilder(ctx,
+                                    "Add Remarks",
+                                    "Save", null, "Cancel", cancelCallback );
+                            alertDialog.show();
                         }
                     });
                     list_view.setAdapter(adapter);
@@ -584,39 +652,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
             }, 300
         );
-    }
-
-    public void onRequestSuccess(String response, String type) {
-        isPosted = false;
-        dismissSpinnerDialog();
-        try {
-            response = response.replace("\r\n", "");
-            JSONArray objArr = new JSONArray(response);
-            if(type.equals("searchemployee")) {
-            }else{
-                if(objArr.length() > 0) {
-                    JSONObject obj = objArr.getJSONObject(0);
-                    Boolean status = obj.getBoolean("error");
-                    if(!status){
-                        Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
-//                        Toast.makeText(ctx, obj.getString("tag"), Toast.LENGTH_LONG).show();
-                        getActivity().onBackPressed();
-                    }else{
-                        Toast.makeText(ctx, "Post error... "+obj.getString("error_msg"), Toast.LENGTH_SHORT).show();
-                    }
-                }else{
-                    Toast.makeText(ctx, "Post error... Please try again.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onRequestFail(VolleyError volleyError, String type) {
-        isPosted = false;
-        dismissSpinnerDialog();
-        Toast.makeText(ctx, Helper.getVolleyError(volleyError), Toast.LENGTH_SHORT).show();
     }
 
     private void backItNow(final View v) {
@@ -837,16 +872,18 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tvMessage.setText(message);
         tvMessage.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         final EditText etText = (EditText) layout.findViewById(R.id.et_remarks);
+        Order ol =  curRefArrayList.get(adapter.getCurPos());
+        etText.setText(ol.getRemarks());
 
         Button btnOK = (Button) layout.findViewById(R.id.btnOk);
         btnOK.setText(okButtonCaption);
         btnOK.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 alertDialog.dismiss();
-//                Toast.makeText(activity, etText.getText().toString(), Toast.LENGTH_SHORT).show();
                 Toast.makeText(activity, "Remarks saved successfully.", Toast.LENGTH_SHORT).show();
-                DcOrder.getInstance(activity).updateOrderlistRemarksString(calcRefId.toString(),
-                        etText.getText().toString(), false);
+                Order ol =  curRefArrayList.get(adapter.getCurPos());
+                ol.setRemarks(etText.getText().toString());
+                adapter.notifyDataSetChanged();
             }
         });
 

@@ -95,10 +95,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("7777777");
+//        usernameText.setText("aban.allen@yahoo.com");
 //        passwordEText.setText("7777777");
-//        usernameText.setText("vhino15@gmail.com");
-//        passwordEText.setText("051295");
     }
 
     private void initListeners(){

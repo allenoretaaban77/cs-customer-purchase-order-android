@@ -10,7 +10,9 @@ import android.util.Log;
 import com.android.volley.VolleyError;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcOrder;
+import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.model.Order;
+import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.VolleyInteractor;
 
 import java.util.LinkedList;
@@ -69,19 +71,18 @@ public class OrdersService extends Service implements VolleyCallback {
         timerTask = new TimerTask() {
             public void run() {
                 Log.i("DSX", "in timer "+ (counter++));
-
-                LinkedList<Order> ol =  DcOrder.getInstance(getApplicationContext())
-                        .getOrderlist(0);
-                if(ol.size() > 0 ) {
-                    for (int i = 0; i < ol.size(); i++) {
-                        Order rsPL = ol.get(i);
+                LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext())
+                        .getOrderedlist();
+                if(od.size() > 0 ) {
+                    for (int i = 0; i < od.size(); i++) {
+                        Ordered rsOD = od.get(i);
 
                         VolleyInteractor vi = new VolleyInteractor();
                         vi.registerCallback(refVB);
-//                        vi.postChecklist(getApplicationContext(), rsPL.getJson());
+                        vi.postOrders(getApplicationContext(), rsOD.getJson());
 //
-//                        DcPreparedlist.getInstance(getApplicationContext())
-//                                .updateStatusViaRecId(String.valueOf(rsPL.getChecklistRecid()), 1);
+                        DcOrdered.getInstance(getApplicationContext())
+                                .updateStatusViaRecId(rsOD.getCustomerRecid(), 1);
                     }
                 }
             }
