@@ -161,47 +161,6 @@ public class VolleyInteractor {
         }).start();
     }
 
-    public void getDrivers(final Context ctx, final HashMap<String, String> params,
-                             final String strParams) {
-        new Thread(new Runnable(){
-            public void run(){
-                StringRequest strRequest = new StringRequest( Request.Method.GET,
-                        ServerConstants.SERVER_URL + API.GET_EMPLOYEES.getApi()+ "?" + strParams,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                if(callback != null) {
-                                    callback.onRequestSuccess(response, "searchemployee");
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if(callback != null) {
-                            callback.onRequestFail(volleyError, "searchemployee");
-                        }
-                    }
-                }) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        return ServerConstants.getHeaderOrder();
-                    }
-                    public Map<String, String> getParams(){
-                        return params;
-                    }
-
-                };
-                requestQueue = Volley.newRequestQueue(ctx);
-                int socketTimeout = 10000;
-                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                strRequest.setRetryPolicy(policy);
-                requestQueue.getCache().clear();
-                requestQueue.add(strRequest);
-            }
-        }).start();
-    }
-
     public void getCustomers(final Context ctx, final HashMap<String, String> params,
                              final String strParams) {
         new Thread(new Runnable(){
@@ -330,47 +289,6 @@ public class VolleyInteractor {
                 requestQueue = Volley.newRequestQueue(ctx);
                 int socketTimeout = 10000;
                 RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-                strRequest.setRetryPolicy(policy);
-                requestQueue.getCache().clear();
-                requestQueue.add(strRequest);
-            }
-        }).start();
-    }
-
-    public void postLoadState(final Context ctx, final HashMap<String, String> params,
-                                    final String strParams) {
-        new Thread(new Runnable(){
-            public void run(){
-                StringRequest strRequest = new StringRequest( Request.Method.POST,
-                        ServerConstants.SERVER_URL + API.POST_LOADSTATE.getApi()+ "?" + strParams,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                if(callback != null) {
-                                    callback.onRequestSuccess(response, "postloadstate");
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if(callback != null) {
-                            callback.onRequestFail(volleyError, "postloadstate");
-                        }
-                    }
-                }) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        return ServerConstants.getHeaderOrder();
-                    }
-                    public Map<String, String> getParams(){
-                        return params;
-                    }
-
-                };
-                requestQueue = Volley.newRequestQueue(ctx);
-                int socketTimeout = 10000;
-                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
                 strRequest.setRetryPolicy(policy);
                 requestQueue.getCache().clear();
                 requestQueue.add(strRequest);

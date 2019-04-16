@@ -41,7 +41,8 @@ public class SplashActivity extends BaseActivity {
                     if(!SharedData.getInstance(ctx).isPrefExists(API.IDENTITY_ID.getApi())) {
                         showActivity(LoginActivity.class);
                     }else{
-                        showActivity(MainActivity.class);
+//                        showActivity(MainActivity.class);
+                        showActivity(LoginActivity.class);
                     }
                 }
                 @Override

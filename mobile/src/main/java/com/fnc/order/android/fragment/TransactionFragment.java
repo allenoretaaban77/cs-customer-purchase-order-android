@@ -7,19 +7,24 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
+import com.fnc.order.android.adapters.TransactionsAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.datacontroller.DcOrdered;
+import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.Helper;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class TransactionFragment extends Fragment implements VolleyCallback {
 
@@ -27,6 +32,8 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
     private View refV;
     private ProgressDialog loader;
     private ImageButton btn_back;
+    private ListView list_view;
+    private TransactionsAdapter adapter;
 
     public TransactionFragment() {
         // Required empty public constructor
@@ -62,6 +69,14 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
 
     private void initViews(View v) {
         btn_back = (ImageButton) refV.findViewById(R.id.btn_back);
+        list_view = (ListView) refV.findViewById(R.id.list_view);
+
+        LinkedList<Ordered> odll = DcOrdered.getInstance(ctx).getOrderedlist();
+        ArrayList<Ordered> arrayList = new ArrayList<Ordered>();
+        if(odll.size() > 0) {
+            adapter = new TransactionsAdapter(ctx, odll);
+            list_view.setAdapter(adapter);
+        }
     }
 
     private void initListeners(View v) {

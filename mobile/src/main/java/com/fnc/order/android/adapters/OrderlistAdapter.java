@@ -39,6 +39,14 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         this.onListenerClickListener = onListenerClickListener;
     }
 
+    private OrderlistAdapter.OnRemarksClickListener onRemarksClickListener;
+    public interface OnRemarksClickListener {
+        void onItemClick(View view, int actionId);
+    }
+    public void setOnRemarksClickListener(final OrderlistAdapter.OnRemarksClickListener onRemarksClickListener) {
+        this.onRemarksClickListener = onRemarksClickListener;
+    }
+
     private class ViewHolder {
         private TextView cell_qty;
         private TextView cell_description;
@@ -103,7 +111,14 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             holder.cell_total.setText("0.00");
         }
 
-        holder.btn_remarks.setOnClickListener(onDeleteListener(position, holder));
+        holder.btn_remarks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (onRemarksClickListener != null) {
+                    onRemarksClickListener.onItemClick(v, position);
+                }
+            }
+        });
         holder.btn_delete.setOnClickListener(onDeleteListener(position, holder));
         holder.item_box.setOnClickListener(new View.OnClickListener() {
             @Override

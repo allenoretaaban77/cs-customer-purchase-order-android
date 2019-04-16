@@ -5,22 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
-        android:id="@+id/outer_liner_layout"
         android:layout_margin="5dp"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent">
-        <LinearLayout
-            style="@style/layoutStyleCheckList"
-            android:background="@drawable/background_round_border"
-            android:orientation="vertical"
-            android:padding="7dp">
+        android:background="@drawable/background_round_border"
+        android:orientation="vertical"
+        android:padding="7dp">
 
             <RelativeLayout
                 style="@style/mHeader">
-                <LinearLayout
+                <RelativeLayout
                     android:layout_height="match_parent"
                     android:layout_width="match_parent">
                     <TextView
@@ -29,12 +27,12 @@
                         android:layout_height="match_parent"
                         android:layout_width="match_parent"
                         android:textFontWeight="700"
-                        android:text="Transactions"
+                        android:text="TRANSACTIONS"
                         android:textStyle="bold"
                         android:textSize="19sp"
-                        android:textColor="@color/blue_3"
+                        android:textColor="@color/gray_6"
                         android:fontFamily="sans-serif-medium" />
-                </LinearLayout>
+                </RelativeLayout>
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -77,14 +75,71 @@
             </RelativeLayout>
 
             <LinearLayout
-                android:background="@drawable/background_gradient_round_a"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:padding="3dp"
                 android:orientation="vertical">
-            </LinearLayout>
 
-        </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/header_box"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TableLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingLeft="1dp"
+                            android:paddingRight="1dp">
+
+                            <TableRow
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <TextView
+                                    style="@style/tblCellTextViewHeader"
+                                    android:layout_width="120dp"
+                                    android:layout_column="0"
+                                    android:text="Date" />
+
+                                <TextView
+                                    android:id="@+id/ref_desc_elem"
+                                    style="@style/tblCellTextViewHeader"
+                                    android:layout_weight="1"
+                                    android:layout_width="match_parent"
+                                    android:layout_column="1"
+                                    android:text="Company Name" />
+
+                                <TextView
+                                    style="@style/tblCellTextViewHeader"
+                                    android:layout_width="200dp"
+                                    android:layout_column="2"
+                                    android:text="Remarks" />
+                            </TableRow>
+                        </TableLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <android.support.design.widget.CoordinatorLayout
+                    android:id="@+id/content_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/background_green_3_border"
+                    android:orientation="vertical"
+                    android:layout_margin="1dp">
+
+                    <ListView
+                        android:layout_weight="1"
+                        android:id="@+id/list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </android.support.design.widget.CoordinatorLayout>
+
+            </LinearLayout>
 
     </LinearLayout>
 
