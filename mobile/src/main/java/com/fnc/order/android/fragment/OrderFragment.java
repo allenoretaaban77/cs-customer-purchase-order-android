@@ -17,8 +17,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -27,13 +25,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.daimajia.swipe.SwipeLayout;
 import com.fnc.order.android.R;
+import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
@@ -102,6 +103,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private Boolean isItemClicked = false;
     private String refDate;
     private String refStringDate;
+    private ListView list_view;
+    private OrderlistAdapter adapter;
+    private SwipeLayout swipeLayout;
+    private ArrayList<Order> curRefArrayList;
+    private Integer curRefPos = 0;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -114,6 +120,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         rootView = inflater.inflate(R.layout.fragment_order, container, false);
         ctx = rootView.getContext();
         thisFragment = this;
+        curRefArrayList = new ArrayList<Order>();
 
         mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
         mainTableBox.post(new Runnable() {
@@ -182,6 +189,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
+
+        list_view = (ListView) v.findViewById(R.id.list_view);
     }
 
     private void initListeners(View v) {
@@ -258,32 +267,36 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public final void onClick(final View v) {
                 Helper.hideSoftKeyboard(getActivity());
 
-                LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
+//                LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
                 final ArrayList<HashMap> detailsArrayList = new ArrayList();
-                if(ol.size() > 0) {
+                if(curRefArrayList.size() > 0) {
                     Boolean errFlag = false;
-                    for (int i = 0; i < ol.size(); i++) {
-                        Order rowRl = ol.get(i);
+                    for (int i = 0; i < curRefArrayList.size(); i++) {
+                        Order rowRl = curRefArrayList.get(i);
                         if(rowRl.getQuantity().equals("") || rowRl.getQuantity().equals("0")) {
                             errFlag = true;
-                            TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
-                            TextView tvQty = (TextView) trx.getChildAt(0);
-                            tvQty.setTextColor(getResources().getColor(R.color.red_2));
-                            TextView tvUnit = (TextView) trx.getChildAt(1);
-                            tvUnit.setTextColor(getResources().getColor(R.color.red_2));
-                            LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-                            TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
-                            tvDesc.setTextColor(getResources().getColor(R.color.red_2));
-                            TextView tvPrice = (TextView) trx.getChildAt(3);
-                            tvPrice.setTextColor(getResources().getColor(R.color.red_2));
-                            TextView tvTotal = (TextView) trx.getChildAt(4);
-                            tvTotal.setTextColor(getResources().getColor(R.color.red_2));
+                            curRefArrayList.get(i).setIsError(true);
+//                            TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
+//                            TextView tvQty = (TextView) trx.getChildAt(0);
+//                            tvQty.setTextColor(getResources().getColor(R.color.red_2));
+//                            TextView tvUnit = (TextView) trx.getChildAt(1);
+//                            tvUnit.setTextColor(getResources().getColor(R.color.red_2));
+//                            LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
+//                            TextView tvDesc = (TextView) tvDescBox.getChildAt(0);
+//                            tvDesc.setTextColor(getResources().getColor(R.color.red_2));
+//                            TextView tvPrice = (TextView) trx.getChildAt(3);
+//                            tvPrice.setTextColor(getResources().getColor(R.color.red_2));
+//                            TextView tvTotal = (TextView) trx.getChildAt(4);
+//                            tvTotal.setTextColor(getResources().getColor(R.color.red_2));
+                        }else{
+                            curRefArrayList.get(i).setIsError(false);
                         }
                     }
 
                     if(errFlag) {
                         isPosted = false;
                         dismissSpinnerDialog();
+                        adapter.notifyDataSetChanged();
                         Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
                     }else{
                         AlertDialog.Builder builder;
@@ -335,12 +348,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         final HashMap<String, Object> paramsArray = new HashMap();
         paramsArray.clear();
 
-        LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
+//        LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
         final ArrayList<HashMap> detailsArrayList = new ArrayList();
-        if (ol.size() > 0) {
+        if (curRefArrayList.size() > 0) {
             Boolean errFlag = false;
-            for (int i = 0; i < ol.size(); i++) {
-                Order rowOl = ol.get(i);
+            for (int i = 0; i < curRefArrayList.size(); i++) {
+                Order rowOl = curRefArrayList.get(i);
                 if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
                     HashMap<String, Object> detailMap = new HashMap();
                     detailMap.put("quantity", rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity() );
@@ -394,10 +407,40 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             case ITEM_DIALOG_FRAGMENT:
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle extras = data.getExtras();
+
+                    curRefPos = adapter != null ? adapter.getCurPos() : -1 ;
+
                     ArrayList<Itemlist> arrayList = new ArrayList<Itemlist>();
                     arrayList = (ArrayList) extras.get(SharedKey.SEARCHED_ITEMS.getKey());
-
                     for(Itemlist il : arrayList){
+                        Order ol = new Order();
+                        ol.setQuantity("");
+                        ol.setItemRecid(String.valueOf(il.getRecid()));
+                        ol.setItemName(String.valueOf(il.getItemName()));
+                        ol.setUnitName(String.valueOf(il.getUnitName()));
+                        ol.setRemarks("");
+                        ol.setOldSku(String.valueOf(il.getOldSku()));
+                        ol.setSellingPrice(String.valueOf(il.getSellingPrice()));
+                        ol.setTotal("null");
+                        ol.setIsChecked(false);
+                        ol.setIsError(false);
+                        curRefArrayList.add(ol);
+                    }
+
+                    adapter = new OrderlistAdapter(ctx, curRefArrayList);
+                    adapter.setCurPos(curRefPos);
+                    adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view,  int position) {
+                            adapter.setCurPos(position);
+                            adapter.notifyDataSetChanged();
+                            bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                            curRefPos = adapter.getCurPos();
+                        }
+                    });
+                    list_view.setAdapter(adapter);
+
+                    /*for(Itemlist il : arrayList){
                         LinkedList<Order> rlx = DcOrder.getInstance(ctx).getOrderlist(il.getRecid());
                         if(rlx.size() == 0) {
                             TableRow trx = (TableRow) getLayoutInflater().inflate(R.layout.table_row_item_list, null);
@@ -491,7 +534,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         }else{
                             Toast.makeText(ctx, "Some item is already exist on the list", Toast.LENGTH_SHORT).show();
                         }
-                    }
+                    }*/
                 }
                 if (resultCode == Activity.RESULT_CANCELED){ }
                 break;
@@ -663,13 +706,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         Button btnDelete = (Button) v.findViewById(R.id.cal_delete);
         btnDelete.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-                TableRow trx = (TableRow) tblContentBox.findViewById(calcRefId);
-                TextView tvQty = (TextView) trx.getChildAt(0);
-                String refStr = tvQty.getText().toString();
+                Order ol =  curRefArrayList.get(adapter.getCurPos());
+                String refStr = ol.getQuantity();
                 if (refStr.length() > 0) {
                     refStr = refStr.substring(0, refStr.length() - 1);
                 }
-                tvQty.setText(refStr);
+                ol.setQuantity(refStr);
+                adapter.notifyDataSetChanged();
+                recomputeTally("");
             }
         });
         Button btnClose = (Button) v.findViewById(R.id.cal_cancel);
@@ -681,7 +725,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private void recomputeTally(String val) {
-        TableRow trx = (TableRow) tblContentBox.findViewById(calcRefId);
+        Order ol =  curRefArrayList.get(adapter.getCurPos());
+        String refStr = ol.getQuantity();
+        double u_price = Double.parseDouble(ol.getSellingPrice());
+
+        /*TableRow trx = (TableRow) tblContentBox.findViewById(calcRefId);
         TextView tvQty = (TextView) trx.getChildAt(0);
         TextView tvPrice = (TextView) trx.getChildAt(3);
         double u_price = Double.parseDouble(tvPrice.getText().toString());
@@ -691,7 +739,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         if(isItemClicked) {
             refStr = "";
             isItemClicked = false;
-        }
+        }*/
+
         if(val.equals(".")) {
             if(!refStr.contains(".")) {
                 refStr = refStr+val;
@@ -706,15 +755,21 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 refStr = refStr+val;
             }
         }
-        tvQty.setText(refStr);
+        ol.setQuantity(refStr);
+//        tvQty.setText(refStr);
+        refStr = refStr.equals("") ? "0" : refStr ;
         double u_quantity = Double.parseDouble(refStr);
         double u_total = u_quantity * u_price;
         DecimalFormat df = new DecimalFormat("#.00");
         if(u_total == 0.0) {
-            tvTotal.setText("0.00");
+            ol.setTotal("0.00");
+//            tvTotal.setText("0.00");
         }else{
-            tvTotal.setText(df.format(u_total));
+            ol.setTotal(df.format(u_total));
+//            tvTotal.setText(df.format(u_total));
         }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void showMenuPopup(View v) {
