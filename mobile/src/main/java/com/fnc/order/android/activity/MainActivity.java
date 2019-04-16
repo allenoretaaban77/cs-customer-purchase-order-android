@@ -26,8 +26,8 @@ public class MainActivity extends BaseActivity {
 
         setContentView(R.layout.activity_main);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-//        openFragment(new OrderFragment(), "order");
-        openFragment(new CustomerFragment(), "customer");
+        openFragment(new OrderFragment(), "order");
+//        openFragment(new CustomerFragment(), "customer");
     }
 
     private void openFragment(Fragment fragment, String tag) {
