@@ -1,28 +1,52 @@
 package com.fnc.order.android.activity;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.fragment.OrderFragment;
 import com.fnc.order.android.fragment.TransactionFragment;
 import com.fnc.order.android.R;
+import com.fnc.order.android.services.OrdersService;
 
 public class MainActivity extends BaseActivity {
 
     Context ctx;
+    private OrdersService oService;
+    Intent mServiceIntent;
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("DSX", "service is running");
+                return true;
+            }
+        }
+        Log.i ("DSX", "service is stops");
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ctx = this;
+
+        oService = new OrdersService(this);
+        mServiceIntent = new Intent(this, oService.getClass());
+        if (!isMyServiceRunning(oService.getClass())) {
+            startService(mServiceIntent);
+        }
 
         setContentView(R.layout.activity_main);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
