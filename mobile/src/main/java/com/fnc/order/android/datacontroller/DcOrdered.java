@@ -66,6 +66,19 @@ public class DcOrdered extends DBHelper {
         return list;
     }
 
+    public LinkedList<Ordered> getOrderedlistCheckStatus() {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.ORDERED.getName() + " WHERE STATUS = 0 ORDER BY datetime DESC";
+        Cursor c = db.rawQuery(strQry, null);
+        LinkedList<Ordered> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setOrderedlist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
     private Ordered setOrderedlist(Cursor c) {
         Ordered od = new Ordered();
         od.setCustomerIntegRecid(c.getString(c.getColumnIndex(OrderedKey.CUSTOMER_INTEG_RECID.getKey())));
