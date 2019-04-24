@@ -72,7 +72,7 @@ public class OrdersService extends Service implements VolleyCallback {
             public void run() {
                 Log.i("DSX", "in timer "+ (counter++));
                 LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext())
-                        .getOrderedlist();
+                        .getOrderedlistCheckStatus();
                 if(od.size() > 0 ) {
                     for (int i = 0; i < od.size(); i++) {
                         Ordered rsOD = od.get(i);

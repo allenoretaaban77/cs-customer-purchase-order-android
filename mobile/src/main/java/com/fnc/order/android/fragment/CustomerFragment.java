@@ -1,8 +1,10 @@
 package com.fnc.order.android.fragment;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,7 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,12 +25,16 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
+import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
+import com.fnc.order.android.adapters.PersonAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.MenulistKey;
+import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
+import com.fnc.order.android.model.Person;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.VolleyInteractor;
 
@@ -51,7 +60,13 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private ListView listview;
     private List<String> customersList = new ArrayList<>();
     private MaterialRippleLayout imgSearch;
+    private MaterialRippleLayout alphaSort;
     private EditText etCustomerName;
+    private GridView alphagridview;
+    private String[] stringAlpha = { "A","B","C","D","E","F","G","H","I","J","K","L",
+            "M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
+    private AlphaGridAdapter adapterAlpha;
+    private LinearLayout alphagridview_box, storelistview_box;
 
     @Nullable
     @Override
@@ -74,11 +89,19 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 
     private void initViews(View v) {
         imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
+        alphaSort = (MaterialRippleLayout) v.findViewById(R.id.layout_alpha);
         etCustomerName = (EditText) v.findViewById(R.id.et_customername);
         listview = (ListView) v.findViewById(R.id.storelistview);
 
         TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
+
+        alphagridview = (GridView) v.findViewById(R.id.alphagridview);
+        adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
+        alphagridview.setAdapter(adapterAlpha);
+
+        alphagridview_box = (LinearLayout) v.findViewById(R.id.alphagridview_box);
+        storelistview_box = (LinearLayout) v.findViewById(R.id.storelistview_box);
     }
 
     private void initListeners(View v) {
@@ -87,7 +110,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     if(!etCustomerName.getText().toString().trim().equals("")) {
                         Helper.hideSoftKeyboard(getActivity());
-                        fillData(v);
+                        fillData(v, etCustomerName.getText().toString().trim());
                     }else{
                         Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
                     }
@@ -100,21 +123,45 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             public void onClick(View v) {
                 if(!etCustomerName.getText().toString().trim().equals("")) {
                     Helper.hideSoftKeyboard(getActivity());
-                    fillData(v);
+                    fillData(v, etCustomerName.getText().toString().trim());
                 }else{
                     Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+        alphaSort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                storelistview_box.setVisibility(View.GONE);
+                alphagridview_box.setVisibility(View.VISIBLE);
+                alphagridview_box.setAlpha(0.0f);
+                alphagridview_box.animate().translationY(0)
+                        .alpha(1.0f).setListener(null);
+            }
+        });
+        adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
+            @Override
+            public void onItemClick(View v, int pos) {
+//                Toast.makeText(ctx, stringAlpha[pos], Toast.LENGTH_SHORT).show();
+                Helper.hideSoftKeyboard(getActivity());
+                fillData(v, stringAlpha[pos]);
+            }
+        });
     }
 
-    private void fillData(View v) {
+    private void fillData(View v, String stringSearch) {
+        alphagridview_box.setVisibility(View.GONE);
+        storelistview_box.setVisibility(View.VISIBLE);
+        storelistview_box.setAlpha(0.0f);
+        storelistview_box.animate().translationY(0)
+                .alpha(1.0f).setListener(null);
+
         showSpinnerDialog(v);
         vi = new VolleyInteractor();
         vi.registerCallback(this);
         HashMap<String, String> params = new HashMap<>();
         params.put("cn", ServerConstants.CN);
-        params.put("customer", etCustomerName.getText().toString().trim());
+        params.put("customer", stringSearch);
 
         Iterator it = params.entrySet().iterator();
         String strParams = "";
