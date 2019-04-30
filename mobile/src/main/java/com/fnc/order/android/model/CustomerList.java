@@ -7,6 +7,9 @@ public class CustomerList implements Serializable {
     private int recid;
     private int customerID;
     private String customername;
+    private int group_recid;
+    private int integration_recid;
+    private String dateupdated;
 
     public Integer getRecId() {
         return recid;

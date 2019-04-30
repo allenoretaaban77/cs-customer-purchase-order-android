@@ -13,6 +13,7 @@ public class Order implements Serializable {
     private String total;
     private Boolean is_checked;
     private Boolean is_error;
+    private Boolean is_locked;
 
     public String getQuantity() { return quantity; }
     public void setQuantity(String quantity) { this.quantity = quantity; }
@@ -49,4 +50,9 @@ public class Order implements Serializable {
         return is_error;
     }
     public void setIsError(Boolean is_error) { this.is_error = is_error; }
+
+    public Boolean getIsLocked() {
+        return is_locked;
+    }
+    public void setIsLocked(Boolean is_locked) { this.is_locked = is_locked; }
 }

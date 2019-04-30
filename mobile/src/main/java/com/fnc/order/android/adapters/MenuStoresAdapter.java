@@ -81,11 +81,6 @@ public class MenuStoresAdapter extends ArrayAdapter<MenuList> {
                 @Override
                 public void onClick(final View v){
                     if(onButtonClickListener != null){
-                        SharedData sp = SharedData.getInstance(context);
-                        sp.saveData(SharedKey.CURRENT_REMARKS.getKey(), mlRS.getRemarks());
-                        sp.saveData(SharedKey.CURRENT_STORE.getKey(), mlRS.getCustomerName());
-                        sp.saveData(SharedKey.CURRENT_CUSTOMER_ID.getKey(), mlRS.getCustomerID());
-                        sp.saveData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey(), mlRS.getCustomerIntegrationId());
                         onButtonClickListener.onItemClick(v, position);
                     }
                 }

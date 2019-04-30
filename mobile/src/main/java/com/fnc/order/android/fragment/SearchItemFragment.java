@@ -160,7 +160,8 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         String searchStr = et_item_name.getText().toString().trim();
         params.put("itemname", searchStr);
         params.put("cn", ServerConstants.CN);
-        params.put("customerid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
+//        params.put("customerid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
+        params.put("customerid", "-1");
         Iterator it = params.entrySet().iterator();
         String strParams = "";
         while (it.hasNext()) {
