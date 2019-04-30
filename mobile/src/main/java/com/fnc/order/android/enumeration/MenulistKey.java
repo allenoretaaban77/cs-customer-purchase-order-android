@@ -7,7 +7,8 @@ public enum MenulistKey {
     CUSTOMER_INTEG_ID("integration_recid", DataType.TEXT),
     CUSTOMER_NAME("customername", DataType.TEXT),
     REMARKS("remarks", DataType.TEXT),
-    RECORD_COUNT("recordcount", DataType.INTEGER);
+    RECORD_COUNT("recordcount", DataType.INTEGER),
+    ALPHA_CHAR("alphachar", DataType.TEXT);
 
     private String key;
     private String dataType;

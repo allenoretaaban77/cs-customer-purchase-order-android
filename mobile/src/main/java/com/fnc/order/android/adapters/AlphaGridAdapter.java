@@ -16,20 +16,22 @@ import com.fnc.order.android.utilities.SharedData;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class AlphaGridAdapter extends BaseAdapter {
 
     private Context ctx;
-    private String[] alphaStringArray;
+    private ArrayList<String> alphaStringArray;
 
-    public AlphaGridAdapter(Context context, String[] array) {
+    public AlphaGridAdapter(Context context, ArrayList<String> array) {
         ctx = context;
         alphaStringArray = array;
     }
 
     public int getCount() {
-        return alphaStringArray.length;
+        return alphaStringArray.size();
     }
 
     public Object getItem(int position) {
@@ -60,7 +62,7 @@ public class AlphaGridAdapter extends BaseAdapter {
             vh = (AlphaGridAdapter.ViewHolder) v.getTag();
         }
 
-        vh.tv_alpha.setText(alphaStringArray[position]);
+        vh.tv_alpha.setText(alphaStringArray.get(position));
         vh.mrl_box.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(final View v){
@@ -69,6 +71,7 @@ public class AlphaGridAdapter extends BaseAdapter {
                 }
             }
         });
+
         return v;
     }
 

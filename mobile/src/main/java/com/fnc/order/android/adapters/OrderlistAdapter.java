@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.daimajia.swipe.SwipeLayout;
@@ -119,7 +120,12 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
                 }
             }
         });
-        holder.btn_delete.setOnClickListener(onDeleteListener(position, holder));
+        if (iRs.getIsLocked()) {
+//            Toast.makeText(context, "Item cannot be deleted", Toast.LENGTH_LONG).show();
+            holder.btn_delete.setVisibility(View.GONE);
+        } else {
+            holder.btn_delete.setOnClickListener(onDeleteListener(position, holder));
+        }
         holder.item_box.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {

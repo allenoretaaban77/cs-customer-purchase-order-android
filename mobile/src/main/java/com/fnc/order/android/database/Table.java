@@ -9,7 +9,8 @@ public enum Table {
     STORELIST("storelists"),
     NOTIFICATIONS("notifications"),
     CHECKLIST("checklists"),
-    CHECKLIST_BU("checklists_backup");
+    CHECKLIST_BU("checklists_backup"),
+    CUSTOMERLIST("customerlists");
 
     private String name;
 

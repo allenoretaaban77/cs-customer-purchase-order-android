@@ -6,9 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 
+import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.model.Ordered;
+import com.fnc.order.android.utilities.Helper;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -19,17 +21,19 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DBPath = Environment.getExternalStorageDirectory().toString()
             + File.separator + "Android"
             + File.separator + "data"
-            + File.separator + "com.fnc.order.android";
+            + File.separator;
 
     public DBHelper(Context context) {
-        super(context, DBPath + File.separator + DbConstants.DB_NAME, null, DbConstants.DB_VERSION);
+        super(context, DBPath + context.getPackageName() + File.separator + DbConstants.DB_NAME,
+                null, DbConstants.DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(createTables(Table.ORDER, setOrderFields()));
         db.execSQL(createTables(Table.ORDERED, setOrderedFields()));
-        Log.i(TAG,"Database created path : "+db.getPath());
+        db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
+        Log.i(TAG,"Database created path : " + db.getPath());
     }
 
     protected String createTables(Table table,LinkedList<?> list) {
@@ -63,12 +67,25 @@ public class DBHelper extends SQLiteOpenHelper {
         return fields;
     }
 
+    protected LinkedList<MenulistKey> setMenulistFields() {
+        LinkedList<MenulistKey> fields = new LinkedList<>();
+        fields.add(MenulistKey.CUSTOMER_ID);
+        fields.add(MenulistKey.CUSTOMER_INTEG_ID);
+        fields.add(MenulistKey.CUSTOMER_NAME);
+        fields.add(MenulistKey.REMARKS);
+        fields.add(MenulistKey.RECORD_COUNT);
+        fields.add(MenulistKey.ALPHA_CHAR);
+        return fields;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         int version = oldVersion + 1;
         switch (version){
             case 2:
                 db.execSQL(createTables(Table.ORDER, setOrderFields()));
+                db.execSQL(createTables(Table.ORDERED, setOrderedFields()));
+                db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
         }
     }
 }

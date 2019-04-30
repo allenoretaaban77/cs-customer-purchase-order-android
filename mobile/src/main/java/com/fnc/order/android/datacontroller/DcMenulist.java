@@ -11,6 +11,7 @@ import com.fnc.order.android.database.Table;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.model.MenuList;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class DcMenulist extends DBHelper {
@@ -52,11 +53,37 @@ public class DcMenulist extends DBHelper {
         db.close();
     }
 
-    public LinkedList<MenuList> getAllMenulist() {
+    public ArrayList<String> getAllMenulistAlpha() {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT *" +
-                " FROM " + Table.MENULIST.getName()
-                + " ORDER BY " + MenulistKey.CUSTOMER_NAME.getKey() + " ASC";
+        String strQry = "SELECT " + MenulistKey.ALPHA_CHAR.getKey() +
+            " FROM " + Table.MENULIST.getName() +
+            " GROUP BY " + MenulistKey.ALPHA_CHAR.getKey() +
+            " ORDER BY " + MenulistKey.ALPHA_CHAR.getKey() + " ASC";
+        Cursor c = db.rawQuery(strQry, null);
+        ArrayList<String> stringAlpha = new ArrayList<String>();
+        int refInc = 0;
+        while (c.moveToNext()) {
+            stringAlpha.add(c.getString(0));
+        }
+        c.close();
+        db.close();
+        return stringAlpha;
+    }
+
+    public LinkedList<MenuList> getAllMenulist(Boolean isAlpha, String stringSearch) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "";
+        if (isAlpha) {
+            strQry = "SELECT *" +
+                    " FROM " + Table.MENULIST.getName() +
+                    " WHERE " + MenulistKey.ALPHA_CHAR.getKey() + " = '" + stringSearch + "'" +
+                    " ORDER BY " + MenulistKey.CUSTOMER_NAME.getKey() + " ASC";
+        } else {
+            strQry = "SELECT *" +
+                    " FROM " + Table.MENULIST.getName() +
+                    " WHERE " + MenulistKey.CUSTOMER_NAME.getKey() + " LIKE '%" + stringSearch + "%'" +
+                    " ORDER BY " + MenulistKey.CUSTOMER_NAME.getKey() + " ASC";
+        }
         Cursor c = db.rawQuery(strQry, null);
         LinkedList<MenuList> list = new LinkedList<>();
         while (c.moveToNext()) {
@@ -73,6 +100,8 @@ public class DcMenulist extends DBHelper {
         menulist.setRecordCount(c.getInt(c.getColumnIndex(MenulistKey.RECORD_COUNT.getKey())));
         menulist.setRemarks(c.getString(c.getColumnIndex(MenulistKey.REMARKS.getKey())));
         menulist.setCustomerID(c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_ID.getKey())));
+        menulist.setCustomerIntegrationId(c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_INTEG_ID.getKey())));
+        menulist.setAlphachar(c.getString(c.getColumnIndex(MenulistKey.ALPHA_CHAR.getKey())));
         return menulist;
     }
 

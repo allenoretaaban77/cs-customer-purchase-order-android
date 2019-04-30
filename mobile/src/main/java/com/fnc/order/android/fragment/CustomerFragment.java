@@ -30,12 +30,15 @@ import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.adapters.PersonAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.PersonsKey;
+import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Person;
 import com.fnc.order.android.utilities.Helper;
+import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
 
 import org.json.JSONArray;
@@ -43,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -63,8 +67,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private MaterialRippleLayout alphaSort;
     private EditText etCustomerName;
     private GridView alphagridview;
-    private String[] stringAlpha = { "A","B","C","D","E","F","G","H","I","J","K","L",
-            "M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
+    private ArrayList<String> stringAlpha = new ArrayList<String>(Arrays.asList("A","B",
+            "C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U",
+            "V","W","X","Y","Z"));
     private AlphaGridAdapter adapterAlpha;
     private LinearLayout alphagridview_box, storelistview_box;
 
@@ -97,6 +102,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
 
         alphagridview = (GridView) v.findViewById(R.id.alphagridview);
+        ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
+        if (refStringAlpha.size() > 0) { stringAlpha = refStringAlpha; }
         adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
         alphagridview.setAdapter(adapterAlpha);
 
@@ -110,7 +117,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     if(!etCustomerName.getText().toString().trim().equals("")) {
                         Helper.hideSoftKeyboard(getActivity());
-                        fillData(v, etCustomerName.getText().toString().trim());
+                        fillData(v, etCustomerName.getText().toString().trim(), false);
                     }else{
                         Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
                     }
@@ -123,7 +130,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             public void onClick(View v) {
                 if(!etCustomerName.getText().toString().trim().equals("")) {
                     Helper.hideSoftKeyboard(getActivity());
-                    fillData(v, etCustomerName.getText().toString().trim());
+                    fillData(v, etCustomerName.getText().toString().trim(), false);
                 }else{
                     Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
                 }
@@ -144,12 +151,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             public void onItemClick(View v, int pos) {
 //                Toast.makeText(ctx, stringAlpha[pos], Toast.LENGTH_SHORT).show();
                 Helper.hideSoftKeyboard(getActivity());
-                fillData(v, stringAlpha[pos]);
+                fillData(v, stringAlpha.get(pos), true);
             }
         });
     }
 
-    private void fillData(View v, String stringSearch) {
+    private void fillData(View v, String stringSearch, Boolean isAlpha) {
         alphagridview_box.setVisibility(View.GONE);
         storelistview_box.setVisibility(View.VISIBLE);
         storelistview_box.setAlpha(0.0f);
@@ -157,21 +164,51 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 .alpha(1.0f).setListener(null);
 
         showSpinnerDialog(v);
-        vi = new VolleyInteractor();
-        vi.registerCallback(this);
-        HashMap<String, String> params = new HashMap<>();
-        params.put("cn", ServerConstants.CN);
-        params.put("customer", stringSearch);
+//        vi = new VolleyInteractor();
+//        vi.registerCallback(this);
+//        HashMap<String, String> params = new HashMap<>();
+//        params.put("cn", ServerConstants.CN);
+//        params.put("customer", stringSearch);
+//
+//        Iterator it = params.entrySet().iterator();
+//        String strParams = "";
+//        while (it.hasNext()) {
+//            Map.Entry pair = (Map.Entry)it.next();
+//            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+//            it.remove();
+//        }
+//        strParams = strParams.replaceAll(" ", "%20");
+//        vi.getCustomers(v.getContext(), params, strParams);
 
-        Iterator it = params.entrySet().iterator();
-        String strParams = "";
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
-            it.remove();
+        final LinkedList<MenuList> mlRSx = DcMenulist.getInstance(ctx).getAllMenulist(isAlpha, stringSearch);
+        if (mlRSx.size() == 0) {
+            MenuList mlList = new MenuList();
+            mlList.setCustomerID("0000000");
+            mlList.setCustomerIntegrationId("0000000");
+            mlList.setCustomerName("No Record Found");
+            mlList.setRecordCount(0);
+            mlList.setRemarks("");
+            mlList.setAlphachar("");
+            mlRSx.add(mlList);
         }
-        strParams = strParams.replaceAll(" ", "%20");
-        vi.getCustomers(v.getContext(), params, strParams);
+        adapter = new MenuStoresAdapter(ctx, mlRSx);
+        dismissSpinnerDialog();
+        listview.setAdapter(adapter);
+        if (mlRSx.size() > 0) {
+            adapter.setOnButtonClickListener(new MenuStoresAdapter.OnButtonClickListener() {
+                @Override
+                public void onItemClick(View view,  int aid) {
+                    MenuList mlRS = mlRSx.get(aid);
+                    SharedData sp = SharedData.getInstance(ctx);
+                    sp.saveData(SharedKey.CURRENT_REMARKS.getKey(), mlRS.getRemarks());
+                    sp.saveData(SharedKey.CURRENT_STORE.getKey(), mlRS.getCustomerName());
+                    sp.saveData(SharedKey.CURRENT_CUSTOMER_ID.getKey(), mlRS.getCustomerID());
+                    sp.saveData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey(), mlRS.getCustomerIntegrationId());
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container,
+                            new OrderFragment()).addToBackStack("order").commit();
+                }
+            });
+        }
     }
 
     private void showSpinnerDialog(View v){

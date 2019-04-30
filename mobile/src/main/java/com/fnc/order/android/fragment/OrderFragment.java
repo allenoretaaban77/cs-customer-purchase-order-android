@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -40,10 +41,15 @@ import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.enumeration.API;
+import com.fnc.order.android.enumeration.ItemlistKey;
+import com.fnc.order.android.enumeration.MenulistKey;
+import com.fnc.order.android.enumeration.OrderKey;
+import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.listeners.DatePickerListener;
 import com.fnc.order.android.model.Itemlist;
+import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
@@ -68,7 +74,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class OrderFragment extends Fragment implements VolleyCallback {
 
@@ -164,9 +173,34 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             DcOrder.getInstance(ctx).emptyOrderlist();
 
             initCalc(rootView);
+
+            fillItems(rootView);
         }
 
         return rootView;
+    }
+
+    private void fillItems(View v) {
+        final SharedData sp = SharedData.getInstance(ctx);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+
+        showSpinnerDialog(v);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("itemname", "");
+        params.put("cn", ServerConstants.CN);
+        params.put("customerid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+            it.remove();
+        }
+        VolleyInteractor vi = new VolleyInteractor();
+        vi.registerCallback(this);
+        strParams = strParams.replaceAll(" ", "%20");
+        vi.getItemlist(ctx, params, strParams);
     }
 
     private void initViews(View v) {
@@ -423,9 +457,64 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         try {
             response = response.replace("\r\n", "");
             JSONArray objArr = new JSONArray(response);
-            if(type.equals("searchemployee")) {
-            }else{
+            if (type.equals("searchemployee")) {
+            } else if (type.equals("searchitem")) {
                 if(objArr.length() > 0) {
+                    List<Itemlist> iRs = new ArrayList<Itemlist>();
+                    for (int i = 0; i < objArr.length(); i++) {
+                        JSONObject rowObj = objArr.getJSONObject(i);
+                        Itemlist irsx = new Itemlist();
+                        irsx.setRecid(rowObj.getInt(ItemlistKey.RECID.getKey()));
+                        irsx.setItemName(rowObj.getString(ItemlistKey.ITEM_NAME_WITH_UNIT.getKey()));
+                        irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
+                        irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
+                        irsx.setIsChecked(false);
+                        irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
+                        irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));
+                        iRs.add(irsx);
+                    }
+
+                    for(Itemlist il : iRs){
+                        Order ol = new Order();
+                        ol.setQuantity("");
+                        ol.setItemRecid(String.valueOf(il.getRecid()));
+                        ol.setItemName(String.valueOf(il.getItemName()));
+                        ol.setUnitName(String.valueOf(il.getUnitName()));
+                        ol.setRemarks("");
+                        ol.setOldSku(String.valueOf(il.getOldSku()));
+                        ol.setSellingPrice(String.valueOf(il.getSellingPrice()));
+                        ol.setTotal("null");
+                        ol.setIsChecked(false);
+                        ol.setIsError(false);
+                        ol.setIsLocked(true);
+                        curRefArrayList.add(ol);
+                    }
+
+                    adapter = new OrderlistAdapter(ctx, curRefArrayList);
+                    adapter.setCurPos(curRefPos);
+                    adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view,  int position) {
+                            adapter.setCurPos(position);
+                            adapter.notifyDataSetChanged();
+                            bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                            curRefPos = adapter.getCurPos();
+                        }
+                    });
+                    adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
+                        @Override
+                        public void onItemClick(View view,  int position) {
+                            adapter.setCurPos(position);
+                            alertDialog = okCancelInputRemarksDialogBuilder(ctx,
+                                    "Add Remarks",
+                                    "Save", null, "Cancel", cancelCallback );
+                            alertDialog.show();
+                        }
+                    });
+                    list_view.setAdapter(adapter);
+                }
+            } else {
+                if (objArr.length() > 0) {
                     JSONObject obj = objArr.getJSONObject(0);
                     Boolean status = obj.getBoolean("error");
                     if(!status){
@@ -435,7 +524,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     }else{
                         Toast.makeText(ctx, "Post error... "+obj.getString("error_msg"), Toast.LENGTH_SHORT).show();
                     }
-                }else{
+                } else {
                     Toast.makeText(ctx, "Post error... Please try again.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -481,6 +570,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setTotal("null");
                         ol.setIsChecked(false);
                         ol.setIsError(false);
+                        ol.setIsLocked(false);
                         curRefArrayList.add(ol);
                     }
 
