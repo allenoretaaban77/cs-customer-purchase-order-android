@@ -309,8 +309,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     for (int i = 0; i < curRefArrayList.size(); i++) {
                         Order rowRl = curRefArrayList.get(i);
                         if(rowRl.getQuantity().equals("") || rowRl.getQuantity().equals("0")) {
-                            errFlag = true;
-                            curRefArrayList.get(i).setIsError(true);
+//                            errFlag = true;
+                            errFlag = false;
+//                            curRefArrayList.get(i).setIsError(true);
+                            curRefArrayList.get(i).setIsError(false);
+                            curRefArrayList.get(i).setQuantity("0");
 //                            TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
 //                            TextView tvQty = (TextView) trx.getChildAt(0);
 //                            tvQty.setTextColor(getResources().getColor(R.color.red_2));

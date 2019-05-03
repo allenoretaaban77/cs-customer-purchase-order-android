@@ -99,8 +99,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        usernameText.setText("aban.allen@yahoo.com");
-        passwordEText.setText("7777777");
+//        usernameText.setText("aban.allen@yahoo.com");
+//        passwordEText.setText("7777777");
     }
 
     private void initListeners(){
@@ -222,12 +222,14 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                             mlList.setCustomerName(strCustomerName);
                             mlList.setRecordCount(0);
                             mlList.setRemarks("");
-                            if(String.valueOf(strCustomerName.charAt(0)).equals("0")) {
-                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)));
-                            } else {
-                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)));
+                            if (!strCustomerName.equals("")) {
+                                if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
+                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)));
+                                } else {
+                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)));
+                                }
+                                DcMenulist.getInstance(ctx).insertMenulist(mlList);
                             }
-                            DcMenulist.getInstance(ctx).insertMenulist(mlList);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
