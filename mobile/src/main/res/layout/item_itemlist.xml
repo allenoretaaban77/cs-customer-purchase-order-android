@@ -50,6 +50,7 @@
             android:layout_height="wrap_content"
             android:focusable="true">
             <TextView
+                android:background="@color/transparent"
                 android:focusable="true"
                 android:maxLines="1"
                 android:textStyle="bold"

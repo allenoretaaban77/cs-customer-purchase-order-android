@@ -93,6 +93,14 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         }
 
         holder.cell_qty.setText(String.valueOf(iRs.getQuantity()));
+        holder.cell_qty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (onListenerClickListener != null) {
+                    onListenerClickListener.onItemClick(v, position);
+                }
+            }
+        });
 
         holder.cell_unit.setText(iRs.getUnitName());
 
@@ -143,7 +151,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             holder.cell_total.setTextColor(context.getResources().getColor(R.color.red_2));
             if (this.curPos == position) {
                 holder.cell_qty.setTextColor(context.getResources().getColor(R.color.green_5));
-                holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
+                holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
@@ -158,7 +166,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         } else {
             if (this.curPos == position) {
                 holder.cell_qty.setTextColor(context.getResources().getColor(R.color.green_5));
-                holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
+                holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
