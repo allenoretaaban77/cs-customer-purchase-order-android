@@ -89,6 +89,7 @@ public class DcOrdered extends DBHelper {
         od.setRemarks(c.getString(c.getColumnIndex(OrderedKey.REMARKS.getKey())));
         od.setReferenceEmployeeNo(c.getString(c.getColumnIndex(OrderedKey.REF_EMPLOYEE_NO.getKey())));
         od.setJson(c.getString(c.getColumnIndex(OrderedKey.JSON.getKey())));
+        od.setGrandtotal(c.getString(c.getColumnIndex(OrderedKey.GRAND_TOTAL.getKey())));
         od.setDateTime(c.getString(c.getColumnIndex(OrderedKey.DATETIME.getKey())));
         od.setStatus(c.getInt(c.getColumnIndex(OrderedKey.STATUS.getKey())));
         return od;

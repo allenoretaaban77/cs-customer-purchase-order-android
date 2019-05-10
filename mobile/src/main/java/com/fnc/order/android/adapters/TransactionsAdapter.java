@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.fnc.order.android.R;
 import com.fnc.order.android.model.Ordered;
+
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class TransactionsAdapter extends ArrayAdapter<Ordered> {
@@ -33,10 +35,12 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
     private class ViewHolder {
         private TextView tv_date;
         private TextView tv_name;
+        private TextView tv_grandtotal;
         private TextView tv_remarks;
         public ViewHolder(View v) {
             tv_date = (TextView) v.findViewById(R.id.tv_date);
             tv_name = (TextView) v.findViewById(R.id.tv_name);
+            tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
             tv_remarks = (TextView) v.findViewById(R.id.tv_remarks);
         }
     }
@@ -59,6 +63,10 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
 
         holder.tv_date.setText(od.getDeliveryDate().replace(" 00:00:00", ""));
         holder.tv_name.setText(od.getCustomerName());
+
+        holder.tv_grandtotal.setText(String.valueOf(new DecimalFormat("#,###,###.00")
+                .format(Double.parseDouble(od.getGrandtotal()))));
+
         holder.tv_remarks.setText(od.getRemarks());
 
         return convertView;

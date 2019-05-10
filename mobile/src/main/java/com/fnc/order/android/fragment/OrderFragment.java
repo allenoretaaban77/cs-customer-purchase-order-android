@@ -17,6 +17,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,7 +93,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private MaterialRippleLayout btn_submit;
     private MaterialRippleLayout btn_menu;
     private MaterialRippleLayout btn_back;
-    private TextView tv_name;
+    private TextView tv_name, tv_grandtotal;
     private EditText et_date;
     private CoordinatorLayout rl_content_box;
     private EditText et_remarks;
@@ -226,6 +227,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
 
         list_view = (ListView) v.findViewById(R.id.list_view);
+        tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
     }
 
     private void initListeners(View v) {
@@ -398,11 +400,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 Order rowOl = curRefArrayList.get(i);
                 if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
                     HashMap<String, Object> detailMap = new HashMap();
-                    detailMap.put("quantity", rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity() );
+                    String rqty = rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity();
+                    rqty = rqty.replace(",", "");
+                    detailMap.put("quantity", rqty);
                     detailMap.put("item_recid", rowOl.getItemRecid());
                     detailMap.put("remarks", rowOl.getRemarks());
                     detailMap.put("old_sku", rowOl.getOldSku());
                     detailMap.put("selling_price", rowOl.getSellingPrice());
+                    String rtotal = rowOl.getTotal().replace(",", "");
+                    detailMap.put("total", rtotal);
                     detailsArrayList.add(detailMap);
                 }
             }
@@ -423,6 +429,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 headersMap.put("pcortab_id", android_id);
                 headersMap.put("reference_employee_no", sp.getData(API.EMPLOYEE_ID.getApi()));
                 headersMap.put("branch_encoding", "1");
+                String gt = tv_grandtotal.getText().toString().trim().replace(",", "");
+                headersMap.put("grand_total", gt);
                 paramsArray.put("header", headersMap);
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
@@ -436,6 +444,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setRemarks(et_remarks.getText().toString().trim());
                 ol.setReferenceEmployeeNo(sp.getData(API.EMPLOYEE_ID.getApi()));
                 ol.setJson(paramsArrayStr);
+                ol.setGrandtotal(gt);
                 ol.setDateTime(Helper.getPostingDate());
                 ol.setStatus(0);
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
@@ -445,6 +454,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 dismissSpinnerDialog();
 
 //                Log.v("post_params_length", String.valueOf(paramsArrayStr.length()));
+                Log.v("post_params", String.valueOf(paramsArrayStr));
 //                vi.postOrders(ctx, paramsArrayStr);
             }
         }else{
@@ -879,24 +889,71 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             if(refStr.trim().equals("0")) {
 
             }else{
-                refStr = refStr+val;
+                refStr = refStr + val;
             }
         }
+
+        refStr = refStr.replace(",", "");
+        DecimalFormat df1 = new DecimalFormat("###.##");
+        if (!refStr.equals("")) {
+            DecimalFormat df = new DecimalFormat("#,###,###");
+            if (!refStr.contains(".")) {
+                int u_qty = Integer.parseInt(refStr);
+                refStr = String.valueOf(df.format(u_qty));
+            } else {
+                String[] strSplit = refStr.split("\\.");
+                int isplit0 = Integer.parseInt(strSplit[0]);
+                if (strSplit.length > 1) {
+                    if (strSplit[1].length() > 1) {
+                        double refD = Double.parseDouble(String.valueOf(isplit0) + "." + strSplit[1]);
+                        DecimalFormat dfd = new DecimalFormat("#,###,###.##");
+                        refStr = String.valueOf(dfd.format(refD));
+                    } else {
+                        refStr = String.valueOf(df.format(isplit0) + "." + strSplit[1]);
+                    }
+                } else {
+                    refStr =  String.valueOf(df.format(isplit0))+".";
+                }
+            }
+        }
+//        if (refStr.contains(".")) {
+//            String[] strSplit = refStr.split("\\.");
+//            if (strSplit.length > 1) {
+//                double xy = Double.parseDouble(refStr);
+//                refStr = df1.format(xy);
+//            } else {
+//                refStr = strSplit[0] + ".";
+//            }
+//        }
         ol.setQuantity(refStr);
-//        tvQty.setText(refStr);
+
+        refStr = refStr.replace(",", "");
         refStr = refStr.equals("") ? "0" : refStr ;
         double u_quantity = Double.parseDouble(refStr);
         double u_total = u_quantity * u_price;
-        DecimalFormat df = new DecimalFormat("#.00");
         if(u_total == 0.0) {
             ol.setTotal("0.00");
-//            tvTotal.setText("0.00");
         }else{
-            ol.setTotal(df.format(u_total));
-//            tvTotal.setText(df.format(u_total));
+            DecimalFormat df2 = new DecimalFormat("#,###,###.00");
+            ol.setTotal(df2.format(u_total));
         }
 
         adapter.notifyDataSetChanged();
+
+        // recompute grand total
+        ArrayList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
+        if(refOS.size() > 0) {
+            double gt = 0.00;
+            for (int i = 0; i < refOS.size(); i++) {
+                Order olx = refOS.get(i);
+                String refTotal = String.valueOf(olx.getTotal().trim()).replace(",", "");
+                gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
+            }
+            DecimalFormat df = new DecimalFormat("#,###,###.00");
+            tv_grandtotal.setText(df.format(gt));
+        } else {
+            tv_grandtotal.setText("0.00");
+        }
     }
 
     private void showMenuPopup(View v) {

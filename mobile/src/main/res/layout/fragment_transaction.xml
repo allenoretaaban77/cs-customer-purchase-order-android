@@ -114,9 +114,16 @@
                                     android:text="Company Name" />
 
                                 <TextView
+                                    android:id="@+id/ref_grandtotal"
+                                    style="@style/tblCellTextViewHeader"
+                                    android:layout_width="150dp"
+                                    android:layout_column="2"
+                                    android:text="Total" />
+
+                                <TextView
                                     style="@style/tblCellTextViewHeader"
                                     android:layout_width="200dp"
-                                    android:layout_column="2"
+                                    android:layout_column="3"
                                     android:text="Remarks" />
                             </TableRow>
                         </TableLayout>

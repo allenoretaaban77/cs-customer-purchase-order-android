@@ -34,12 +34,21 @@
                 android:text="Company Name" />
 
             <TextView
+                android:id="@+id/tv_grandtotal"
+                android:gravity="center_vertical|right"
+                style="@style/tblCellTextView"
+                android:layout_width="150dp"
+                android:layout_column="2"
+                android:paddingRight="10dp"
+                android:text="Total" />
+
+            <TextView
                 android:paddingLeft="10dp"
                 android:id="@+id/tv_remarks"
                 android:gravity="center_vertical"
                 style="@style/tblCellTextView"
                 android:layout_width="200dp"
-                android:layout_column="2"
+                android:layout_column="3"
                 android:text="Remarks" />
 
         </TableRow>

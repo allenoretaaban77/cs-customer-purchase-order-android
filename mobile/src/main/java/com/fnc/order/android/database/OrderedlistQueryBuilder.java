@@ -17,6 +17,7 @@ public class OrderedlistQueryBuilder {
         values.put(OrderedKey.REMARKS.getKey(), ordered.getRemarks());
         values.put(OrderedKey.REF_EMPLOYEE_NO.getKey(), ordered.getReferenceEmployeeNo());
         values.put(OrderedKey.JSON.getKey(), ordered.getJson());
+        values.put(OrderedKey.GRAND_TOTAL.getKey(), ordered.getGrandtotal());
         values.put(OrderedKey.DATETIME.getKey(), ordered.getDateTime());
         values.put(OrderedKey.STATUS.getKey(), ordered.getStatus());
         return values;

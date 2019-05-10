@@ -99,8 +99,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("19130");
-//        passwordEText.setText("siomai1994");
+        usernameText.setText("19130");
+        passwordEText.setText("nathaniels@1994");
     }
 
     private void initListeners(){
@@ -284,13 +284,13 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                         requestCustomers("");
                     }
                 } else {
+                    dismissSpinnerDialog();
                     alertDialog = okCancelInputDialogBuilder(ctx,
                             "Please update your Employee ID to continue using this application.",
                             "Update", null,
                             "Cancel", new View.OnClickListener() {
                                 public void onClick(View v) {
                                     Helper.hideSoftKeyboard(LoginActivity.this);
-                                    dismissSpinnerDialog();
                                     alertDialog.dismiss();
                                 }
                             } );
@@ -303,6 +303,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                 sp.saveData(API.DATA_USER.getApi(), obj.getString(API.DATA_USER.getApi()).toString());
                 JSONArray datauserArray = obj.getJSONArray(API.DATA_USER.getApi());
                 if (datauserArray.toString().equals("[]")) {
+                    dismissSpinnerDialog();
                     Toast.makeText(ctx, "Login invalid.", Toast.LENGTH_SHORT).show();
                 } else {
                     if(datauserArray.length() > 0) {
@@ -312,7 +313,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
 
                         // validate
                         Toast.makeText(ctx, "Login Success! Validating account...", Toast.LENGTH_SHORT).show();
-                        showSpinnerDialog();
+//                        showSpinnerDialog();
                         new android.os.Handler().postDelayed(
                             new Runnable() {
                                 public void run() {
@@ -339,6 +340,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                 }
             }
         } catch (JSONException e) {
+            dismissSpinnerDialog();
             Toast.makeText(ctx, "Login invalid.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
@@ -430,8 +432,13 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         btnOK.setText(okButtonCaption);
         btnOK.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                alertDialog.dismiss();
-                updateEmployeeId(etText.getText().toString().trim());
+                if(!etText.getText().toString().trim().equals("")) {
+                    alertDialog.dismiss();
+                    updateEmployeeId(etText.getText().toString().trim());
+                }else{
+                    dismissSpinnerDialog();
+                    Toast.makeText(activity, "Please input employee id.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
