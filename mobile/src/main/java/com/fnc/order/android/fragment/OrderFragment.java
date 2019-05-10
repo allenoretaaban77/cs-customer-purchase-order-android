@@ -341,6 +341,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     } else {
                         if (refStringDate == null) {
                             Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
+                            Helper.hideSoftKeyboard(getActivity());
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                    showDatePicker(v);
+                                }
+                            }, 500);
                         } else {
                             AlertDialog.Builder builder;
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

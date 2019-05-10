@@ -405,16 +405,16 @@
                                             android:layout_marginTop="2dp"
                                             android:layout_height="match_parent"
                                             style="@style/tblCellTextViewHeader"
-                                            android:layout_width="100dp"
+                                            android:layout_width="130dp"
                                             android:layout_column="0"
                                             android:textSize="20sp"
-                                            android:text="Total" />
+                                            android:text="Grand Total" />
 
                                         <TextView
                                             android:id="@+id/tv_grandtotal"
                                             android:textSize="20sp"
-                                            android:paddingRight="10dp"
-                                            android:gravity="center|right"
+                                            android:paddingLeft="10dp"
+                                            android:gravity="center|left"
                                             android:layout_height="match_parent"
                                             style="@style/tblCellTextViewHeaderWhite"
                                             android:layout_width="150dp"
