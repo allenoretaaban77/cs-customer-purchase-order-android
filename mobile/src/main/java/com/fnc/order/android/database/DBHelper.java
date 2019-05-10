@@ -62,6 +62,7 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(OrderedKey.REMARKS);
         fields.add(OrderedKey.REF_EMPLOYEE_NO);
         fields.add(OrderedKey.JSON);
+        fields.add(OrderedKey.GRAND_TOTAL);
         fields.add(OrderedKey.DATETIME);
         fields.add(OrderedKey.STATUS);
         return fields;

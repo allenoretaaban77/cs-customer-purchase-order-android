@@ -187,6 +187,16 @@
         <item name="android:background">@drawable/cell_background_green</item>
     </style>
 
+    <style name="tblCellTextViewHeaderWhite">
+        <item name="android:textColor">@color/gray_6</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/cell_background</item>
+    </style>
+
     <style name="mHeader">
         <item name="android:background">@drawable/background_green_3_border</item>
         <item name="android:layout_marginBottom">5dp</item>

@@ -2,6 +2,7 @@ package com.fnc.order.android.adapters;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,7 +93,36 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             holder = (OrderlistAdapter.ViewHolder) convertView.getTag();
         }
 
-        holder.cell_qty.setText(String.valueOf(iRs.getQuantity()));
+        holder.cell_qty.setText(iRs.getQuantity());
+        /*if (iRs.getQuantity().equals("")) {
+            Log.d("TAGX", "1");
+            holder.cell_qty.setText(iRs.getQuantity());
+        } else {
+            String refQty = iRs.getQuantity();
+            DecimalFormat df = new DecimalFormat("#,###,###");
+            if (!refQty.contains(".")) {
+                Log.d("TAGX", "2");
+                int u_qty = Integer.parseInt(iRs.getQuantity());
+                holder.cell_qty.setText(String.valueOf(df.format(u_qty)));
+            } else {
+                String[] strSplit = refQty.split("\\.");
+                int isplit0 = Integer.parseInt(strSplit[0]);
+                if (strSplit.length > 1) {
+                    if (strSplit[1].length() > 1) {
+                        Log.d("TAGX", "4");
+                        double refD = Double.parseDouble(String.valueOf(isplit0) + "." + strSplit[1]);
+                        DecimalFormat dfd = new DecimalFormat("#,###,###.##");
+                        holder.cell_qty.setText(String.valueOf(dfd.format(refD)));
+                    } else {
+                        Log.d("TAGX", "5");
+                        holder.cell_qty.setText(String.valueOf(df.format(isplit0) + "." + strSplit[1]));
+                    }
+                } else {
+                    Log.d("TAGX", "6");
+                    holder.cell_qty.setText(String.valueOf(df.format(isplit0))+".");
+                }
+            }
+        }*/
         holder.cell_qty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {

@@ -11,6 +11,7 @@ public class Ordered implements Serializable {
     private String remarks;
     private String reference_employee_no;
     private String json;
+    private String grandtotal;
     private String datetime;
     private int status;
 
@@ -53,6 +54,11 @@ public class Ordered implements Serializable {
         return json;
     }
     public void setJson(String json) { this.json = json; }
+
+    public String getGrandtotal() {
+        return grandtotal;
+    }
+    public void setGrandtotal(String grandtotal) { this.grandtotal = grandtotal; }
 
     public String getDateTime() {
         return datetime;

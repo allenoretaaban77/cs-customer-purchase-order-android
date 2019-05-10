@@ -59,7 +59,7 @@
                 android:paddingRight="7dp"
                 android:textSize="20sp"
                 android:imeOptions="actionNext"
-                android:maxLength="7"
+                android:maxLength="10"
                 android:gravity="right|center_vertical"
                 android:id="@+id/cell_qty"
                 android:layout_width="100dp"

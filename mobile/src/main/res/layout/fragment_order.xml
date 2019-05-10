@@ -387,22 +387,65 @@
                                 android:layout_weight="1"
                                 android:gravity="right"
                                 android:orientation="horizontal">
-                                <LinearLayout
-                                    style="@style/btnTransparentStyle"
-                                    android:layout_width="140dp">
-                                    <com.balysv.materialripple.MaterialRippleLayout
-                                        android:id="@+id/btn_submit"
+
+                                <TableLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:paddingLeft="1dp"
+                                    android:paddingRight="1dp">
+
+                                    <TableRow
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent">
-                                        <Button
-                                            android:layout_width="match_parent"
+
+                                        <TextView
+                                            android:layout_marginRight="1dp"
+                                            android:layout_marginLeft="2dp"
+                                            android:layout_marginBottom="1dp"
+                                            android:layout_marginTop="2dp"
                                             android:layout_height="match_parent"
-                                            android:background="@android:color/transparent"
-                                            android:text="SUBMIT"
-                                            android:textAllCaps="false"
-                                            android:textColor="@color/white" />
-                                    </com.balysv.materialripple.MaterialRippleLayout>
-                                </LinearLayout>
+                                            style="@style/tblCellTextViewHeader"
+                                            android:layout_width="100dp"
+                                            android:layout_column="0"
+                                            android:textSize="20sp"
+                                            android:text="Total" />
+
+                                        <TextView
+                                            android:id="@+id/tv_grandtotal"
+                                            android:textSize="20sp"
+                                            android:paddingRight="10dp"
+                                            android:gravity="center|right"
+                                            android:layout_height="match_parent"
+                                            style="@style/tblCellTextViewHeaderWhite"
+                                            android:layout_width="150dp"
+                                            android:layout_column="1"
+                                            android:layout_weight="1"
+                                            android:text="0.00" />
+
+                                        <RelativeLayout
+                                            android:layout_marginRight="2dp"
+                                            android:layout_marginLeft="2dp"
+                                            android:layout_marginBottom="1dp"
+                                            android:layout_height="match_parent"
+                                            android:layout_column="2"
+                                            style="@style/btnTransparentStyle"
+                                            android:layout_width="160dp">
+                                            <com.balysv.materialripple.MaterialRippleLayout
+                                                android:id="@+id/btn_submit"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent">
+                                                <Button
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="match_parent"
+                                                    android:background="@android:color/transparent"
+                                                    android:text="SUBMIT"
+                                                    android:textAllCaps="false"
+                                                    android:textColor="@color/white" />
+                                           </com.balysv.materialripple.MaterialRippleLayout>
+                                       </RelativeLayout>
+
+                                    </TableRow>
+                                </TableLayout>
                             </RelativeLayout>
                         </TableRow>
                     </TableLayout>
