@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.daimajia.swipe.SwipeLayout;
 import com.fnc.order.android.R;
+import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
@@ -80,6 +81,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import hari.bounceview.BounceView;
+
 public class OrderFragment extends Fragment implements VolleyCallback {
 
     private static final int PERSON_DIALOG_FRAGMENT = 7;
@@ -119,6 +122,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private SwipeLayout swipeLayout;
     private ArrayList<Order> curRefArrayList;
     private Integer curRefPos = 0;
+    private Boolean oldskuerr = false;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -241,7 +245,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     @Override
                     public void run() {
                         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                        showDatePicker(v);
+                        showDatePicker();
                     }
                 }, 500);
             }
@@ -302,6 +306,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         btn_submit.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
+                if (oldskuerr == true) {
+//                    Toast.makeText(ctx, "Some items does not have reference SKU, please contact the developer to assist you....", Toast.LENGTH_LONG).show();
+                    alertDialog = Helper.okDialog(ctx,
+                            "Error","Some items does not have reference SKU, please contact the developer to assist you.", "OK",
+                            null, false);
+                    BounceView.addAnimTo(alertDialog);
+                    return;
+                }
+
                 Helper.hideSoftKeyboard(getActivity());
 
 //                LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
@@ -311,11 +324,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     for (int i = 0; i < curRefArrayList.size(); i++) {
                         Order rowRl = curRefArrayList.get(i);
                         if(rowRl.getQuantity().equals("") || rowRl.getQuantity().equals("0")) {
-//                            errFlag = true;
-                            errFlag = false;
-//                            curRefArrayList.get(i).setIsError(true);
-                            curRefArrayList.get(i).setIsError(false);
-                            curRefArrayList.get(i).setQuantity("0");
+                            if(rowRl.getRemarks().equals("") || rowRl.getRemarks().equals("null")) {
+                                errFlag = true;
+//                            errFlag = false;
+                                curRefArrayList.get(i).setIsError(true);
+//                            curRefArrayList.get(i).setIsError(false);
+                                curRefArrayList.get(i).setQuantity("0");
+
 //                            TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
 //                            TextView tvQty = (TextView) trx.getChildAt(0);
 //                            tvQty.setTextColor(getResources().getColor(R.color.red_2));
@@ -328,6 +343,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //                            tvPrice.setTextColor(getResources().getColor(R.color.red_2));
 //                            TextView tvTotal = (TextView) trx.getChildAt(4);
 //                            tvTotal.setTextColor(getResources().getColor(R.color.red_2));
+                            }
                         }else{
                             curRefArrayList.get(i).setIsError(false);
                         }
@@ -337,18 +353,33 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         isPosted = false;
                         dismissSpinnerDialog();
                         adapter.notifyDataSetChanged();
-                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
+                        alertDialog = Helper.okDialog(ctx,
+                                "Error","Please set a remarks on items with 0 or empty quantity.", "OK",
+                                null, false);
+                        BounceView.addAnimTo(alertDialog);
                     } else {
                         if (refStringDate == null) {
-                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
-                            Helper.hideSoftKeyboard(getActivity());
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                    showDatePicker(v);
+//                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
+                            alertDialog = Helper.okDialog(ctx,
+                                "Error","Please select delivery date.", "OK",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        alertDialog.dismiss();
+                                        Helper.hideSoftKeyboard(getActivity());
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                                showDatePicker();
+                                            }
+                                        }, 500);
+                                    }
                                 }
-                            }, 500);
+                                , false
+                            );
+                            BounceView.addAnimTo(alertDialog);
                         } else {
                             AlertDialog.Builder builder;
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -357,7 +388,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                 builder = new AlertDialog.Builder(ctx);
                             }
                             builder.setCancelable(false);
-                            builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
+                            BounceView.addAnimTo(
+                                builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -373,11 +405,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                         isPosted = false;
                                     }
                                 })
-                                .show();
+                                .show()
+                            );
                         }
                     }
                 }else{
-                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
+                    alertDialog = Helper.okDialog(ctx,
+                            "Error","Please add an item.", "CLOSE",
+                            null, false);
+                    BounceView.addAnimTo(alertDialog);
                 }
             }
         });
@@ -467,7 +504,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
         }else{
             dismissSpinnerDialog();
-            Toast.makeText(ctx, "Error request. Please try again.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(ctx, "Error request. Please try again.", Toast.LENGTH_SHORT).show();
+            alertDialog = Helper.okDialog(ctx,
+                    "Error","Error request. Please try again.", "CLOSE",
+                    null, false);
+            BounceView.addAnimTo(alertDialog);
             isPosted = false;
         }
     }
@@ -482,6 +523,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             } else if (type.equals("searchitem")) {
                 if(objArr.length() > 0) {
                     List<Itemlist> iRs = new ArrayList<Itemlist>();
+
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         Itemlist irsx = new Itemlist();
@@ -490,6 +532,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
                         irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
                         irsx.setIsChecked(false);
+                        if (rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null")) {
+                            oldskuerr = true;
+                        }
                         irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
                         irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));
                         iRs.add(irsx);
@@ -525,11 +570,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
                         @Override
                         public void onItemClick(View view,  int position) {
+                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                             adapter.setCurPos(position);
                             alertDialog = okCancelInputRemarksDialogBuilder(ctx,
                                     "Add Remarks",
                                     "Save", null, "Cancel", cancelCallback );
                             alertDialog.show();
+                            BounceView.addAnimTo(alertDialog);
                         }
                     });
                     list_view.setAdapter(adapter);
@@ -587,7 +634,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setUnitName(String.valueOf(il.getUnitName()));
                         ol.setRemarks("");
                         ol.setOldSku(String.valueOf(il.getOldSku()));
-                        ol.setSellingPrice(String.valueOf(il.getSellingPrice()));
+                        String strSP = String.valueOf(il.getSellingPrice()).equals("null") ? "0" : String.valueOf(il.getSellingPrice()) ;
+                        ol.setSellingPrice(strSP);
                         ol.setTotal("null");
                         ol.setIsChecked(false);
                         ol.setIsError(false);
@@ -614,6 +662,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                     "Add Remarks",
                                     "Save", null, "Cancel", cancelCallback );
                             alertDialog.show();
+                            BounceView.addAnimTo(alertDialog);
                         }
                     });
                     list_view.setAdapter(adapter);
@@ -981,6 +1030,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             "Add Remarks",
                             "Save", null, "Cancel", cancelCallback );
                     alertDialog.show();
+                    BounceView.addAnimTo(alertDialog);
                 }
             });
             menuPop.getBtnDelete().setOnClickListener(new View.OnClickListener() {
@@ -1055,7 +1105,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         return builder.show();
     }
 
-    private void showDatePicker(final View v) {
+    private void showDatePicker() {
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);

@@ -130,6 +130,27 @@
                             android:layout_height="match_parent"/>
                     </com.balysv.materialripple.MaterialRippleLayout>
                 </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="3dp"
+                    android:padding="3dp"
+                    style="@style/btnTransparentStyleSmallWrap">
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:id="@+id/layout_refresh"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="3dp">
+                        <Button
+                            android:backgroundTint="@color/white"
+                            android:background="@drawable/sharp_refresh_24"
+                            android:id="@+id/btn_refresh"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                    </com.balysv.materialripple.MaterialRippleLayout>
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout

@@ -43,6 +43,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import hari.bounceview.BounceView;
+
 public class SearchItemFragment extends DialogFragment implements VolleyCallback {
 
     public Context ctx;
@@ -101,7 +103,11 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                 if(!et_item_name.getText().toString().trim().equals("")) {
                     requestItem(v);
                 }else{
-                    Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
+                    alertDialog = Helper.okDialog(ctx,
+                            "Error","Please input item name.", "OK",
+                            null, false);
+                    BounceView.addAnimTo(alertDialog);
                 }
             }
         });
@@ -138,7 +144,11 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                         }
                     }
                 }else{
-                    Toast.makeText(ctx, "Please select items...", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ctx, "Please select items...", Toast.LENGTH_SHORT).show();
+                    alertDialog = Helper.okDialog(ctx,
+                            "Error","Please select an item/s", "OK",
+                            null, false);
+                    BounceView.addAnimTo(alertDialog);
                 }
             }
         });

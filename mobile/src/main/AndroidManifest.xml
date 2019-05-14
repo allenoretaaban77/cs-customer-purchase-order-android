@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait" />
-        <activity android:name=".activity.MainActivity" android:screenOrientation="portrait"
+        <activity android:name=".activity.MainActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <service
