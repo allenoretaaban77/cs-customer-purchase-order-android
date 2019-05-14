@@ -173,6 +173,20 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             }
         });
 
+        if (iRs.getOldSku().equals("null")) {
+            holder.cell_qty.setTextColor(context.getResources().getColor(R.color.orange_2));
+            holder.cell_unit.setTextColor(context.getResources().getColor(R.color.orange_2));
+            holder.cell_description.setTextColor(context.getResources().getColor(R.color.orange_2));
+            holder.cell_price.setTextColor(context.getResources().getColor(R.color.orange_2));
+            holder.cell_total.setTextColor(context.getResources().getColor(R.color.orange_2));
+        } else {
+            holder.cell_qty.setTextColor(context.getResources().getColor(R.color.gray_8));
+            holder.cell_unit.setTextColor(context.getResources().getColor(R.color.gray_8));
+            holder.cell_description.setTextColor(context.getResources().getColor(R.color.gray_8));
+            holder.cell_price.setTextColor(context.getResources().getColor(R.color.gray_8));
+            holder.cell_total.setTextColor(context.getResources().getColor(R.color.gray_8));
+        }
+
         if (iRs.getIsError()) {
             holder.cell_qty.setTextColor(context.getResources().getColor(R.color.red_2));
             holder.cell_unit.setTextColor(context.getResources().getColor(R.color.red_2));

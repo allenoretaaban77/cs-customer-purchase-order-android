@@ -1,6 +1,7 @@
 package com.fnc.order.android.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
+import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.adapters.PersonAdapter;
@@ -53,6 +55,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import hari.bounceview.BounceView;
+
 public class CustomerFragment extends Fragment implements VolleyCallback{
 
     public Context ctx;
@@ -63,8 +67,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private VolleyInteractor vi;
     private ListView listview;
     private List<String> customersList = new ArrayList<>();
-    private MaterialRippleLayout imgSearch;
-    private MaterialRippleLayout alphaSort;
+    private MaterialRippleLayout imgSearch, alphaSort, refreshAll;
     private EditText etCustomerName;
     private GridView alphagridview;
     private ArrayList<String> stringAlpha = new ArrayList<String>(Arrays.asList("A","B",
@@ -72,6 +75,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             "V","W","X","Y","Z"));
     private AlphaGridAdapter adapterAlpha;
     private LinearLayout alphagridview_box, storelistview_box;
+    private AlertDialog alertDialog;
 
     @Nullable
     @Override
@@ -95,6 +99,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private void initViews(View v) {
         imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
         alphaSort = (MaterialRippleLayout) v.findViewById(R.id.layout_alpha);
+        refreshAll = (MaterialRippleLayout) v.findViewById(R.id.layout_refresh);
         etCustomerName = (EditText) v.findViewById(R.id.et_customername);
         listview = (ListView) v.findViewById(R.id.storelistview);
 
@@ -119,7 +124,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         Helper.hideSoftKeyboard(getActivity());
                         fillData(v, etCustomerName.getText().toString().trim(), false);
                     }else{
-                        Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
+                        alertDialog = Helper.okDialog(ctx,
+                                "Error","Please input item name.", "CLOSE",
+                                null, false);
+                        BounceView.addAnimTo(alertDialog);
                     }
                 }
                 return false;
@@ -132,7 +141,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     Helper.hideSoftKeyboard(getActivity());
                     fillData(v, etCustomerName.getText().toString().trim(), false);
                 }else{
-                    Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
+                    alertDialog = Helper.okDialog(ctx,
+                            "Error","Please input item name.", "CLOSE",
+                            null, false);
+                    BounceView.addAnimTo(alertDialog);
                 }
             }
         });
@@ -146,14 +159,39 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         .alpha(1.0f).setListener(null);
             }
         });
+        refreshAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSpinnerDialog(v);
+                requestCustomers("");
+            }
+        });
         adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
             @Override
             public void onItemClick(View v, int pos) {
-//                Toast.makeText(ctx, stringAlpha[pos], Toast.LENGTH_SHORT).show();
                 Helper.hideSoftKeyboard(getActivity());
                 fillData(v, stringAlpha.get(pos), true);
             }
         });
+
+    }
+
+    private void requestCustomers(String stringSearch) {
+        VolleyInteractor vic = new VolleyInteractor();
+        vic.registerCallback(this);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cn", ServerConstants.CN);
+        params.put("customer", stringSearch);
+
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+            it.remove();
+        }
+        strParams = strParams.replaceAll(" ", "%20");
+        vic.getCustomers(ctx, params, strParams);
     }
 
     private void fillData(View v, String stringSearch, Boolean isAlpha) {
@@ -225,35 +263,98 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     public void onRequestSuccess(String response, String type) {
         LinkedList<MenuList> mlRS = new LinkedList<MenuList>();
         try {
-            JSONArray objArr = new JSONArray(response);
-            if(objArr.length() > 0) {
-                for (int i = 0; i < objArr.length(); i++) {
-                    try {
-                        JSONObject obj = objArr.getJSONObject(i);
-                        MenuList mlList = new MenuList();
-                        mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
-                        mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
-                        mlList.setCustomerName(obj.getString(MenulistKey.CUSTOMER_NAME.getKey()));
-                        mlList.setRecordCount(0);
-                        mlList.setRemarks("");
-                        mlRS.add(mlList);
-                    } catch (JSONException e) {
-                        dismissSpinnerDialog();
-                        e.printStackTrace();
+            if (type.equals("searchcustomer")) {
+                JSONArray objArr = new JSONArray(response);
+                if(objArr.length() > 0) {
+                    DcMenulist.getInstance(ctx).emptyMenulist();
+                    for (int i = 0; i < objArr.length(); i++) {
+                        try {
+                            JSONObject obj = objArr.getJSONObject(i);
+                            MenuList mlList = new MenuList();
+                            mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
+                            mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
+                            String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                            mlList.setCustomerName(strCustomerName);
+                            mlList.setRecordCount(0);
+                            mlList.setRemarks("");
+                            if (!strCustomerName.equals("")) {
+                                if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
+                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)));
+                                } else {
+                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)));
+                                }
+                                DcMenulist.getInstance(ctx).insertMenulist(mlList);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
+
+                    alphagridview = (GridView) v.findViewById(R.id.alphagridview);
+                    ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
+                    if (refStringAlpha.size() > 0) { stringAlpha = refStringAlpha; }
+                    adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
+                    adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
+                        @Override
+                        public void onItemClick(View v, int pos) {
+                            Helper.hideSoftKeyboard(getActivity());
+                            fillData(v, stringAlpha.get(pos), true);
+                        }
+                    });
+                    alphagridview.setAdapter(adapterAlpha);
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    dismissSpinnerDialog();
+                                    storelistview_box.setVisibility(View.GONE);
+                                    alphagridview_box.setVisibility(View.VISIBLE);
+                                    alphagridview_box.setAlpha(0.0f);
+                                    alphagridview_box.animate().translationY(0)
+                                            .alpha(1.0f).setListener(null);
+//                                    dismissSpinnerDialog();
+//                                    showActivity(MainActivity.class);
+//                                    Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
+                                }
+                            },
+                            500
+                    );
                 }
-            }else{
-                MenuList mlList = new MenuList();
-                mlList.setCustomerID("0000000");
-                mlList.setCustomerIntegrationId("0000000");
-                mlList.setCustomerName("No Record Found");
-                mlList.setRecordCount(0);
-                mlList.setRemarks("");
-                mlRS.add(mlList);
+            } else {
+                JSONArray objArr = new JSONArray(response);
+                if(objArr.length() > 0) {
+                    for (int i = 0; i < objArr.length(); i++) {
+                        try {
+                            JSONObject obj = objArr.getJSONObject(i);
+                            MenuList mlList = new MenuList();
+                            mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
+                            mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
+                            mlList.setCustomerName(obj.getString(MenulistKey.CUSTOMER_NAME.getKey()));
+                            mlList.setRecordCount(0);
+                            mlList.setRemarks("");
+                            mlRS.add(mlList);
+                        } catch (JSONException e) {
+                            dismissSpinnerDialog();
+                            e.printStackTrace();
+                        }
+                    }
+                }else{
+                    MenuList mlList = new MenuList();
+                    mlList.setCustomerID("0000000");
+                    mlList.setCustomerIntegrationId("0000000");
+                    mlList.setCustomerName("No Record Found");
+                    mlList.setRecordCount(0);
+                    mlList.setRemarks("");
+                    mlRS.add(mlList);
+                }
             }
         } catch (JSONException e) {
             dismissSpinnerDialog();
-            Toast.makeText(ctx, "Something went wrong, please refresh the list.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(ctx, "Something went wrong, please refresh the list.", Toast.LENGTH_SHORT).show();
+            alertDialog = Helper.okDialog(ctx,
+                    "Error","Something went wrong, please refresh the list.", "CLOSE",
+                    null, false);
+            BounceView.addAnimTo(alertDialog);
             e.printStackTrace();
         } finally {
             dismissSpinnerDialog();

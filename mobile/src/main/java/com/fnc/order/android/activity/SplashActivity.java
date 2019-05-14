@@ -16,6 +16,8 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.List;
 
+import spencerstudios.com.bungeelib.Bungee;
+
 public class SplashActivity extends BaseActivity {
 
     private Context ctx;
@@ -62,6 +64,7 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void run() {
                 startActivity(new Intent(getApplicationContext(), cls));
+                Bungee.inAndOut(ctx);
                 finish();
             }
         }, 1000);

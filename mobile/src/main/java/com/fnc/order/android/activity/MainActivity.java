@@ -19,6 +19,8 @@ import com.fnc.order.android.fragment.TransactionFragment;
 import com.fnc.order.android.R;
 import com.fnc.order.android.services.OrdersService;
 
+import hari.bounceview.BounceView;
+
 public class MainActivity extends BaseActivity {
 
     Context ctx;

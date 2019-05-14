@@ -52,6 +52,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import hari.bounceview.BounceView;
+import spencerstudios.com.bungeelib.Bungee;
+
 public class LoginActivity extends BaseActivity implements VolleyCallback {
 
     PasswordVisibility passwordVisibility;
@@ -101,8 +104,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
 
 //        usernameText.setText("19130");
 //        passwordEText.setText("nathaniels@1994");
-        usernameText.setText("aban.allen@yahoo.com");
-        passwordEText.setText("7777777");
+//        usernameText.setText("aban.allen@yahoo.com");
+//        passwordEText.setText("7777777");
     }
 
     private void initListeners(){
@@ -137,12 +140,14 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                     alertDialog = Helper.okDialog(ctx,
                             "Error","Please enter username.", "CLOSE",
                             null, false);
+                    BounceView.addAnimTo(alertDialog);
                     return;
                 }
                 if(passwordEText.getText().toString().matches("")){
                     alertDialog = Helper.okDialog(ctx,
                             "Error","Please enter password.", "CLOSE",
                             null, false);
+                    BounceView.addAnimTo(alertDialog);
                     return;
                 }
 
@@ -166,6 +171,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                             alertDialog.dismiss();
                         }
                     } );
+                BounceView.addAnimTo(alertDialog);
             }
         });
     }
@@ -296,6 +302,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                                     alertDialog.dismiss();
                                 }
                             } );
+                    BounceView.addAnimTo(alertDialog);
                 }
             } else {
                 JSONObject obj = new JSONObject(response);
@@ -372,6 +379,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
             public void run() {
                 dismissSpinnerDialog();
                 startActivity(new Intent(getApplicationContext(), cls));
+                Bungee.inAndOut(ctx);
                 finish();
             }
         }, 300);
@@ -394,6 +402,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         alertDialog =  Helper.okCancelDialog(ctx, "Closing Application", "Are you sure you want to close this app?",
                 "Yes", closeApp,
                 "No", null, false);
+        BounceView.addAnimTo(alertDialog);
     }
 
     DialogInterface.OnClickListener closeApp = new DialogInterface.OnClickListener() {
