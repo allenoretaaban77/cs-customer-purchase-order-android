@@ -12,7 +12,7 @@ public class ServerConstants {
 //    public static final String CN = "beta";
     public static final String CN = "backoffice";
     public static final String DRIVER = "DRVR";
-    
+
     public static final boolean IS_HTTPS = false;
 
     public static final HashMap<String,String> getHeaderLogin() {
