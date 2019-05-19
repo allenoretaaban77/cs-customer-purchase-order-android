@@ -24,8 +24,6 @@ import hari.bounceview.BounceView;
 public class MainActivity extends BaseActivity {
 
     Context ctx;
-    private OrdersService oService;
-    Intent mServiceIntent;
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -35,7 +33,6 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         }
-        Log.i ("DSX", "service is stops");
         return false;
     }
 
@@ -44,11 +41,31 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         ctx = this;
 
-        oService = new OrdersService(ctx);
-        mServiceIntent = new Intent(this, oService.getClass());
-        if (!isMyServiceRunning(oService.getClass())) {
-            startService(mServiceIntent);
+        String svcname = "OrderService";
+        Boolean isSvcRunning = false;
+        ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
+        for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
+            if(service.service.getClassName().indexOf(svcname)>0){
+                isSvcRunning = true;
+            }
         }
+
+        if (!isSvcRunning) {
+            startService(new Intent(getBaseContext(), OrdersService.class));
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                startService(new Intent(getBaseContext(), OrdersService.class));
+//    //                    startForegroundService(mServiceIntent);
+//            } else {
+//                startService(new Intent(getBaseContext(), OrdersService.class));
+//    //                    startService(mServiceIntent);
+//            }
+        }
+
+//        OrdersService mSensorService = new OrdersService(getApplicationContext());
+//        Intent mServiceIntent = new Intent(getApplicationContext(), mSensorService.getClass());
+//        if (!isMyServiceRunning(mSensorService.getClass())) {
+//
+//        }
 
         setContentView(R.layout.activity_main);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);

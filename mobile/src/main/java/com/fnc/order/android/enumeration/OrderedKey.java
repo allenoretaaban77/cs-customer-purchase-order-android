@@ -13,7 +13,8 @@ public enum OrderedKey {
     JSON("json", DataType.TEXT),
     GRAND_TOTAL("grandtotal", DataType.TEXT),
     DATETIME("datetime", DataType.DATETIME),
-    STATUS("status", DataType.INTEGER);
+    STATUS("status", DataType.INTEGER),
+    REF_RECID("reference_recid", DataType.INTEGER);
 
     private String key;
     private String dataType;

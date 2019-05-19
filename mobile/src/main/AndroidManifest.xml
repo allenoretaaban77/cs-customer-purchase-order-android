@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <supports-screens android:requiresSmallestWidthDp="600" />
     <supports-screens
@@ -39,15 +42,13 @@
             android:windowSoftInputMode="adjustResize" />
 
         <service
-            android:name=".services.OrdersService"
-            android:enabled="true" >
+            android:process=":FNCCustomerOrderService"
+            android:stopWithTask="false"
+            android:name=".services.OrdersService">
         </service>
 
         <receiver
-            android:name=".services.ServiceStarter"
-            android:enabled="true"
-            android:exported="true"
-            android:label="RestartServiceWhenStopped">
+            android:name=".services.ServiceStarter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

@@ -139,7 +139,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         if (!iRs.getSellingPrice().equals("null")) {
             double u_price = Double.parseDouble(iRs.getSellingPrice());
             DecimalFormat df = new DecimalFormat("#.00");
-            holder.cell_price.setText(df.format(u_price));
+            holder.cell_price.setText(df.format(u_price).equals(".00") ? "0.00" : df.format(u_price));
         } else {
             holder.cell_price.setText("0.00");
         }

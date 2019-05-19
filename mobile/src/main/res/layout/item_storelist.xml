@@ -24,7 +24,6 @@
                 android:orientation="vertical">
                     <TextView
                         android:text="A"
-                        android:lineHeight="10dp"
                         android:textSize="18dp"
                         android:textStyle="bold"
                         android:textColor="@android:color/black"
@@ -35,7 +34,6 @@
                         android:text="b"
                         android:textStyle="bold"
                         android:textSize="16dp"
-                        android:lineHeight="14dp"
                         android:textColor="@color/gray_5"
                         android:id="@+id/tv_foodservice"
                         android:layout_width="match_parent"
@@ -49,7 +47,6 @@
                     <TextView
                         android:paddingTop="5dp"
                         android:textColor="@color/orange_1"
-                        android:lineHeight="10dp"
                         android:textSize="16dp"
                         android:id="@+id/tv_refid"
                         android:layout_width="match_parent"
