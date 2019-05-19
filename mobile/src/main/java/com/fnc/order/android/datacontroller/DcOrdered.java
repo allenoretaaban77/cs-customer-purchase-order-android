@@ -53,6 +53,16 @@ public class DcOrdered extends DBHelper {
         db.close();
     }
 
+    public void updateRefRecIdViaRecId(String recid, Integer intx){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(OrderedKey.STATUS.getKey(), intx);
+        db.updateWithOnConflict(Table.ORDERED.getName(), cv,
+                OrderedKey.CUSTOMER_RECID.getKey()+ " = ?",
+                new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
     public LinkedList<Ordered> getOrderedlist() {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.ORDERED.getName() + " ORDER BY datetime DESC";
@@ -92,6 +102,7 @@ public class DcOrdered extends DBHelper {
         od.setGrandtotal(c.getString(c.getColumnIndex(OrderedKey.GRAND_TOTAL.getKey())));
         od.setDateTime(c.getString(c.getColumnIndex(OrderedKey.DATETIME.getKey())));
         od.setStatus(c.getInt(c.getColumnIndex(OrderedKey.STATUS.getKey())));
+        od.setReferenceRecid(c.getString(c.getColumnIndex(OrderedKey.REF_RECID.getKey())));
         return od;
     }
 }

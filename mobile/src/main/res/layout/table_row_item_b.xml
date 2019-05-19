@@ -32,7 +32,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="18dp"
-            android:lineHeight="16dp"
             android:textStyle="bold"
             android:gravity="center"
             android:id="@+id/cell_actual"/>
@@ -69,7 +68,6 @@
         <TextView
             android:textColor="@color/green_1"
             android:textSize="14dp"
-            android:lineHeight="14dp"
             android:paddingLeft="10dp"
             android:gravity="center_vertical"
             android:id="@+id/cell_description"

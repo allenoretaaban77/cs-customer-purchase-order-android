@@ -80,7 +80,6 @@
                 <TextView
                     android:textColor="@color/brown_4"
                     android:textSize="14dp"
-                    android:lineHeight="14dp"
                     android:paddingRight="10dp"
                     android:paddingLeft="10dp"
                     android:gravity="center_vertical"

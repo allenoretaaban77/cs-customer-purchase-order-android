@@ -92,10 +92,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private View rootView;
     private Fragment thisFragment;
     private ProgressDialog loader;
-    private MaterialRippleLayout btn_add_item;
-    private MaterialRippleLayout btn_submit;
-    private MaterialRippleLayout btn_menu;
-    private MaterialRippleLayout btn_back;
+    private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh;
     private TextView tv_name, tv_grandtotal;
     private EditText et_date;
     private CoordinatorLayout rl_content_box;
@@ -123,6 +120,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private ArrayList<Order> curRefArrayList;
     private Integer curRefPos = 0;
     private Boolean oldskuerr = false;
+    private ArrayList<Order> curRefArrayListErr;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -136,6 +134,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         ctx = rootView.getContext();
         thisFragment = this;
         curRefArrayList = new ArrayList<Order>();
+        curRefArrayListErr = new ArrayList<Order>();
 
         mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
         mainTableBox.post(new Runnable() {
@@ -209,6 +208,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private void initViews(View v) {
+        btn_refresh = (MaterialRippleLayout) v.findViewById(R.id.btn_refresh);
         btn_add_item = (MaterialRippleLayout) v.findViewById(R.id.btn_add_item);
         btn_back = (MaterialRippleLayout) v.findViewById(R.id.btn_back);
         tv_name = (TextView) v.findViewById(R.id.tv_name);
@@ -309,7 +309,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 if (oldskuerr == true) {
 //                    Toast.makeText(ctx, "Some items does not have reference SKU, please contact the developer to assist you....", Toast.LENGTH_LONG).show();
                     alertDialog = Helper.okDialog(ctx,
-                            "Error","Some items does not have reference SKU, please contact the developer to assist you.", "OK",
+                            "Warning","Some items does not have reference SKU, please contact the developer for assistance.\n", "OK",
                             null, false);
                     BounceView.addAnimTo(alertDialog);
                     return;
@@ -418,6 +418,62 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
             }
         });
+
+        btn_refresh.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+                } else {
+                    builder = new AlertDialog.Builder(ctx);
+                }
+                builder.setCancelable(false);
+                BounceView.addAnimTo(
+                    builder.setTitle("Post Transaction").setMessage("Are you sure want to refresh the list? All items will reset.")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+                            curRefArrayList = new ArrayList<Order>();
+                            curRefArrayListErr = new ArrayList<Order>();
+
+                            mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
+                            mainTableBox.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    maintableViewHeight = mainTableBox.getHeight();
+                                    maintableViewWidth = mainTableBox.getWidth();
+                                    try {
+                                        tblContentBox = new LinearLayout(ctx);
+                                        tblContentBox.setLayoutParams(new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                        mainTableBox.addView(tblContentBox);
+                                    } finally {
+                                        LinearLayout ll = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_table_content, null);
+                                        tl = (TableLayout) ll.findViewById(R.id.checklist_table_layout);
+                                        tl.setLayoutParams(new LinearLayout.LayoutParams(maintableViewWidth,
+                                                LinearLayout.LayoutParams.WRAP_CONTENT));
+                                        tblContentBox.addView(ll);
+                                    }
+                                }
+                            });
+
+                            fillItems(rootView);
+
+                            tv_grandtotal.setText("0.00");
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            isPosted = false;
+                        }
+                    })
+                    .show()
+                );
+            }
+        });
     }
 
     View.OnClickListener cancelCallback = new View.OnClickListener() {
@@ -492,6 +548,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setGrandtotal(gt);
                 ol.setDateTime(Helper.getPostingDate());
                 ol.setStatus(0);
+                ol.setReferenceRecid("null");
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
 
                 Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
@@ -548,12 +605,17 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setUnitName(String.valueOf(il.getUnitName()));
                         ol.setRemarks("");
                         ol.setOldSku(String.valueOf(il.getOldSku()));
-                        ol.setSellingPrice(String.valueOf(il.getSellingPrice()));
+                        String strSP = String.valueOf(il.getSellingPrice()).equals("null") ? "0" : String.valueOf(il.getSellingPrice()) ;
+                        ol.setSellingPrice(strSP);
                         ol.setTotal("null");
                         ol.setIsChecked(false);
                         ol.setIsError(false);
                         ol.setIsLocked(true);
                         curRefArrayList.add(ol);
+
+                        if (String.valueOf(il.getOldSku()).equals("null")) {
+                            curRefArrayListErr.add(ol);
+                        }
                     }
 
                     adapter = new OrderlistAdapter(ctx, curRefArrayList);
@@ -580,6 +642,20 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         }
                     });
                     list_view.setAdapter(adapter);
+
+                    if (oldskuerr) {
+                        String strSkuMsg = "";
+                        for (int i = 0; i < curRefArrayListErr.size(); i++) {
+                            Order rowRl = curRefArrayListErr.get(i);
+                            String refCnt = String.valueOf(i+1);
+                            strSkuMsg = strSkuMsg + "\n " + refCnt + ". " + rowRl.getItemName();
+                        }
+                        alertDialog = Helper.okDialog(ctx,
+                                "Warning","Some items does not have reference SKU, " +
+                                        "please contact the developer for assistance.\n" + strSkuMsg, "OK",
+                                null, false);
+                        BounceView.addAnimTo(alertDialog);
+                    }
                 }
             } else {
                 if (objArr.length() > 0) {
@@ -969,7 +1045,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         refStr = String.valueOf(df.format(isplit0) + "." + strSplit[1]);
                     }
                 } else {
-                    refStr =  String.valueOf(df.format(isplit0))+".";
+                    refStr =  String.valueOf(df.format(isplit0)) + ".";
                 }
             }
         }
@@ -1007,7 +1083,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
             }
             DecimalFormat df = new DecimalFormat("#,###,###.00");
-            tv_grandtotal.setText(df.format(gt));
+            tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
         } else {
             tv_grandtotal.setText("0.00");
         }

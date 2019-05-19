@@ -20,6 +20,7 @@ public class OrderedlistQueryBuilder {
         values.put(OrderedKey.GRAND_TOTAL.getKey(), ordered.getGrandtotal());
         values.put(OrderedKey.DATETIME.getKey(), ordered.getDateTime());
         values.put(OrderedKey.STATUS.getKey(), ordered.getStatus());
+        values.put(OrderedKey.REF_RECID.getKey(), ordered.getReferenceRecid());
         return values;
     }
 }

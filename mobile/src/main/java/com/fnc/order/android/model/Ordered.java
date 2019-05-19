@@ -14,6 +14,7 @@ public class Ordered implements Serializable {
     private String grandtotal;
     private String datetime;
     private int status;
+    private String reference_recid;
 
     public String getCustomerIntegRecid() {
         return customer_integ_recid;
@@ -69,5 +70,10 @@ public class Ordered implements Serializable {
         return status;
     }
     public void setStatus(int status) { this.status = status; }
+
+    public String getReferenceRecid() {
+        return reference_recid;
+    }
+    public void setReferenceRecid(String reference_recid) { this.reference_recid = reference_recid; }
 
 }

@@ -65,6 +65,7 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(OrderedKey.GRAND_TOTAL);
         fields.add(OrderedKey.DATETIME);
         fields.add(OrderedKey.STATUS);
+        fields.add(OrderedKey.REF_RECID);
         return fields;
     }
 

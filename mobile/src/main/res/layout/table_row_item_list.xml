@@ -33,7 +33,6 @@
         <TextView
             android:textColor="@color/brown_4"
             android:textSize="14dp"
-            android:lineHeight="14dp"
             android:paddingLeft="10dp"
             android:gravity="center_vertical"
             android:id="@+id/cell_description"
