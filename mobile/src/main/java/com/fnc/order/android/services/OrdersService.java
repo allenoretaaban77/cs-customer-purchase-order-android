@@ -54,7 +54,7 @@ public class OrdersService extends Service implements VolleyCallback {
 
         handler.removeCallbacks(postRunnable);
         counter = 0;
-        handler.postDelayed(postRunnable, 3000);
+        handler.postDelayed(postRunnable, 2000);
 
         Intent activityIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
@@ -99,7 +99,7 @@ public class OrdersService extends Service implements VolleyCallback {
                 }
             }
 
-            handler.postDelayed(this, 3000);
+            handler.postDelayed(this, 2000);
         }
     };
 
