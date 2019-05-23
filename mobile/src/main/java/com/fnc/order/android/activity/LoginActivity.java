@@ -104,8 +104,6 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
 
 //        usernameText.setText("19130");
 //        passwordEText.setText("nathaniels@1994");
-//        usernameText.setText("aban.allen@yahoo.com");
-//        passwordEText.setText("7777777");
     }
 
     private void initListeners(){
