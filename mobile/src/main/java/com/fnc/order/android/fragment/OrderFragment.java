@@ -162,8 +162,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         rootView.setOnKeyListener( new View.OnKeyListener() {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
-                if( keyCode == KeyEvent.KEYCODE_BACK ) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
                     backItNow(v);
+                    return true;
                 }
                 return false;
             }
@@ -192,7 +193,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         showSpinnerDialog(v);
         HashMap<String, String> params = new HashMap<>();
         params.put("itemname", "");
-        params.put("cn", ServerConstants.CN);
+        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
         params.put("customerid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
         Iterator it = params.entrySet().iterator();
         String strParams = "";
@@ -269,7 +270,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public final void onClick(final View v) {
                 if(isBacked == false) {
                     isBacked = true;
-                    getActivity().onBackPressed();
+                    backItNow(v);
                 }
             }
         });
@@ -294,11 +295,21 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public void call(View v, int id) {
                 switch(id){
                     case 0:
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container,
-                                new TransactionFragment()).addToBackStack("transactionlist").commit();
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
+                            .addToBackStack(null)
+                            .commit();
                         break;
                     default:
-                        backItNow(v);
+                        alertDialog = Helper.okCancelDialog(ctx,
+                                "Log Out", "Are you sure you want to log-out?",
+                                "Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        getActivity().finish();
+                                    }
+                                }, "Cancel", null, false);
+                        BounceView.addAnimTo(alertDialog);
                         break;
                 }
             }
@@ -506,7 +517,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     detailMap.put("quantity", rqty);
                     detailMap.put("item_recid", rowOl.getItemRecid());
                     detailMap.put("remarks", rowOl.getRemarks());
-                    detailMap.put("old_sku", rowOl.getOldSku());
+                    detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
                     detailMap.put("selling_price", rowOl.getSellingPrice());
                     String rtotal = rowOl.getTotal().replace(",", "");
                     detailMap.put("total", rtotal);
@@ -519,7 +530,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 paramsArray.put("details", detailsArrayList);
 
                 HashMap<String, String> headersMap = new HashMap();
-                headersMap.put("companydb", ServerConstants.CN);
+                headersMap.put("companydb", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
                 headersMap.put("customer_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
                 headersMap.put("customer_integ_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
                 headersMap.put("deliver_date", refStringDate);

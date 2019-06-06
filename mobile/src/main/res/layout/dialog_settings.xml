@@ -37,6 +37,7 @@
                 android:padding="3dp"
                 style="@style/btnTransparentStyleSmallWrap">
                 <com.balysv.materialripple.MaterialRippleLayout
+                    android:id="@+id/btn_close"
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -44,7 +45,6 @@
                     <Button
                         android:backgroundTint="@color/white"
                         android:background="@drawable/baseline_close_24"
-                        android:id="@+id/btn_close"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
                 </com.balysv.materialripple.MaterialRippleLayout>
@@ -67,7 +67,7 @@
 
                 <TextView
                     android:id="@+id/tv_label1"
-                    android:layout_width="80dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="3dp"
                     android:text="Domain :"
@@ -83,7 +83,7 @@
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:gravity="top"
-                    android:hint="Click here to input domain server..."
+                    android:hint="Click here to input domain server"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="2"
@@ -105,15 +105,15 @@
 
                 <TextView
                     android:id="@+id/tv_label2"
-                    android:layout_width="80dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="3dp"
-                    android:text="Local :"
+                    android:text="Connection :"
                     android:textColor="@color/gray_6"
                     android:textSize="16sp" />
 
                 <EditText
-                    android:id="@+id/et_local_svr"
+                    android:id="@+id/et_database"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentRight="true"
@@ -121,7 +121,7 @@
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:gravity="top"
-                    android:hint="Click here to input local server..."
+                    android:hint="Click here to input connection string"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="2"

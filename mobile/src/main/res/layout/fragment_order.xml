@@ -142,7 +142,7 @@
                                 <TextView
                                     android:id="@+id/ref_desc_elem"
                                     style="@style/tblCellTextViewHeader"
-                                    android:layout_width="320dp"
+                                    android:layout_width="220dp"
                                     android:layout_column="2"
                                     android:text="Description" />
 

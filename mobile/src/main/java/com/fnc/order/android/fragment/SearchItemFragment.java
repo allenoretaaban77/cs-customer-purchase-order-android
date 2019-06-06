@@ -169,7 +169,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         HashMap<String, String> params = new HashMap<>();
         String searchStr = et_item_name.getText().toString().trim();
         params.put("itemname", searchStr);
-        params.put("cn", ServerConstants.CN);
+        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
 //        params.put("customerid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
         params.put("customerid", "-1");
         Iterator it = params.entrySet().iterator();
