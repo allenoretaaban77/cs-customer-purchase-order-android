@@ -70,10 +70,15 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 //        openFragment(new OrderFragment(), "order");
-        openFragment(new CustomerFragment(), "customer");
+//        openFragment(new CustomerFragment(), "customer");
+
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.container, new CustomerFragment(), "customer_fragment")
+            .addToBackStack(null)
+            .commit();
     }
 
-    private void openFragment(Fragment fragment, String tag) {
+    /*private void openFragment(Fragment fragment, String tag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         Integer sbec = fm.getBackStackEntryCount(); //
@@ -99,9 +104,9 @@ public class MainActivity extends BaseActivity {
                 fm.executePendingTransactions();
                 break;
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void onBackPressed() {
         final FragmentManager fm = getSupportFragmentManager();
         Integer sbec = fm.getBackStackEntryCount();
@@ -125,9 +130,9 @@ public class MainActivity extends BaseActivity {
         }else{
             showLogout();
         }
-    }
+    }*/
 
-    private void showLogout(){
+    /* private void showLogout(){
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
@@ -148,5 +153,5 @@ public class MainActivity extends BaseActivity {
                     }
                 })
                 .show();
-    }
+    } */
 }

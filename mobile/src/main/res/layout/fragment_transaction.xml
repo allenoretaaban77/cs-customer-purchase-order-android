@@ -110,7 +110,7 @@
                                     android:layout_weight="1"
                                     android:layout_width="match_parent"
                                     android:layout_column="1"
-                                    android:text="Company Name" />
+                                    android:text="Company" />
 
                                 <TextView
                                     android:id="@+id/ref_grandtotal"
@@ -121,7 +121,7 @@
 
                                 <TextView
                                     style="@style/tblCellTextViewHeader"
-                                    android:layout_width="200dp"
+                                    android:layout_width="150dp"
                                     android:layout_column="3"
                                     android:text="Remarks" />
                             </TableRow>

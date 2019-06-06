@@ -1,15 +1,10 @@
 package com.fnc.order.android.services;
 
-import android.app.ActivityManager;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -25,14 +20,10 @@ import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.VolleyInteractor;
 
 import java.util.LinkedList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
-public class OrdersService extends Service implements VolleyCallback {
+public class OrdersService extends Service {
 
     public int counter = 0;
-    public VolleyCallback refVB;
     Context c;
     LocalBroadcastManager broadcaster = null;
     Handler handler = new Handler();
@@ -66,6 +57,7 @@ public class OrdersService extends Service implements VolleyCallback {
 
         return START_STICKY;
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -90,8 +82,17 @@ public class OrdersService extends Service implements VolleyCallback {
                     Ordered rsOD = od.get(i);
 
                     VolleyInteractor vi = new VolleyInteractor();
-                    vi.registerCallback(refVB);
-                    Log.i("DSX", "post orders");
+                    vi.registerCallback(new VolleyCallback() {
+                        @Override
+                        public void onRequestSuccess(String response, String type) {
+                            Log.d("DSX post success: ", response);
+                        }
+
+                        @Override
+                        public void onRequestFail(VolleyError response, String type) {
+                            Log.d("DSX post error: ", response.getMessage());
+                        }
+                    });
                     vi.postOrders(getApplicationContext(), rsOD.getJson());
 
                     DcOrdered.getInstance(getApplicationContext())
@@ -103,29 +104,11 @@ public class OrdersService extends Service implements VolleyCallback {
         }
     };
 
-//    public void startTimer() {
-//        runner = new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        };
-//
-//        handler.postDelayed(runner, 1000);
-//    }
-
-    public void onRequestSuccess(String response, String type) {
-        Log.d("DSX", response);
-//
-    }
-
-    public void onRequestFail(VolleyError volleyError, String type) {
-        Log.d("DSX", "request error");
-    }
-
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         Log.d("DSX", "on task removed");
+
 //        ExecutorService executorService = Executors.newSingleThreadExecutor();
 //        executorService.submit(runner).cancel(true);
     }

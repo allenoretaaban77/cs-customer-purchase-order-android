@@ -18,6 +18,7 @@ import com.android.volley.toolbox.Volley;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.API;
+import com.fnc.order.android.enumeration.SharedKey;
 import com.github.yangweigbh.volleyx.VolleyX;
 
 import java.util.HashMap;
@@ -43,7 +44,8 @@ public class VolleyInteractor {
         new Thread(new Runnable(){
             public void run(){
                 StringRequest strRequest = new StringRequest( Request.Method.POST,
-                        ServerConstants.SERVER_URL + API.LOGIN.getApi(),
+                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                + API.LOGIN.getApi(),
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -79,12 +81,55 @@ public class VolleyInteractor {
         }).start();
     }
 
+    public void getUsers(final Context ctx, final HashMap<String, String> params,
+                             final String strParams) {
+        new Thread(new Runnable(){
+            public void run(){
+                StringRequest strRequest = new StringRequest( Request.Method.GET,
+                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                + API.GET_USERS.getApi()+ "?" + strParams,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                if(callback != null) {
+                                    callback.onRequestSuccess(response, "getusers");
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        if(callback != null) {
+                            callback.onRequestFail(volleyError, "getusers");
+                        }
+                    }
+                }) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        return ServerConstants.getHeaderOrder();
+                    }
+                    public Map<String, String> getParams(){
+                        return params;
+                    }
+
+                };
+                requestQueue = Volley.newRequestQueue(ctx);
+                int socketTimeout = 10000;
+                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                strRequest.setRetryPolicy(policy);
+                requestQueue.getCache().clear();
+                requestQueue.add(strRequest);
+            }
+        }).start();
+    }
+
     public void updateEmployeeId(final Context ctx, final HashMap<String, String> params,
                          final String strParams) {
         new Thread(new Runnable(){
             public void run(){
                 StringRequest strRequest = new StringRequest( Request.Method.POST,
-                        ServerConstants.SERVER_URL + API.POST_UPDATE_EMPLOYEE.getApi()+ "?" + strParams,
+                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                + API.POST_UPDATE_EMPLOYEE.getApi()+ "?" + strParams,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -125,7 +170,8 @@ public class VolleyInteractor {
         new Thread(new Runnable(){
             public void run(){
                 StringRequest strRequest = new StringRequest( Request.Method.GET,
-                        ServerConstants.SERVER_URL + API.GET_VERIFIED.getApi()+ "?" + strParams,
+                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                + API.GET_VERIFIED.getApi()+ "?" + strParams,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -166,7 +212,8 @@ public class VolleyInteractor {
         new Thread(new Runnable(){
             public void run(){
                 StringRequest strRequest = new StringRequest( Request.Method.GET,
-                        ServerConstants.SERVER_URL + API.GET_CUSTOMERS.getApi()+ "?" + strParams,
+                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                + API.GET_CUSTOMERS.getApi()+ "?" + strParams,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -207,7 +254,8 @@ public class VolleyInteractor {
         new Thread(new Runnable(){
             public void run(){
                 StringRequest strRequest = new StringRequest( Request.Method.GET,
-                        ServerConstants.SERVER_URL + API.GET_ITEMLIST.getApi()+ "?" + strParams,
+                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                + API.GET_ITEMLIST.getApi()+ "?" + strParams,
                         null, null) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
@@ -253,7 +301,9 @@ public class VolleyInteractor {
     public void postOrders(final Context ctx, final String param) {
         new Thread(new Runnable(){
             public void run(){
-                String urlStr = ServerConstants.SERVER_URL + API.POST_ORDER.getApi();
+                String urlStr = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                        + API.POST_ORDER.getApi();
+                Log.i("DSX", urlStr + " | " + param);
                 StringRequest strRequest = new StringRequest( Request.Method.POST, urlStr,
                         new Response.Listener<String>() {
                             @Override

@@ -9,7 +9,9 @@ import android.util.Log;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
+import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.model.Ordered;
+import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.utilities.Helper;
 
 import java.io.File;
@@ -33,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(createTables(Table.ORDER, setOrderFields()));
         db.execSQL(createTables(Table.ORDERED, setOrderedFields()));
         db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
+        db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
         Log.i(TAG,"Database created path : " + db.getPath());
     }
 
@@ -80,6 +83,22 @@ public class DBHelper extends SQLiteOpenHelper {
         return fields;
     }
 
+    protected LinkedList<UserslistKey> setUserlistFields() {
+        LinkedList<UserslistKey> fields = new LinkedList<>();
+        fields.add(UserslistKey.IDENTITYID);
+        fields.add(UserslistKey.EMAIL);
+        fields.add(UserslistKey.PASSWORD);
+        fields.add(UserslistKey.FIRSTNAME);
+        fields.add(UserslistKey.MIDDLENAME);
+        fields.add(UserslistKey.LASTNAME);
+        fields.add(UserslistKey.DATEOFBIRTH);
+        fields.add(UserslistKey.VERIFIED);
+        fields.add(UserslistKey.COMPANY_UNIQIE);
+        fields.add(UserslistKey.REF_EMPLOYEE_NO);
+        fields.add(UserslistKey.TEMPO_ID);
+        return fields;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         int version = oldVersion + 1;
@@ -88,6 +107,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.execSQL(createTables(Table.ORDER, setOrderFields()));
                 db.execSQL(createTables(Table.ORDERED, setOrderedFields()));
                 db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
+                db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
         }
     }
 }

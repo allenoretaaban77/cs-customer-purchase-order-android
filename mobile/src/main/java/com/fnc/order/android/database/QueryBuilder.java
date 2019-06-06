@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
+import com.fnc.order.android.enumeration.UserslistKey;
 
 import java.util.LinkedList;
 
@@ -29,6 +30,8 @@ public class QueryBuilder {
             fieldName = ((OrderedKey)field).getKey();
         if(field instanceof MenulistKey)
             fieldName = ((MenulistKey)field).getKey();
+        if(field instanceof UserslistKey)
+            fieldName = ((UserslistKey)field).getKey();
         return fieldName;
     }
 
@@ -40,6 +43,8 @@ public class QueryBuilder {
             dataType = ((OrderedKey)field).getDataType();
         if(field instanceof MenulistKey)
             dataType = ((MenulistKey)field).getDataType();
+        if(field instanceof UserslistKey)
+            dataType = ((UserslistKey)field).getDataType();
         return dataType;
     }
 

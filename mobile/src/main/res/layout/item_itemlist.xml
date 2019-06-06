@@ -76,7 +76,7 @@
             <LinearLayout
                 android:layout_column="2"
                 style="@style/tblCellTextView"
-                android:layout_width="320dp">
+                android:layout_width="220dp">
                 <TextView
                     android:textColor="@color/brown_4"
                     android:textSize="14dp"

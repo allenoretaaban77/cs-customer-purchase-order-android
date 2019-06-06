@@ -25,6 +25,7 @@ import com.fnc.order.android.adapters.PersonAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.PersonsKey;
+import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.Person;
 import com.fnc.order.android.utilities.Helper;
@@ -105,7 +106,7 @@ public class SearchPersonFragment extends DialogFragment implements VolleyCallba
         showSpinnerDialog(v);
         HashMap<String, String> params = new HashMap<>();
         params.put("name", et_person_name.getText().toString().trim());
-        params.put("cn", ServerConstants.CN);
+        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
         Iterator it = params.entrySet().iterator();
         String strParams = "";
         while (it.hasNext()) {

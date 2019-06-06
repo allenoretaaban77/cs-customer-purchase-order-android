@@ -6,6 +6,7 @@ public enum Table {
     RETURN("return"),
     PREPAREDLIST("preparedlist"),
     MENULIST("menulist"),
+    USERSLIST("userslist"),
     STORELIST("storelists"),
     NOTIFICATIONS("notifications"),
     CHECKLIST("checklists"),

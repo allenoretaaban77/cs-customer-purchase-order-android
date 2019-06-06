@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,7 @@ import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.API;
+import com.fnc.order.android.enumeration.SharedKey;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -131,7 +134,7 @@ public class Helper {
         EditText etText = (EditText) layout.findViewById(R.id.et_password);
 
         btnOK.setOnClickListener(onClickListener);
-        btnOK.setOnClickListener(cancelClickListener);
+        btnCancel.setOnClickListener(cancelClickListener);
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
         builder.setView(layout);
@@ -260,7 +263,7 @@ public class Helper {
         VolleyInteractor v = new VolleyInteractor();
         v.registerCallback(volleycb);
         HashMap<String, String> params = new HashMap<>();
-        params.put("cn", ServerConstants.CN);
+        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
         params.put("customer", "");
 
         Iterator it = params.entrySet().iterator();
@@ -280,5 +283,21 @@ public class Helper {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    public static boolean checkOfflineLogin(Context ctx){
+        if(isNetworkAvailable(ctx)){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public static boolean isNetworkAvailable(Context ctx) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) ctx.getSystemService(
+                ctx.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

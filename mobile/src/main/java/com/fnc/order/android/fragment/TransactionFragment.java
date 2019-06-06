@@ -36,7 +36,6 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
     private TransactionsAdapter adapter;
 
     public TransactionFragment() {
-        // Required empty public constructor
     }
 
     @Nullable
@@ -51,8 +50,9 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
         refV.setOnKeyListener( new View.OnKeyListener() {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
-                if( keyCode == KeyEvent.KEYCODE_BACK ) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
                     backItNow(v);
+                    return true;
                 }
                 return false;
             }
