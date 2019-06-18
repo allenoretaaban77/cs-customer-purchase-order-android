@@ -120,8 +120,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("02");
-//        passwordEText.setText("7777777");
+        usernameText.setText("02");
+        passwordEText.setText("7777777");
     }
 
     private void initListeners(){
@@ -180,6 +180,11 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                         Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
                         isSubmit = true;
                         showActivity(MainActivity.class);
+
+                        SharedData spx = SharedData.getInstance(ctx);
+                        spx.saveData(API.IDENTITY_ID.getApi(), ul.get(0).getIdentityId());
+                        spx.saveData(API.EMPLOYEE_ID.getApi(), ul.get(0).getReference_employee_no());
+
 //                        if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
 //                                .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
 ////                            sp.saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
@@ -193,7 +198,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
 //                            showActivity(MainActivity.class);
 //                        }
                     } else {
-                        isSubmit = true;
+                        isSubmit = false;
                         Toast.makeText(ctx, "Invalid username or password",Toast.LENGTH_LONG).show();
                     }
                 } else {

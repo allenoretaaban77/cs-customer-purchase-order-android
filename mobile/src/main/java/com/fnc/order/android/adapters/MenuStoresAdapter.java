@@ -87,7 +87,6 @@ public class MenuStoresAdapter extends ArrayAdapter<MenuList> {
             });
         }
 
-
         return rowView;
     }
 }

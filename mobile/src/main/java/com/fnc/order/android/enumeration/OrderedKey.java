@@ -11,6 +11,7 @@ public enum OrderedKey {
     REMARKS("remarks", DataType.TEXT),
     REF_EMPLOYEE_NO("reference_employee_no", DataType.TEXT),
     JSON("json", DataType.TEXT),
+    JSON_COMPLETE("json_complete", DataType.TEXT),
     GRAND_TOTAL("grandtotal", DataType.TEXT),
     DATETIME("datetime", DataType.DATETIME),
     STATUS("status", DataType.INTEGER),

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fnc.order.android.R;
@@ -37,11 +38,14 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
         private TextView tv_name;
         private TextView tv_grandtotal;
         private TextView tv_remarks;
+        private LinearLayout ll_item_box;
         public ViewHolder(View v) {
             tv_date = (TextView) v.findViewById(R.id.tv_date);
             tv_name = (TextView) v.findViewById(R.id.tv_name);
             tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
             tv_remarks = (TextView) v.findViewById(R.id.tv_remarks);
+            ll_item_box = (LinearLayout) v.findViewById(R.id.item_box);
+
         }
     }
 
@@ -63,11 +67,18 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
 
         holder.tv_date.setText(od.getDeliveryDate().replace(" 00:00:00", ""));
         holder.tv_name.setText(od.getCustomerName());
-
         holder.tv_grandtotal.setText(String.valueOf(new DecimalFormat("#,###,###.00")
                 .format(Double.parseDouble(od.getGrandtotal()))));
-
         holder.tv_remarks.setText(od.getRemarks());
+
+        holder.ll_item_box.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(final View v){
+                if(onListenerClickListener != null){
+                    onListenerClickListener.onItemClick(v, position);
+                }
+            }
+        });
 
         return convertView;
     }

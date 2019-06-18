@@ -318,18 +318,25 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         btn_submit.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
                 if (oldskuerr == true) {
-//                    Toast.makeText(ctx, "Some items does not have reference SKU, please contact the developer to assist you....", Toast.LENGTH_LONG).show();
+
+                    String strSkuMsg = "";
+                    for (int i = 0; i < curRefArrayListErr.size(); i++) {
+                        Order rowRl = curRefArrayListErr.get(i);
+                        String refCnt = String.valueOf(i+1);
+                        strSkuMsg = strSkuMsg + "\n " + refCnt + ". " + rowRl.getItemName();
+                    }
                     alertDialog = Helper.okDialog(ctx,
-                            "Warning","Some items does not have reference SKU, please contact the developer for assistance.\n", "OK",
+                            "Warning","Some items does not have reference SKU, please contact the developer for assistance.\n" + strSkuMsg, "OK",
                             null, false);
                     BounceView.addAnimTo(alertDialog);
+
                     return;
                 }
 
                 Helper.hideSoftKeyboard(getActivity());
 
 //                LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
-                final ArrayList<HashMap> detailsArrayList = new ArrayList();
+//                final ArrayList<HashMap> detailsArrayList = new ArrayList();
                 if(curRefArrayList.size() > 0) {
                     Boolean errFlag = false;
                     for (int i = 0; i < curRefArrayList.size(); i++) {
@@ -506,6 +513,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
 //        LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
         final ArrayList<HashMap> detailsArrayList = new ArrayList();
+        final ArrayList<HashMap> detailsArrayListC = new ArrayList();
         if (curRefArrayList.size() > 0) {
             Boolean errFlag = false;
             for (int i = 0; i < curRefArrayList.size(); i++) {
@@ -522,6 +530,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     String rtotal = rowOl.getTotal().replace(",", "");
                     detailMap.put("total", rtotal);
                     detailsArrayList.add(detailMap);
+
+                    detailMap.put("unitName", rowOl.getUnitName());
+                    detailMap.put("itemname", rowOl.getItemName());
+                    detailMap.put("itemname", rowOl.getItemName());
+                    detailMap.put("is_checked", false);
+                    detailMap.put("is_error", false);
+                    detailMap.put("is_locked", false);
+                    detailsArrayListC.add(detailMap);
                 }
             }
             if(!errFlag) {
@@ -543,6 +559,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 headersMap.put("branch_encoding", "1");
                 String gt = tv_grandtotal.getText().toString().trim().replace(",", "");
                 headersMap.put("grand_total", gt);
+
                 paramsArray.put("header", headersMap);
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
@@ -556,6 +573,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setRemarks(et_remarks.getText().toString().trim());
                 ol.setReferenceEmployeeNo(sp.getData(API.EMPLOYEE_ID.getApi()));
                 ol.setJson(paramsArrayStr);
+//                HashMap<String, Object> paramsArrayX = new HashMap();
+//                paramsArrayX.put("details", detailsArrayListC);
+                ol.setJsonComplete(new JSONArray(detailsArrayListC).toString());
                 ol.setGrandtotal(gt);
                 ol.setDateTime(Helper.getPostingDate());
                 ol.setStatus(0);
@@ -592,6 +612,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 if(objArr.length() > 0) {
                     List<Itemlist> iRs = new ArrayList<Itemlist>();
 
+                    oldskuerr = false;
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         Itemlist irsx = new Itemlist();
