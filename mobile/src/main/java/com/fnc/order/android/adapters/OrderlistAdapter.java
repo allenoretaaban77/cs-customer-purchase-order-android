@@ -24,7 +24,6 @@ import java.util.List;
 public class OrderlistAdapter extends ArrayAdapter<Order> {
 
     private final Context context;
-
     private final List<Order> item_values;
 
     public OrderlistAdapter(Context context, List<Order> values) {

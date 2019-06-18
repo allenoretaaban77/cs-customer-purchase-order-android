@@ -17,10 +17,11 @@
             android:background="@drawable/background_round_border"
             android:padding="7dp">
             <TextView
+                android:layout_marginTop="5dp"
                 android:layout_centerInParent="true"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-smallc"
-                android:textColor="@color/green_1"
+                android:textColor="@color/white"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
@@ -47,7 +48,7 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_marginTop="43dp"
+            android:layout_marginTop="48dp"
             style="@style/layoutStyleMenu"
             android:orientation="vertical"
             android:background="@drawable/background_round_border"

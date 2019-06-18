@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -70,6 +72,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.dialog_search_item, container, false);
         ctx = rootView.getContext();
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         try {
             initViews(rootView);

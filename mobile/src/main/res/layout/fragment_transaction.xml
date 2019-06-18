@@ -100,7 +100,7 @@
 
                                 <TextView
                                     style="@style/tblCellTextViewHeader"
-                                    android:layout_width="120dp"
+                                    android:layout_width="110dp"
                                     android:layout_column="0"
                                     android:text="Date" />
 
