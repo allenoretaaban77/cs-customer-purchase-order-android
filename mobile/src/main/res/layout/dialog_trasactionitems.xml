@@ -69,22 +69,22 @@
                         android:layout_height="match_parent">
                         <TextView
                             android:id="@+id/ref_desc_elem"
-                            style="@style/tblCellTextViewHeader"
+                            style="@style/tblCellTextViewHeaderTrans"
                             android:layout_weight="1"
                             android:layout_column="0"
                             android:text="Description" />
                         <TextView
-                            style="@style/tblCellTextViewHeader"
+                            style="@style/tblCellTextViewHeaderTrans"
                             android:layout_width="80dp"
                             android:layout_column="1"
                             android:text="Price" />
                         <TextView
-                            style="@style/tblCellTextViewHeader"
+                            style="@style/tblCellTextViewHeaderTrans"
                             android:layout_width="90dp"
                             android:layout_column="2"
                             android:text="Quantity" />
                         <TextView
-                            style="@style/tblCellTextViewHeader"
+                            style="@style/tblCellTextViewHeaderTrans"
                             android:layout_width="80dp"
                             android:layout_column="3"
                             android:text="Total" />

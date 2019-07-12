@@ -5,17 +5,24 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -26,7 +33,9 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
+import com.fnc.order.android.activity.SplashActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
@@ -299,5 +308,27 @@ public class Helper {
                 ctx.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public static void setLogo(ImageView ivlogo, Context ctx) {
+        SharedData sp = SharedData.getInstance(ctx);
+        switch (sp.getData(SharedKey.DATABASE.getKey())) {
+            case "massive":
+                ivlogo.setImageResource(R.drawable.massive_logo);
+                break;
+            default:
+                ivlogo.setImageResource(R.drawable.logo);
+                break;
+        }
+    }
+
+    public static String getNumericMonthDay() {
+        Date date = Calendar.getInstance().getTime();
+        String dayOfTheWeek = (String) DateFormat.format("EEEE", date); // Sunday
+        String day          = (String) DateFormat.format("dd",   date); // 23
+        String monthString  = (String) DateFormat.format("MMM",  date); // Jun
+        String monthNumber  = (String) DateFormat.format("MM",   date); // 06
+        String year         = (String) DateFormat.format("yyyy", date); // 2019
+        return monthNumber + day;
     }
 }

@@ -47,13 +47,13 @@ public class OrdersService extends Service {
         counter = 0;
         handler.postDelayed(postRunnable, 2000);
 
-        Intent activityIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-                activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification notification = new Notification.Builder(this).
-                setContentTitle(getText(R.string.app_name)).
-                setContentIntent(pendingIntent).build();
-        startForeground(1, notification);
+//        Intent activityIntent = new Intent(this, MainActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+//                activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        Notification notification = new Notification.Builder(this).
+//                setContentTitle(getText(R.string.app_name)).
+//                setContentIntent(pendingIntent).build();
+//        startForeground(1, notification);
 
         return START_STICKY;
     }

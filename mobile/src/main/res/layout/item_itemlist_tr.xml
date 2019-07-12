@@ -20,17 +20,16 @@
 
                 <TextView
                     android:id="@+id/tv_date"
-                    android:gravity="center"
-                    style="@style/tblCellTextView"
+                    android:gravity="center|top"
+                    style="@style/tblCellTextViewItems"
                     android:layout_width="110dp"
                     android:layout_column="0"
                     android:text="Date" />
 
                 <TextView
-                    android:paddingLeft="10dp"
                     android:id="@+id/tv_name"
-                    android:gravity="center_vertical"
-                    style="@style/tblCellTextView"
+                    android:gravity="top"
+                    style="@style/tblCellTextViewItems"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_column="1"
@@ -38,18 +37,17 @@
 
                 <TextView
                     android:id="@+id/tv_grandtotal"
-                    android:gravity="center_vertical|right"
-                    style="@style/tblCellTextView"
+                    android:gravity="center|top|right"
+                    style="@style/tblCellTextViewItems"
                     android:layout_width="150dp"
                     android:layout_column="2"
-                    android:paddingRight="10dp"
                     android:text="Total" />
 
                 <TextView
                     android:paddingLeft="10dp"
                     android:id="@+id/tv_remarks"
-                    android:gravity="center_vertical"
-                    style="@style/tblCellTextView"
+                    android:gravity="top"
+                    style="@style/tblCellTextViewItems"
                     android:layout_width="150dp"
                     android:layout_column="3"
                     android:text="Remarks" />

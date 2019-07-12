@@ -24,8 +24,9 @@ public class GlobalConstants {
     public static String DATE_REF_FORMAT = "yyyy-MM-dd";
     public static String DATE_FORMAT_POST = "M/dd/yyyy HH:mm:ss";
 
-
     public static Integer SWIPE_PAGE_ON_FACTOR = 700;
     public static Integer SWIPE_MIN_DISTANCE = 700;
     public static Integer SWIPE_THRESHOLD_VELOCITY = 2000;
+
+    public static final String ACTION_PLAY = "action_play_fnc_order";
 }
