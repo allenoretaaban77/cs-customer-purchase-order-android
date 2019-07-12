@@ -1,6 +1,7 @@
 package com.fnc.order.android.adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,7 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        TransactionsAdapter.ViewHolder holder;
+        final TransactionsAdapter.ViewHolder holder;
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -74,12 +75,30 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
         holder.ll_item_box.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(final View v){
-                if(onListenerClickListener != null){
+                if(onListenerClickListener != null) {
                     onListenerClickListener.onItemClick(v, position);
+                    setCurPos(position);
+                    notifyDataSetChanged();
                 }
             }
         });
 
+        if (this.curPos == position) {
+            holder.tv_date.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
+            holder.tv_name.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
+            holder.tv_grandtotal.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
+            holder.tv_remarks.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
+        } else {
+            holder.tv_date.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
+            holder.tv_name.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
+            holder.tv_grandtotal.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
+            holder.tv_remarks.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
+        }
+
         return convertView;
     }
+
+    private Integer curPos = -1;
+    public Integer getCurPos() { return this.curPos; }
+    public void setCurPos(Integer position) { this.curPos = position; }
 }

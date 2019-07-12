@@ -189,12 +189,24 @@
 
     <style name="tblCellTextViewHeaderTrans">
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">15dp</item>
+        <item name="android:textSize">14dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_height">38dp</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/cell_background_green</item>
+    </style>
+
+    <style name="tblCellTextViewItems">
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:textColor">@color/brown_4</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:background">@drawable/cell_background</item>
     </style>
 
     <style name="tblCellTextViewHeaderWhite">

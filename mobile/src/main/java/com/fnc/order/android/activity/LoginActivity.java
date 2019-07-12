@@ -2,21 +2,30 @@ package com.fnc.order.android.activity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -27,6 +36,7 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrder;
@@ -45,14 +55,17 @@ import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.R;
 
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.net.FileNameMap;
 import java.security.interfaces.DSAKey;
@@ -87,6 +100,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), this);
+
         vi = new VolleyInteractor();
         vi.registerCallback(this);
         ctx = this;
@@ -94,34 +109,44 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
 
         SharedData sp = SharedData.getInstance(this);
         if(sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "192.168.1.200:81");
+            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://192.168.1.200:81/");
         }
         if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) {
             sp.saveData(SharedKey.DATABASE.getKey(), "backoffice");
         }
-        if(sp.getData(SharedKey.DATABASE_OLD.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.DATABASE_OLD.getKey(), "");
-        }
-
         initViews();
         initListeners();
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        SharedData sp = SharedData.getInstance(this);
+//        if(sp.getData(SharedKey.DEV_USERNAME.getKey()).trim().equals("")) {
+            sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
+//        }
+//        if(sp.getData(SharedKey.DEV_PASSWORD.getKey()).trim().equals("")) {
+            sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
+//        }
+//        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
+    }
+
     private void initViews() {
-        relPassword = (RelativeLayout)findViewById(R.id.relPassword);
-        usernameText = (FormEditText)findViewById(R.id.username);
+        relPassword = (RelativeLayout) findViewById(R.id.relPassword);
+        usernameText = (FormEditText) findViewById(R.id.username);
         usernameText.setFilters(new InputFilter[] { filter });
         passwordEText = (FormEditText) findViewById(R.id.password);
         passwordEText.setText("");
-        hidePassword = (Button)findViewById(R.id.hide_password);
-        showPassword = (Button)findViewById(R.id.show_password);
-        loginButton = (Button)findViewById(R.id.login_button);
+        hidePassword = (Button) findViewById(R.id.hide_password);
+        showPassword = (Button) findViewById(R.id.show_password);
+        loginButton = (Button) findViewById(R.id.login_button);
         tvVersion = (TextView) findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("02");
-//        passwordEText.setText("7777777");
+        usernameText.setText("02");
+        passwordEText.setText("7777777");
     }
 
     private void initListeners(){
@@ -185,6 +210,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                         spx.saveData(API.IDENTITY_ID.getApi(), ul.get(0).getIdentityId());
                         spx.saveData(API.EMPLOYEE_ID.getApi(), ul.get(0).getReference_employee_no());
 
+
 //                        if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
 //                                .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
 ////                            sp.saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
@@ -221,14 +247,74 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         tvVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alertDialog = settingsDialog(ctx,
-                    "Please update your Employee ID to continue using this application.",
-                    "Update", null,
-                    "Cancel", new View.OnClickListener() {
-                        public void onClick(View v) {
-                            alertDialog.dismiss();
-                        }
-                    } );
+                alertDialog = actionDialog(ctx,
+                        "Validate settings security account",
+                        "Username", "Password",
+                        "Submit", new View.OnClickListener() {
+                            public void onClick(View v) {
+                                LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
+                                EditText etUsername = (EditText) layout.findViewById(R.id.et_edittext1);
+                                EditText etPassword = (EditText) layout.findViewById(R.id.et_edittext2);
+                                SharedData spx = SharedData.getInstance(ctx);
+                                alertDialog.dismiss();
+
+                                if (spx.getData(SharedKey.DEV_USERNAME.getKey()).equals(etUsername.getText().toString()) &&
+                                        spx.getData(SharedKey.DEV_PASSWORD.getKey()).equals(etPassword.getText().toString())) {
+                                    alertDialog = actionDialog(ctx,
+                                    "Customize settings per client as required",
+                                    "Server", "Database",
+                                    "Update", new View.OnClickListener() {
+                                        public void onClick(View v) {
+                                            LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
+                                            EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
+                                            EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
+                                            Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
+                                            Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
+                                            alertDialog.dismiss();
+                                            SharedData spx = SharedData.getInstance(ctx);
+                                            spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
+                                            spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
+                                            spx.saveBoolean(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked());
+                                            spx.saveBoolean(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked());
+                                            Toast.makeText(ctx, "Server settings saved successfully.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    },
+                                    "Cancel", new View.OnClickListener() {
+                                        public void onClick(View v) {
+                                            alertDialog.dismiss();
+                                        }
+                                },1);
+                                    EditText etDomainServerName = (EditText) alertDialog.findViewById(R.id.et_edittext1);
+                                    String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
+                                    etDomainServerName.setText(strSN);
+                                    EditText etDatabase = (EditText) alertDialog.findViewById(R.id.et_edittext2);
+                                    etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()));
+                                    Switch sw_skuvalid = (Switch) alertDialog.findViewById(R.id.sw_skuvalid);
+                                    sw_skuvalid.setChecked(spx.getBoolean(SharedKey.SKU_VALIDATION.getKey()));
+                                    Switch sw_preloaditems = (Switch) alertDialog.findViewById(R.id.sw_preloaditems);
+                                    sw_preloaditems.setChecked(spx.getBoolean(SharedKey.PRELOAD_ITEMS.getKey()));
+                                    alertDialog.getWindow().setLayout(1000, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                    BounceView.addAnimTo(alertDialog);
+                                } else {
+                                    Toast.makeText(ctx, "Access denied. Invalid credentials", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        },
+                        "Cancel", new View.OnClickListener() {
+                            public void onClick(View v) {
+                                alertDialog.dismiss();
+                            }
+                        },
+                        2);
+
+                EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
+                LinearLayout ll_skuvalid = (LinearLayout) alertDialog.findViewById(R.id.ll_validations);
+                ll_skuvalid.setVisibility(View.GONE);
+//                etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                alertDialog.getWindow().setLayout(800, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 BounceView.addAnimTo(alertDialog);
             }
         });
@@ -483,7 +569,6 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     private InputFilter filter = new InputFilter() {
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-
             if (source != null && blockCharacterSet.contains(("" + source))) {
                 return "";
             }else{
@@ -504,6 +589,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        finish();
                     }
                 }, 100);
             }
@@ -537,10 +623,10 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     DialogInterface.OnClickListener closeApp = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            moveTaskToBack(true);
-            android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(1);
-            finish();
+//            moveTaskToBack(true);
+//            android.os.Process.killProcess(android.os.Process.myPid());
+//            System.exit(1);
+            finishAndRemoveTask();
         }
     };
 
@@ -551,11 +637,6 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
             alertDialog.hide();
         }
     };
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
     private AlertDialog okCancelInputDialogBuilder(final Context activity, String message,
                                                           String okButtonCaption, View.OnClickListener onClickListener,
@@ -593,32 +674,36 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         return builder.show();
     }
 
-    private AlertDialog settingsDialog(final Context activity, String message,
-                                                   String okButtonCaption, View.OnClickListener onClickListener,
-                                                   String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+    private AlertDialog actionDialog(final Context activity, String message, String strLabel1, String strLabel2,
+           String okButtonCaption, View.OnClickListener onClickListener,
+           String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer typeFlag
+        ) {
 
-        final SharedData spx = SharedData.getInstance(this);
+        SharedData spx = SharedData.getInstance(this);
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.dialog_settings, null);
-        final EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_domain_svr);
-        String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
-        etDomainServerName.setText(strSN);
-        final EditText etDatabase = (EditText) layout.findViewById(R.id.et_database);
-        etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()));
+
+        TextView tv_message = (TextView) layout.findViewById(R.id.tv_message);
+        tv_message.setText(message);
+
+        TextView tv_lbl1 = (TextView) layout.findViewById(R.id.tv_label1);
+        tv_lbl1.setText(strLabel1);
+        EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
+//        String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
+//        etDomainServerName.setText(strSN);
+
+        TextView tv_lbl2 = (TextView) layout.findViewById(R.id.tv_label2);
+        tv_lbl2.setText(strLabel2);
+        EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
+//        etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()));
+
 //        etDomainServerName.setHint("e.g.: http://wwww.domain.com/");
 //        etLocalServerName.setText("e.g.: http://192.168.1.200:81/");
 
         Button btnOK = (Button) layout.findViewById(R.id.btn_update);
         btnOK.setText(okButtonCaption);
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
-                spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
-                alertDialog.dismiss();
-                Toast.makeText(activity, "Server settings saved successfully.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        btnOK.setOnClickListener(onClickListener);
 
         MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(new View.OnClickListener() {

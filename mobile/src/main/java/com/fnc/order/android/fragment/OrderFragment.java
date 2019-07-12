@@ -121,6 +121,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private Integer curRefPos = 0;
     private Boolean oldskuerr = false;
     private ArrayList<Order> curRefArrayListErr;
+    private SharedData sp;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -179,7 +180,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
             initCalc(rootView);
 
-            fillItems(rootView);
+            sp = SharedData.getInstance(ctx);
+            if (sp.getBoolean(SharedKey.PRELOAD_ITEMS.getKey())) {
+                fillItems(rootView);
+            }
         }
 
         return rootView;
@@ -621,8 +625,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
                         irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
                         irsx.setIsChecked(false);
-                        if (rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null")) {
-                            oldskuerr = true;
+                        sp = SharedData.getInstance(ctx);
+                        if (sp.getBoolean(SharedKey.SKU_VALIDATION.getKey())) {
+                            if (rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null")) {
+                                oldskuerr = true;
+                            }
                         }
                         irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
                         irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));

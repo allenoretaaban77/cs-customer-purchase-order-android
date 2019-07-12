@@ -65,12 +65,25 @@ public class DcMenulist extends DBHelper {
             " ORDER BY " + MenulistKey.ALPHA_CHAR.getKey() + " ASC";
         Cursor c = db.rawQuery(strQry, null);
         ArrayList<String> stringAlpha = new ArrayList<String>();
-        int refInc = 0;
         while (c.moveToNext()) {
-            stringAlpha.add(c.getString(0));
+            if (Character.isLetter(c.getString(0).charAt(0))) {
+                stringAlpha.add(c.getString(0));
+            }
         }
         c.close();
         db.close();
+
+        // get other characters
+        db = getReadableDatabase();
+        c = db.rawQuery(strQry, null);
+        while (c.moveToNext()) {
+            if (!Character.isLetter(c.getString(0).charAt(0))) {
+                stringAlpha.add(c.getString(0));
+            }
+        }
+        c.close();
+        db.close();
+
         return stringAlpha;
     }
 

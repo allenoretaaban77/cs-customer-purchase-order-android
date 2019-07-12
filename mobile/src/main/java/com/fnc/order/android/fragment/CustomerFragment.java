@@ -68,6 +68,7 @@ import java.util.List;
 import java.util.Map;
 
 import hari.bounceview.BounceView;
+import spencerstudios.com.bungeelib.Bungee;
 
 public class CustomerFragment extends Fragment implements VolleyCallback{
 
@@ -112,11 +113,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show();
                     } else {
                         alertDialog = Helper.okCancelDialog(ctx,
-                                "Log Out", "Are you sure you want to log-out?",
+                                "Closing Application", "Are you sure you want to close this app?",
                                 "Ok", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        getActivity().finish();
+                                        getActivity().finishAndRemoveTask();
                                     }
                                 }, "Cancel", null, false);
                         BounceView.addAnimTo(alertDialog);
@@ -281,7 +282,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                 "Ok", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        getActivity().finish();
+//                                        getActivity().finish();
                                     }
                                 }, "Cancel", null, false);
                         break;
@@ -291,7 +292,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                 "Ok", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        getActivity().finish();
+                                        getActivity().finishAndRemoveTask();
+                                        startActivity(new Intent(ctx, LoginActivity.class));
+                                        Bungee.inAndOut(ctx);
                                     }
                                 }, "Cancel", null, false);
                         BounceView.addAnimTo(alertDialog);

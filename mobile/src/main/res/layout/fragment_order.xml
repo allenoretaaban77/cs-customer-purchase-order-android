@@ -237,7 +237,7 @@
                         <EditText
                             android:id="@+id/et_date"
                             android:layout_width="match_parent"
-                            android:layout_height="27dp"
+                            android:layout_height="match_parent"
                             android:layout_alignParentRight="true"
                             android:layout_marginLeft="5dp"
                             android:layout_marginRight="10dp"
