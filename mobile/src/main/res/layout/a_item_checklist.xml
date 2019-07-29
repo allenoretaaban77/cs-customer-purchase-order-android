@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:bind="http://schemas.android.com/apk/res/android">
+    <data>
+        <import type="com.fnc.receiving.android.model.aChecklist" />
+    </data>
+    <LinearLayout
+        android:id="@+id/ll_container"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/tv_includedpo"
+                    style="@style/a_tblCellTextView"
+                    android:layout_width="150dp"
+                    android:layout_column="0"
+                    android:text="Included PO" />
+                <TextView
+                    android:id="@+id/tv_receiveddate"
+                    style="@style/a_tblCellTextView"
+                    android:layout_width="100dp"
+                    android:layout_column="1" />
+                <TextView
+                    android:id="@+id/tv_suppliername"
+                    style="@style/a_tblCellTextView"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_column="2" />
+                <TextView
+                    android:id="@+id/tv_status"
+                    style="@style/a_tblCellTextView"
+                    android:layout_width="100dp"
+                    android:layout_column="3" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+</layout>

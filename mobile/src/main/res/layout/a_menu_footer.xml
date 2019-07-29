@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:fontFamily="@font/regular"
+        android:id="@+id/duo_view_footer_text"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/a_rounded_all"
+        android:gravity="center"
+        android:padding="8dp"
+        android:textColor="@color/blue_4"
+        android:textAllCaps="false"
+        android:text="Log-Out"/>
+</RelativeLayout>
