@@ -82,7 +82,7 @@
                                 android:layout_gravity="center"
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
-                                android:background="@drawable/sharp_refresh_24"
+                                android:background="@drawable/baseline_library_add_24"
                                 android:backgroundTint="@color/gold_3" />
                         </com.balysv.materialripple.MaterialRippleLayout>
                     </RelativeLayout>

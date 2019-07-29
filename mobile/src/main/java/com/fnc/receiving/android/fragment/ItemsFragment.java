@@ -47,8 +47,9 @@ public class ItemsFragment extends Fragment implements VolleyCallback {
     }
 
     private void initViews(View v) {
-        ActionBar actionBar = getActivity().getActionBar(). ;
-        actionBar.setDisplayHomeAsUpEnabled(true);
+//        ActionBar actionBar = getActivity().getActionBar();
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+
         progressBar = (ProgressBar) rv.findViewById(R.id.pb_loader);
         RecyclerView rvItems = (RecyclerView) rv.findViewById(R.id.rv_view);
 

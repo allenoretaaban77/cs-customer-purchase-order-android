@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.fnc.order.android">
+    package="com.fnc.receiving.android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -12,8 +12,6 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
 
     <supports-screens android:requiresSmallestWidthDp="600" />
     <supports-screens
@@ -23,67 +21,37 @@
         android:smallScreens="true" />
 
     <application
+        tools:replace="android:allowBackup"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:hardwareAccelerated="false"
-        tools:replace="android:allowBackup"
         android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".activity.SplashActivity"></activity>
-
-        <activity-alias
-            android:label="@string/app_name"
-            android:icon="@mipmap/ic_launcher"
-            android:name=".DEFAULT"
-            android:enabled="true"
-            android:targetActivity=".activity.SplashActivity">
+        <activity android:name=".activity.SplashActivity" android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:label="@string/app_name"
-            android:icon="@mipmap/ic_launcher"
-            android:name=".FNC"
-            android:enabled="false"
-            android:targetActivity=".activity.SplashActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <!--<category android:name="android.intent.category.HOME" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:label="@string/app_name_massive"
-            android:icon="@mipmap/ic_launcher_massive"
-            android:name=".MASSIVES"
-            android:enabled="false"
-            android:targetActivity=".activity.SplashActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-
-        <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait" />
-        <activity android:name=".activity.MainActivity" android:windowSoftInputMode="adjustResize" />
+        </activity>
+        <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity android:name=".activity.SampleActivity" android:screenOrientation="portrait" />
+        <activity android:name=".activity.MainActivity" android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar" />
 
         <service
-            android:enabled="true"
-            android:exported="true"
-            android:process=":FNCCustomerOrderService"
+            android:process=":FNCReceivingService"
             android:stopWithTask="false"
-            android:name=".services.OrdersService">
+            android:name=".services.ReceivingService">
         </service>
 
         <receiver
-            android:enabled="true"
-            android:exported="true"
             android:name=".services.ServiceStarter">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

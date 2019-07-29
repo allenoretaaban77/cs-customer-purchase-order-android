@@ -43,7 +43,7 @@
                     android:layout_height="match_parent"
                     android:padding="3dp">
                     <Button
-                        android:backgroundTint="@color/white"
+                        android:backgroundTint="@color/white_1"
                         android:background="@drawable/baseline_close_24"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
@@ -58,23 +58,13 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="vertical">
-
-            <TextView
-                android:textColor="@color/gray_6"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
-                android:id="@+id/tv_message"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Test"
-                android:textSize="17sp" />
-
             <LinearLayout
                 android:paddingBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/tv_label1"
                     android:layout_width="100dp"
@@ -83,8 +73,9 @@
                     android:text="Domain :"
                     android:textColor="@color/gray_6"
                     android:textSize="16sp" />
+
                 <EditText
-                    android:id="@+id/et_edittext1"
+                    android:id="@+id/et_domain_svr"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentRight="true"
@@ -92,6 +83,7 @@
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:gravity="top"
+                    android:hint="Click here to input domain server"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="2"
@@ -103,13 +95,14 @@
                     android:textColor="@color/brown_5"
                     android:textColorHint="@color/gray_4"
                     android:textSize="17dp" />
-            </LinearLayout>
 
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/tv_label2"
                     android:layout_width="100dp"
@@ -118,8 +111,9 @@
                     android:text="Connection :"
                     android:textColor="@color/gray_6"
                     android:textSize="16sp" />
+
                 <EditText
-                    android:id="@+id/et_edittext2"
+                    android:id="@+id/et_database"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentRight="true"
@@ -127,7 +121,8 @@
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:gravity="top"
-                    android:imeOptions="actionDone"
+                    android:hint="Click here to input connection string"
+                    android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="2"
                     android:paddingLeft="7dp"
@@ -138,48 +133,8 @@
                     android:textColor="@color/brown_5"
                     android:textColorHint="@color/gray_4"
                     android:textSize="17dp" />
-            </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/ll_validations"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="3dp"
-                        android:text="Validation of SKU on Ordering Process:"
-                        android:textColor="@color/gray_6"
-                        android:textSize="16sp" />
-                    <Switch
-                        android:id="@+id/sw_skuvalid"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="3dp"
-                        android:text="Load Items on Customer Select:"
-                        android:textColor="@color/gray_6"
-                        android:textSize="16sp" />
-                    <Switch
-                        android:id="@+id/sw_preloaditems"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
 
         <RelativeLayout
@@ -196,7 +151,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="UPDATE"
-                    android:textColor="@color/white"
+                    android:textColor="@color/white_1"
                     android:textAllCaps="false"/>
             </com.balysv.materialripple.MaterialRippleLayout>
         </RelativeLayout>

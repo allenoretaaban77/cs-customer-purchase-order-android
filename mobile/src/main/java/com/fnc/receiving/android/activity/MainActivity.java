@@ -3,6 +3,7 @@ package com.fnc.receiving.android.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +33,7 @@ import com.nightonke.boommenu.BoomButtons.HamButton;
 import com.nightonke.boommenu.BoomMenuButton;
 import java.util.ArrayList;
 import hari.bounceview.BounceView;
+import spencerstudios.com.bungeelib.Bungee;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -125,9 +127,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.:
-//                drawer.openDrawer(Gravity.END);
-//                return true;
+            case R.id.nav_logout:
+                showLogout();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -195,8 +197,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         @Override
                         public void run() {
                             finish();
-//                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-//                                Bungee.fade(ctx);
+                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                                Bungee.fade(ctx);
                         }
                     }, 500);
                     alertDialog.hide();
