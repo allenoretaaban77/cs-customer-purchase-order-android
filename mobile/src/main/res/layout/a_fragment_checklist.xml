@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:bind="http://schemas.android.com/apk/res/android">
+<layout xmlns:bind="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -75,14 +76,14 @@
                             android:padding="5dp"
                             android:backgroundTint="@color/transparent"
                             android:background="@color/transparent"
-                            android:id="@+id/btn_refresh"
+                            android:id="@+id/btn_add_checklist"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
                             <Button
                                 android:layout_gravity="center"
                                 android:layout_width="22dp"
                                 android:layout_height="22dp"
-                                android:background="@drawable/sharp_refresh_24"
+                                android:background="@drawable/baseline_library_add_24"
                                 android:backgroundTint="@color/gold_3" />
                         </com.balysv.materialripple.MaterialRippleLayout>
                     </RelativeLayout>

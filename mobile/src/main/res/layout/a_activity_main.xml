@@ -22,7 +22,7 @@
         android:background="@drawable/a_background_border_inner"
         app:menu="@menu/menu" />
 
-    <com.google.android.material.navigation.NavigationView
+    <!--com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view_notification"
         android:background="@color/colorPrimary"
         android:layout_width="wrap_content"
@@ -30,7 +30,7 @@
         android:layout_gravity="end"
         android:fitsSystemWindows="false">
         <include layout="@layout/a_notification_content"/>
-    </com.google.android.material.navigation.NavigationView>
+    </com.google.android.material.navigation.NavigationView-->
 
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

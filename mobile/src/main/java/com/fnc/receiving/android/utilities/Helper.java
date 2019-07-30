@@ -41,6 +41,7 @@ import com.fnc.receiving.android.callback.VolleyCallback;
 import com.fnc.receiving.android.database.DBHelper;
 import com.fnc.receiving.android.enumeration.SharedKey;
 import com.fnc.receiving.android.model.aStaffs;
+import com.mikhaellopez.rxanimation.RxAnimation;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -128,26 +129,6 @@ public class Helper {
         }else{
             return false;
         }
-    }
-
-    public static AlertDialog okCancelDialog(final Context activity, String title, String message,
-        String okButtonCaption, DialogInterface.OnClickListener okClickListener,
-        String cancelButtonCaption, DialogInterface.OnClickListener cancelClickListener,
-        Boolean isCancelable) {
-
-        android.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new android.app.AlertDialog.Builder(activity,
-                    android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-        } else {
-            builder = new android.app.AlertDialog.Builder(activity);
-        }
-        builder.setCancelable(isCancelable);
-        builder.setTitle(title).setMessage(message)
-            .setPositiveButton(okButtonCaption, okClickListener)
-            .setNegativeButton(cancelButtonCaption, cancelClickListener);
-        builder.create();
-        return builder.show();
     }
 
     public static AlertDialog okCancelSpinnerDialogBuilder(final Context activity, String message,
@@ -263,9 +244,30 @@ public class Helper {
         } else {
             builder = new android.app.AlertDialog.Builder(activity);
         }
+        builder.setIcon(R.drawable.calendar_check_outline);
         builder.setCancelable(isCancelable);
         builder.setTitle("").setMessage(message)
                 .setPositiveButton(okButtonCaption, okClickListener);
+        builder.create();
+        return builder.show();
+    }
+
+
+    public static AlertDialog okCancelDialog(final Context activity, String title, String message,
+                                             String okButtonCaption, DialogInterface.OnClickListener okClickListener,
+                                             String cancelButtonCaption, DialogInterface.OnClickListener cancelClickListener,
+                                             Boolean isCancelable) {
+        android.app.AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new android.app.AlertDialog.Builder(activity, R.style.ProgressSpinnerTheme);
+        } else {
+            builder = new android.app.AlertDialog.Builder(activity);
+        }
+        builder.setIcon(R.drawable.calendar_check_outline);
+        builder.setCancelable(isCancelable);
+        builder.setTitle("").setMessage(message)
+                .setPositiveButton(okButtonCaption, okClickListener)
+                .setNegativeButton(cancelButtonCaption, cancelClickListener);
         builder.create();
         return builder.show();
     }

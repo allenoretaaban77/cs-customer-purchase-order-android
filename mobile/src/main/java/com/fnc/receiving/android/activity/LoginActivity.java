@@ -1,6 +1,7 @@
 package com.fnc.receiving.android.activity;
 
 import android.animation.ValueAnimator;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -40,6 +41,7 @@ import com.fnc.receiving.android.utilities.Helper;
 import com.fnc.receiving.android.utilities.PasswordVisibility;
 import com.fnc.receiving.android.utilities.SharedData;
 import com.fnc.receiving.android.R;
+import com.mikhaellopez.rxanimation.RxAnimation;
 
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -57,7 +59,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import hari.bounceview.BounceView;
-import spencerstudios.com.bungeelib.Bungee;
 
 public class LoginActivity extends BaseActivity implements VolleyCallback {
 
@@ -87,7 +88,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         initViews();
         initListeners();
 
-        loginButton.callOnClick();
+//        loginButton.callOnClick();
     }
 
     private void initViews() {
@@ -382,9 +383,11 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Helper.dismissSpinnerDialog(loader);
-                startActivity(new Intent(ctx, cls));
-                Bungee.fade(ctx);
+//                Helper.dismissSpinnerDialog(loader);
+//                startActivity(new Intent(ctx, cls));
+                ActivityOptions options = ActivityOptions.makeCustomAnimation(ctx, R.anim.fade_in, R.anim.fade_out);
+                startActivity(new Intent(getApplicationContext(), cls), options.toBundle());
+                finish();
             }
         }, 100);
     }

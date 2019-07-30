@@ -2,6 +2,7 @@ package com.fnc.receiving.android.activity;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.receiving.android.BaseActivity;
 import com.fnc.receiving.android.callback.VolleyCallback;
 import com.fnc.receiving.android.constants.GlobalConstants;
@@ -69,7 +71,6 @@ import java.util.Map;
 
 import hari.bounceview.BounceView;
 import io.grpc.Server;
-import spencerstudios.com.bungeelib.Bungee;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -181,6 +182,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback{
             LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
             if (sl.size() > 0) {
                 showActivity(LoginActivity.class);
+//                showActivity(MainActivity.class);
             } else {
                 loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
 
@@ -358,11 +360,11 @@ public class SplashActivity extends BaseActivity implements VolleyCallback{
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(getApplicationContext(), cls));
-                Bungee.fade(ctx);
+                ActivityOptions options = ActivityOptions.makeCustomAnimation(ctx, R.anim.fade_in, R.anim.fade_out);
+                startActivity(new Intent(getApplicationContext(), cls), options.toBundle());
                 finish();
             }
-        }, 100);
+        }, 1000);
     }
 
     @Override
@@ -389,7 +391,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback{
                     }, false);
                 BounceView.addAnimTo(alertDialog);
             } else {
-
                 loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
 
                 final VolleyInteractor vipr = new VolleyInteractor();

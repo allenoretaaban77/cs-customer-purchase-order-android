@@ -16,10 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * Created by aldwind on 25/01/2018.
- */
-
 public class DatePickerDialogFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
     Calendar c = Calendar.getInstance();
@@ -45,7 +41,7 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
     }
 
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(GlobalConstants.DATE_REF_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date;
         try {
             date = dateFormat.parse(year +"-" + (monthOfYear+ 1) +"-"+dayOfMonth);

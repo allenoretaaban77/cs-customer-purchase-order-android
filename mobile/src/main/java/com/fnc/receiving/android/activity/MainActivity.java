@@ -33,7 +33,6 @@ import com.nightonke.boommenu.BoomButtons.HamButton;
 import com.nightonke.boommenu.BoomMenuButton;
 import java.util.ArrayList;
 import hari.bounceview.BounceView;
-import spencerstudios.com.bungeelib.Bungee;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -77,13 +76,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         drawer.setViewScale(Gravity.START, 0.8f);
         drawer.setRadius(Gravity.START, 30);
         drawer.setViewElevation(Gravity.START, 80);
+        drawer.useCustomBehavior(Gravity.START);
 
 //        main_header = (LinearLayout) findViewById(R.id.main_header);
 //        main_header_title = (TextView) findViewById(R.id.main_header_title);
 //        ll_backbtnbox = (LinearLayout) findViewById(R.id.ll_backbtnbox);
 //        btn_back = (Button) findViewById(R.id.btn_back);
-
-        initMenu();
 
 //        ArrayList<String> sl = new ArrayList<String>();
 //        sl.add("SELECT AREA....");
@@ -102,7 +100,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 //        alertDialog.getWindow().setLayout(800, RelativeLayout.LayoutParams.WRAP_CONTENT);
 //        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 //
-        getSupportFragmentManager().beginTransaction()
+         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, new ChecklistFragment(), "checklist_fragment")
                 .addToBackStack(null)
                 .commit();
@@ -112,8 +110,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-
+        switch (item.getItemId()) {
+            case R.id.nav_about:
+                break;
+            case R.id.nav_logout:
+                showLogout();
+                break;
+            default:
+                break;
+        }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -122,16 +127,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_logout:
-                showLogout();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void initMenu() {
@@ -185,7 +180,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public void onBackPressed() {
-        showLogout();
+        showCloseApp();
     }
 
     public void showLogout() {
@@ -197,14 +192,31 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         @Override
                         public void run() {
                             finish();
-                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                                Bungee.fade(ctx);
+                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                         }
                     }, 500);
                     alertDialog.hide();
                 }
             },
             "No", null, false);
+        BounceView.addAnimTo(alertDialog);
+    }
+
+    public void showCloseApp() {
+        alertDialog =  Helper.okCancelDialog(ctx, "Close App", "Are you sure you want close this app?",
+                "Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finishAndRemoveTask();
+                            }
+                        }, 500);
+                        alertDialog.hide();
+                    }
+                },
+                "No", null, false);
         BounceView.addAnimTo(alertDialog);
     }
 }

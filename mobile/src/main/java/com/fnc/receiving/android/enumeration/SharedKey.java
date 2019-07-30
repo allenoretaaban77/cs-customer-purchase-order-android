@@ -24,7 +24,8 @@ public enum SharedKey {
     IMEI_ID("imei_identification"),
     BRANCH_ID("branch_id"),
     BRANCH_CODE("branch_code"),
-    BRANCH_DESCRIPTION("branch_description");
+    BRANCH_DESCRIPTION("branch_description"),
+    SELECTED_DATE("branch_selected_date");
 
     private String key;
     SharedKey(String key) { this.key = key; }

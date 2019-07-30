@@ -21,7 +21,7 @@ public class GlobalConstants {
     public static final String ARB_NOTIF_RECEIVE = "NOTIF_RECEIVE";
 
     public static String DATE_FORMAT = "MMMM d, yyyy";
-    public static String DATE_REF_FORMAT = "yyyy-MM-dd";
+    public static String DATE_REF_FORMAT = "MddYYYY";
     public static String DATE_FORMAT_POST = "M/dd/yyyy HH:mm:ss";
 
 

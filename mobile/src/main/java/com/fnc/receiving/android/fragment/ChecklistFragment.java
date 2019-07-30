@@ -1,5 +1,6 @@
 package com.fnc.receiving.android.fragment;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -7,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.VolleyError;
+import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.receiving.android.R;
 import com.fnc.receiving.android.callback.VolleyCallback;
 import com.fnc.receiving.android.constants.GlobalConstants;
@@ -23,11 +27,16 @@ import com.fnc.receiving.android.databinding.AFragmentReceivingBinding;
 import com.fnc.receiving.android.databinding.AItemChecklistBinding;
 import com.fnc.receiving.android.datacontroller.DcChecklist;
 import com.fnc.receiving.android.datacontroller.DcItems;
+import com.fnc.receiving.android.enumeration.API;
+import com.fnc.receiving.android.enumeration.SharedKey;
 import com.fnc.receiving.android.enumeration.aChecklistKey;
 import com.fnc.receiving.android.enumeration.aItemsKey;
+import com.fnc.receiving.android.listeners.DatePickerListener;
 import com.fnc.receiving.android.model.aChecklist;
 import com.fnc.receiving.android.model.aItems;
+import com.fnc.receiving.android.utilities.DatePickerDialogFragment;
 import com.fnc.receiving.android.utilities.Helper;
+import com.fnc.receiving.android.utilities.SharedData;
 import com.google.api.core.NanoClock;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -64,6 +73,9 @@ public class ChecklistFragment extends Fragment implements VolleyCallback {
     private Storage storageinit;
     private ArrayList<String> strFileArr = new ArrayList<String>();
     private ProgressBar progressBar;
+    private MaterialRippleLayout btn_add_checklist;
+    private DatePickerDialogFragment dtDialog;
+    private SharedData sp;
 
     public ChecklistFragment() {
         // Required empty public constructor
@@ -76,17 +88,21 @@ public class ChecklistFragment extends Fragment implements VolleyCallback {
         rv = inflater.inflate(R.layout.a_fragment_checklist, container, false);
         ctx = rv.getContext();
 
+//        LottieAnimationView animationView = rv.findViewById(R.id.lottieAnimationView);
+
         initViews(rv);
         initListeners(rv);
 
-        new googleClouFetchdProc().execute("OG");
+        new googleClouFetchdProc().execute("");
 
         return rv;
     }
 
     private void initViews(View v) {
-        progressBar = (ProgressBar) rv.findViewById(R.id.pb_loader);
-        RecyclerView rvItems = (RecyclerView) rv.findViewById(R.id.rv_view);
+        btn_add_checklist = (MaterialRippleLayout) v.findViewById(R.id.btn_add_checklist);
+
+        progressBar = (ProgressBar) v.findViewById(R.id.pb_loader);
+        RecyclerView rvItems = (RecyclerView) v.findViewById(R.id.rv_view);
 
         LinkedList<aChecklist> cRs = DcChecklist.getInstance(ctx).getChecklist();
         EasyAdapter adapter = new EasyAdapter<aChecklist, AItemChecklistBinding>(R.layout.a_item_checklist) {
@@ -123,9 +139,27 @@ public class ChecklistFragment extends Fragment implements VolleyCallback {
 
         rvItems.setAdapter(adapter);
         rvItems.setLayoutManager(new LinearLayoutManager(ctx));
+
+        final Calendar c = Calendar.getInstance();
+        dtDialog = new DatePickerDialogFragment();
+        dtDialog.setShowsDialog(true);
+        dtDialog.setDatePickerListener(new DatePickerListener() {
+            @Override
+            public void didPickDate(Context context, Date date) {
+                Toast.makeText(ctx, new SimpleDateFormat(GlobalConstants.DATE_REF_FORMAT).format(date), Toast.LENGTH_SHORT).show();
+                sp = SharedData.getInstance(ctx);
+                sp.saveData(SharedKey.SELECTED_DATE.getKey(), new SimpleDateFormat(GlobalConstants.DATE_REF_FORMAT).format(date));
+            }
+        });
     }
 
     private void initListeners(View v) {
+        btn_add_checklist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View vx) {
+                dtDialog.show(getFragmentManager(), "");
+            }
+        });
     }
 
     public void onRequestSuccess(String response, String type) {
@@ -152,7 +186,10 @@ public class ChecklistFragment extends Fragment implements VolleyCallback {
                 File file = new File(Helper.getProjectPath(ctx)); if(!file.exists()){ file.mkdir(); } // make first main dir
                 file = new File(Helper.getFilePath(ctx)); if(!file.exists()){ file.mkdir(); }
 
-                Page<Blob> blobs = storageinit.list(GlobalConstants.GCP_BUCKET, Storage.BlobListOption.prefix("OG/03112019"));
+                String strBranchCode = SharedData.getInstance(ctx).getData(SharedKey.BRANCH_CODE.getKey());
+                String strSelectedDate = SharedData.getInstance(ctx).getData(SharedKey.SELECTED_DATE.getKey());
+
+                Page<Blob> blobs = storageinit.list(GlobalConstants.GCP_BUCKET, Storage.BlobListOption.prefix(strBranchCode + "/" + strSelectedDate));
                 for (Blob b : blobs.iterateAll()) {
                     if (b != null) {
                         String[] refStr = b.getGeneratedId().split("/");
@@ -277,6 +314,7 @@ public class ChecklistFragment extends Fragment implements VolleyCallback {
         @Override
         protected void onPreExecute() {
             progressBar.setVisibility(View.VISIBLE);
+            progressBar.setMax(20);
             Log.d("dsx", "Task Items Starting");
         }
         @Override
