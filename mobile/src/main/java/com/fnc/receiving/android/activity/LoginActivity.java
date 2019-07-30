@@ -72,7 +72,6 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     private Context ctx;
     private Boolean isSubmit = false;
     private AlertDialog alertDialog;
-    private RequestQueue requestQueue;
     private SharedData sp;
     private VolleyCallback callback;
     private VolleyInteractor vi;
