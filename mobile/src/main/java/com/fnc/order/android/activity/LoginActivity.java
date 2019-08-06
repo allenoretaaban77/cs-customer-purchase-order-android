@@ -14,8 +14,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -75,7 +73,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import hari.bounceview.BounceView;
-import spencerstudios.com.bungeelib.Bungee;
 
 public class LoginActivity extends BaseActivity implements VolleyCallback {
 

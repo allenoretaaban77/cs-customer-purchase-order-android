@@ -13,11 +13,9 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.fnc.order.android.BaseActivity;
-import com.fnc.order.android.BuildConfig;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.database.DBHelper;
-import com.fnc.order.android.R;
 import com.fnc.order.android.datacontroller.DcUserslist;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
@@ -25,12 +23,12 @@ import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
+import com.fnc.receiving.android.BuildConfig;
+import com.fnc.receiving.android.R;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.util.List;
-
-import spencerstudios.com.bungeelib.Bungee;
 
 public class SplashActivity extends BaseActivity {
 

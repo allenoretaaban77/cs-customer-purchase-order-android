@@ -6,27 +6,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.fragment.OrderFragment;
 import com.fnc.order.android.fragment.TransactionFragment;
-import com.fnc.order.android.R;
 import com.fnc.order.android.services.OrdersService;
+import com.fnc.receiving.android.R;
 
 import hari.bounceview.BounceView;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 public class MainActivity extends BaseActivity {
 
     Context ctx;
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 Log.i ("DSX", "service is running");
