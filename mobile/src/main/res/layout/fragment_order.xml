@@ -90,7 +90,7 @@
             </RelativeLayout>
         </RelativeLayout>
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <android.support.design.widget.CoordinatorLayout
             android:id="@+id/content_box"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -195,7 +195,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:background="@drawable/baseline_library_add_24"
-                                android:backgroundTint="@color/white_1" />
+                                android:backgroundTint="@color/white" />
                         </com.balysv.materialripple.MaterialRippleLayout>
                     </LinearLayout>
 
@@ -369,7 +369,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:background="@drawable/sharp_refresh_24"
-                                    android:backgroundTint="@color/white_1" />
+                                    android:backgroundTint="@color/white" />
                             </com.balysv.materialripple.MaterialRippleLayout>
                         </LinearLayout>
                     </RelativeLayout>
@@ -459,7 +459,7 @@
                                                     android:background="@android:color/transparent"
                                                     android:text="SUBMIT"
                                                     android:textAllCaps="false"
-                                                    android:textColor="@color/white_1" />
+                                                    android:textColor="@color/white" />
                                            </com.balysv.materialripple.MaterialRippleLayout>
                                        </RelativeLayout>
 
@@ -555,7 +555,7 @@
                             android:layout_marginTop="-4dp"
                             style="@style/caclulatorButton"
                             android:backgroundTint="@color/brown_5"
-                            android:textColor="@color/white_1"
+                            android:textColor="@color/white"
                             android:textSize="17dp"
                             android:id="@+id/cal_delete"
                             android:text="DEL"/>
@@ -563,7 +563,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </android.support.design.widget.CoordinatorLayout>
 
     </LinearLayout>
 

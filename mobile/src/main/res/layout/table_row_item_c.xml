@@ -23,7 +23,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/action_post_short"
-                    android:textColor="@color/white_1"
+                    android:textColor="@color/white"
                     android:textAllCaps="false"/>
             </com.balysv.materialripple.MaterialRippleLayout>
         </LinearLayout>

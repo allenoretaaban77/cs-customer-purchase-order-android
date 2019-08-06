@@ -100,7 +100,7 @@
 
                                 <TextView
                                     style="@style/tblCellTextViewHeader"
-                                    android:layout_width="120dp"
+                                    android:layout_width="110dp"
                                     android:layout_column="0"
                                     android:text="Date" />
 
@@ -129,7 +129,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                <android.support.design.widget.CoordinatorLayout
                     android:id="@+id/content_box"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -143,7 +143,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
-                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                </android.support.design.widget.CoordinatorLayout>
 
             </LinearLayout>
 

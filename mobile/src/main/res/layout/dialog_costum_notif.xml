@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/white_1"
+        android:background="@android:color/white"
         android:layout_marginTop="26dp"
         android:id="@+id/linCustomNotif">
         <LinearLayout

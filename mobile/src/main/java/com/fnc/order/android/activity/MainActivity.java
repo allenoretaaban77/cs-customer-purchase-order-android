@@ -9,11 +9,11 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.fnc.order.android.BaseActivity;
+import com.fnc.order.android.R;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.fragment.OrderFragment;
 import com.fnc.order.android.fragment.TransactionFragment;
 import com.fnc.order.android.services.OrdersService;
-import com.fnc.receiving.android.R;
 
 import hari.bounceview.BounceView;
 

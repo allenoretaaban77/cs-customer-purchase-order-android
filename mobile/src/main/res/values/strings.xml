@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FNC Area Receiving</string>
+    <string name="app_name">FNC Customer Order</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -32,14 +32,4 @@
         <item>Hockey</item>
         <item>Swimming</item>
     </string-array>
-    <array name="menuOptions">
-        <item>Home</item>
-        <item>Personal</item>
-        <item>High scores</item>
-        <item>Settings</item>
-        <item>About</item>
-    </array>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_right_drawer">Right Drawer</string>
 </resources>

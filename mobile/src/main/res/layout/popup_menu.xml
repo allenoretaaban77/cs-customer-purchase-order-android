@@ -41,7 +41,7 @@
             android:layout_height="25dp"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:backgroundTint="@color/white_1"
+            android:backgroundTint="@color/white"
             android:background="@drawable/baseline_chat_24"
             />
     </LinearLayout>

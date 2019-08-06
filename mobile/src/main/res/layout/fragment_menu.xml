@@ -17,10 +17,11 @@
             android:background="@drawable/background_round_border"
             android:padding="7dp">
             <TextView
+                android:layout_marginTop="5dp"
                 android:layout_centerInParent="true"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-smallc"
-                android:textColor="@color/green_1"
+                android:textColor="@color/white"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
@@ -47,7 +48,7 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_marginTop="43dp"
+            android:layout_marginTop="48dp"
             style="@style/layoutStyleMenu"
             android:orientation="vertical"
             android:background="@drawable/background_round_border"
@@ -108,7 +109,7 @@
                         android:layout_height="match_parent"
                         android:padding="3dp">
                         <Button
-                            android:backgroundTint="@color/white_1"
+                            android:backgroundTint="@color/white"
                             android:background="@drawable/baseline_search_24"
                             android:id="@+id/btn_search"
                             android:layout_width="match_parent"
@@ -129,7 +130,7 @@
                         android:layout_height="match_parent"
                         android:padding="3dp">
                         <Button
-                            android:backgroundTint="@color/white_1"
+                            android:backgroundTint="@color/white"
                             android:background="@drawable/baseline_sort_by_alpha_24"
                             android:id="@+id/btn_alpha"
                             android:layout_width="match_parent"
@@ -150,7 +151,7 @@
                         android:layout_height="match_parent"
                         android:padding="3dp">
                         <Button
-                            android:backgroundTint="@color/white_1"
+                            android:backgroundTint="@color/white"
                             android:background="@drawable/sharp_refresh_24"
                             android:id="@+id/btn_refresh"
                             android:layout_width="match_parent"
@@ -179,7 +180,15 @@
                 android:background="@drawable/background_green_3_border"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical">
+                <ProgressBar
+                    android:visibility="gone"
+                    android:id="@+id/progressBar"
+                    android:minHeight="5dp"
+                    android:maxHeight="5dp"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    style="@android:style/Widget.ProgressBar.Horizontal"/>
                 <GridView
                     android:layout_margin="10dp"
                     android:verticalSpacing="10dp"

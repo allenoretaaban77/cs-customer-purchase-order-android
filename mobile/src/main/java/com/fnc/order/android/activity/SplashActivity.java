@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.fnc.order.android.BaseActivity;
+import com.fnc.order.android.BuildConfig;
+import com.fnc.order.android.R;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.database.DBHelper;
@@ -23,8 +25,6 @@ import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
-import com.fnc.receiving.android.BuildConfig;
-import com.fnc.receiving.android.R;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -47,7 +47,7 @@ public class SplashActivity extends BaseActivity {
             return;
         }
         setContentView(R.layout.activity_splash);
-        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), ctx);
+//        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), ctx);
 
         SharedData sp = SharedData.getInstance(ctx);
         switch (sp.getData(SharedKey.DATABASE.getKey())) {
@@ -97,7 +97,6 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void run() {
                 startActivity(new Intent(getApplicationContext(), cls));
-                Bungee.inAndOut(ctx);
                 finish();
             }
         }, 1000);
