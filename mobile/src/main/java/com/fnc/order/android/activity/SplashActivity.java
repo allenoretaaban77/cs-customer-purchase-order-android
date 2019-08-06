@@ -50,24 +50,24 @@ public class SplashActivity extends BaseActivity {
 //        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), ctx);
 
         SharedData sp = SharedData.getInstance(ctx);
-        switch (sp.getData(SharedKey.DATABASE.getKey())) {
-            case "massive":
-                getPackageManager().setComponentEnabledSetting(
-                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
-                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-                getPackageManager().setComponentEnabledSetting(
-                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".FNC"),
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-                break;
-            default:
-                getPackageManager().setComponentEnabledSetting(
-                        new ComponentName(BuildConfig.APPLICATION_ID,  BuildConfig.APPLICATION_ID + ".FNC"),
-                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-                getPackageManager().setComponentEnabledSetting(
-                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-                break;
-        }
+//        switch (sp.getData(SharedKey.DATABASE.getKey())) {
+//            case "massive":
+//                getPackageManager().setComponentEnabledSetting(
+//                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
+//                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+//                getPackageManager().setComponentEnabledSetting(
+//                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".FNC"),
+//                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+//                break;
+//            default:
+//                getPackageManager().setComponentEnabledSetting(
+//                        new ComponentName(BuildConfig.APPLICATION_ID,  BuildConfig.APPLICATION_ID + ".FNC"),
+//                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+//                getPackageManager().setComponentEnabledSetting(
+//                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
+//                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+//                break;
+//        }
 
         TedPermission.with(this).setPermissionListener(new PermissionListener() {
                 @Override

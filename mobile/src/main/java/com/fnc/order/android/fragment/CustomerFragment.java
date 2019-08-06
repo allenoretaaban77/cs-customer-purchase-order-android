@@ -291,7 +291,6 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                     public void onClick(DialogInterface dialog, int which) {
                                         getActivity().finishAndRemoveTask();
                                         startActivity(new Intent(ctx, LoginActivity.class));
-                                        Bungee.inAndOut(ctx);
                                     }
                                 }, "Cancel", null, false);
                         BounceView.addAnimTo(alertDialog);
