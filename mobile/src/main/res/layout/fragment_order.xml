@@ -30,6 +30,7 @@
                 android:layout_height="match_parent"
                 android:layout_width="match_parent">
                 <TextView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/headertitle"
                     android:gravity="center"
                     android:layout_height="match_parent"
@@ -39,16 +40,15 @@
                     android:textSize="20sp"
                     android:textColor="@color/gray_6" />
                 <TextView
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="45dp"
+                    android:gravity="center"
+                    android:layout_marginRight="55dp"
                     android:id="@+id/tv_version"
                     android:layout_alignParentRight="true"
-                    android:fontFamily="sans-serif-smallc"
+                    android:fontFamily="@font/regular"
                     android:textColor="@color/gray_5"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_width="wrap_content"
-                    android:textSize="12dp"
+                    android:textSize="12sp"
                     android:text="1.0.1"/>
             </RelativeLayout>
             <RelativeLayout
@@ -187,8 +187,8 @@
 
                         <com.balysv.materialripple.MaterialRippleLayout
                             android:id="@+id/btn_add_item"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="37dp"
+                            android:layout_height="37dp"
                             android:padding="3dp">
                             <Button
                                 android:layout_width="match_parent"
