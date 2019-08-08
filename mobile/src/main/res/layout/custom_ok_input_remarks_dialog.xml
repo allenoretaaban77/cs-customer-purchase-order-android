@@ -14,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
-        android:textSize="18dp"
+        android:fontFamily="@font/medium"
+        android:textSize="18sp"
         android:textAlignment="center" />
 
     <LinearLayout
@@ -44,12 +45,14 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true" />
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.andreabaccega.widget.FormEditText
+                    android:textSize="17sp"
+                    android:fontFamily="@font/regular"
                     android:textColorHint="@color/brown_4"
                     android:textColor="@color/black"
                     android:id="@+id/et_remarks"
@@ -62,7 +65,7 @@
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"/>
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_marginBottom="5dp"
@@ -78,6 +81,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
                         <Button
+                            android:textSize="20sp"
+                            android:fontFamily="@font/medium"
                             android:background="@android:color/transparent"
                             android:id="@+id/btnCancel"
                             android:layout_width="match_parent"
@@ -95,6 +100,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
                         <Button
+                            android:textSize="20sp"
+                            android:fontFamily="@font/medium"
                             android:background="@android:color/transparent"
                             android:id="@+id/btnOk"
                             android:layout_width="match_parent"

@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,22 +19,11 @@ import androidx.fragment.app.Fragment;
 
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
-import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.adapters.TransactionsAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcOrdered;
-import com.fnc.order.android.enumeration.SharedKey;
-import com.fnc.order.android.model.MenuList;
-import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.Helper;
-import com.fnc.order.android.utilities.SharedData;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class TransactionFragment extends Fragment implements VolleyCallback {

@@ -15,10 +15,7 @@ import android.widget.Toast;
 import androidx.fragment.app.DialogFragment;
 
 import com.fnc.order.android.R;
-import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.adapters.TransactionItemsAdapter;
-import com.fnc.order.android.datacontroller.DcMenulist;
-import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.Order;
 
 import org.json.JSONArray;

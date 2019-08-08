@@ -16,7 +16,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +27,6 @@ import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
 import com.fnc.order.android.adapters.ItemlistAdapterRv;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Itemlist;
