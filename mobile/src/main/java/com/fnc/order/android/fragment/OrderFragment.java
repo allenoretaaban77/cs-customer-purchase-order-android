@@ -313,6 +313,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         getActivity().finish();
+                                        startActivity(new Intent(ctx, LoginActivity.class));
                                     }
                                 }, "Cancel", null, false);
                         BounceView.addAnimTo(alertDialog);

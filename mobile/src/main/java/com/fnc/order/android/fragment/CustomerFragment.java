@@ -85,7 +85,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             "V","W","X","Y","Z"));
     private AlphaGridAdapter adapterAlpha;
     private LinearLayout alphagridview_box, storelistview_box;
-    private RelativeLayout rl_version_box;
+    private LinearLayout ll_version_box;
     private AlertDialog alertDialog;
     private DroppyMenuPopup.Builder sortMenu;
     private DroppyMenuPopup sortMenuObj;
@@ -186,8 +186,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         alphagridview_box = (LinearLayout) v.findViewById(R.id.alphagridview_box);
         storelistview_box = (LinearLayout) v.findViewById(R.id.storelistview_box);
 
-        rl_version_box = (RelativeLayout) v.findViewById(R.id.rl_version_box);
-        sortMenu = new DroppyMenuPopup.Builder(ctx, rl_version_box);
+        ll_version_box = (LinearLayout) v.findViewById(R.id.ll_version_box);
+        sortMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
+        sortMenu.setXOffset(85);
         sortMenu.addMenuItem(new DroppyMenuItem(" View Transactions "))
                 .addSeparator()
                 .addMenuItem(new DroppyMenuItem(" Update Users "))

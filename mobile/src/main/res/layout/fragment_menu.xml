@@ -4,51 +4,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
+        style="@style/layoutStyleMenu"
+        android:orientation="vertical"
         android:layout_gravity="center"
         android:background="@android:color/transparent"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <RelativeLayout
-            android:layout_height="wrap_content"
-            style="@style/layoutStyleMenu"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
             android:orientation="horizontal"
-            android:background="@drawable/background_round_border"
-            android:padding="7dp">
+            android:background="@drawable/background_round_border">
             <TextView
-                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:textAlignment="center"
                 android:layout_centerInParent="true"
                 android:textStyle="bold"
                 android:textColor="@color/white"
-                android:layout_gravity="center_horizontal"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
                 android:fontFamily="@font/regular"
                 android:textSize="20sp"
                 android:text="CUSTOMER LIST"/>
-            <RelativeLayout
-                android:id="@+id/rl_version_box"
+            <LinearLayout
+                android:id="@+id/ll_version_box"
                 android:layout_alignParentRight="true"
                 android:layout_width="50dp"
-                android:layout_height="25dp">
+                android:layout_height="match_parent">
                 <TextView
-                    android:layout_marginTop="5dp"
-                    android:layout_marginRight="5dp"
+                    android:textAlignment="center"
                     android:id="@+id/tv_version"
                     android:layout_alignParentRight="true"
                     android:textColor="@color/gray_5"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_gravity="center"
                     android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:fontFamily="@font/regular"
                     android:textSize="12sp"
-                    android:text="1.0.1"/>
-            </RelativeLayout>
+                    android:text="0.0.0"/>
+            </LinearLayout>
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_marginTop="46dp"
+            android:layout_marginTop="3dp"
             style="@style/layoutStyleMenu"
             android:orientation="vertical"
             android:background="@drawable/background_round_border"
@@ -205,6 +204,6 @@
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </ScrollView>
