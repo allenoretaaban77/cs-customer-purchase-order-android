@@ -22,12 +22,12 @@
             <TextView
                 android:layout_centerVertical="true"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-smallc"
+                android:fontFamily="@font/regular"
                 android:textColor="@color/gray_6"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 android:text="SETTINGS"/>
             <LinearLayout
                 android:layout_alignParentRight="true"
@@ -58,13 +58,23 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="vertical">
+
+            <TextView
+                android:textColor="@color/gray_8"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:id="@+id/tv_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/medium"
+                android:textSize="17sp" />
+
             <LinearLayout
                 android:paddingBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:orientation="horizontal">
-
                 <TextView
                     android:id="@+id/tv_label1"
                     android:layout_width="100dp"
@@ -72,37 +82,35 @@
                     android:layout_marginLeft="3dp"
                     android:text="Domain :"
                     android:textColor="@color/gray_6"
+                    android:fontFamily="@font/medium"
                     android:textSize="16sp" />
-
                 <EditText
-                    android:id="@+id/et_domain_svr"
+                    android:id="@+id/et_edittext1"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/background_round_border_inner"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
-                    android:gravity="top"
-                    android:hint="Click here to input domain server"
+                    android:gravity="center|left"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="2"
                     android:paddingLeft="7dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
                     android:paddingRight="5dp"
-                    android:text=""
                     android:textColor="@color/brown_5"
                     android:textColorHint="@color/gray_4"
-                    android:textSize="17dp" />
-
+                    android:fontFamily="@font/regular"
+                    android:textSize="17sp" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:orientation="horizontal">
-
                 <TextView
                     android:id="@+id/tv_label2"
                     android:layout_width="100dp"
@@ -110,31 +118,70 @@
                     android:layout_marginLeft="3dp"
                     android:text="Connection :"
                     android:textColor="@color/gray_6"
+                    android:fontFamily="@font/medium"
                     android:textSize="16sp" />
-
                 <EditText
-                    android:id="@+id/et_database"
+                    android:id="@+id/et_edittext2"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/background_round_border_inner"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
-                    android:gravity="top"
-                    android:hint="Click here to input connection string"
-                    android:imeOptions="actionNext"
+                    android:gravity="center|left"
+                    android:imeOptions="actionDone"
                     android:inputType="text"
                     android:maxLines="2"
                     android:paddingLeft="7dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
                     android:paddingRight="5dp"
-                    android:text=""
                     android:textColor="@color/brown_5"
                     android:textColorHint="@color/gray_4"
-                    android:textSize="17dp" />
-
+                    android:fontFamily="@font/regular"
+                    android:textSize="17sp" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_validations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:text="Validation of SKU on Ordering Process:"
+                        android:textColor="@color/gray_6"
+                        android:fontFamily="@font/medium"
+                        android:textSize="16sp" />
+                    <Switch
+                        android:id="@+id/sw_skuvalid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:text="Load Items on Customer Select:"
+                        android:textColor="@color/gray_6"
+                        android:fontFamily="@font/medium"
+                        android:textSize="16sp" />
+                    <Switch
+                        android:id="@+id/sw_preloaditems"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
 
         <RelativeLayout
@@ -146,6 +193,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <Button
+                    android:textSize="20sp"
+                    android:fontFamily="@font/medium"
                     android:background="@android:color/transparent"
                     android:id="@+id/btn_update"
                     android:layout_width="match_parent"

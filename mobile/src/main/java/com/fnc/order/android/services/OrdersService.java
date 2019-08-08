@@ -45,6 +45,7 @@ public class OrdersService extends Service {
 //        startTimer();
 
         handler.removeCallbacks(postRunnable);
+        handler.removeCallbacks(postRunnable);
         counter = 0;
         handler.postDelayed(postRunnable, 2000);
 

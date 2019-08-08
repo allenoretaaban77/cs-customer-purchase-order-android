@@ -35,10 +35,9 @@
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"
                     android:text="ORDER ITEMS"
-                    android:textStyle="bold"
-                    android:textSize="19sp"
-                    android:textColor="@color/gray_6"
-                    android:fontFamily="sans-serif-medium" />
+                    android:fontFamily="@font/medium"
+                    android:textSize="20sp"
+                    android:textColor="@color/gray_6" />
                 <TextView
                     android:layout_marginTop="5dp"
                     android:layout_marginRight="45dp"
@@ -226,12 +225,13 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:paddingRight="5dp"
                             android:id="@+id/tv_date"
-                            android:layout_width="110dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="3dp"
                             android:text="Delivery Date :"
                             android:textColor="@color/gray_6"
+                            android:fontFamily="@font/medium"
                             android:textSize="16sp" />
 
                         <EditText
@@ -239,8 +239,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="27dp"
                             android:layout_alignParentRight="true"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="10dp"
+                            android:layout_marginRight="7dp"
                             android:background="@drawable/background_round_border_inner"
                             android:focusable="false"
                             android:focusableInTouchMode="false"
@@ -255,7 +254,8 @@
                             android:text=""
                             android:textColor="@color/brown_5"
                             android:textColorHint="@color/gray_4"
-                            android:textSize="15dp" />
+                            android:fontFamily="@font/regular"
+                            android:textSize="16sp" />
 
                     </LinearLayout>
 
@@ -276,22 +276,23 @@
 
                         <TextView
                             android:id="@+id/tv_name_label"
-                            android:layout_width="95dp"
+                            android:paddingRight="5dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="3dp"
                             android:layout_marginTop="2dp"
                             android:text="Customer :"
                             android:textColor="@color/gray_6"
+                            android:fontFamily="@font/medium"
                             android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/tv_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
                             android:layout_marginTop="2dp"
                             android:textColor="@color/brown_5"
-                            android:textSize="18sp" />
+                            android:fontFamily="@font/regular"
+                            android:textSize="20sp" />
 
                     </LinearLayout>
 
@@ -303,11 +304,12 @@
 
                         <TextView
                             android:id="@+id/tv_remarks"
-                            android:layout_width="77dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="3dp"
+                            android:paddingRight="5dp"
                             android:text="Remarks :"
                             android:textColor="@color/gray_6"
+                            android:fontFamily="@font/medium"
                             android:textSize="16sp" />
 
                         <EditText
@@ -315,8 +317,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="47dp"
                             android:layout_alignParentRight="true"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginRight="10dp"
+                            android:layout_marginLeft="3dp"
+                            android:layout_marginRight="7dp"
                             android:background="@drawable/background_round_border_inner"
                             android:focusable="true"
                             android:focusableInTouchMode="true"
@@ -331,7 +333,8 @@
                             android:text=""
                             android:textColor="@color/brown_5"
                             android:textColorHint="@color/gray_4"
-                            android:textSize="15dp" />
+                            android:fontFamily="@font/regular"
+                            android:textSize="16sp" />
 
                     </LinearLayout>
 
@@ -353,8 +356,8 @@
                             android:layout_height="wrap_content"
                             android:text="Item Lists:"
                             android:textColor="@color/brown_5"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
+                            android:fontFamily="@font/medium"
+                            android:textSize="18sp" />
                         <LinearLayout
                             android:layout_alignParentRight="true"
                             style="@style/btnTransparentStyleSmallWrap"
@@ -418,20 +421,18 @@
                                         android:layout_height="match_parent">
 
                                         <TextView
-                                            android:layout_marginRight="1dp"
-                                            android:layout_marginLeft="2dp"
-                                            android:layout_marginBottom="1dp"
-                                            android:layout_marginTop="2dp"
+                                            android:layout_margin="1dp"
                                             android:layout_height="match_parent"
                                             style="@style/tblCellTextViewHeader"
-                                            android:layout_width="130dp"
+                                            android:layout_width="120dp"
                                             android:layout_column="0"
                                             android:textSize="20sp"
-                                            android:text="Grand Total" />
+                                            android:text="Grand Total:" />
 
                                         <TextView
                                             android:id="@+id/tv_grandtotal"
-                                            android:textSize="20sp"
+                                            android:fontFamily="@font/medium"
+                                            android:textSize="23sp"
                                             android:paddingLeft="10dp"
                                             android:gravity="center|left"
                                             android:layout_height="match_parent"
@@ -442,11 +443,7 @@
                                             android:text="0.00" />
 
                                         <RelativeLayout
-                                            android:layout_marginRight="2dp"
-                                            android:layout_marginLeft="2dp"
-                                            android:layout_marginBottom="1dp"
-                                            android:layout_height="match_parent"
-                                            android:layout_column="2"
+                                            android:layout_margin="1dp"
                                             style="@style/btnTransparentStyle"
                                             android:layout_width="160dp">
                                             <com.balysv.materialripple.MaterialRippleLayout
@@ -454,6 +451,8 @@
                                                 android:layout_width="match_parent"
                                                 android:layout_height="match_parent">
                                                 <Button
+                                                    android:textSize="20sp"
+                                                    android:fontFamily="@font/medium"
                                                     android:layout_width="match_parent"
                                                     android:layout_height="match_parent"
                                                     android:background="@android:color/transparent"
@@ -474,92 +473,120 @@
             <LinearLayout
                 android:visibility="gone"
                 android:backgroundTint="@color/transparent"
-                android:layout_alignParentBottom="true"
+                android:layout_gravity="right"
                 android:id="@+id/bs_calculator"
-                android:layout_width="match_parent"
-                android:layout_marginRight="5dp"
-                android:layout_height="215dp"
+                android:paddingBottom="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@android:color/darker_gray"
                 android:orientation="vertical"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
                 <LinearLayout
-                    android:layout_gravity="right"
                     android:layout_width="wrap_content"
-                    android:layout_height="209dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
                     <GridLayout
-                        android:background="@drawable/popupbg"
+                        android:background="@drawable/popupbg_left"
                         android:alpha="0.8"
                         android:id="@+id/calc_box"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:columnCount="4"
-                        android:padding="5dp">
+                        android:layout_height="match_parent"
+                        android:columnCount="3"
+                        android:padding="2dp">
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_7"
                             android:text="7"/>
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_8"
                             android:text="8"/>
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_9"
                             android:text="9"/>
                         <Button
-                            android:layout_marginTop="-5dp"
-                            style="@style/caclulatorButtonPassive"
-                            android:id="@+id/cal_cancel"
-                            android:text="CLOSE"/>
-                        <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_4"
                             android:text="4"/>
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_5"
                             android:text="5"/>
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_6"
                             android:text="6"/>
                         <Button
-                            android:visibility="invisible"
-                            style="@style/caclulatorButton"/>
-                        <Button
-                            android:onClick="calcTriggerBtn"
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_1"
                             android:text="1"/>
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_2"
                             android:text="2"/>
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_3"
                             android:text="3"/>
-                        <Button
+                        <!--Button
                             android:visibility="invisible"
-                            style="@style/caclulatorButton"/>
+                            style="@style/caclulatorButton"/-->
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_0"
                             android:text="0"/>
                         <Button
-                            style="@style/caclulatorButton"
+                            style="@style/calculatorButton"
                             android:id="@+id/cal_dot"
                             android:text="."/>
-                        <Button
+                        <!--LinearLayout
+                            style="@style/calculatorButtonSuccess">
+                            <com.balysv.materialripple.MaterialRippleLayout
+                                android:id="@+id/cal_next"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+                                <Button
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:backgroundTint="@color/white_1"
+                                    android:background="@drawable/baseline_navigate_next_24"
+                                    android:text=""/>
+                            </com.balysv.materialripple.MaterialRippleLayout>
+                        </LinearLayout-->
+                        <!--Button
                             android:layout_marginTop="-4dp"
                             style="@style/caclulatorButton"
-                            android:backgroundTint="@color/brown_5"
+                            android:backgroundTint="@color/orange_1"
                             android:textColor="@color/white"
                             android:textSize="17dp"
                             android:id="@+id/cal_delete"
-                            android:text="DEL"/>
+                            android:text="DEL"/-->
                     </GridLayout>
+                    <LinearLayout
+                        android:paddingRight="2dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="0dp"
+                        android:paddingLeft="-2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/popupbg_right"
+                        android:alpha="0.8"
+                        android:orientation="vertical">
+                        <Button
+                            style="@style/calculatorButtonPassive"
+                            android:id="@+id/cal_cancel"
+                            android:text="CLOSE"/>
+                        <Button
+                            style="@style/calculatorButtonAssertive"
+                            android:id="@+id/cal_delete"
+                            android:text="DEL"/>
+                        <!--Button
+                            style="@style/calculatorButtonWarning"
+                            android:id="@+id/cal_plus"
+                            android:layout_height="124dp"
+                            android:text="+"/-->
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 

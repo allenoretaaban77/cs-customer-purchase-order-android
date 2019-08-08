@@ -10,8 +10,10 @@ import android.widget.Button;
 import com.andreabaccega.widget.FormEditText;
 
 public class PasswordVisibility {
+
     public static boolean shownNew = false;
     public static boolean shownConfirm = false;
+
     public static void visibility(final Button hidePassword, final Button showPassword, final FormEditText etPassword){
         Log.d("test1", "error");
         showPassword.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +80,7 @@ public class PasswordVisibility {
             }
         });
     }
+
     public static void visibilityInValidationConfirm(final FormEditText etPassword, final Button showPassword, final Button hidePassword){
         if(etPassword.getText().length() == 0) {
             showPassword.setVisibility(View.GONE);

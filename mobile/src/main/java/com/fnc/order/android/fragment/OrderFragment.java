@@ -78,6 +78,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -550,7 +551,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                 paramsArray.put("details", detailsArrayList);
 
-                HashMap<String, String> headersMap = new HashMap();
+                LinkedHashMap<String, String> headersMap = new LinkedHashMap();
                 headersMap.put("companydb", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
                 headersMap.put("customer_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
                 headersMap.put("customer_integ_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
@@ -560,6 +561,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(),
                         Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
+                headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
                 headersMap.put("reference_employee_no", sp.getData(API.EMPLOYEE_ID.getApi()));
                 headersMap.put("branch_encoding", "1");
                 String gt = tv_grandtotal.getText().toString().trim().replace(",", "");
