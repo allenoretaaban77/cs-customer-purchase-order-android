@@ -189,10 +189,10 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         ll_version_box = (LinearLayout) v.findViewById(R.id.ll_version_box);
         sortMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
         sortMenu.setXOffset(85);
-        sortMenu.addMenuItem(new DroppyMenuItem(" View Transactions "))
+        sortMenu.addMenuItem(new DroppyMenuItem("  View Transactions "))
                 .addSeparator()
-                .addMenuItem(new DroppyMenuItem(" Update Users "))
-                .addMenuItem(new DroppyMenuItem(" Log-out "));
+                .addMenuItem(new DroppyMenuItem("  Update Users "))
+                .addMenuItem(new DroppyMenuItem("  Log-out "));
     }
 
     private void initListeners(View v) {
@@ -281,6 +281,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
 //                                        getActivity().finish();
+                                        Toast.makeText(ctx, "Module error, please contact developer", Toast.LENGTH_LONG).show();
                                     }
                                 }, "Cancel", null, false);
                         break;
