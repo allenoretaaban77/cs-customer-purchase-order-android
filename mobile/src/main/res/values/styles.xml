@@ -29,11 +29,12 @@
     </style>
 
     <style name="caclulatorButton" parent="@android:style/Widget.ProgressBar">
-        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_height">53dp</item>
         <item name="android:layout_width">60dp</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:layout_centerVertical">true</item>
-        <item name="android:layout_margin">2dp</item>
+        <item name="android:layout_marginLeft">3dp</item>
+        <item name="android:layout_marginRight">3dp</item>
         <item name="android:padding">0dp</item>
         <item name="android:textSize">30dp</item>
     </style>
@@ -161,7 +162,8 @@
     </style>
 
     <style name="tblCellTextView">
-        <item name="android:textSize">16dp</item>
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:textColor">@color/brown_4</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">match_parent</item>
@@ -179,8 +181,8 @@
 
     <style name="tblCellTextViewHeader">
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">15dp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/medium</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:gravity">center</item>
@@ -213,6 +215,70 @@
         <item name="android:layout_height">50dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="calculatorButton">
+        <item name="android:fontFamily">@font/medium</item>
+        <item name="android:textColor">@color/gray_8</item>
+        <item name="android:background">@drawable/background_round_border_calc</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">35sp</item>
+    </style>
+
+    <style name="calculatorButtonSuccess">
+        <item name="android:fontFamily">@font/medium</item>
+        <item name="android:background">@drawable/background_round_border_calc_success</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">35sp</item>
+    </style>
+
+    <style name="calculatorButtonPassive">
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:background">@drawable/background_round_border_calc_passive</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white_1</item>
+    </style>
+
+    <style name="calculatorButtonAssertive">
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:background">@drawable/background_round_border_calc_assertive</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white_1</item>
+    </style>
+
+    <style name="calculatorButtonWarning">
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:background">@drawable/background_round_border_calc_warning</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:textColor">@color/white_1</item>
     </style>
 
 

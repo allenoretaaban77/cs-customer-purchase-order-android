@@ -2,25 +2,18 @@ package com.fnc.order.android.activity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
-import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,16 +27,13 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcMenulist;
-import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.datacontroller.DcUserslist;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.UserslistKey;
-import com.fnc.order.android.fragment.SearchItemFragment;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.utilities.VolleyInteractor;
@@ -63,10 +53,6 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.net.FileNameMap;
-import java.security.interfaces.DSAKey;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -120,13 +106,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         super.onResume();
 
         SharedData sp = SharedData.getInstance(this);
-//        if(sp.getData(SharedKey.DEV_USERNAME.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
-//        }
-//        if(sp.getData(SharedKey.DEV_PASSWORD.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
-//        }
-//        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
+        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
+        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
     }
 
     private void initViews() {
@@ -207,6 +188,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                         spx.saveData(API.IDENTITY_ID.getApi(), ul.get(0).getIdentityId());
                         spx.saveData(API.EMPLOYEE_ID.getApi(), ul.get(0).getReference_employee_no());
 
+
 //                        if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
 //                                .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
 ////                            sp.saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
@@ -237,6 +219,81 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                     }
                 }
 
+            }
+        });
+
+        tvVersion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog = actionDialog(ctx,
+                        "Validate settings security account",
+                        "Username", "Password",
+                        "Submit", new View.OnClickListener() {
+                            public void onClick(View v) {
+                                LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
+                                EditText etUsername = (EditText) layout.findViewById(R.id.et_edittext1);
+                                EditText etPassword = (EditText) layout.findViewById(R.id.et_edittext2);
+                                SharedData spx = SharedData.getInstance(ctx);
+                                alertDialog.dismiss();
+
+                                if (spx.getData(SharedKey.DEV_USERNAME.getKey()).equals(etUsername.getText().toString()) &&
+                                        spx.getData(SharedKey.DEV_PASSWORD.getKey()).equals(etPassword.getText().toString())) {
+                                    alertDialog = actionDialog(ctx,
+                                            "Customize settings per client as required",
+                                            "Server", "Database",
+                                            "Update", new View.OnClickListener() {
+                                                public void onClick(View v) {
+                                                    LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
+                                                    EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
+                                                    EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
+                                                    Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
+                                                    Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
+                                                    alertDialog.dismiss();
+                                                    SharedData spx = SharedData.getInstance(ctx);
+                                                    spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
+                                                    spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
+                                                    spx.saveBoolean(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked());
+                                                    spx.saveBoolean(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked());
+                                                    Toast.makeText(ctx, "Server settings saved successfully.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            },
+                                            "Cancel", new View.OnClickListener() {
+                                                public void onClick(View v) {
+                                                    alertDialog.dismiss();
+                                                }
+                                            },1);
+                                    EditText etDomainServerName = (EditText) alertDialog.findViewById(R.id.et_edittext1);
+                                    String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
+                                    etDomainServerName.setText(strSN);
+                                    EditText etDatabase = (EditText) alertDialog.findViewById(R.id.et_edittext2);
+                                    etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()));
+                                    Switch sw_skuvalid = (Switch) alertDialog.findViewById(R.id.sw_skuvalid);
+                                    sw_skuvalid.setChecked(spx.getBoolean(SharedKey.SKU_VALIDATION.getKey()));
+                                    Switch sw_preloaditems = (Switch) alertDialog.findViewById(R.id.sw_preloaditems);
+                                    sw_preloaditems.setChecked(spx.getBoolean(SharedKey.PRELOAD_ITEMS.getKey()));
+                                    alertDialog.getWindow().setLayout(1000, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                    BounceView.addAnimTo(alertDialog);
+                                } else {
+                                    Toast.makeText(ctx, "Access denied. Invalid credentials", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        },
+                        "Cancel", new View.OnClickListener() {
+                            public void onClick(View v) {
+                                alertDialog.dismiss();
+                            }
+                        },
+                        2);
+
+                EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
+                LinearLayout ll_skuvalid = (LinearLayout) alertDialog.findViewById(R.id.ll_validations);
+                ll_skuvalid.setVisibility(View.GONE);
+//                etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                alertDialog.getWindow().setLayout(800, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                BounceView.addAnimTo(alertDialog);
             }
         });
     }
@@ -312,14 +369,14 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                         }
                     }
                     new android.os.Handler().postDelayed(
-                        new Runnable() {
-                            public void run() {
-                                requestUsers();
-                                showActivity(MainActivity.class);
-                                Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
-                            }
-                        },
-                        300
+                            new Runnable() {
+                                public void run() {
+                                    requestUsers();
+                                    showActivity(MainActivity.class);
+                                    Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
+                                }
+                            },
+                            300
                     );
                 }
             } else if (type.equals("updateemployeeid")) {
@@ -345,14 +402,14 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
             } else if (type.equals("validate")) {
                 if (response.trim().equals("True")) {
                     new android.os.Handler().postDelayed(
-                        new Runnable() {
-                            public void run() {
-                                requestUsers();
-                                showActivity(MainActivity.class);
-                                Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
-                            }
-                        },
-                        300
+                            new Runnable() {
+                                public void run() {
+                                    requestUsers();
+                                    showActivity(MainActivity.class);
+                                    Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
+                                }
+                            },
+                            300
                     );
                     /*LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "");
                     if (llr.size() > 0) {
@@ -451,26 +508,26 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                         Toast.makeText(ctx, "Login Success! Validating account...", Toast.LENGTH_SHORT).show();
 //                        showSpinnerDialog();
                         new android.os.Handler().postDelayed(
-                            new Runnable() {
-                                public void run() {
-                                    VolleyInteractor viv = new VolleyInteractor();
-                                    viv.registerCallback(refThis);
-                                    HashMap<String, String> params = new HashMap<>();
-                                    params.put("cn", ServerConstants.LOGDB);
-                                    params.put("identityid", sp.getData(API.IDENTITY_ID.getApi()));
+                                new Runnable() {
+                                    public void run() {
+                                        VolleyInteractor viv = new VolleyInteractor();
+                                        viv.registerCallback(refThis);
+                                        HashMap<String, String> params = new HashMap<>();
+                                        params.put("cn", ServerConstants.LOGDB);
+                                        params.put("identityid", sp.getData(API.IDENTITY_ID.getApi()));
 
-                                    Iterator it = params.entrySet().iterator();
-                                    String strParams = "";
-                                    while (it.hasNext()) {
-                                        Map.Entry pair = (Map.Entry)it.next();
-                                        strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
-                                        it.remove();
+                                        Iterator it = params.entrySet().iterator();
+                                        String strParams = "";
+                                        while (it.hasNext()) {
+                                            Map.Entry pair = (Map.Entry)it.next();
+                                            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                                            it.remove();
+                                        }
+                                        strParams = strParams.replaceAll(" ", "%20");
+                                        viv.validate(ctx, params, strParams);
                                     }
-                                    strParams = strParams.replaceAll(" ", "%20");
-                                    viv.validate(ctx, params, strParams);
-                                }
-                            },
-                            500
+                                },
+                                500
                         );
                     }
                 }
@@ -559,8 +616,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     };
 
     private AlertDialog okCancelInputDialogBuilder(final Context activity, String message,
-                                                          String okButtonCaption, View.OnClickListener onClickListener,
-                                                          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+                                                   String okButtonCaption, View.OnClickListener onClickListener,
+                                                   String cancelButtonCaption, View.OnClickListener cancelClickListener) {
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.custom_ok_input_dialog_default, null);
@@ -595,27 +652,27 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     }
 
     private AlertDialog actionDialog(final Context activity, String message, String strLabel1, String strLabel2,
-           String okButtonCaption, View.OnClickListener onClickListener,
-           String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer typeFlag
-        ) {
+                                     String okButtonCaption, View.OnClickListener onClickListener,
+                                     String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer typeFlag
+    ) {
 
         SharedData spx = SharedData.getInstance(this);
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.dialog_settings, null);
 
-//        TextView tv_message = (TextView) layout.findViewById(R.id.tv_message);
-//        tv_message.setText(message);
+        TextView tv_message = (TextView) layout.findViewById(R.id.tv_message);
+        tv_message.setText(message);
 
         TextView tv_lbl1 = (TextView) layout.findViewById(R.id.tv_label1);
         tv_lbl1.setText(strLabel1);
-//        EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
+        EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
 //        String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
 //        etDomainServerName.setText(strSN);
 
         TextView tv_lbl2 = (TextView) layout.findViewById(R.id.tv_label2);
         tv_lbl2.setText(strLabel2);
-//        EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
+        EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
 //        etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()));
 
 //        etDomainServerName.setHint("e.g.: http://wwww.domain.com/");

@@ -13,6 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <Button
+                android:fontFamily="@font/medium"
+                android:textSize="17sp"
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp"
                 android:background="@android:color/transparent"
@@ -26,7 +28,7 @@
         </com.balysv.materialripple.MaterialRippleLayout>
         <TextView
             android:visibility="gone"
-            android:textSize="11dp"
+            android:textSize="11sp"
             android:layout_marginLeft="13dp"
             android:layout_marginBottom="14dp"
             android:layout_marginTop="-18dp"

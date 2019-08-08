@@ -5,24 +5,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.BuildConfig;
-import com.fnc.order.android.R;
-import com.fnc.order.android.constants.GlobalConstants;
-import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.database.DBHelper;
-import com.fnc.order.android.datacontroller.DcUserslist;
+import com.fnc.order.android.R;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
-import com.fnc.order.android.enumeration.UserslistKey;
-import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.gun0912.tedpermission.PermissionListener;
@@ -47,49 +39,49 @@ public class SplashActivity extends BaseActivity {
             return;
         }
         setContentView(R.layout.activity_splash);
-//        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), ctx);
+        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), ctx);
 
         SharedData sp = SharedData.getInstance(ctx);
-//        switch (sp.getData(SharedKey.DATABASE.getKey())) {
-//            case "massive":
-//                getPackageManager().setComponentEnabledSetting(
-//                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
-//                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-//                getPackageManager().setComponentEnabledSetting(
-//                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".FNC"),
-//                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//                break;
-//            default:
-//                getPackageManager().setComponentEnabledSetting(
-//                        new ComponentName(BuildConfig.APPLICATION_ID,  BuildConfig.APPLICATION_ID + ".FNC"),
-//                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-//                getPackageManager().setComponentEnabledSetting(
-//                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
-//                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//                break;
-//        }
+        switch (sp.getData(SharedKey.DATABASE.getKey())) {
+            case "massive":
+                getPackageManager().setComponentEnabledSetting(
+                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                getPackageManager().setComponentEnabledSetting(
+                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".FNC"),
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                break;
+            default:
+                getPackageManager().setComponentEnabledSetting(
+                        new ComponentName(BuildConfig.APPLICATION_ID,  BuildConfig.APPLICATION_ID + ".FNC"),
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                getPackageManager().setComponentEnabledSetting(
+                        new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                break;
+        }
 
         TedPermission.with(this).setPermissionListener(new PermissionListener() {
-                @Override
-                public void onPermissionGranted() {
-                    new DBHelper(getApplicationContext());
-                    if(!SharedData.getInstance(ctx).isPrefExists(API.IDENTITY_ID.getApi())) {
-                        showActivity(LoginActivity.class);
-                    }else{
+                                                           @Override
+                                                           public void onPermissionGranted() {
+                                                               new DBHelper(getApplicationContext());
+                                                               if(!SharedData.getInstance(ctx).isPrefExists(API.IDENTITY_ID.getApi())) {
+                                                                   showActivity(LoginActivity.class);
+                                                               }else{
 //                        showActivity(MainActivity.class);
-                        showActivity(LoginActivity.class);
-                    }
-                }
-                @Override
-                public void onPermissionDenied(List<String> deniedPermissions) {
-                    finish();
-                }
-            }
+                                                                   showActivity(LoginActivity.class);
+                                                               }
+                                                           }
+                                                           @Override
+                                                           public void onPermissionDenied(List<String> deniedPermissions) {
+                                                               finish();
+                                                           }
+                                                       }
         ).setDeniedMessage("If you reject permission, you cannot use this application.")
-        .setPermissions(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ).check();
+                .setPermissions(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                ).check();
     }
 
     private void showActivity(final Class<?> cls) {
@@ -99,7 +91,7 @@ public class SplashActivity extends BaseActivity {
                 startActivity(new Intent(getApplicationContext(), cls));
                 finish();
             }
-        }, 1000);
+        }, 2000);
     }
 
     @Override

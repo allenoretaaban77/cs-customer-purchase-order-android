@@ -1,34 +1,28 @@
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swipe_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:id="@+id/item_box"
-        android:layout_width="155dp"
-        android:layout_height="110dp"
-        android:background="@drawable/background_round_border_blue">
+    android:layout_height="wrap_content"
+    android:id="@+id/item_box"
+    android:padding="0dp"
+    android:background="@drawable/background_round_border_blue">
 
         <com.balysv.materialripple.MaterialRippleLayout
             android:id="@+id/mrl_box"
             android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="3dp">
+            android:layout_height="wrap_content">
 
             <TextView
+                android:layout_marginTop="5dp"
                 android:textColor="@color/green_5"
-                android:textSize="60dp"
-                android:textStyle="bold"
+                android:fontFamily="@font/medium"
+                android:textSize="90sp"
                 android:gravity="center"
                 android:id="@+id/tv_alpha"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:text="A" />
 
         </com.balysv.materialripple.MaterialRippleLayout>
 
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

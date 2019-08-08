@@ -34,8 +34,9 @@
                 android:layout_centerInParent="true"/>
 
             <TextView
+                android:fontFamily="@font/regular"
                 android:layout_marginBottom="40dp"
-                android:textSize="20dp"
+                android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="@color/red_2"
                 android:layout_gravity="center"
@@ -61,9 +62,11 @@
             </com.github.florent37.materialtextfield.MaterialTextField-->
 
             <com.google.android.material.textfield.TextInputLayout
+                android:fontFamily="@font/regular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.andreabaccega.widget.FormEditText
+                    android:fontFamily="@font/regular"
                     android:id="@+id/username"
                     android:textColorHint="@color/gray_4"
                     android:textColor="@color/gray_6"
@@ -78,22 +81,24 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <FrameLayout
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputLayout
+                    android:fontFamily="@font/regular"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <com.andreabaccega.widget.FormEditText
+                        android:fontFamily="@font/regular"
                         android:id="@+id/password"
                         android:textColorHint="@color/gray_4"
                         android:textColor="@color/gray_6"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_password"
-                        android:imeActionId="6"
-                        android:imeActionLabel="@string/action_log_in_short"
+                        android:imeActionLabel="@string/action_next"
                         android:imeOptions="actionDone"
-                        android:inputType="textPassword"
+                        android:inputType="textWebPassword"
                         android:maxLines="1"
                         android:singleLine="true"/>
                 </com.google.android.material.textfield.TextInputLayout>
@@ -121,12 +126,14 @@
             </FrameLayout>
 
             <LinearLayout
-                android:layout_marginTop="17dp"
+                android:layout_marginTop="20dp"
                 style="@style/btnTransparentStyle">
                 <com.balysv.materialripple.MaterialRippleLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <Button
+                        android:textSize="20sp"
+                        android:fontFamily="@font/medium"
                         android:background="@android:color/transparent"
                         android:id="@+id/login_button"
                         android:layout_width="match_parent"
@@ -143,17 +150,17 @@
 
     <LinearLayout
         android:layout_gravity="bottom"
-        android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
-            android:fontFamily="sans-serif-smallc"
+            android:layout_margin="20dp"
+            android:fontFamily="@font/regular"
             android:textColor="@color/gray_5"
-            android:textSize="12dp"
-            android:gravity="right"
+            android:textSize="12sp"
             android:text="0.0.0"
+            android:textAlignment="textEnd"
             android:id="@+id/tv_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
