@@ -34,10 +34,9 @@
                 android:layout_centerInParent="true"/>
 
             <TextView
-                android:fontFamily="@font/regular"
+                android:fontFamily="@font/medium"
                 android:layout_marginBottom="40dp"
-                android:textSize="25sp"
-                android:textStyle="bold"
+                android:textSize="26sp"
                 android:textColor="@color/red_2"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
@@ -66,7 +65,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.andreabaccega.widget.FormEditText
-                    android:fontFamily="@font/regular"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/medium"
                     android:id="@+id/username"
                     android:textColorHint="@color/gray_4"
                     android:textColor="@color/gray_6"
@@ -89,6 +89,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <com.andreabaccega.widget.FormEditText
+                        android:textSize="17sp"
                         android:fontFamily="@font/regular"
                         android:id="@+id/password"
                         android:textColorHint="@color/gray_4"

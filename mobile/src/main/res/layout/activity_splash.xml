@@ -32,8 +32,8 @@
                         <TextView
                             android:gravity="center"
                             android:fontFamily="@font/medium"
-                            android
-                            android:textSize="25sp"
+                            android:lineHeight="26sp"
+                            android:textSize="26sp"
                             android:textColor="@color/white"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"

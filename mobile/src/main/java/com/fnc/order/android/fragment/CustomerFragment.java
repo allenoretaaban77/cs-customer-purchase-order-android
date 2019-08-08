@@ -87,7 +87,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private LinearLayout alphagridview_box, storelistview_box;
     private LinearLayout ll_version_box;
     private AlertDialog alertDialog;
-    private DroppyMenuPopup.Builder sortMenu;
+    private DroppyMenuPopup.Builder boxMenu;
     private DroppyMenuPopup sortMenuObj;
     private String updateCustomerMessage = "Please wait while updating customer lists...";
 
@@ -187,9 +187,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         storelistview_box = (LinearLayout) v.findViewById(R.id.storelistview_box);
 
         ll_version_box = (LinearLayout) v.findViewById(R.id.ll_version_box);
-        sortMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
-        sortMenu.setXOffset(85);
-        sortMenu.addMenuItem(new DroppyMenuItem("  View Transactions "))
+        boxMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
+        boxMenu.setXOffset(85);
+        boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "))
                 .addSeparator()
                 .addMenuItem(new DroppyMenuItem("  Update Users "))
                 .addMenuItem(new DroppyMenuItem("  Log-out "));
@@ -262,7 +262,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             }
         });
 
-        sortMenu.setOnClick(new DroppyClickCallbackInterface() {
+        boxMenu.setOnClick(new DroppyClickCallbackInterface() {
             @Override
             public void call(View v, int id) {
                 if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
@@ -300,7 +300,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 }
             }
         });
-        sortMenu.build();
+        boxMenu.build();
 
     }
 

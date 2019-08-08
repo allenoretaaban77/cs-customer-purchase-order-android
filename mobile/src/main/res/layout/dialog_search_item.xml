@@ -33,12 +33,13 @@
                         android:focusable="true"
                         android:focusableInTouchMode="true" />
                     <EditText
+                        android:fontFamily="@font/regular"
+                        android:textSize="16sp"
                         android:hint="Input item name here to search..."
                         android:id="@+id/et_item_name"
                         android:background="@color/transparent"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:textSize="16sp"
                         android:maxLines="1"
                         android:lines="1"
                         android:inputType="text"
@@ -148,6 +149,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <Button
+                    android:textSize="20sp"
+                    android:fontFamily="@font/medium"
                     android:background="@android:color/transparent"
                     android:id="@+id/btn_add_to_list"
                     android:layout_width="match_parent"

@@ -57,7 +57,6 @@
                 android:fontFamily="@font/medium"
                 android:digits="1234567890."
                 android:inputType="numberDecimal"
-                android:paddingRight="7dp"
                 android:textSize="20sp"
                 android:imeOptions="actionNext"
                 android:maxLength="10"
@@ -76,32 +75,26 @@
                 android:layout_column="1" />
             <LinearLayout
                 android:layout_column="2"
-                style="@style/tblCellTextView"
                 android:layout_width="220dp">
                 <TextView
+                    style="@style/tblCellTextView"
                     android:textColor="@color/brown_4"
                     android:fontFamily="@font/medium"
-                    android:lineHeight="14sp"
+                    android:lineHeight="15sp"
                     android:textSize="15sp"
-                    android:paddingRight="10dp"
-                    android:paddingLeft="10dp"
                     android:gravity="center_vertical"
                     android:id="@+id/cell_description"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </LinearLayout>
             <TextView
-                android:textSize="14dp"
                 android:layout_width="80dp"
-                android:paddingRight="5dp"
                 android:gravity="right|center_vertical"
                 android:id="@+id/cell_price"
                 style="@style/tblCellTextView"
                 android:layout_column="3" />
             <TextView
-                android:textSize="14dp"
                 android:layout_width="80dp"
-                android:paddingRight="5dp"
                 android:gravity="right|center_vertical"
                 android:id="@+id/cell_total"
                 style="@style/tblCellTextView"
