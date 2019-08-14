@@ -540,7 +540,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                     detailMap.put("unitName", rowOl.getUnitName());
                     detailMap.put("itemname", rowOl.getItemName());
-                    detailMap.put("itemname", rowOl.getItemName());
                     detailMap.put("is_checked", false);
                     detailMap.put("is_error", false);
                     detailMap.put("is_locked", false);
