@@ -25,19 +25,31 @@
         android:smallScreens="true" />
 
     <application
-        android:banner="@drawable/afpmc_logo"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:hardwareAccelerated="false"
         tools:replace="android:allowBackup"
         android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activity.SplashActivity"></activity>
+        <activity android:name=".activity.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <!--<category android:name="android.intent.category.HOME" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-        <activity-alias
+        <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait" />
+        <activity android:name=".activity.MainActivity" android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!--activity-alias
             android:label="@string/app_name"
             android:icon="@mipmap/ic_launcher"
             android:name=".DEFAULT"
@@ -71,10 +83,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity-alias>
-
-        <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait" />
-        <activity android:name=".activity.MainActivity" android:windowSoftInputMode="adjustResize" />
+        </activity-alias-->
 
         <service
             android:enabled="true"

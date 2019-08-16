@@ -43,9 +43,10 @@ public class VolleyInteractor {
 
         new Thread(new Runnable(){
             public void run(){
-                StringRequest strRequest = new StringRequest( Request.Method.POST,
-                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
-                                + API.LOGIN.getApi(),
+                String strUrl = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                        + API.LOGIN.getApi();
+                Log.d("dsx vlogin", strUrl);
+                StringRequest strRequest = new StringRequest( Request.Method.POST, strUrl,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {

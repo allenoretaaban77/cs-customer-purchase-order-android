@@ -41,7 +41,7 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
         Helper.setLogo((ImageView) findViewById(R.id.iv_logo), ctx);
 
-        SharedData sp = SharedData.getInstance(ctx);
+        /*SharedData sp = SharedData.getInstance(ctx);
         switch (sp.getData(SharedKey.DATABASE.getKey())) {
             case "massive":
                 getPackageManager().setComponentEnabledSetting(
@@ -59,24 +59,24 @@ public class SplashActivity extends BaseActivity {
                         new ComponentName(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID + ".MASSIVES"),
                         PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
                 break;
-        }
+        }*/
 
         TedPermission.with(this).setPermissionListener(new PermissionListener() {
-                                                           @Override
-                                                           public void onPermissionGranted() {
-                                                               new DBHelper(getApplicationContext());
-                                                               if(!SharedData.getInstance(ctx).isPrefExists(API.IDENTITY_ID.getApi())) {
-                                                                   showActivity(LoginActivity.class);
-                                                               }else{
+               @Override
+               public void onPermissionGranted() {
+                   new DBHelper(getApplicationContext());
+                   if(!SharedData.getInstance(ctx).isPrefExists(API.IDENTITY_ID.getApi())) {
+                       showActivity(LoginActivity.class);
+                   }else{
 //                        showActivity(MainActivity.class);
-                                                                   showActivity(LoginActivity.class);
-                                                               }
-                                                           }
-                                                           @Override
-                                                           public void onPermissionDenied(List<String> deniedPermissions) {
-                                                               finish();
-                                                           }
-                                                       }
+                       showActivity(LoginActivity.class);
+                   }
+               }
+               @Override
+               public void onPermissionDenied(List<String> deniedPermissions) {
+                   finish();
+               }
+           }
         ).setDeniedMessage("If you reject permission, you cannot use this application.")
                 .setPermissions(
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -91,7 +91,7 @@ public class SplashActivity extends BaseActivity {
                 startActivity(new Intent(getApplicationContext(), cls));
                 finish();
             }
-        }, 2000);
+        }, 3000);
     }
 
     @Override
