@@ -78,7 +78,8 @@ public class DcOrdered extends DBHelper {
 
     public LinkedList<Ordered> getOrderedlistCheckStatus() {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT * FROM " + Table.ORDERED.getName() + " WHERE STATUS = 0 ORDER BY datetime DESC";
+        String strQry = "SELECT * FROM " + Table.ORDERED.getName() + " WHERE "
+                + OrderedKey.STATUS.getKey() + " = 0 ORDER BY datetime DESC";
         Cursor c = db.rawQuery(strQry, null);
         LinkedList<Ordered> list = new LinkedList<>();
         while (c.moveToNext()) {

@@ -39,7 +39,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         ctx = this;
 
-        String svcname = "OrderService";
+        String svcname = "OrdersService";
         Boolean isSvcRunning = false;
         ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
         for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
@@ -50,13 +50,6 @@ public class MainActivity extends BaseActivity {
 
         if (!isSvcRunning) {
             startService(new Intent(getBaseContext(), OrdersService.class));
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                startService(new Intent(getBaseContext(), OrdersService.class));
-//    //                    startForegroundService(mServiceIntent);
-//            } else {
-//                startService(new Intent(getBaseContext(), OrdersService.class));
-//    //                    startService(mServiceIntent);
-//            }
         }
 
 //        OrdersService mSensorService = new OrdersService(getApplicationContext());
@@ -152,4 +145,22 @@ public class MainActivity extends BaseActivity {
                 })
                 .show();
     } */
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        String svcname = "OrderService";
+//        Boolean isSvcRunning = false;
+//        ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
+//        for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
+//            if(service.service.getClassName().indexOf(svcname)>0){
+//                isSvcRunning = true;
+//            }
+//        }
+//
+//        if (!isSvcRunning) {
+//            startService(new Intent(getBaseContext(), OrdersService.class));
+//        }
+//    }
 }

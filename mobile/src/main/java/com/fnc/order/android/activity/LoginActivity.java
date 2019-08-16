@@ -97,6 +97,12 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) {
             sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
         }
+        if(!sp.getBoolean(SharedKey.SKU_VALIDATION.getKey())) {
+            sp.saveBoolean(SharedKey.SKU_VALIDATION.getKey(), true);
+        }
+        if(!sp.getBoolean(SharedKey.PRELOAD_ITEMS.getKey())) {
+            sp.saveBoolean(SharedKey.PRELOAD_ITEMS.getKey(), true);
+        }
         initViews();
         initListeners();
     }
@@ -123,8 +129,8 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        usernameText.setText("02");
-        passwordEText.setText("7777777");
+//        usernameText.setText("02");
+//        passwordEText.setText("7777777");
     }
 
     private void initListeners(){
@@ -275,7 +281,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                                     BounceView.addAnimTo(alertDialog);
                                 } else {
-                                    Toast.makeText(ctx, "Access denied. Invalid credentials", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ctx, "Access denied. Invalid credentials.", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         },
