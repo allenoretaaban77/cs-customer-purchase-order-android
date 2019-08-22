@@ -51,6 +51,7 @@
             android:layout_height="wrap_content"
             android:focusable="true">
             <TextView
+                android:layout_weight="1"
                 android:background="@color/transparent"
                 android:focusable="true"
                 android:maxLines="1"
@@ -62,12 +63,12 @@
                 android:maxLength="10"
                 android:gravity="right|center_vertical"
                 android:id="@+id/cell_qty"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_column="0"
                 style="@style/tblCellTextView">
             </TextView>
             <TextView
-                android:layout_weight="1"
+                android:layout_width="90dp"
                 android:paddingLeft="7dp"
                 android:gravity="center|center_vertical"
                 android:id="@+id/cell_unit"
@@ -75,7 +76,7 @@
                 android:layout_column="1" />
             <LinearLayout
                 android:layout_column="2"
-                android:layout_width="220dp">
+                android:layout_width="250dp">
                 <TextView
                     style="@style/tblCellTextView"
                     android:textColor="@color/brown_4"

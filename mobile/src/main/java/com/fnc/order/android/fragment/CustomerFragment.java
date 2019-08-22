@@ -565,6 +565,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                             },
                             500
                     ); */
+                } else {
+                    Toast.makeText(ctx, "Customer record empty, pleas contact developer", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 JSONArray objArr = new JSONArray(response);
