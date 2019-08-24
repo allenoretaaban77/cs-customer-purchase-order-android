@@ -9,6 +9,7 @@ public enum SharedKey {
     DATABASE_OLD("ref_old_database"),
     SKU_VALIDATION("old_sku_validation"),
     PRELOAD_ITEMS("preload_items"),
+    SAVE_PRODUCT_ITEMS("saved_product_items"),
     WAITING_FOR_POST("waiting_for_post"),
     WAITING_STORE("waiting_store"),
     WAITING_RECID("waiting_recid"),

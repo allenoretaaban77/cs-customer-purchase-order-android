@@ -137,9 +137,8 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         holder.cell_description.setText(iRs.getItemName());
 
         if (!iRs.getSellingPrice().equals("null")) {
-            double u_price = Double.parseDouble(iRs.getSellingPrice());
-            DecimalFormat df = new DecimalFormat("#.00");
-            holder.cell_price.setText(df.format(u_price).equals(".00") ? "0.00" : df.format(u_price));
+            String strPrice = new DecimalFormat("#,###,###.00").format(Double.parseDouble(String.valueOf(iRs.getSellingPrice())));
+            holder.cell_price.setText(strPrice.equals(".00") ? "0.00" : strPrice);
         } else {
             holder.cell_price.setText("0.00");
         }

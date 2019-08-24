@@ -4,20 +4,47 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.R;
+import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.datacontroller.DcAitemlist;
+import com.fnc.order.android.datacontroller.DcOrdered;
+import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.fragment.OrderFragment;
 import com.fnc.order.android.fragment.TransactionFragment;
+import com.fnc.order.android.model.Itemlist;
+import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.services.OrdersService;
+import com.fnc.order.android.utilities.SharedData;
+import com.fnc.order.android.utilities.VolleyInteractor;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import hari.bounceview.BounceView;
 
 import static android.content.Context.ACTIVITY_SERVICE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class MainActivity extends BaseActivity {
 
@@ -67,7 +94,15 @@ public class MainActivity extends BaseActivity {
             .replace(R.id.container, new CustomerFragment(), "customer_fragment")
             .addToBackStack(null)
             .commit();
+
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+
 
     /*private void openFragment(Fragment fragment, String tag) {
         FragmentManager fm = getSupportFragmentManager();

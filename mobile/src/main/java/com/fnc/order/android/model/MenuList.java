@@ -19,8 +19,7 @@ public class MenuList implements Serializable {
     public String getCustomerName() {
         return customername;
     }
-    public void setCustomerName(String customername) { this.customername = customername;
-    }
+    public void setCustomerName(String customername) { this.customername = customername; }
 
     public String getRemarks() { return remarks; }
     public void setRemarks(String remarks) { this.remarks = remarks; }

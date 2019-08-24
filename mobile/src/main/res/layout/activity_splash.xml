@@ -17,7 +17,7 @@
             android:layout_height="match_parent">
                 <ImageView
                     android:layout_marginBottom="20dp"
-                    android:src="@drawable/massive_logo"
+                    android:src="@drawable/iv_logo"
                     android:adjustViewBounds="true"
                     android:id="@+id/iv_logo"
                     android:layout_gravity="center"

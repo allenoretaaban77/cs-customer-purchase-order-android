@@ -1,15 +1,18 @@
 package com.fnc.order.android.database;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 
+import com.fnc.order.android.R;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.UserslistKey;
+import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.utilities.Helper;
@@ -36,6 +39,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(createTables(Table.ORDERED, setOrderedFields()));
         db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
         db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
+        db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
         Log.i(TAG,"Database created path : " + db.getPath());
     }
 
@@ -100,6 +104,34 @@ public class DBHelper extends SQLiteOpenHelper {
         return fields;
     }
 
+    protected LinkedList<aItemlistKey> setaItemlistFields() {
+        LinkedList<aItemlistKey> fields = new LinkedList<>();
+        fields.add(aItemlistKey.INTEGRATION_RECID);
+        fields.add(aItemlistKey.RECID);
+        fields.add(aItemlistKey.OLD_SKU);
+        fields.add(aItemlistKey.BASEUNIT_RECID);
+        fields.add(aItemlistKey.BASEUNIT_QTY);
+        fields.add(aItemlistKey.ITEMNO);
+        fields.add(aItemlistKey.ITEMNAME);
+        fields.add(aItemlistKey.ITEMNAME_WUNIT);
+        fields.add(aItemlistKey.QUANTITY_INUNIT);
+        fields.add(aItemlistKey.DEPT);
+        fields.add(aItemlistKey.UNIT);
+        fields.add(aItemlistKey.TBLUNIT_RECID);
+        fields.add(aItemlistKey.UNIT_TOCONVERT);
+        fields.add(aItemlistKey.BARCODENO);
+        fields.add(aItemlistKey.F_BASE);
+        fields.add(aItemlistKey.D_ITEMDEPARTMENT_CODE);
+        fields.add(aItemlistKey.SELLING_PRICE);
+        fields.add(aItemlistKey.COST_PRICE);
+        fields.add(aItemlistKey.TAXCODE);
+        fields.add(aItemlistKey.EXPENSE_ACCT);
+        fields.add(aItemlistKey.INCOME_ACCT);
+        fields.add(aItemlistKey.DATA_VISIBILITY);
+        fields.add(aItemlistKey.BARCODENO1);
+        return fields;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         int version = oldVersion + 1;
@@ -109,6 +141,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.execSQL(createTables(Table.ORDERED, setOrderedFields()));
                 db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
                 db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
+                db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
         }
     }
 }

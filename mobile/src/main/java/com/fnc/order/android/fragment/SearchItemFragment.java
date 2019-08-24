@@ -8,6 +8,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,12 +31,16 @@ import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
 import com.fnc.order.android.adapters.ItemlistAdapterRv;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.datacontroller.DcAitemlist;
+import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Itemlist;
+import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,8 +49,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import hari.bounceview.BounceView;
 
@@ -91,28 +102,74 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         rvItems = (RecyclerView) v.findViewById(R.id.itemrecyclerview);
     }
 
-    private void initListeners(View v) {
+    private Boolean flagTaskRun = false; private Handler m_handler; private Runnable m_runnable;
+
+    private void initListeners(final View v) {
         et_item_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-                    btn_search.callOnClick();
+                    if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 0) {
+                        btn_search.callOnClick();
+                        return true;
+                    }
                 }
                 return false;
             }
         });
+
+        if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+            et_item_name.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            et_item_name.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void afterTextChanged(final Editable s) {
+                    tv_no_data.setVisibility(View.VISIBLE); tv_no_data.setText("Searching...");
+                    rvItems.setVisibility(View.GONE);
+
+                    if (flagTaskRun) { m_handler.removeCallbacks(m_runnable); }
+                    m_handler = new Handler();
+                    m_runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            String searchStr = s.toString().trim().equals("") ? "noitem" : s.toString() ;
+                            Log.d("dsx", searchStr);
+                            requestItemLocal(v, searchStr);
+                            flagTaskRun = false;
+                            tv_no_data.setText("No record found...");
+                        }
+                    };
+                    flagTaskRun = m_handler.postDelayed(m_runnable, 700);
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            });
+        }
+
         btn_search.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
+
                 if(!et_item_name.getText().toString().trim().equals("")) {
-                    requestItem(v);
+                    if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+                        requestItemLocal(v, et_item_name.getText().toString().trim());
+                    } else {
+                        requestItem(v);
+                    }
                 }else{
-//                    Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
-                    alertDialog = Helper.okDialog(ctx,
-                            "Error","Please input item name.", "OK",
+                    if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+                        requestItemLocal(v, "noitem");
+                    } else {
+                        alertDialog = Helper.okDialog(ctx, "Error","Please input item name.", "OK",
                             null, false);
-                    BounceView.addAnimTo(alertDialog);
+                        BounceView.addAnimTo(alertDialog);
+                    }
+
                 }
             }
         });
+
         btn_add_to_list.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
                 if(adapter != null) {
@@ -161,13 +218,58 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         });
     }
 
+    private void requestItemLocal(View v, String searchStr) {
+        try {
+            LinkedList<aItemlist> ailRs =  DcAitemlist.getInstance(ctx).getFilteraItemlist(searchStr);
+            List<Itemlist> iRs = new ArrayList<Itemlist>();
+            if(ailRs.size() > 0) {
+                for (int i = 0; i < ailRs.size(); i++) {
+                    aItemlist ail = ailRs.get(i);
+                    Itemlist irsx = new Itemlist();
+                    irsx.setRecid(ail.getRecid());
+                    irsx.setItemName(ail.getItemname());
+                    irsx.setDept(ail.getDept());
+                    irsx.setUnitName(ail.getUnit());
+                    irsx.setIsChecked(false);
+                    irsx.setOldSku(ail.getOld_sku());
+                    irsx.setSellingPrice(String.valueOf(ail.getSelling_price()));
+                    iRs.add(irsx);
+                }
+                if(iRs.size() == 0) {
+                    tv_no_data.setVisibility(View.VISIBLE);
+                    rvItems.setVisibility(View.GONE);
+                }else{
+                    tv_no_data.setVisibility(View.GONE);
+                    rvItems.setVisibility(View.VISIBLE);
+                }
+            }else{
+                tv_no_data.setVisibility(View.VISIBLE);
+                rvItems.setVisibility(View.GONE);
+            }
+
+            adapter = new ItemlistAdapterRv(ctx, iRs);
+            rvItems.setAdapter(adapter);
+            rvItems.setLayoutManager(new LinearLayoutManager(ctx));
+            rvItems.setHasFixedSize(true);
+        } catch (Exception e) {
+            tv_no_data.setVisibility(View.VISIBLE);
+            rvItems.setVisibility(View.GONE);
+            Log.d("dsx", "search error " + e.getMessage());
+            Toast.makeText(ctx, "Search items error.", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
     private void requestItem(View v) {
+        tv_no_data.setVisibility(View.VISIBLE); tv_no_data.setText("Searching...");
+        rvItems.setVisibility(View.GONE);
+
         final SharedData sp = SharedData.getInstance(ctx);
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                 Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_item_name.getWindowToken(), 0);
 
-        showSpinnerDialog(v);
+//        showSpinnerDialog(v);
         HashMap<String, String> params = new HashMap<>();
         String searchStr = et_item_name.getText().toString().trim();
         params.put("itemname", searchStr);
@@ -188,6 +290,8 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
     }
 
     public void onRequestSuccess(String response, String type) {
+        tv_no_data.setText("No record found...");
+
         final SharedData sp = SharedData.getInstance(ctx);
         try {
             response = response.replace("\r\n ", "");
@@ -204,10 +308,6 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                     irsx.setIsChecked(false);
                     irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
                     irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));
-//                    if(!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("null") &&
-//                            !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).trim().equals("")) {
-//                        iRs.add(irsx);
-//                    }
                     iRs.add(irsx);
                 }
                 if(iRs.size() == 0) {
@@ -227,23 +327,16 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
             rvItems.setLayoutManager(new LinearLayoutManager(ctx));
             rvItems.setHasFixedSize(true);
         } catch (JSONException e) {
-            dismissSpinnerDialog();
+            tv_no_data.setVisibility(View.VISIBLE);
+            rvItems.setVisibility(View.GONE);
             Toast.makeText(ctx, "Something went wrong, please refresh the list.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
-        } finally {
-            new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            dismissSpinnerDialog();
-                        }
-                    },
-                    1000
-            );
         }
     }
 
     public void onRequestFail(VolleyError volleyError, String type) {
-        dismissSpinnerDialog();
+        tv_no_data.setVisibility(View.VISIBLE);
+        rvItems.setVisibility(View.GONE);
         Toast.makeText(ctx, Helper.getVolleyError(volleyError), Toast.LENGTH_SHORT).show();
     }
 

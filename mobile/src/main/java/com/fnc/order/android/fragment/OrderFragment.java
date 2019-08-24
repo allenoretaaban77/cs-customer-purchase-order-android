@@ -173,19 +173,17 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
         } );
 
-        try {
-            initViews(rootView);
-        } finally {
-            initListeners(rootView);
-            // empty order table
-            DcOrder.getInstance(ctx).emptyOrderlist();
+        initViews(rootView);
 
-            initCalc(rootView);
+        initListeners(rootView);
+        // empty order table
+        DcOrder.getInstance(ctx).emptyOrderlist();
 
-            sp = SharedData.getInstance(ctx);
-            if (sp.getBoolean(SharedKey.PRELOAD_ITEMS.getKey())) {
-                fillItems(rootView);
-            }
+        initCalc(rootView);
+
+        sp = SharedData.getInstance(ctx);
+        if (sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1) {
+            fillItems(rootView);
         }
 
         return rootView;
@@ -226,9 +224,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
         pageMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         pageMenu.setXOffset(8).setYOffset(0);
-        pageMenu.addMenuItem(new DroppyMenuItem("  View Transactions  "))
-                .addSeparator()
-                .addMenuItem(new DroppyMenuItem("  Log-out  "));
+        pageMenu.addMenuItem(new DroppyMenuItem("  View Transactions  ")).addSeparator();
+        if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+            pageMenu.addMenuItem(new DroppyMenuItem("  Update Product Items  ")).addSeparator();
+        }
+        pageMenu.addMenuItem(new DroppyMenuItem("  Log-out  "));
         btn_submit = (MaterialRippleLayout) v.findViewById(R.id.btn_submit);
         et_remarks = (EditText) v.findViewById(R.id.et_remarks);
         bsCalc = (LinearLayout) v.findViewById(R.id.bs_calculator);
@@ -629,7 +629,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
                         irsx.setIsChecked(false);
                         sp = SharedData.getInstance(ctx);
-                        if (sp.getBoolean(SharedKey.SKU_VALIDATION.getKey())) {
+                        if (sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == 1) {
                             if (rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null")) {
                                 oldskuerr = true;
                             }

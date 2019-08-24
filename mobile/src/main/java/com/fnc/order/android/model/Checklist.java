@@ -49,9 +49,7 @@ public class Checklist implements Serializable {
     public String getTallyInQuantity() {
         return tally_in_quantity;
     }
-    public void setTallyInQuantity(String tally_in_quantity) {
-        this.tally_in_quantity = tally_in_quantity;
-    }
+    public void setTallyInQuantity(String tally_in_quantity) { this.tally_in_quantity = tally_in_quantity; }
 
     public String getPoQuantity() {
         return po_quantity;
