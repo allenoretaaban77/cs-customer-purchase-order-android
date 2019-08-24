@@ -1,6 +1,8 @@
 package com.fnc.order.android.services;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -51,13 +53,34 @@ public class OrdersService extends Service {
         counter = 0;
         handler.postDelayed(postRunnable, 2000);
 
-        Intent activityIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-                activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification notification = new Notification.Builder(this).
-                setContentTitle(getText(R.string.app_name)).
-                setContentIntent(pendingIntent).build();
-        startForeground(1, notification);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            String channelId = getString(R.string.app_name);
+            NotificationChannel notificationChannel = new NotificationChannel(channelId, channelId, NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setDescription(channelId);
+            notificationChannel.setSound(null, null);
+
+            notificationManager.createNotificationChannel(notificationChannel);
+            Notification notification = new Notification.Builder(this, channelId)
+    //                .setContentTitle(getString(R.string.app_name))
+    //                .setContentText("Connected through SDL")
+    //                .setSmallIcon(R.mipmap.ic_launcher_order)
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .build();
+            startForeground(111, notification);
+
+        } else {
+
+            Intent activityIntent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                    activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Notification notification = new Notification.Builder(this).
+                    setContentTitle(getText(R.string.app_name)).
+                    setContentIntent(pendingIntent).build();
+            startForeground(1, notification);
+
+        }
 
         return START_STICKY;
     }
