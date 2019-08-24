@@ -69,6 +69,13 @@
                         android:background="@drawable/background_input_round_border"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:id="@+id/ll_dummy"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
+                            android:layout_width="0px"
+                            android:layout_height="0px"/>
                         <EditText
                             android:hint="Input customer name here to search..."
                             android:id="@+id/et_customername"
@@ -86,13 +93,6 @@
                             android:nextFocusUp="@id/ll_dummy"
                             android:nextFocusLeft="@id/ll_dummy"
                             android:paddingLeft="17dp"/>
-                        <LinearLayout
-                            android:orientation="horizontal"
-                            android:id="@+id/ll_dummy"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
-                            android:layout_width="0px"
-                            android:layout_height="0px"/>
                     </FrameLayout>
                 </LinearLayout>
                 <RelativeLayout
