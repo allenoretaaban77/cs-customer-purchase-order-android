@@ -44,8 +44,6 @@ public class Notification {
         return notificationDate;
     }
 
-    public void setNotificationDate(String notificationDate) {
-        this.notificationDate = notificationDate;
-    }
+    public void setNotificationDate(String notificationDate) { this.notificationDate = notificationDate; }
 }
 

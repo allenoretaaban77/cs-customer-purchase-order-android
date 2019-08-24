@@ -39,13 +39,16 @@ import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.adapters.PersonAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Person;
+import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
@@ -464,23 +467,33 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 }
             });
 
+            dismissSpinnerDialog();
+            storelistview_box.setVisibility(View.GONE);
+            alphagridview_box.setVisibility(View.VISIBLE);
+            alphagridview_box.setAlpha(0.0f);
+            alphagridview_box.animate().translationY(0)
+                    .alpha(1.0f).setListener(null);
+            alphagridview.setAdapter(adapterAlpha);
+
+            isUpdateCustomer = false;
+
             new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            dismissSpinnerDialog();
-                            storelistview_box.setVisibility(View.GONE);
-                            alphagridview_box.setVisibility(View.VISIBLE);
-                            alphagridview_box.setAlpha(0.0f);
-                            alphagridview_box.animate().translationY(0)
-                                .alpha(1.0f).setListener(null);
-                            alphagridview.setAdapter(adapterAlpha);
-
-                            isUpdateCustomer = false;
-
+                new Runnable() {
+                    public void run() {
+                        if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+                            LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
+                            if (ailRs.size() < 1) {
+                                loader = Helper.showSpinnerDialog(ctx,"Syncing Product Items", "Please wait..."); loader.show();
+                                requestProductItems();
+                            } else {
+                                Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
                             Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
                         }
-                    },
-                    500
+                    }
+                },
+                500
             );
 
         }
@@ -621,5 +634,100 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     public void onRequestFail(VolleyError volleyError, String type){
         dismissSpinnerDialog();
         Toast.makeText(ctx, Helper.getVolleyError(volleyError), Toast.LENGTH_SHORT).show();
+    }
+
+    private void requestProductItems() {
+        Log.d("dsx", "request product items");
+        VolleyInteractor vi = new VolleyInteractor();
+        vi.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(String response, String type) {
+                new requestProductItemsAsync().execute(response);
+            }
+
+            @Override
+            public void onRequestFail(VolleyError response, String type) {
+                Log.d("DSX fetch items error: ", response.getMessage());
+            }
+        });
+
+        HashMap<String, String> params = new HashMap<>();
+        String searchStr = "";
+        params.put("itemname", searchStr);
+        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
+        params.put("customerid", "-1");
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+            it.remove();
+        }
+        strParams = strParams.replaceAll(" ", "%20");
+        vi.getItemlist(ctx, params, strParams);
+    }
+
+    private class requestProductItemsAsync extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                String response = params[0].replace("\r\n ", "");
+                JSONArray objArr = new JSONArray(response);
+                if(objArr.length() > 0) {
+                    DcAitemlist.getInstance(ctx).emptyaItemlist();
+                    for (int i = 0; i < objArr.length(); i++) {
+                        JSONObject rowObj = objArr.getJSONObject(i);
+                        aItemlist ail = new aItemlist(
+                                String.valueOf(rowObj.getString(aItemlistKey.INTEGRATION_RECID.getKey())),
+                                rowObj.getInt(aItemlistKey.RECID.getKey()),
+                                String.valueOf(rowObj.getString(aItemlistKey.OLD_SKU.getKey())),
+                                rowObj.getInt(aItemlistKey.BASEUNIT_RECID.getKey()),
+                                rowObj.getDouble(aItemlistKey.BASEUNIT_QTY.getKey()),
+                                rowObj.getString(aItemlistKey.ITEMNO.getKey()),
+                                rowObj.getString(aItemlistKey.ITEMNAME.getKey()),
+                                rowObj.getString(aItemlistKey.ITEMNAME_WUNIT.getKey()),
+                                rowObj.getDouble(aItemlistKey.QUANTITY_INUNIT.getKey()),
+                                rowObj.getString(aItemlistKey.DEPT.getKey()),
+                                rowObj.getString(aItemlistKey.UNIT.getKey()),
+                                rowObj.getInt(aItemlistKey.TBLUNIT_RECID.getKey()),
+                                rowObj.getInt(aItemlistKey.UNIT_TOCONVERT.getKey()),
+                                rowObj.getString(aItemlistKey.BARCODENO.getKey()),
+                                rowObj.getBoolean(aItemlistKey.F_BASE.getKey()) == true ? 1 : 0,
+                                rowObj.getString(aItemlistKey.D_ITEMDEPARTMENT_CODE.getKey()),
+                                String.valueOf(rowObj.getString(aItemlistKey.SELLING_PRICE.getKey())).equals("null")
+                                        ? 0.00 : rowObj.getDouble(aItemlistKey.SELLING_PRICE.getKey()),
+                                String.valueOf(rowObj.getString(aItemlistKey.COST_PRICE.getKey())).equals("null")
+                                        ? 0.00 : rowObj.getDouble(aItemlistKey.COST_PRICE.getKey()),
+                                rowObj.getString(aItemlistKey.TAXCODE.getKey()),
+                                String.valueOf(rowObj.getString(aItemlistKey.EXPENSE_ACCT.getKey())).equals("null")
+                                        ? 0 : rowObj.getInt(aItemlistKey.EXPENSE_ACCT.getKey()),
+                                String.valueOf(rowObj.getString(aItemlistKey.INCOME_ACCT.getKey())).equals("null")
+                                        ? 0 : rowObj.getInt(aItemlistKey.INCOME_ACCT.getKey()),
+                                rowObj.getString(aItemlistKey.DATA_VISIBILITY.getKey()),
+                                rowObj.getString(aItemlistKey.BARCODENO1.getKey())
+                        );
+                        DcAitemlist.getInstance(ctx).insertaItemlist(ail);
+                    }
+                }
+                return "fetch items success";
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return "fetch items error";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
+            dismissSpinnerDialog();
+            Log.d("adsx",  result);
+        }
+        @Override
+        protected void onPreExecute() {
+            Log.d("adsx", "task fetch items starting");
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.d("adsx", "task fetch items running " + + values[0]);
+        }
     }
 }

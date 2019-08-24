@@ -30,8 +30,8 @@
         android:hardwareAccelerated="false"
         tools:replace="android:allowBackup"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_order"
+        android:roundIcon="@mipmap/ic_launcher_order"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">

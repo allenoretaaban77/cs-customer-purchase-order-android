@@ -35,6 +35,12 @@ public class SharedData {
         prefsEditor.apply();
     }
 
+    public void saveInt(String key, int isTrue) {
+        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+        prefsEditor.putInt(key, isTrue);
+        prefsEditor.apply();
+    }
+
     public void saveStringSet(String key, Set<String> value) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         prefsEditor.putStringSet(key, value);
@@ -60,6 +66,14 @@ public class SharedData {
         }
         return null;
     }
+
+    public int getInt(String key) {
+        if (sharedPreferences != null) {
+            return sharedPreferences.getInt(key, -1);
+        }
+        return -1;
+    }
+
 
     public Set<String> getStringSet(String key) {
         if (sharedPreferences != null) {

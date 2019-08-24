@@ -17,8 +17,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,6 +70,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.callback.Callback;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 public class Helper {
 
@@ -330,5 +334,32 @@ public class Helper {
         String monthNumber  = (String) DateFormat.format("MM",   date); // 06
         String year         = (String) DateFormat.format("yyyy", date); // 2019
         return monthNumber + day;
+    }
+
+    public static int getScreenDimension(Context ctx, String strSide) {
+        WindowManager wm = (WindowManager) ctx.getSystemService(WINDOW_SERVICE);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(displayMetrics);
+        if (strSide.equals("w")) {
+            return displayMetrics.widthPixels;
+        } else {
+            return displayMetrics.heightPixels;
+        }
+    }
+
+    public static int getDialogWidth(Context ctx) {
+        if (Helper.getScreenDimension(ctx, "w") >= 1200) {
+            return 800;
+        } else {
+            return 500;
+        }
+    }
+
+    public static ProgressDialog showSpinnerDialog(Context context, String title, String message){
+        ProgressDialog progressDialog = new ProgressDialog(context, R.style.ProgressSpinnerTheme);
+        if (!title.trim().equals("")) { progressDialog.setTitle(title); }
+        if (!message.trim().equals("")) { progressDialog.setMessage(message); }
+        progressDialog.setCancelable(false);
+        return progressDialog;
     }
 }
