@@ -1,20 +1,16 @@
 package com.fnc.order.android.activity;
 
 import android.Manifest;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.fnc.order.android.BaseActivity;
-import com.fnc.order.android.BuildConfig;
 import com.fnc.order.android.database.DBHelper;
 import com.fnc.order.android.R;
 import com.fnc.order.android.enumeration.API;
-import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.gun0912.tedpermission.PermissionListener;
