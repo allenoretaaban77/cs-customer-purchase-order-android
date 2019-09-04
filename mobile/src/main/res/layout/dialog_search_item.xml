@@ -56,25 +56,10 @@
                         android:focusableInTouchMode="true"
                         android:layout_width="0px"
                         android:layout_height="0px"/>
-                    <!--RelativeLayout
-                        android:layout_margin="2dp"
-                        android:layout_gravity="right|center_vertical"
-                        android:layout_width="37dp"
-                        android:layout_height="match_parent">
-                        <ImageView
-                            android:backgroundTint="@color/brown_1"
-                            android:background="@drawable/baseline_description_24"
-                            android:id="@+id/hide_password"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_margin="3dp"
-                            />
-                    </RelativeLayout-->
                 </FrameLayout>
             </LinearLayout>
             <LinearLayout
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
+                android:layout_centerVertical="true"
                 android:layout_marginRight="47dp"
                 android:layout_alignParentRight="true"
                 android:layout_width="36dp"
@@ -95,10 +80,11 @@
                 </com.balysv.materialripple.MaterialRippleLayout>
             </LinearLayout>
             <LinearLayout
+                android:layout_centerVertical="true"
+                android:layout_marginRight="4dp"
                 android:layout_alignParentRight="true"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_margin="4dp"
                 android:padding="3dp"
                 style="@style/btnTransparentStyleSmallWrap">
                 <com.balysv.materialripple.MaterialRippleLayout

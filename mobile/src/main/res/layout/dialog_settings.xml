@@ -15,6 +15,7 @@
         android:padding="7dp">
 
         <RelativeLayout
+            android:layout_height="46dp"
             android:paddingLeft="12dp"
             android:layout_width="match_parent"
             android:orientation="horizontal"
@@ -30,10 +31,11 @@
                 android:textSize="19sp"
                 android:text="SETTINGS"/>
             <LinearLayout
+                android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:layout_margin="8dp"
+                android:layout_marginRight="5dp"
                 android:padding="3dp"
                 style="@style/btnTransparentStyleSmallWrap">
                 <com.balysv.materialripple.MaterialRippleLayout

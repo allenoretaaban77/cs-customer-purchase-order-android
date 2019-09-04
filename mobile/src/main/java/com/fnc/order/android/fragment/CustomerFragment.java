@@ -1,6 +1,5 @@
 package com.fnc.order.android.fragment;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -14,13 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,21 +30,16 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.activity.LoginActivity;
-import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
-import com.fnc.order.android.adapters.PersonAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.enumeration.MenulistKey;
-import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
-import com.fnc.order.android.model.Person;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
@@ -94,20 +86,21 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private DroppyMenuPopup sortMenuObj;
     private String updateCustomerMessage = "Please wait while updating customer lists...";
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_menu, container, false);
         ctx = v.getContext();
+        Helper.setPreviousPage(ctx, "main_page");
+
         initViews(v);
         initListeners(v);
 
-        v.setFocusableInTouchMode(true);
+        /*v.setFocusableInTouchMode(true);
         v.requestFocus();
         v.setOnKeyListener( new View.OnKeyListener() {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
+                Log.d("dsx", "backpressed on CustomerFragment");
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
                     if (isUpdateCustomer) {
                         Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show();
@@ -126,24 +119,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 }
                 return false;
             }
-        } );
+        });*/
 
         if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
                 .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
             SharedData.getInstance(ctx).saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             requestCustomers("");
-            /*alphagridview = (GridView) v.findViewById(R.id.alphagridview);
-            ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
-            if (refStringAlpha.size() > 0) { stringAlpha = refStringAlpha; }
-            adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
-            adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
-                @Override
-                public void onItemClick(View v, int pos) {
-                    Helper.hideSoftKeyboard(getActivity());
-                    fillData(v, stringAlpha.get(pos), true);
-                }
-            });
-            alphagridview.setAdapter(adapterAlpha);*/
         } else {
             LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "");
             if (llr.size() < 1) {
@@ -154,12 +135,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         return v;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        // TODO: Use the ViewModel
-    }
+//    @Override
+//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+//        super.onActivityCreated(savedInstanceState);
+//        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+//        // TODO: Use the ViewModel
+//    }
 
     private void initViews(View v) {
         imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
@@ -272,10 +253,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 
                 switch(id){
                     case 0:
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
-                                .addToBackStack(null)
-                                .commit();
+                        Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
+                            new TransactionFragment(), "transaction_fragment", "customer_fragment");
                         break;
                     case 1:
                         alertDialog = Helper.okCancelDialog(ctx,
@@ -376,10 +355,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     sp.saveData(SharedKey.CURRENT_STORE.getKey(), mlRS.getCustomerName());
                     sp.saveData(SharedKey.CURRENT_CUSTOMER_ID.getKey(), mlRS.getCustomerID());
                     sp.saveData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey(), mlRS.getCustomerIntegrationId());
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, new OrderFragment(), "order_fragment")
-                        .addToBackStack(null)
-                        .commit();
+//                    getActivity().getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.container, new OrderFragment(), "order_fragment")
+//                        .addToBackStack(null)
+//                        .commit();
+                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
+                        new OrderFragment(), "order_fragment", "customer_fragment");
                 }
             });
         }

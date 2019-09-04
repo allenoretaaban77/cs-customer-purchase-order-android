@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
+import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.adapters.TransactionsAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcOrdered;
@@ -48,18 +49,18 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
         ctx = refV.getContext();
         thisFragment = this;
 
-        refV.setFocusableInTouchMode(true);
-        refV.requestFocus();
-        refV.setOnKeyListener( new View.OnKeyListener() {
-            @Override
-            public boolean onKey( View v, int keyCode, KeyEvent event ) {
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    backItNow(v);
-                    return true;
-                }
-                return false;
-            }
-        } );
+//        refV.setFocusableInTouchMode(true);
+//        refV.requestFocus();
+//        refV.setOnKeyListener( new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey( View v, int keyCode, KeyEvent event ) {
+//                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+//                    backItNow(v);
+//                    return true;
+//                }
+//                return false;
+//            }
+//        } );
 
         try {
             initViews(refV);

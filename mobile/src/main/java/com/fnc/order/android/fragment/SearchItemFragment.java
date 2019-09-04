@@ -60,7 +60,7 @@ import hari.bounceview.BounceView;
 public class SearchItemFragment extends DialogFragment implements VolleyCallback {
 
     public Context ctx;
-    private View rootView;
+    private View rv;
     private Button btn_search;
     private Button btn_close;
     private Button btn_add_to_list;
@@ -80,17 +80,30 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.dialog_search_item, container, false);
-        ctx = rootView.getContext();
+        rv = inflater.inflate(R.layout.dialog_search_item, container, false);
+        ctx = rv.getContext();
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+        rv.setFocusableInTouchMode(true);
+        rv.requestFocus();
+        rv.setOnKeyListener( new View.OnKeyListener() {
+            @Override
+            public boolean onKey( View v, int keyCode, KeyEvent event ) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+                    dismiss();
+                    return true;
+                }
+                return false;
+            }
+        } );
+
         try {
-            initViews(rootView);
+            initViews(rv);
         } finally {
-            initListeners(rootView);
+            initListeners(rv);
         }
 
-        return rootView;
+        return rv;
     }
 
     private void initViews(View v) {

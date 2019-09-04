@@ -25,7 +25,8 @@ public enum SharedKey {
     DATA_STORELIST("dtstorelist"),
     DEV_USERNAME("usernamne"),
     DEV_PASSWORD("password"),
-    SEARCHED_ITEMS("searched_items");
+    SEARCHED_ITEMS("searched_items"),
+    CURRENT_PAGE("current_page");
 
     private String key;
     SharedKey(String key) { this.key = key; }

@@ -59,47 +59,43 @@
                 android:orientation="horizontal"
                 style="@style/mHeader">
                 <LinearLayout
-                    android:layout_weight="1"
                     android:layout_marginRight="3dp"
+                    android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
                     <FrameLayout
-                        android:id="@+id/layout_calendar"
                         android:background="@drawable/background_input_round_border"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:id="@+id/ll_dummy"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
                             android:layout_width="0px"
-                            android:layout_height="0px"/>
+                            android:layout_height="0px"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true" />
                         <EditText
+                            android:fontFamily="@font/regular"
+                            android:textSize="16sp"
                             android:hint="Input customer name here to search..."
                             android:id="@+id/et_customername"
                             android:background="@color/transparent"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:fontFamily="@font/regular"
-                            android:textSize="16sp"
                             android:maxLines="1"
                             android:lines="1"
                             android:inputType="text"
                             android:imeOptions="actionSearch"
                             android:textColorHint="@color/gray_4"
-                            android:textColor="@color/gray_6"
-                            android:nextFocusUp="@id/ll_dummy"
-                            android:nextFocusLeft="@id/ll_dummy"
+                            android:textColor="@color/green_1"
+                            android:nextFocusUp="@id/et_customername"
+                            android:nextFocusLeft="@id/et_customername"
                             android:paddingLeft="17dp"/>
                     </FrameLayout>
                 </LinearLayout>
-                <RelativeLayout
+                <LinearLayout
+                    android:layout_margin="3dp"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_margin="3dp"
                     android:padding="3dp"
                     style="@style/btnTransparentStyleSmallWrap">
                     <com.balysv.materialripple.MaterialRippleLayout
@@ -115,12 +111,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                     </com.balysv.materialripple.MaterialRippleLayout>
-                </RelativeLayout>
-                <RelativeLayout
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_margin="3dp"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_margin="3dp"
                     android:padding="3dp"
                     style="@style/btnTransparentStyleSmallWrap">
                     <com.balysv.materialripple.MaterialRippleLayout
@@ -136,12 +131,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                     </com.balysv.materialripple.MaterialRippleLayout>
-                </RelativeLayout>
-                <RelativeLayout
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_margin="3dp"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_margin="3dp"
                     android:padding="3dp"
                     style="@style/btnTransparentStyleSmallWrap">
                     <com.balysv.materialripple.MaterialRippleLayout
@@ -157,7 +151,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
                     </com.balysv.materialripple.MaterialRippleLayout>
-                </RelativeLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
