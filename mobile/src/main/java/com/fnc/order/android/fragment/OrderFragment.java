@@ -39,19 +39,14 @@ import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
-import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.ItemlistKey;
-import com.fnc.order.android.enumeration.MenulistKey;
-import com.fnc.order.android.enumeration.OrderKey;
-import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.listeners.DatePickerListener;
 import com.fnc.order.android.model.Itemlist;
-import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
@@ -129,13 +124,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         // Required empty public constructor
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_order, container, false);
         ctx = rootView.getContext();
         thisFragment = this;
+        Helper.setPreviousPage(ctx, "customer_fragment");
+
         curRefArrayList = new ArrayList<Order>();
         curRefArrayListErr = new ArrayList<Order>();
 
@@ -301,10 +297,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public void call(View v, int id) {
                 switch(id){
                     case 0:
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
-                            .addToBackStack(null)
-                            .commit();
+//                        getActivity().getSupportFragmentManager().beginTransaction()
+//                            .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
+//                            .addToBackStack(null)
+//                            .commit();
+                        Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
+                            new TransactionFragment(), "transaction_fragment", "order_fragment");
                         break;
                     default:
                         alertDialog = Helper.okCancelDialog(ctx,
@@ -678,7 +676,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             adapter.setCurPos(position);
                             alertDialog = okCancelInputRemarksDialogBuilder(ctx,
                                     "Add Remarks",
-                                    "Save", null, "Cancel", cancelCallback );
+                                    "SAVE", null, "CANCEL", cancelCallback );
                             alertDialog.show();
                             BounceView.addAnimTo(alertDialog);
                         }
@@ -1146,7 +1144,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                     alertDialog = okCancelInputRemarksDialogBuilder(ctx,
                             "Add Remarks",
-                            "Save", null, "Cancel", cancelCallback );
+                            "SAVE", null, "CANCEL", cancelCallback );
                     alertDialog.show();
                     BounceView.addAnimTo(alertDialog);
                 }

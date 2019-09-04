@@ -1,21 +1,15 @@
 package com.fnc.order.android.database;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
-
-import com.fnc.order.android.R;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
-import com.fnc.order.android.model.Ordered;
-import com.fnc.order.android.model.Userslist;
-import com.fnc.order.android.utilities.Helper;
 
 import java.io.File;
 import java.util.LinkedList;

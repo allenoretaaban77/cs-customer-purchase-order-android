@@ -106,6 +106,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
     @Override
     public void onResume(){
         super.onResume();
+        super.onResume();
 
         SharedData sp = SharedData.getInstance(this);
         sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
@@ -248,7 +249,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                 alertDialog = actionDialog(ctx,
                         "Validate settings security account",
                         "Username", "Password",
-                        "Submit", new View.OnClickListener() {
+                        "SUBMIT", new View.OnClickListener() {
                             public void onClick(View v) {
                                 LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
                                 EditText etUsername = (EditText) layout.findViewById(R.id.et_edittext1);
@@ -261,7 +262,7 @@ public class LoginActivity extends BaseActivity implements VolleyCallback {
                                     alertDialog = actionDialog(ctx,
                                             "Customize settings per client as required",
                                             "Server", "Database",
-                                            "Update", new View.OnClickListener() {
+                                            "UPATE", new View.OnClickListener() {
                                                 public void onClick(View v) {
                                                     LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
                                                     EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);

@@ -27,6 +27,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
@@ -35,12 +38,14 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
+import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.activity.SplashActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.fragment.CustomerFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -361,5 +366,17 @@ public class Helper {
         if (!message.trim().equals("")) { progressDialog.setMessage(message); }
         progressDialog.setCancelable(false);
         return progressDialog;
+    }
+
+    public static void changePage(Context ctx, FragmentManager fm, Fragment fr,
+        String target_fragmentname, String previous_fragmentname) {
+        fm.beginTransaction().replace(R.id.container, fr, target_fragmentname).addToBackStack(null).commit();
+        SharedData.getInstance(ctx).saveData(SharedKey.CURRENT_PAGE.getKey(), previous_fragmentname);
+    }
+    public static void setPreviousPage(Context ctx, String page) {
+        SharedData.getInstance(ctx).saveData(SharedKey.CURRENT_PAGE.getKey(), page);
+    }
+    public static String getPage(Context ctx) {
+        return SharedData.getInstance(ctx).getData(SharedKey.CURRENT_PAGE.getKey());
     }
 }
