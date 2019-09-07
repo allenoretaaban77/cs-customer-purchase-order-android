@@ -26,7 +26,17 @@ public enum SharedKey {
     DEV_USERNAME("usernamne"),
     DEV_PASSWORD("password"),
     SEARCHED_ITEMS("searched_items"),
-    CURRENT_PAGE("current_page");
+    IMEI_ID("imei_identification"),
+    BRANCH_ID("branch_id"),
+    BRANCH_CODE("branch_code"),
+    BRANCH_DESCRIPTION("branch_description"),
+    CURRENT_PAGE("current_page"),
+    IDENTITY_ID("identityId"),
+    EMP_NO("reference_employee_no"),
+    EMP_ID("employee_id"),
+    REF_EMP_NO("reference_employee_no"),
+    EMP_NAME("employee_name"),
+    EMP_POSITION("employee_position");
 
     private String key;
     SharedKey(String key) { this.key = key; }

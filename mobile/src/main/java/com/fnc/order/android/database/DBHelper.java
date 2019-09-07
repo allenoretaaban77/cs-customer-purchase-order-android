@@ -10,6 +10,7 @@ import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
+import com.fnc.order.android.enumeration.aStaffsKey;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
         db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
         db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
+        db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
         Log.i(TAG,"Database created path : " + db.getPath());
     }
 
@@ -126,6 +128,20 @@ public class DBHelper extends SQLiteOpenHelper {
         return fields;
     }
 
+    protected LinkedList<aStaffsKey> setStaffsFields() {
+        LinkedList<aStaffsKey> fields = new LinkedList<>();
+        fields.add(aStaffsKey.EMPID);
+        fields.add(aStaffsKey.REFEMPNO);
+        fields.add(aStaffsKey.EMPNO);
+        fields.add(aStaffsKey.EMAIL);
+        fields.add(aStaffsKey.NAME);
+        fields.add(aStaffsKey.BRANCH);
+        fields.add(aStaffsKey.JOBTITLE);
+        fields.add(aStaffsKey.PASS);
+        fields.add(aStaffsKey.ACTIVE);
+        return fields;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         int version = oldVersion + 1;
@@ -136,6 +152,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
                 db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
                 db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
+                db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
         }
     }
 }

@@ -12,7 +12,8 @@ public enum Table {
     CHECKLIST("checklists"),
     CHECKLIST_BU("checklists_backup"),
     CUSTOMERLIST("customerlists"),
-    A_ITEMLIST("aitemlist");
+    A_ITEMLIST("aitemlist"),
+    STAFFS("aStaffs");
 
     private String name;
 

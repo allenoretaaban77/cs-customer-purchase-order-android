@@ -23,6 +23,7 @@ public class GlobalConstants {
     public static String DATE_FORMAT = "MMMM d, yyyy";
     public static String DATE_REF_FORMAT = "yyyy-MM-dd";
     public static String DATE_FORMAT_POST = "M/dd/yyyy HH:mm:ss";
+    public static String DATE_FORMAT_TZ = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     public static Integer SWIPE_PAGE_ON_FACTOR = 700;
     public static Integer SWIPE_MIN_DISTANCE = 700;

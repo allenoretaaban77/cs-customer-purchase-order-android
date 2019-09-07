@@ -1,5 +1,6 @@
 package com.fnc.order.android.utilities;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -16,6 +17,7 @@ import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -46,6 +48,7 @@ import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.fragment.CustomerFragment;
+import com.fnc.order.android.model.aStaffs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -360,14 +363,6 @@ public class Helper {
         }
     }
 
-    public static ProgressDialog showSpinnerDialog(Context context, String title, String message){
-        ProgressDialog progressDialog = new ProgressDialog(context, R.style.ProgressSpinnerTheme);
-        if (!title.trim().equals("")) { progressDialog.setTitle(title); }
-        if (!message.trim().equals("")) { progressDialog.setMessage(message); }
-        progressDialog.setCancelable(false);
-        return progressDialog;
-    }
-
     public static void changePage(Context ctx, FragmentManager fm, Fragment fr,
         String target_fragmentname, String previous_fragmentname) {
         fm.beginTransaction().replace(R.id.container, fr, target_fragmentname).addToBackStack(null).commit();
@@ -378,5 +373,94 @@ public class Helper {
     }
     public static String getPage(Context ctx) {
         return SharedData.getInstance(ctx).getData(SharedKey.CURRENT_PAGE.getKey());
+    }
+
+
+    public static String getImei(Context ctx) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            return getImeiNew(ctx);
+        } else {
+            return getImeiOld(ctx);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public static String getImeiOld(Context ctx) {
+        try {
+            TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+            return tm.getDeviceId();
+        } catch(SecurityException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    public static String getImeiNew(Context ctx) {
+        try {
+            TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+            return tm.getImei();
+        } catch(SecurityException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static ProgressDialog showSpinnerDialog(Context context, String title, String message){
+        ProgressDialog progressDialog = new ProgressDialog(context, R.style.ProgressSpinnerTheme);
+        if (!title.trim().equals("")) { progressDialog.setTitle(title); }
+        if (!message.trim().equals("")) { progressDialog.setMessage(message); }
+        progressDialog.setCancelable(false);
+        return progressDialog;
+    }
+
+    public static void dismissSpinnerDialog(ProgressDialog loader) {
+        if(loader != null && loader.isShowing()) {
+            loader.dismiss();
+        }
+    }
+
+    public static aStaffs defaultStaff(Context ctx) {
+        SharedData sp = SharedData.getInstance(ctx);
+        aStaffs cs = new aStaffs(-777, -1, "2", "aban.allen@yahoo.com",
+                "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
+                1900000000, "P@ssw0rd" + Helper.getReqDate(0, ""), "true");
+        return cs;
+    }
+
+    public static String getReqDate(Integer type, String dateSample) {
+        Date date = Calendar.getInstance().getTime();
+        String dayOfTheWeek = (String) DateFormat.format("EEEE", date); // Sunday
+        String day          = (String) DateFormat.format("dd",   date); // 23
+        String monthString  = (String) DateFormat.format("MMM",  date); // Jun
+        String monthNumber  = (String) DateFormat.format("MM",   date); // 06
+        String year         = (String) DateFormat.format("yyyy", date); // 2019
+        switch (type) {
+            case 4:
+                java.text.DateFormat dfx = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_POST);
+                return dfx.format(date);
+            case 3:
+                try{
+                    SimpleDateFormat format = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_TZ);
+                    date = format.parse(dateSample + "Z");
+                    java.text.DateFormat df = new SimpleDateFormat(GlobalConstants.DATE_FORMAT);
+                    return df.format(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            case 2:
+                return  monthNumber + day + year;
+            case 1:
+                try{
+                    SimpleDateFormat format = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_TZ);
+                    date = format.parse(dateSample + "Z");
+                    java.text.DateFormat df = new SimpleDateFormat(GlobalConstants.DATE_REF_FORMAT);
+                    return df.format(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            default:
+                return monthNumber + day;
+        }
     }
 }

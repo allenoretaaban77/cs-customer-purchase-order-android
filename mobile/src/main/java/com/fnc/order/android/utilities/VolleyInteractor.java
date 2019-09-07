@@ -346,4 +346,104 @@ public class VolleyInteractor {
             }
         }).start();
     }
+
+    public void getDeviceProfile(final Context ctx, final HashMap<String, String> params,
+                                 final String strParams) {
+        new Thread(new Runnable(){
+            public void run(){
+                String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                        + API.GET_DEVICE_PROFILE.getApi()+ "?" + strParams;
+                StringRequest strRequest = new StringRequest( Request.Method.GET, url,
+                        null, null) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        return ServerConstants.getHeaderOdPos();
+                    }
+                    public Map<String, String> getParams(){
+                        return params;
+                    }
+
+                };
+                requestQueue = Volley.newRequestQueue(ctx);
+                int socketTimeout = 10000;
+                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                strRequest.setRetryPolicy(policy);
+                requestQueue.getCache().clear();
+                requestQueue.add(strRequest);
+
+                VolleyX.init(ctx);
+                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+                        @Override
+                        public void onCompleted() {
+                            Log.d("dsxoc", "getdeviceprofile");
+                        }
+                        @Override
+                        public void onError(Throwable e) {
+                            VolleyError ve = new VolleyError();
+                            Log.d("dsxe getdeviceprofile", String.valueOf(ve.getMessage()));
+                            callback.onRequestFail(ve, "getdeviceprofile");
+                        }
+                        @Override
+                        public void onNext(String response) {
+                            Log.d("dsx", response);
+                            callback.onRequestSuccess(response, "getdeviceprofile");
+                        }
+                    });
+                VolleyX.setRequestQueue(requestQueue);
+            }
+        }).start();
+    }
+
+    public void getPreRequisite(final Context ctx, final HashMap<String, String> params,
+                                final String strParams) {
+        new Thread(new Runnable(){
+            public void run(){
+                String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                    + API.GET_PRE_REQUISITE.getApi()+ "?" + strParams;
+                StringRequest strRequest = new StringRequest( Request.Method.GET, url,
+                        null, null) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        return ServerConstants.getHeaderOdPos();
+                    }
+                    public Map<String, String> getParams(){
+                        return params;
+                    }
+
+                };
+                requestQueue = Volley.newRequestQueue(ctx);
+                int socketTimeout = 10000;
+                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                strRequest.setRetryPolicy(policy);
+                requestQueue.getCache().clear();
+                requestQueue.add(strRequest);
+
+                VolleyX.init(ctx);
+                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+                        @Override
+                        public void onCompleted() {
+                            Log.d("dsxoc", "getprerequisite");
+                        }
+                        @Override
+                        public void onError(Throwable e) {
+                            VolleyError ve = new VolleyError();
+                            Log.d("dsxe getprerequisite", String.valueOf(ve.getMessage()));
+                            callback.onRequestFail(ve, "getprerequisite");
+                        }
+                        @Override
+                        public void onNext(String response) {
+                            Log.d("dsx", response);
+                            callback.onRequestSuccess(response, "getprerequisite");
+                        }
+                    });
+                VolleyX.setRequestQueue(requestQueue);
+            }
+        }).start();
+    }
 }
