@@ -121,7 +121,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         final VolleyInteractor vidp = new VolleyInteractor();
         vidp.registerCallback(this);
         String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
-//        strImeiId = "";
+        strImeiId = "";
         if (strImeiId.equals("")) {
             if (Helper.isNetworkAvailable(this)) {
                 TedPermission.with(ctx).setPermissionListener(new PermissionListener() {

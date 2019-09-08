@@ -13,8 +13,8 @@ public enum API {
     GET_VERIFIED("api/getVerified_linkOldEmployeeNo"),
     POST_UPDATE_EMPLOYEE("api/updateRefEmployeeID"),
     POST_ORDER("api/PostCOrder"),
-    GET_DEVICE_PROFILE("api/getStRecDeviceProfile"),
-    GET_PRE_REQUISITE("api/getStRecPreReq"),
+    GET_DEVICE_PROFILE("api/getCoDeviceProfile"),
+    GET_PRE_REQUISITE("api/getCoPreReq"),
 
     POST_LOADSTATE("api/PostChecklistLoadedState"),
     DATA_USER("dtuser"),

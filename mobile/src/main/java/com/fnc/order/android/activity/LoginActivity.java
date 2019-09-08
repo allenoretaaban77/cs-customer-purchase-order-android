@@ -184,7 +184,7 @@ public class LoginActivity extends BaseActivity {
                     if (slUP.size() > 0 ) {
                         aStaffs slx = slUP.get(0);
                         SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), "-1");
-                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), "-1");
+                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));

@@ -357,7 +357,7 @@ public class VolleyInteractor {
                         null, null) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
-                        return ServerConstants.getHeaderOdPos();
+                        return ServerConstants.getHeaderOrder();
                     }
                     public Map<String, String> getParams(){
                         return params;
@@ -407,7 +407,7 @@ public class VolleyInteractor {
                         null, null) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
-                        return ServerConstants.getHeaderOdPos();
+                        return ServerConstants.getHeaderOrder();
                     }
                     public Map<String, String> getParams(){
                         return params;
