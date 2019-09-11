@@ -112,7 +112,7 @@ public class LoginActivity extends BaseActivity {
         sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
         sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
 
-        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), this);
+//        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), this);
     }
 
     private void initViews() {
@@ -183,40 +183,44 @@ public class LoginActivity extends BaseActivity {
                     LinkedList<aStaffs> slUP = DcStaffs.getInstance(ctx).checkStaff(usernameStr, passwordString);
                     if (slUP.size() > 0 ) {
                         aStaffs slx = slUP.get(0);
-                        SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), "-1");
-                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
-                        isSubmit = true;
-                        showActivity(MainActivity.class);
-                        Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
+                        if (slx.getRefempno() == -1) {
+                            isSubmit = false;
+                            BounceView.addAnimTo( Helper.okDialog( ctx,
+                                    "Error","Invalid username or password", "CLOSE",
+                                    null, false) );
+                        } else {
+                            SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), "-1");
+                            SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
+                            isSubmit = true;
+                            showActivity(MainActivity.class);
+                            Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         isSubmit = false;
-                        alertDialog = Helper.okDialog(ctx,
+                        BounceView.addAnimTo( Helper.okDialog( ctx,
                             "Error","Invalid username or password", "CLOSE",
-                            null, false);
-                        BounceView.addAnimTo(alertDialog);
+                            null, false) );
                     }
                 } else {
-                    alertDialog = Helper.okDialog(ctx,
+                    BounceView.addAnimTo( Helper.okDialog( ctx,
                         "Data Sync Erro","This app needs to be initialized, please connect to the internet",
                         "CLOSE", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finishAndRemoveTask();
                             }
-                        }, false);
-                    BounceView.addAnimTo(alertDialog);
+                        }, false) );
                 }
-
             }
         });
 
         tvVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alertDialog = actionDialog(ctx,
+                alertDialog = actionDialog(ctx, "SETTINGS",
                     "Validate settings security account",
                     "Username", "Password",
                     "SUBMIT", new View.OnClickListener() {
@@ -229,7 +233,7 @@ public class LoginActivity extends BaseActivity {
 
                             if (spx.getData(SharedKey.DEV_USERNAME.getKey()).equals(etUsername.getText().toString()) &&
                                     spx.getData(SharedKey.DEV_PASSWORD.getKey()).equals(etPassword.getText().toString())) {
-                                alertDialog = actionDialog(ctx,
+                                alertDialog = actionDialog(ctx, "SETTINGS",
                                         "Customize settings per client as required",
                                         "Server", "Database",
                                         "UPATE", new View.OnClickListener() {
@@ -259,6 +263,10 @@ public class LoginActivity extends BaseActivity {
                                                 alertDialog.dismiss();
                                             }
                                         },1);
+
+                                LinearLayout ll_skuvalid = (LinearLayout) alertDialog.findViewById(R.id.ll_validations);
+                                ll_skuvalid.setVisibility(View.VISIBLE);
+
                                 EditText etDomainServerName = (EditText) alertDialog.findViewById(R.id.et_edittext1);
                                 String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
                                 etDomainServerName.setText(strSN);
@@ -290,8 +298,6 @@ public class LoginActivity extends BaseActivity {
                     2);
 
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
-                LinearLayout ll_skuvalid = (LinearLayout) alertDialog.findViewById(R.id.ll_validations);
-                ll_skuvalid.setVisibility(View.GONE);
 //                etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
@@ -623,20 +629,20 @@ public class LoginActivity extends BaseActivity {
         return builder.show();
     } */
 
-    private AlertDialog actionDialog(final Context activity, String message, String strLabel1, String strLabel2,
-                                     String okButtonCaption, View.OnClickListener onClickListener,
-                                     String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer typeFlag) {
+    private AlertDialog actionDialog(final Context activity, String title, String message,
+        String strLabel, String strLabel2, String okButtonCaption, View.OnClickListener onClickListener,
+        String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer typeFlag) {
 
         SharedData spx = SharedData.getInstance(this);
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.dialog_settings, null);
 
-        TextView tv_message = (TextView) layout.findViewById(R.id.tv_message);
-        tv_message.setText(message);
+        ((TextView) layout.findViewById(R.id.tv_message)).setText(title);
+        ((TextView) layout.findViewById(R.id.tv_message)).setText(message);
 
         TextView tv_lbl1 = (TextView) layout.findViewById(R.id.tv_label1);
-        tv_lbl1.setText(strLabel1);
+        tv_lbl1.setText(strLabel);
         EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
 
         TextView tv_lbl2 = (TextView) layout.findViewById(R.id.tv_label2);

@@ -11,6 +11,15 @@
     tools:ignore="MissingPrefix"
     android:orientation="vertical">
 
+    <ImageView
+        android:alpha=".3"
+        android:backgroundTintMode="src_over"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/wp" />
+
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -25,18 +34,18 @@
 
             <ImageView
                 android:layout_marginBottom="10dp"
-                android:src="@drawable/iv_logo"
+                android:src="@mipmap/ic_launcher_order"
                 android:adjustViewBounds="true"
                 android:id="@+id/iv_logo"
                 android:layout_gravity="center"
-                android:layout_width="200dp"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"/>
 
             <TextView
                 android:fontFamily="@font/medium"
-                android:layout_marginBottom="40dp"
-                android:textSize="26sp"
+                android:layout_marginBottom="10dp"
+                android:textSize="31sp"
                 android:textColor="@color/red_2"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"

@@ -33,4 +33,5 @@
         <item>Hockey</item>
         <item>Swimming</item>
     </string-array>
+    <string name="unrecognized_device">Unrecognized Device ID, please contact IT support to register this device.</string>
 </resources>

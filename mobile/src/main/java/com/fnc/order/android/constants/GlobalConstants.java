@@ -30,4 +30,8 @@ public class GlobalConstants {
     public static Integer SWIPE_THRESHOLD_VELOCITY = 2000;
 
     public static final String ACTION_PLAY = "action_play_fnc_order";
+
+    public static String GCP_BUCKET_TARGET = "requested_imei";
+    public static String GCP_PROJECTID = "customerdata-246518";
+    public static String GCP_CREDENTIAL = "credentials";
 }

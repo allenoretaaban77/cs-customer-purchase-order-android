@@ -9,36 +9,52 @@
     android:orientation="vertical"
     android:background="@drawable/background_gradient">
 
+        <ImageView
+            android:alpha=".3"
+            android:backgroundTintMode="src_over"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/wp" />
+
         <LinearLayout
             android:orientation="vertical"
-            android:alpha="1"
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
                 <ImageView
-                    android:layout_marginBottom="20dp"
-                    android:src="@drawable/iv_logo"
+                    android:layout_marginBottom="10dp"
+                    android:src="@mipmap/ic_launcher_order"
                     android:adjustViewBounds="true"
                     android:id="@+id/iv_logo"
                     android:layout_gravity="center"
-                    android:layout_width="200dp"
+                    android:layout_width="120dp"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"/>
-                <LinearLayout
+                <TextView
+                    android:fontFamily="@font/medium"
+                    android:textSize="31sp"
+                    android:textColor="@color/red_2"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CUSTOMER ORDER"/>
+                <!--LinearLayout
                     android:background="@drawable/background_gradient_green"
                     android:gravity="center"
                     android:layout_width="match_parent"
-                    android:layout_height="46dp">
+                    android:layout_height="40dp">
                         <TextView
                             android:gravity="center"
                             android:fontFamily="@font/medium"
-                            android:lineHeight="26sp"
-                            android:textSize="26sp"
+                            android:lineHeight="23sp"
+                            android:textSize="23sp"
                             android:textColor="@color/white"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="CUSTOMER ORDER"/>
-                </LinearLayout>
+                </LinearLayout-->
         </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
