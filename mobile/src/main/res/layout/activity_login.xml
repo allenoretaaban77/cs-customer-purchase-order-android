@@ -12,13 +12,13 @@
     android:orientation="vertical">
 
     <ImageView
-        android:alpha=".3"
+        android:layout_gravity="center"
+        android:alpha=".1"
         android:backgroundTintMode="src_over"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/wp" />
+        android:src="@drawable/po1" />
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="300dp"
@@ -33,6 +33,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:visibility="gone"
                 android:layout_marginBottom="10dp"
                 android:src="@mipmap/ic_launcher_order"
                 android:adjustViewBounds="true"
@@ -45,8 +46,8 @@
             <TextView
                 android:fontFamily="@font/medium"
                 android:layout_marginBottom="10dp"
-                android:textSize="31sp"
-                android:textColor="@color/red_2"
+                android:textSize="33sp"
+                android:textColor="@color/green_1"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

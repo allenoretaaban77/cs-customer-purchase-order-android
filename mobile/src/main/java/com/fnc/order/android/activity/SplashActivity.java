@@ -207,7 +207,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
             params.put("deviceid", Helper.getImei(ctx));
-//                            params.put("deviceid", "353800100112222"); // timog
+//            params.put("deviceid", "353800100112222"); // timog
             Iterator it = params.entrySet().iterator();
             String strParams = "";
             while (it.hasNext()) {
