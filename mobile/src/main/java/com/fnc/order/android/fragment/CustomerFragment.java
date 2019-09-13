@@ -35,12 +35,14 @@ import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
+import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.aItemlist;
+import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
@@ -262,8 +264,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                 "Ok", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-//                                        getActivity().finish();
-                                        Toast.makeText(ctx, "Module error, please contact developer", Toast.LENGTH_LONG).show();
+                                        updateUsers();
                                     }
                                 }, "Cancel", null, false);
                         break;
@@ -493,72 +494,65 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     public void onRequestSuccess(String response, String type) {
         LinkedList<MenuList> mlRS = new LinkedList<MenuList>();
         try {
-            if (type.equals("searchcustomer")) {
+            if (type.equals("getprerequisite")) {
+                DcStaffs.getInstance(ctx).emptyStaffslist();
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    if (obj.length() > 0) {
+                        JSONArray sArr = obj.getJSONArray("staff");
+                        if (sArr.length() > 0) {
+                            DcStaffs.getInstance(ctx).emptyStaffslist();
+                            DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add main
+                            for (int i = 0; i < sArr.length(); i++) {
+                                JSONObject rowObj = sArr.getJSONObject(i);
+                                aStaffs sl = new aStaffs(
+                                        rowObj.getInt("empId"),
+                                        rowObj.getString("refempno").equals("null") ? -1 : rowObj.getInt("refempno"),
+                                        rowObj.getString("empNo"),
+                                        rowObj.getString("Email"),
+                                        rowObj.getString("name"),
+                                        rowObj.getInt("Branch"),
+                                        rowObj.getInt("Jobtitle"),
+                                        rowObj.getString("pass"),
+                                        rowObj.getString("active")
+                                );
+                                DcStaffs.getInstance(ctx).insertStaffs(sl);
+                            }
+                        }
+                        Helper.dismissSpinnerDialog(loader);
+                        Toast.makeText(ctx, "Update success...", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Helper.dismissSpinnerDialog(loader);
+                        BounceView.addAnimTo( Helper.okDialog( ctx,
+                            "Data Sync Error","Data Sync Error, please contact IT support",
+                            "CLOSE", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }, false) );
+                    }
+                } catch (JSONException e) {
+                    Helper.dismissSpinnerDialog(loader);
+                    BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Unrecognized Device", getString(R.string.unrecognized_device),
+                        "CLOSE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }, false)
+                    );
+                }
+            } else if (type.equals("searchcustomer")) {
                 Log.d("dsxcf", "searchcustomer");
                 JSONArray objArr = new JSONArray(response);
                 if(objArr.length() > 0) {
-
                     dismissSpinnerDialog();
                     progressBarx = (ProgressBar) v.findViewById(R.id.progressBar);
                     progressBarx.setMax(objArr.length());
                     new customerAT().execute(response);
-
-                    /*
-                    DcMenulist.getInstance(ctx).emptyMenulist();
-                    for (int i = 0; i < objArr.length(); i++) {
-                        try {
-                            JSONObject obj = objArr.getJSONObject(i);
-                            MenuList mlList = new MenuList();
-                            mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
-                            mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
-                            String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
-                            mlList.setCustomerName(strCustomerName);
-                            mlList.setRecordCount(0);
-                            mlList.setRemarks("");
-                            if (!strCustomerName.equals("")) {
-                                if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
-                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)));
-                                } else {
-                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)));
-                                }
-                                DcMenulist.getInstance(ctx).insertMenulist(mlList);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    */
                     Log.d("dsxcf", "searchcustomer saved");
-
-                    /* alphagridview = (GridView) v.findViewById(R.id.alphagridview);
-                    ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
-                    if (refStringAlpha.size() > 0) { stringAlpha = refStringAlpha; }
-                    adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
-                    adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
-                        @Override
-                        public void onItemClick(View v, int pos) {
-                            Helper.hideSoftKeyboard(getActivity());
-                            fillData(v, stringAlpha.get(pos), true);
-                        }
-                    });
-                    alphagridview.setAdapter(adapterAlpha);
-
-                    new android.os.Handler().postDelayed(
-                            new Runnable() {
-                                public void run() {
-                                    dismissSpinnerDialog();
-                                    storelistview_box.setVisibility(View.GONE);
-                                    alphagridview_box.setVisibility(View.VISIBLE);
-                                    alphagridview_box.setAlpha(0.0f);
-                                    alphagridview_box.animate().translationY(0)
-                                        .alpha(1.0f).setListener(null);
-//                                    dismissSpinnerDialog();
-//                                    showActivity(MainActivity.class);
-//                                    Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
-                                }
-                            },
-                            500
-                    ); */
                 } else {
                     Toast.makeText(ctx, "Customer record empty, pleas contact developer", Toast.LENGTH_SHORT).show();
                 }
@@ -592,10 +586,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             }
         } catch (JSONException e) {
             dismissSpinnerDialog();
-//            Toast.makeText(ctx, "Something went wrong, please refresh the list.", Toast.LENGTH_SHORT).show();
             alertDialog = Helper.okDialog(ctx,
-                    "Error","Something went wrong, please refresh the list.", "CLOSE",
-                    null, false);
+                "Error","Something went wrong, please refresh the list.", "CLOSE",
+                null, false);
             BounceView.addAnimTo(alertDialog);
             e.printStackTrace();
         } finally {
@@ -709,6 +702,35 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         @Override
         protected void onProgressUpdate(Integer... values) {
             Log.d("adsx", "task fetch items running " + + values[0]);
+        }
+    }
+
+    private void updateUsers() {
+        if (Helper.isNetworkAvailable(getActivity())) {
+            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+
+            VolleyInteractor vipr = new VolleyInteractor();
+            vipr.registerCallback(this);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
+            params.put("branchid", SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()));
+            Iterator it = params.entrySet().iterator();
+            String strParams = "";
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+                it.remove();
+            }
+            vipr.getPreRequisite(ctx, params, strParams.replaceAll(" ", "%20"));
+        } else {
+            BounceView.addAnimTo( Helper.okDialog( ctx,
+                "Initialization Error","This app requires internet to initialize.  Please check your connection.",
+                "CLOSE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }, false) );
         }
     }
 }
