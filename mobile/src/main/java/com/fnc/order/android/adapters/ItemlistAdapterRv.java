@@ -161,9 +161,8 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
                             }
                             x++;
                         }
-                        for (int y = 0 ;y<positions.size(); y++)
+                        for (int y = 0; y < positions.size(); y++)
                             notifyItemChanged(positions.get(y));
-
                     }
                 });
 //            }

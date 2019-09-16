@@ -9,6 +9,7 @@ import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.UserslistKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.enumeration.aStaffsKey;
 
@@ -36,6 +37,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
         db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
         db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
+        db.execSQL(createTables(Table.BRANCHLIST, setBranchlistFields()));
         Log.i(TAG,"Database created path : " + db.getPath());
     }
 
@@ -142,6 +144,15 @@ public class DBHelper extends SQLiteOpenHelper {
         return fields;
     }
 
+    protected LinkedList<aBranchlistKey> setBranchlistFields() {
+        LinkedList<aBranchlistKey> fields = new LinkedList<>();
+        fields.add(aBranchlistKey.BRANCHID);
+        fields.add(aBranchlistKey.BRANCHCODE);
+        fields.add(aBranchlistKey.DEVICEID);
+        fields.add(aBranchlistKey.DESCRIPTION);
+        return fields;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         int version = oldVersion + 1;
@@ -153,6 +164,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
                 db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
                 db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
+                db.execSQL(createTables(Table.BRANCHLIST, setBranchlistFields()));
         }
     }
 }

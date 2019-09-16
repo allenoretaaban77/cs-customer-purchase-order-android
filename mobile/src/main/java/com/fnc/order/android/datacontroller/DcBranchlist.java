@@ -1,0 +1,108 @@
+package com.fnc.order.android.datacontroller;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.fnc.order.android.database.DBHelper;
+import com.fnc.order.android.database.Table;
+import com.fnc.order.android.database.aBranchlistQueryBuilder;
+import com.fnc.order.android.database.aStaffsQueryBuilder;
+import com.fnc.order.android.enumeration.MenulistKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
+import com.fnc.order.android.enumeration.aItemlistKey;
+import com.fnc.order.android.enumeration.aStaffsKey;
+import com.fnc.order.android.model.aBranchlist;
+import com.fnc.order.android.model.aItemlist;
+import com.fnc.order.android.model.aStaffs;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+public class DcBranchlist extends DBHelper {
+
+    private Context context;
+    private static DcBranchlist instance;
+
+    public static DcBranchlist getInstance(Context context) {
+        if (instance == null) {
+            instance = new DcBranchlist(context);
+        }
+        return instance;
+    }
+
+    public DcBranchlist(Context context) {
+        super(context);
+        this.context = context;
+    }
+
+    public void emptyBranchlist() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(Table.BRANCHLIST.getName(), null, null);
+        db.close();
+    }
+
+    public void insertBranches(aBranchlist bl) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues value = aBranchlistQueryBuilder.prepareaBranchlistInsertValues(bl, context);
+        db.insertWithOnConflict(Table.BRANCHLIST.getName(), null, value, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
+    public LinkedList<aBranchlist> getBranchlist() {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName();
+        Cursor c = db.rawQuery(strQry, null);
+        LinkedList<aBranchlist> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setBranchlist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    public ArrayList<String> getDescriptions() {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT " + aBranchlistKey.DESCRIPTION.getKey()
+                + "  FROM " + Table.BRANCHLIST.getName()
+                + " GROUP BY " + aBranchlistKey.DESCRIPTION.getKey()
+                + " ORDER BY " + aBranchlistKey.DESCRIPTION.getKey() + " ASC";
+        Cursor c = db.rawQuery(strQry, null);
+        ArrayList<String> stringBranches = new ArrayList<String>();
+        while (c.moveToNext()) {
+            if (Character.isLetter(c.getString(0).charAt(0))) {
+                stringBranches.add(c.getString(0));
+            }
+        }
+        c.close();
+        db.close();
+        return stringBranches;
+    }
+
+    public LinkedList<aBranchlist> searchBranch(String searchStr, String strImei) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName()
+                + " WHERE " + aBranchlistKey.DESCRIPTION.getKey() + " = '" + searchStr + "'"
+                + " AND " + aBranchlistKey.DEVICEID.getKey() + " = '" + strImei + "'";
+        Cursor c = db.rawQuery(strQry, null);
+        LinkedList<aBranchlist> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setBranchlist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    private aBranchlist setBranchlist(Cursor c) {
+        aBranchlist bl = new aBranchlist(
+            c.getInt(c.getColumnIndex(aBranchlistKey.BRANCHID.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.BRANCHCODE.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.DEVICEID.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.DESCRIPTION.getKey()))
+        );
+        return bl;
+    }
+}

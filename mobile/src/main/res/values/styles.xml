@@ -285,5 +285,12 @@
         <item name="android:textColor">@color/white_1</item>
     </style>
 
+    <style name="spinnerDropdown">
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:textColor">@color/gray_8</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
 
 </resources>

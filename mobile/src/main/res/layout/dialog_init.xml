@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
@@ -52,109 +52,122 @@
                 android:textSize="17sp" />
 
             <LinearLayout
-                android:paddingBottom="5dp"
+                android:id="@+id/ll_signin_box"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/tv_label1"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:text="Domain :"
-                    android:textColor="@color/gray_6"
-                    android:fontFamily="@font/medium"
-                    android:textSize="16sp" />
-                <EditText
-                    android:id="@+id/et_edittext1"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:paddingBottom="5dp"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_alignParentRight="true"
-                    android:background="@drawable/background_round_border_inner"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:gravity="center|left"
-                    android:imeOptions="actionNext"
-                    android:inputType="text"
-                    android:maxLines="2"
-                    android:paddingLeft="7dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tv_label1"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:text="Domain :"
+                        android:textColor="@color/gray_6"
+                        android:fontFamily="@font/medium"
+                        android:textSize="16sp" />
+                    <EditText
+                        android:id="@+id/et_edittext1"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
+                        android:background="@drawable/background_round_border_inner"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:gravity="center|left"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:maxLines="2"
+                        android:paddingLeft="7dp"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/brown_5"
+                        android:textColorHint="@color/gray_4"
+                        android:fontFamily="@font/regular"
+                        android:textSize="17sp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:paddingBottom="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tv_label2"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:text="Connection :"
+                        android:textColor="@color/gray_6"
+                        android:fontFamily="@font/medium"
+                        android:textSize="16sp" />
+                    <EditText
+                        android:id="@+id/et_edittext2"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_alignParentRight="true"
+                        android:background="@drawable/background_round_border_inner"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:gravity="center|left"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:maxLines="2"
+                        android:paddingLeft="7dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/brown_5"
+                        android:textColorHint="@color/gray_4"
+                        android:fontFamily="@font/regular"
+                        android:textSize="17sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_branch_box"
+                android:layout_height="44dp"
+                android:layout_width="match_parent"
+                android:orientation="horizontal">
+                <LinearLayout
                     android:paddingTop="0dp"
-                    android:paddingBottom="0dp"
-                    android:paddingRight="5dp"
-                    android:textColor="@color/brown_5"
-                    android:textColorHint="@color/gray_4"
-                    android:fontFamily="@font/regular"
-                    android:textSize="17sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:paddingBottom="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/tv_label2"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:text="Connection :"
-                    android:textColor="@color/gray_6"
-                    android:fontFamily="@font/medium"
-                    android:textSize="16sp" />
-                <EditText
-                    android:id="@+id/et_edittext2"
+                    android:background="@drawable/background_green_3_border"
+                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_alignParentRight="true"
-                    android:background="@drawable/background_round_border_inner"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:gravity="center|left"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
-                    android:maxLines="2"
-                    android:paddingLeft="7dp"
-                    android:paddingRight="5dp"
-                    android:textColor="@color/brown_5"
-                    android:textColorHint="@color/gray_4"
-                    android:fontFamily="@font/regular"
-                    android:textSize="17sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="1dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/tv_label3"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:text="Connection :"
-                    android:textColor="@color/gray_6"
-                    android:fontFamily="@font/medium"
-                    android:textSize="16sp" />
-                <EditText
-                    android:id="@+id/et_edittext3"
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_alignParentRight="true"
-                    android:background="@drawable/background_round_border_inner"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:gravity="center|left"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
-                    android:maxLines="2"
-                    android:paddingLeft="7dp"
-                    android:paddingRight="5dp"
-                    android:textColor="@color/brown_5"
-                    android:textColorHint="@color/gray_4"
-                    android:fontFamily="@font/regular"
-                    android:textSize="17sp" />
+                    android:layout_weight="1">
+                    <com.tiper.MaterialSpinner
+                        android:background="@null"
+                        app:spinnerMode="dialog"
+                        android:layout_height="53dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="-10dp"
+                        android:paddingTop="0dp"
+                        android:id="@+id/ms_branches"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="3dp"
+                    style="@style/btnTransparentStyleSmallWrap">
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:id="@+id/mrl_reload"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="3dp">
+                        <Button
+                            android:backgroundTint="@color/white"
+                            android:background="@drawable/sharp_refresh_24"
+                            android:id="@+id/btn_refresh"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                    </com.balysv.materialripple.MaterialRippleLayout>
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

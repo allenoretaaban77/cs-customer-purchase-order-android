@@ -15,24 +15,31 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
+import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.R;
+import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.api.core.NanoClock;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
@@ -42,6 +49,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.tiper.MaterialSpinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +57,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -122,6 +133,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 
     private void startProcedure() {
         String strCN = sp.getData(SharedKey.DATABASE.getKey());
+//        strCN = "";
         if(strCN.equals("")) {
             if (Helper.isNetworkAvailable(this)) {
                 alertDialog = actionDialog( ctx, "APP START-UP",
@@ -131,10 +143,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         public void onClick(View v) {
                             clientSignin();
                         }
-                    }, "", null
+                    }, "", null, 0
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -145,10 +159,98 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         } else {
             String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
             if (strImeiId.equals("")) {
-                new requestToRegImei().execute(Helper.getImei(ctx));
+                getDeviceProfile("init");
+//                new requestToRegImei().execute(Helper.getImei(ctx));
             } else {
                 proceedNormal();
             }
+        }
+    }
+
+    private MaterialSpinner msBranches;
+    private AlertDialog alertdialogBL;
+    private void showDisplayBranchDialog(String type) {
+        if (type.equals("init")) {
+            final VolleyInteractor vipr = new VolleyInteractor(); vipr.registerCallback(this);
+
+            alertdialogBL = actionDialog( ctx, "ASSIGN BRANCH",
+                "Please select branch.",
+                "Username", "Password", "Branch",
+                "SUBMIT", new View.OnClickListener() {
+                    public void onClick(View v) {
+                        msBranches = alertdialogBL.findViewById(R.id.ms_branches);
+                        String selectedBranch = String.valueOf(msBranches.getSelectedItem());
+                        LinkedList<aBranchlist> abl =
+                            DcBranchlist.getInstance(ctx).searchBranch(selectedBranch, Helper.getImei(ctx));
+                        if (abl.size() > 0) {
+                            for (int i = 0; i < abl.size(); i++) {
+                                aBranchlist ab = abl.get(i);
+                                if(ab.getDeviceid().equals(Helper.getImei(ctx))) {
+                                    loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+                                    sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
+                                    sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
+                                    sp.saveData(SharedKey.BRANCH_CODE.getKey(), ab.getBranchcode());
+                                    sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ab.getDescription());
+                                }
+                            }
+                            HashMap<String, String> params = new HashMap<>();
+                            params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+                            params.put("branchid", sp.getData(SharedKey.BRANCH_ID.getKey()));
+                            Iterator it = params.entrySet().iterator();
+                            String strParams = "";
+                            while (it.hasNext()) {
+                                Map.Entry pair = (Map.Entry) it.next();
+                                strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+                                it.remove();
+                            }
+                            vipr.getPreRequisite(getApplicationContext(), params,
+                                    strParams.replaceAll(" ", "%20"));
+                        } else {
+                            BounceView.addAnimTo( Helper.okDialog( ctx,
+                                "Initialization Failed","Branch selected does not matches to this device. Please select correct branch or contact IT support.",
+                                "CLOSE",
+                                null, false) );
+                        }
+                    }
+                }, "", null, 1
+            );
+
+            loadSpinnerBranches();
+
+            MaterialRippleLayout mlrReload = (MaterialRippleLayout) alertdialogBL.findViewById(R.id.mrl_reload);
+            mlrReload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getDeviceProfile("reload");
+                }
+            });
+
+            alertdialogBL.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+            alertdialogBL.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            BounceView.addAnimTo(alertdialogBL);
+            Helper.dismissSpinnerDialog(loader);
+        } else {
+            loadSpinnerBranches();
+        }
+    }
+
+    private void loadSpinnerBranches() {
+        if(alertdialogBL != null) {
+            msBranches = (MaterialSpinner) alertdialogBL.findViewById(R.id.ms_branches);
+            ArrayList<String> arrBranches = DcBranchlist.getInstance(ctx).getDescriptions();
+            ArrayAdapter<String> sadapter = new ArrayAdapter<String>(ctx, R.layout.item_spinner, arrBranches) {
+                @Override
+                public boolean isEnabled(int position) {
+                    return true;
+                }
+                @Override
+                public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                    parent.setBackgroundResource(R.color.transparent);
+                    View view = super.getDropDownView(position, convertView, parent);
+                    return view;
+                }
+            };
+            msBranches.setAdapter(sadapter);
         }
     }
 
@@ -158,8 +260,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         protected String doInBackground(String... params) {
             String strImei = params[0].replace("\r\n", ""),
                 strCn = sp.getData(SharedKey.DATABASE.getKey()),
-                strRefBranch = sp.getData(SharedKey.DUMMY_BRANCH_ID.getKey()),
-                strContents = "";
+                strRefBranch = "", strContents = "";
             try {
                 InputStream ins = getResources().openRawResource(
                         getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw",ctx.getPackageName()));
@@ -189,7 +290,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         protected void onPostExecute(String result) {
             Log.d("gcp",  result);
             String[] resMsg = result.split(":");
-            getDeviceProfile();
             if (resMsg[0].equals("Success")) { } else { }
         }
         @Override
@@ -202,11 +302,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
     }
 
-    private void getDeviceProfile() {
+    private void getDeviceProfile(String type) {
         if (Helper.isNetworkAvailable(this)) {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
-            params.put("deviceid", Helper.getImei(ctx));
+            params.put("deviceid", "n/a");
+//            params.put("deviceid", Helper.getImei(ctx));
 //            params.put("deviceid", "353800100112222"); // timog
             Iterator it = params.entrySet().iterator();
             String strParams = "";
@@ -218,7 +319,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             VolleyInteractor vidp = new VolleyInteractor();
             vidp.registerCallback(this);
             vidp.getDeviceProfile(getApplicationContext(), params, strParams
-                    .replaceAll(" ", "%20"));
+                    .replaceAll(" ", "%20"), type);
         } else {
             alertRequireInternet();
         }
@@ -254,7 +355,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         String strUsername = ((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString();
         String strPassword = ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString();
 //        strUsername = "admin@backoffice.com"; strPassword = "admin123";
-        String strBranch = ((EditText) alertDialog.findViewById(R.id.et_edittext3)).getText().toString();
+//        String strBranch = ((EditText) alertDialog.findViewById(R.id.et_edittext3)).getText().toString();
 
         if(strUsername.matches("")){
             BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -266,12 +367,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 "Error","Please enter password.", "CLOSE",
                 null, false) ); return;
         }
-        if(strBranch.matches("")){
-            BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Error","Please enter branch name.", "CLOSE",
-                null, false) ); return;
-        }
-        sp.saveData(SharedKey.DUMMY_BRANCH_ID.getKey(), strBranch);
 
         loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
         HashMap<String, String> params = new HashMap<>();
@@ -313,12 +408,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         super.onStop();
     }
 
-    public void onRequestSuccess(final String response, String type) {
+    public void onRequestSuccess(final String response, final String type) {
         if (type.equals("login")) {
             try {
-                Helper.dismissSpinnerDialog(loader);
                 JSONObject obj = new JSONObject(response);
                 if (obj.getString("dtcompany").equals("[]")) {
+                    Helper.dismissSpinnerDialog(loader);
                     BounceView.addAnimTo( Helper.okDialog( ctx,
                         "Initialization Error","Invalid credentials",
                         "CLOSE", new DialogInterface.OnClickListener() {
@@ -331,6 +426,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                     JSONArray objArr = new JSONArray(obj.getString("dtcompany").toString());
                     JSONObject objx = new JSONObject(objArr.get(0).toString());
                     if (objx.getString("DatabaseID").equals("")) {
+                        Helper.dismissSpinnerDialog(loader);
                         BounceView.addAnimTo( Helper.okDialog( ctx,
                             "Initialization Error","Invalid credentials",
                             "CLOSE", new DialogInterface.OnClickListener() {
@@ -356,7 +452,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         sp.saveData(SharedKey.DATABASE.getKey(), strCN);
                         String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
                         if (strImeiId.equals("")) {
-                            new requestToRegImei().execute(Helper.getImei(ctx));
+                            getDeviceProfile("init");
+//                            new requestToRegImei().execute(Helper.getImei(ctx));
                         } else {
                             proceedNormal();
                         }
@@ -375,7 +472,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         }, false) );
             }
         }
-        if (type.equals("getdeviceprofile")) {
+        if (type.contains("getdeviceprofile|")) {
             if (response.equals("[]")) {
                 BounceView.addAnimTo( Helper.okDialog( ctx,
                     "Unrecognized Device",  getString(R.string.unrecognized_device),
@@ -386,33 +483,31 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         }
                     }, false) );
             } else {
-                loader = Helper.showSpinnerDialog(ctx, "", "Syncing Data... Please wait..."); loader.show();
+//                loader = Helper.showSpinnerDialog(ctx, "", "Syncing Data... Please wait..."); loader.show();
 
-                final VolleyInteractor vipr = new VolleyInteractor();
-                vipr.registerCallback(this);
+//                final VolleyInteractor vipr = new VolleyInteractor();
+//                vipr.registerCallback(this);
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             JSONArray objArr = new JSONArray(response);
-                            JSONObject obj = new JSONObject(objArr.get(0).toString());
-                            sp.saveData(SharedKey.IMEI_ID.getKey(), obj.getString("deviceid"));
-                            sp.saveData(SharedKey.BRANCH_ID.getKey(), obj.getString("branchid"));
-                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), obj.getString("branchcode"));
-                            sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), obj.getString("description"));
-
-                            HashMap<String, String> params = new HashMap<>();
-                            params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
-                            params.put("branchid", obj.getString("branchid"));
-                            Iterator it = params.entrySet().iterator();
-                            String strParams = "";
-                            while (it.hasNext()) {
-                                Map.Entry pair = (Map.Entry) it.next();
-                                strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
-                                it.remove();
+                            if (objArr.length() > 0) {
+                                DcBranchlist.getInstance(ctx).emptyBranchlist();
+                                for (int i = 0; i < objArr.length(); i++) {
+                                    JSONObject rowObj = objArr.getJSONObject(i);
+                                    aBranchlist br = new aBranchlist(
+                                        rowObj.getInt("branchid"),
+                                        rowObj.getString("branchcode").trim(),
+                                        rowObj.getString("deviceid"),
+                                        rowObj.getString("description").trim()
+                                    );
+                                    DcBranchlist.getInstance(ctx).insertBranches(br);
+                                }
                             }
-                            vipr.getPreRequisite(getApplicationContext(), params, strParams.replaceAll(" ", "%20"));
+                            String[] strRef = type.split("\\|");
+                            showDisplayBranchDialog(strRef[1]);
                         } catch (JSONException e) {
                             Helper.dismissSpinnerDialog(loader);
                             BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -517,7 +612,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     private AlertDialog actionDialog(final Context activity, String title, String message,
         String strLabel1, String strLabel2, String strLabel3, String okButtonCaption,
         View.OnClickListener onClickListener, String cancelButtonCaption,
-        View.OnClickListener cancelClickListener) {
+        View.OnClickListener cancelClickListener, Integer flagType) {
 
         SharedData spx = SharedData.getInstance(this);
 
@@ -529,11 +624,18 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 
         ((TextView) layout.findViewById(R.id.tv_label1)).setText(strLabel1);
         ((TextView) layout.findViewById(R.id.tv_label2)).setText(strLabel2);
-        ((TextView) layout.findViewById(R.id.tv_label3)).setText(strLabel3);
 
         Button btnOK = (Button) layout.findViewById(R.id.btn_update);
         btnOK.setText(okButtonCaption);
         btnOK.setOnClickListener(onClickListener);
+
+        if(flagType == 1) {
+            ((LinearLayout) layout.findViewById(R.id.ll_signin_box)).setVisibility(View.GONE);
+            ((LinearLayout) layout.findViewById(R.id.ll_branch_box)).setVisibility(View.VISIBLE);
+        } else {
+            ((LinearLayout) layout.findViewById(R.id.ll_branch_box)).setVisibility(View.GONE);
+            ((LinearLayout) layout.findViewById(R.id.ll_signin_box)).setVisibility(View.VISIBLE);
+        }
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
         builder.setView(layout);
