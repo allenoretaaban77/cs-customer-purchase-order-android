@@ -206,9 +206,33 @@
 
         </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_add_user"
             android:layout_height="40dp"
             android:layout_marginTop="-40dp"
+            android:layout_marginBottom="45dp"
+            android:layout_gravity="bottom"
+            style="@style/btnTransparentStyle">
+            <com.balysv.materialripple.MaterialRippleLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <Button
+                    android:textSize="20sp"
+                    android:fontFamily="@font/medium"
+                    android:background="@android:color/transparent"
+                    android:id="@+id/btn_add_user"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="ADD USER"
+                    android:textColor="@color/white"
+                    android:textAllCaps="false"/>
+            </com.balysv.materialripple.MaterialRippleLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="-40dp"
+            android:layout_height="40dp"
             android:layout_gravity="bottom"
             style="@style/btnTransparentStyle">
             <com.balysv.materialripple.MaterialRippleLayout
@@ -225,7 +249,7 @@
                     android:textColor="@color/white"
                     android:textAllCaps="false"/>
             </com.balysv.materialripple.MaterialRippleLayout>
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

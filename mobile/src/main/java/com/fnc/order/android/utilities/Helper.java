@@ -355,6 +355,14 @@ public class Helper {
         }
     }
 
+    public static int getDialogWidthSignup(Context ctx) {
+        if (Helper.getScreenDimension(ctx, "w") >= 1200) {
+            return 1100;
+        } else {
+            return 700;
+        }
+    }
+
     public static int getDialogWidth(Context ctx) {
         if (Helper.getScreenDimension(ctx, "w") >= 1200) {
             return 800;
@@ -377,6 +385,7 @@ public class Helper {
 
 
     public static String getImei(Context ctx) {
+//        return "12345";
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             return getImeiNew(ctx);
         } else {

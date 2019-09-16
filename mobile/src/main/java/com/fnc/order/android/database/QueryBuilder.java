@@ -6,6 +6,7 @@ import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.UserslistKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.enumeration.aStaffsKey;
 
@@ -38,6 +39,8 @@ public class QueryBuilder {
             fieldName = ((aItemlistKey)field).getKey();
         if(field instanceof aStaffsKey)
             fieldName = ((aStaffsKey)field).getKey();
+        if(field instanceof aBranchlistKey)
+            fieldName = ((aBranchlistKey)field).getKey();
         return fieldName;
     }
 
@@ -55,6 +58,8 @@ public class QueryBuilder {
             dataType = ((aItemlistKey)field).getDataType();
         if(field instanceof aStaffsKey)
             dataType = ((aStaffsKey)field).getDataType();
+        if(field instanceof aBranchlistKey)
+            dataType = ((aBranchlistKey)field).getDataType();
         return dataType;
     }
 

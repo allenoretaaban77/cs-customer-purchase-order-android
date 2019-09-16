@@ -13,7 +13,8 @@ public enum Table {
     CHECKLIST_BU("checklists_backup"),
     CUSTOMERLIST("customerlists"),
     A_ITEMLIST("aitemlist"),
-    STAFFS("aStaffs");
+    STAFFS("aStaffs"),
+    BRANCHLIST("abranchlist");
 
     private String name;
 

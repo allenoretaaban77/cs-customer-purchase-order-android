@@ -14,6 +14,8 @@ public enum API {
     POST_UPDATE_EMPLOYEE("api/updateRefEmployeeID"),
     POST_ORDER("api/PostCOrder"),
     GET_DEVICE_PROFILE("api/getCoDeviceProfile"),
+    GET_ADMIN_GROUPINGS("api/getCoAdminGroupings"),
+    POST_BRANCH_SIGNUP("api/postCoBranchSignUp"),
     GET_PRE_REQUISITE("api/getCoPreReq"),
 
     POST_LOADSTATE("api/PostChecklistLoadedState"),

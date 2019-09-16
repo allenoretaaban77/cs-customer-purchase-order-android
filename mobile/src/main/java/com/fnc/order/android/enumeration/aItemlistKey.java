@@ -3,7 +3,6 @@ package com.fnc.order.android.enumeration;
 import com.fnc.order.android.database.DataType;
 
 public enum aItemlistKey {
-
     INTEGRATION_RECID("integration_recid", DataType.TEXT),
     RECID("recid", DataType.TEXT),
     OLD_SKU("old_sku", DataType.TEXT),
@@ -39,7 +38,6 @@ public enum aItemlistKey {
     public String getKey() {
         return key;
     }
-
     public String getDataType() {
         return dataType;
     }

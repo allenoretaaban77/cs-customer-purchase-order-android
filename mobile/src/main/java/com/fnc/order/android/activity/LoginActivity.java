@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 import com.andreabaccega.widget.FormEditText;
@@ -43,6 +45,7 @@ import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Userslist;
+import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.VolleyInteractor;
@@ -55,6 +58,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,7 +89,7 @@ public class LoginActivity extends BaseActivity {
     private RelativeLayout relPassword;
     private Context ctx;
     private Boolean isSubmit = false;
-    private AlertDialog alertDialog;
+    private AlertDialog alertDialog, alertDialogUser;
     private RequestQueue requestQueue;
     private SharedData sp;
     private VolleyCallback callback;
@@ -98,17 +102,20 @@ public class LoginActivity extends BaseActivity {
 
         ctx = this;
         loader = Helper.buildSpinnerDialog(ctx);
+        sp = SharedData.getInstance(this);
 
         initViews();
         initListeners();
+
+//        addUser();
+        refreshUsers();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        super.onResume();
 
-        SharedData sp = SharedData.getInstance(this);
+        sp = SharedData.getInstance(this);
         sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
         sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
 
@@ -236,7 +243,7 @@ public class LoginActivity extends BaseActivity {
                                 alertDialog = actionDialog(ctx, "SETTINGS",
                                         "Customize settings per client as required",
                                         "Server", "Database",
-                                        "UPATE", new View.OnClickListener() {
+                                        "UPDATE", new View.OnClickListener() {
                                             public void onClick(View v) {
                                                 LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
                                                 EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
@@ -258,9 +265,9 @@ public class LoginActivity extends BaseActivity {
                                                 DcMenulist.getInstance(ctx).emptyMenulist();
                                             }
                                         },
-                                        "Cancel", new View.OnClickListener() {
+                                        "ADD USER", new View.OnClickListener() {
                                             public void onClick(View v) {
-                                                alertDialog.dismiss();
+                                                addUser();
                                             }
                                         },1);
 
@@ -282,6 +289,9 @@ public class LoginActivity extends BaseActivity {
                                 Switch sw_saveitems = (Switch) alertDialog.findViewById(R.id.sw_saveitems);
                                 sw_saveitems.setChecked(spx.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1 ? true : false);
 
+                                LinearLayout ll_add_user = (LinearLayout) alertDialog.findViewById(R.id.ll_add_user);
+                                ll_add_user.setVisibility(View.VISIBLE);
+
                                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                                 BounceView.addAnimTo(alertDialog);
@@ -300,6 +310,9 @@ public class LoginActivity extends BaseActivity {
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+                LinearLayout ll_add_user = (LinearLayout) alertDialog.findViewById(R.id.ll_add_user);
+                ll_add_user.setVisibility(View.GONE);
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -593,42 +606,6 @@ public class LoginActivity extends BaseActivity {
         }
     };
 
-    /* private AlertDialog okCancelInputDialogBuilder(final Context activity, String message,
-                                                   String okButtonCaption, View.OnClickListener onClickListener,
-                                                   String cancelButtonCaption, View.OnClickListener cancelClickListener) {
-
-        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.custom_ok_input_dialog_default, null);
-        TextView tvMessage = (TextView) layout.findViewById(R.id.tvMessage);
-        tvMessage.setText(message);
-        tvMessage.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        final EditText etText = (EditText) layout.findViewById(R.id.et_inputtext);
-
-        Button btnOK = (Button) layout.findViewById(R.id.btnOk);
-        btnOK.setText(okButtonCaption);
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(!etText.getText().toString().trim().equals("")) {
-                    alertDialog.dismiss();
-                    updateEmployeeId(etText.getText().toString().trim());
-                }else{
-                    dismissSpinnerDialog();
-                    Toast.makeText(activity, "Please input employee id.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        Button btnCancel = (Button) layout.findViewById(R.id.btnCancel);
-        btnCancel.setText(cancelButtonCaption);
-        btnCancel.setOnClickListener(cancelClickListener);
-
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
-        builder.setView(layout);
-        builder.create();
-        builder.setCancelable(false);
-        return builder.show();
-    } */
-
     private AlertDialog actionDialog(final Context activity, String title, String message,
         String strLabel, String strLabel2, String okButtonCaption, View.OnClickListener onClickListener,
         String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer typeFlag) {
@@ -653,6 +630,10 @@ public class LoginActivity extends BaseActivity {
         btnOK.setText(okButtonCaption);
         btnOK.setOnClickListener(onClickListener);
 
+        Button btnAdduser = (Button) layout.findViewById(R.id.btn_add_user);
+        btnAdduser.setText(cancelButtonCaption);
+        btnAdduser.setOnClickListener(cancelClickListener);
+
         MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -665,6 +646,274 @@ public class LoginActivity extends BaseActivity {
         builder.create();
         builder.setCancelable(false);
         return builder.show();
+    }
+
+    private AlertDialog addUserDialog(final Context activity) {
+
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.dialog_add_user, null);
+
+        MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                alertDialogUser.dismiss();
+            }
+        });
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
+        builder.setView(layout);
+        builder.create();
+        builder.setCancelable(false);
+        return builder.show();
+    }
+
+    private Spinner btnAddJobTitle;
+    private FormEditText et_jobtitle;
+    private EditText et_jobtitle_id;
+    private ArrayAdapter<aAdminGroupings> spinneradapter;
+    private void addUser() {
+        alertDialogUser = addUserDialog(ctx);
+        et_jobtitle = (FormEditText) alertDialogUser.findViewById(R.id.et_jobtitle);
+        et_jobtitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnAddJobTitle.performClick();
+            }
+        });
+        et_jobtitle_id = (EditText) alertDialogUser.findViewById(R.id.et_jobtitle_id);
+        btnAddJobTitle = (Spinner) alertDialogUser.findViewById(R.id.btnAddJobTitle);
+
+        Button btnSubmit = (Button) alertDialogUser.findViewById(R.id.btn_submit);
+        btnSubmit.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FormEditText et_employeeno = (FormEditText) alertDialogUser.findViewById(R.id.et_employeeno);
+                FormEditText et_firstname = (FormEditText) alertDialogUser.findViewById(R.id.et_firstname);
+                FormEditText et_middlename = (FormEditText) alertDialogUser.findViewById(R.id.et_middlename);
+                FormEditText et_lastname = (FormEditText) alertDialogUser.findViewById(R.id.et_lastname);
+                FormEditText et_password = (FormEditText) alertDialogUser.findViewById(R.id.et_password);
+                FormEditText et_repeatpassword = (FormEditText) alertDialogUser.findViewById(R.id.et_repeatpassword);
+
+                if (et_employeeno.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid employee number.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_firstname.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid first name.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_middlename.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid middle name.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_lastname.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid last name.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_jobtitle_id.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Please select job title.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_password.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_repeatpassword.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (!et_repeatpassword.getText().toString().trim().equals(et_password.getText().toString().trim())) {
+                    Toast.makeText(ctx, "Psssword does not match.", Toast.LENGTH_SHORT).show(); return;
+                }
+
+                loader = Helper.showSpinnerDialog(ctx, "Signing-Up", "Please wait..."); loader.show();
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("cnstr", sp.getData(SharedKey.DATABASE.getKey()));
+                params.put("empNo", et_employeeno.getText().toString().trim());
+                params.put("email", "");
+                params.put("pass", et_password.getText().toString().trim());
+                params.put("fname", et_firstname.getText().toString().trim());
+                params.put("mname", et_middlename.getText().toString().trim());
+                params.put("lname", et_lastname.getText().toString().trim());
+                params.put("branch", sp.getData(SharedKey.BRANCH_ID.getKey()));
+                params.put("jobtitle", et_jobtitle_id.getText().toString().trim());
+                Iterator it = params.entrySet().iterator();
+                String strParams = "";
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                    it.remove();
+                }
+
+                final VolleyInteractor vidp = new VolleyInteractor();
+                vidp.registerCallback(new VolleyCallback() {
+                    @Override
+                    public void onRequestSuccess(final String response, String type) {
+                        try {
+                            JSONArray objArr = new JSONArray(response);
+                            JSONObject obj = new JSONObject(objArr.get(0).toString());
+                            if (obj.getString("error").equals("true")) {
+                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.d("DSX signup success", response);
+                                Toast.makeText(ctx, "User successfully added!", Toast.LENGTH_SHORT).show();
+                                refreshUsers();
+                                alertDialogUser.dismiss();
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onRequestFail(VolleyError response, String type) {
+                        Log.d("DSX signup success: ", String.valueOf(response.getMessage()));
+                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Log.d("dsx", strParams);
+                vidp.postBranchSignUp(getApplicationContext(), params, strParams.replaceAll(" ", "%20"));
+            }
+        });
+
+        alertDialogUser.getWindow().setLayout(Helper.getDialogWidthSignup(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        alertDialogUser.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        BounceView.addAnimTo(alertDialog);
+
+        VolleyInteractor viag = new VolleyInteractor();
+        viag.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(String response, String type) {
+                try {
+                    response = response.replace("\r\n ", "");
+                    Log.d("DSX post response: ", response);
+                    JSONArray objArr = new JSONArray(response);
+                    final ArrayList<aAdminGroupings> sl = new ArrayList<>();
+                    if(objArr.length() > 0) {
+                        aAdminGroupings cjt = new aAdminGroupings();
+                        cjt.setRecid(0);
+                        cjt.setCode("0");
+                        cjt.setDescription("Select Job Title:");
+                        cjt.setDeleted("false");
+                        sl.add(cjt);
+                        for (int ix = 0; ix < objArr.length(); ix++) {
+                            JSONObject rowObj = objArr.getJSONObject(ix);
+                            cjt = new aAdminGroupings();
+                            cjt.setRecid(rowObj.getInt("recid"));
+                            cjt.setCode(rowObj.getString("code"));
+                            cjt.setDescription(rowObj.getString("Description"));
+                            cjt.setDeleted(rowObj.getString("deleted"));
+                            sl.add(cjt);
+                        }
+                        spinneradapter = new ArrayAdapter<aAdminGroupings>(ctx, android.R.layout.simple_spinner_dropdown_item, sl) {
+                            @Override
+                            public boolean isEnabled(int position) {
+                                if(position == 0) { return false; }
+                                else { return true; }
+                            }
+                            @Override
+                            public View getDropDownView(int pos, View cv, ViewGroup prnt) {
+                                View view = super.getDropDownView(pos, cv, prnt);
+                                TextView tv = (TextView) view;
+                                if(pos == 0){ tv.setTextColor(Color.GRAY);  }
+                                else { tv.setTextColor(Color.GRAY); }
+                                tv.setText(sl.get(pos).getDescription());
+                                return view;
+                            }
+                        };
+                        btnAddJobTitle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
+                                if (pos != 0) {
+                                    et_jobtitle.setText(sl.get(pos).getDescription());
+                                    et_jobtitle_id.setText(sl.get(pos).getRecid().toString());
+                                }
+                            }
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) { }
+                        });
+                        btnAddJobTitle.setAdapter(spinneradapter);
+                    } else {
+                        Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onRequestFail(VolleyError response, String type) {
+                Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // load admin positions
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+        params.put("type", "5");
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+            it.remove();
+        }
+        viag.getAdminGroupings(ctx, params, strParams.replaceAll(" ", "%20"));
+    }
+
+    private void refreshUsers() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final VolleyInteractor vipr = new VolleyInteractor();
+                vipr.registerCallback(new VolleyCallback() {
+                    @Override
+                    public void onRequestSuccess(final String response, String type) {
+                        Helper.dismissSpinnerDialog(loader);
+                        Log.d("dsxs getuser", response);
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            if (obj.length() > 0) {
+                                JSONArray sArr = obj.getJSONArray("staff");
+                                if (sArr.length() > 0) {
+                                    DcStaffs.getInstance(ctx).emptyStaffslist();
+                                    DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add main
+                                    for (int i = 0; i < sArr.length(); i++) {
+                                        JSONObject rowObj = sArr.getJSONObject(i);
+                                        aStaffs sl = new aStaffs(
+                                            rowObj.getInt("empId"),
+                                            rowObj.getString("refempno").equals("null") ? -1 : rowObj.getInt("refempno"),
+                                            rowObj.getString("empNo"),
+                                            rowObj.getString("Email"),
+                                            rowObj.getString("name"),
+                                            rowObj.getInt("Branch"),
+                                            rowObj.getInt("Jobtitle"),
+                                            rowObj.getString("pass"),
+                                            rowObj.getString("active")
+                                        );
+                                        DcStaffs.getInstance(ctx).insertStaffs(sl);
+                                    }
+                                }
+                            } else {
+                                Log.d("dsxe getuser", response);
+//                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            Log.d("dsxe getuser", response);
+//                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onRequestFail(VolleyError response, String type) {
+                        Log.d("dsxe getuser", String.valueOf(response));
+//                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                HashMap<String, String> params = new HashMap<>();
+                params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+                params.put("branchid", sp.getData(SharedKey.BRANCH_ID.getKey()));
+                Iterator it = params.entrySet().iterator();
+                String strParams = "";
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+                    it.remove();
+                }
+                vipr.getPreRequisite(getApplicationContext(), params, strParams.replaceAll(" ", "%20"));
+            }
+        }, 500);
     }
 }
 
