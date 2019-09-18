@@ -6,7 +6,9 @@ public enum aBranchlistKey {
     BRANCHID("branchid",DataType.INTEGER),
     BRANCHCODE( "branchcode", DataType.TEXT),
     DEVICEID("deviceid", DataType.TEXT),
-    DESCRIPTION("description", DataType.TEXT);
+    DESCRIPTION("description", DataType.TEXT),
+    DEVICEID1("deviceID1", DataType.TEXT),
+    ACTIVE("active", DataType.TEXT);
 
     private String key;
     private String dataType;

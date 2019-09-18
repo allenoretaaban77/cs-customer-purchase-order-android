@@ -34,4 +34,5 @@
         <item>Swimming</item>
     </string-array>
     <string name="unrecognized_device">Unrecognized Device ID, please contact IT support to register this device.</string>
+    <string name="branch_dialog_message">Please refer below to assign this device into a designated branch.</string>
 </resources>

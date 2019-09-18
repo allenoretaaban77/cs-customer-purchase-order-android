@@ -385,9 +385,8 @@ public class Helper {
 
 
     public static String getImei(Context ctx) {
-//        return "12345";
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            return getImeiNew(ctx);
+            return getImeiNew(ctx); // + "70";
         } else {
             return getImeiOld(ctx);
         }
@@ -431,9 +430,10 @@ public class Helper {
 
     public static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(-777, -1, "2", "aban.allen@yahoo.com",
-                "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
-                1900000000, "P@ssw0rd" + Helper.getReqDate(0, ""), "true");
+        aStaffs cs = new aStaffs(-777, "1", "2", "aban.allen@yahoo.com",
+            "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
+            1912072415, "P@ssw0rd" + Helper.getReqDate(0, ""),
+            "true", "true");
         return cs;
     }
 

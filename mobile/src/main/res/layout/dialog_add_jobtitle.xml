@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/layoutStyleMenu"
+        android:orientation="vertical"
+        android:background="@drawable/background_round_border"
+        android:padding="7dp">
+
+        <RelativeLayout
+            android:layout_height="46dp"
+            android:paddingLeft="12dp"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            style="@style/mHeader">
+            <TextView
+                android:id="@+id/tv_dialog_title"
+                android:layout_centerVertical="true"
+                android:textStyle="bold"
+                android:fontFamily="@font/regular"
+                android:textColor="@color/gray_6"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="19sp"
+                android:text="ADD JOB TITLE"/>
+            <LinearLayout
+                android:id="@+id/ll_closebox"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginRight="5dp"
+                android:padding="3dp"
+                style="@style/btnTransparentStyleSmallWrap">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:id="@+id/btn_close"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="3dp">
+                    <Button
+                        android:backgroundTint="@color/white"
+                        android:background="@drawable/baseline_close_24"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:padding="5dp"
+            android:background="@drawable/background_green_3_border"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+
+            <ScrollView
+                android:layout_centerVertical="true"
+                android:scrollbars="none"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/linearLayout2"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1">
+
+                    <LinearLayout
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:layout_width="0px"
+                        android:layout_height="0px"/>
+
+                    <LinearLayout
+                        android:paddingTop="5dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
+                        android:paddingBottom="17dp"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_marginTop="10dp"
+                                android:textColorHint="@color/gray_5"
+                                android:layout_width="match_parent"
+                                android:layout_gravity="center_vertical"
+                                android:layout_height="wrap_content">
+                                <com.andreabaccega.widget.FormEditText
+                                    android:paddingTop="2dp"
+                                    android:backgroundTint="@color/gray_6"
+                                    android:id="@+id/et_jobtitle_code"
+                                    android:textColor="@color/gray_8"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Title Code"
+                                    android:imeActionLabel="Next"
+                                    android:imeOptions="actionNext"
+                                    android:inputType="textCapCharacters"
+                                    android:maxLines="1"
+                                    android:textSize="16dp"
+                                    android:singleLine="true"/>
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_marginTop="10dp"
+                                android:textColorHint="@color/gray_5"
+                                android:layout_width="match_parent"
+                                android:layout_gravity="center_vertical"
+                                android:layout_height="wrap_content">
+                                <com.andreabaccega.widget.FormEditText
+                                    android:paddingTop="2dp"
+                                    android:backgroundTint="@color/gray_6"
+                                    android:id="@+id/et_jobtitle_description"
+                                    android:textColor="@color/gray_8"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Description"
+                                    android:imeActionLabel="Next"
+                                    android:imeOptions="actionNext"
+                                    android:inputType="textCapWords"
+                                    android:maxLines="1"
+                                    android:textSize="16dp"
+                                    android:singleLine="true"/>
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom"
+            style="@style/btnTransparentStyle">
+            <com.balysv.materialripple.MaterialRippleLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <Button
+                    android:textSize="20sp"
+                    android:fontFamily="@font/medium"
+                    android:background="@android:color/transparent"
+                    android:id="@+id/btn_submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="SUBMIT"
+                    android:textColor="@color/white"
+                    android:textAllCaps="false"/>
+            </com.balysv.materialripple.MaterialRippleLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

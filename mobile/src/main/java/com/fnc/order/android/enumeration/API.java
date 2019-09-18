@@ -16,8 +16,9 @@ public enum API {
     GET_DEVICE_PROFILE("api/getCoDeviceProfile"),
     GET_ADMIN_GROUPINGS("api/getCoAdminGroupings"),
     POST_BRANCH_SIGNUP("api/postCoBranchSignUp"),
+    POST_ADMIN_GROUPINGS_SET("api/postcoAdminGroupingSet"),
+    POST_BRANCH_IMEI("api/postBranchImei"),
     GET_PRE_REQUISITE("api/getCoPreReq"),
-
     POST_LOADSTATE("api/PostChecklistLoadedState"),
     DATA_USER("dtuser"),
     DATA_COMPANY("dtcompany"),

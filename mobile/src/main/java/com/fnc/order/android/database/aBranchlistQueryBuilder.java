@@ -13,6 +13,8 @@ public class aBranchlistQueryBuilder {
         values.put(aBranchlistKey.BRANCHCODE.getKey(), abl.getBranchcode());
         values.put(aBranchlistKey.DEVICEID.getKey(), abl.getDeviceid());
         values.put(aBranchlistKey.DESCRIPTION.getKey(), abl.getDescription());
+        values.put(aBranchlistKey.DEVICEID1.getKey(), abl.getDeviceID1());
+        values.put(aBranchlistKey.ACTIVE.getKey(), abl.getActive());
         return values;
     }
 }

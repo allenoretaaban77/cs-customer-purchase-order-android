@@ -108,12 +108,13 @@ public class LoginActivity extends BaseActivity {
         initListeners();
 
 //        addUser();
-        refreshUsers();
     }
 
     @Override
     public void onResume(){
         super.onResume();
+
+        refreshUsers();
 
         sp = SharedData.getInstance(this);
         sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
@@ -135,8 +136,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("7777777");
-//        passwordEText.setText("7777");
+//        usernameText.setText("7771");
+//        passwordEText.setText("1");
     }
 
     private void initListeners(){
@@ -190,21 +191,25 @@ public class LoginActivity extends BaseActivity {
                     LinkedList<aStaffs> slUP = DcStaffs.getInstance(ctx).checkStaff(usernameStr, passwordString);
                     if (slUP.size() > 0 ) {
                         aStaffs slx = slUP.get(0);
-                        if (slx.getRefempno() == -1) {
-                            isSubmit = false;
-                            BounceView.addAnimTo( Helper.okDialog( ctx,
-                                    "Error","Invalid username or password", "CLOSE",
-                                    null, false) );
-                        } else {
-                            SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), "-1");
-                            SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
-                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
-                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
-                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
-                            isSubmit = true;
-                            showActivity(MainActivity.class);
-                            Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
+                        if (slx.getRefempno().equals("-1")) {
+                            if(sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                                isSubmit = false;
+                                BounceView.addAnimTo( Helper.okDialog( ctx,
+                                        "Error","Reference employee number not recognized", "CLOSE",
+                                        null, false) );
+                                return;
+                            }
                         }
+
+                        SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), String.valueOf(slx.getRefempno()));
+                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
+                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
+                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
+                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
+                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_ISMOBILEADMIN.getKey(), String.valueOf(slx.getIsmobileadmin()));
+                        isSubmit = true;
+                        showActivity(MainActivity.class);
+                        Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
                     } else {
                         isSubmit = false;
                         BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -213,7 +218,7 @@ public class LoginActivity extends BaseActivity {
                     }
                 } else {
                     BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Data Sync Erro","This app needs to be initialized, please connect to the internet",
+                        "Data Sync Required","This app needs to be restarted.",
                         "CLOSE", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -263,9 +268,10 @@ public class LoginActivity extends BaseActivity {
                                                 DcAitemlist.getInstance(ctx).emptyaItemlist();
                                                 DcOrdered.getInstance(ctx).emptyOrderedlist();
                                                 DcMenulist.getInstance(ctx).emptyMenulist();
+                                                DcStaffs.getInstance(ctx).emptyStaffslist();
                                             }
                                         },
-                                        "ADD USER", new View.OnClickListener() {
+                                        "CHANGE BRANCH", new View.OnClickListener() {
                                             public void onClick(View v) {
                                                 addUser();
                                             }
@@ -290,7 +296,9 @@ public class LoginActivity extends BaseActivity {
                                 sw_saveitems.setChecked(spx.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1 ? true : false);
 
                                 LinearLayout ll_add_user = (LinearLayout) alertDialog.findViewById(R.id.ll_add_user);
-                                ll_add_user.setVisibility(View.VISIBLE);
+//                                ll_add_user.setVisibility(View.VISIBLE);
+                                LinearLayout ll_branch_box = (LinearLayout) alertDialog.findViewById(R.id.ll_branch_box);
+//                                ll_branch_box.setVisibility(View.VISIBLE);
 
                                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -313,6 +321,8 @@ public class LoginActivity extends BaseActivity {
 
                 LinearLayout ll_add_user = (LinearLayout) alertDialog.findViewById(R.id.ll_add_user);
                 ll_add_user.setVisibility(View.GONE);
+                LinearLayout ll_branch_box = (LinearLayout) alertDialog.findViewById(R.id.ll_branch_box);
+                ll_branch_box.setVisibility(View.GONE);
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -641,6 +651,15 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
+        MaterialRippleLayout btnInfo = (MaterialRippleLayout) layout.findViewById(R.id.btn_info);
+        btnInfo.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                    "Info", "Device ID: " + Helper.getImei(ctx), "CLOSE",
+                    null, false) );
+            }
+        });
+
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
         builder.setView(layout);
         builder.create();
@@ -781,7 +800,7 @@ public class LoginActivity extends BaseActivity {
                     response = response.replace("\r\n ", "");
                     Log.d("DSX post response: ", response);
                     JSONArray objArr = new JSONArray(response);
-                    final ArrayList<aAdminGroupings> sl = new ArrayList<>();
+                    final LinkedList<aAdminGroupings> sl = new LinkedList<>();
                     if(objArr.length() > 0) {
                         aAdminGroupings cjt = new aAdminGroupings();
                         cjt.setRecid(0);
@@ -874,17 +893,21 @@ public class LoginActivity extends BaseActivity {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
                                             rowObj.getInt("empId"),
-                                            rowObj.getString("refempno").equals("null") ? -1 : rowObj.getInt("refempno"),
+                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
                                             rowObj.getString("empNo"),
                                             rowObj.getString("Email"),
                                             rowObj.getString("name"),
                                             rowObj.getInt("Branch"),
                                             rowObj.getInt("Jobtitle"),
                                             rowObj.getString("pass"),
-                                            rowObj.getString("active")
+                                            rowObj.getString("active"),
+                                            rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
+                                } else {
+                                    DcStaffs.getInstance(ctx).emptyStaffslist();
+                                    DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add main
                                 }
                             } else {
                                 Log.d("dsxe getuser", response);

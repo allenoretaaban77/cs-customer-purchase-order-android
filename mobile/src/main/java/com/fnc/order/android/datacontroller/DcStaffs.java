@@ -81,14 +81,15 @@ public class DcStaffs extends DBHelper {
     private aStaffs setStaffs(Cursor c) {
         aStaffs sl = new aStaffs(
             c.getInt(c.getColumnIndex(aStaffsKey.EMPID.getKey())),
-            c.getInt(c.getColumnIndex(aStaffsKey.REFEMPNO.getKey())),
+            c.getString(c.getColumnIndex(aStaffsKey.REFEMPNO.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.EMPNO.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.EMAIL.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.NAME.getKey())),
             c.getInt(c.getColumnIndex(aStaffsKey.BRANCH.getKey())),
             c.getInt(c.getColumnIndex(aStaffsKey.JOBTITLE.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.PASS.getKey())),
-            c.getString(c.getColumnIndex(aStaffsKey.ACTIVE.getKey()))
+            c.getString(c.getColumnIndex(aStaffsKey.ACTIVE.getKey())),
+            c.getString(c.getColumnIndex(aStaffsKey.ISMOBILEADMIN.getKey()))
         );
         return sl;
     }
