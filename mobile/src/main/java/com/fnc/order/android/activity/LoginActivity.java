@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.text.Editable;
@@ -30,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
@@ -42,6 +45,7 @@ import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.UserslistKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.MenuList;
@@ -55,6 +59,12 @@ import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PasswordVisibility;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.R;
+import com.google.api.core.NanoClock;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -69,6 +79,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -112,19 +124,6 @@ public class LoginActivity extends BaseActivity {
 //        addUser();
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        refreshUsers();
-
-        sp = SharedData.getInstance(this);
-        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
-        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
-
-//        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), this);
-    }
-
     private void initViews() {
         relPassword = (RelativeLayout) findViewById(R.id.relPassword);
         usernameText = (FormEditText) findViewById(R.id.username);
@@ -138,8 +137,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("7771");
-//        passwordEText.setText("1");
+//        usernameText.setText("2");
+//        passwordEText.setText("P@ssw0rd" + Helper.getReqDate(0, ""));
     }
 
     private void initListeners(){
@@ -202,7 +201,6 @@ public class LoginActivity extends BaseActivity {
                                 return;
                             }
                         }
-
                         SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
@@ -258,19 +256,21 @@ public class LoginActivity extends BaseActivity {
                                                 Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
                                                 Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
                                                 Switch sw_saveitems = (Switch) layout.findViewById(R.id.sw_saveitems);
-                                                alertDialogSettings.dismiss();
                                                 SharedData spx = SharedData.getInstance(ctx);
                                                 spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
                                                 spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
                                                 spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
                                                 spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
                                                 spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
-                                                Toast.makeText(ctx, "Server settings saved successfully.", Toast.LENGTH_SHORT).show();
 
                                                 DcAitemlist.getInstance(ctx).emptyaItemlist();
                                                 DcOrdered.getInstance(ctx).emptyOrderedlist();
                                                 DcMenulist.getInstance(ctx).emptyMenulist();
                                                 DcStaffs.getInstance(ctx).emptyStaffslist(); refreshUsers();
+
+                                                postBranchImei(); // check branch before success
+//                                                alertDialogSettings.dismiss();
+//                                                Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
                                             }
                                         },
                                         "CHANGE BRANCH", new View.OnClickListener() {
@@ -317,6 +317,17 @@ public class LoginActivity extends BaseActivity {
                                 mlrReload.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
+                                        EditText etDomainServerName = (EditText) alertDialogSettings.findViewById(R.id.et_edittext1);
+                                        EditText etDatabase = (EditText) alertDialogSettings.findViewById(R.id.et_edittext2);
+                                        Switch sw_skuvalid = (Switch) alertDialogSettings.findViewById(R.id.sw_skuvalid);
+                                        Switch sw_preloaditems = (Switch) alertDialogSettings.findViewById(R.id.sw_preloaditems);
+                                        Switch sw_saveitems = (Switch) alertDialogSettings.findViewById(R.id.sw_saveitems);
+                                        SharedData spx = SharedData.getInstance(ctx);
+                                        spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
+                                        spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
+                                        spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
+                                        spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
+                                        spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
                                         loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait...."); loader.show();
                                         getDeviceProfile("reload");
                                     }
@@ -341,9 +352,9 @@ public class LoginActivity extends BaseActivity {
 //                etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
-                EditText etUsername = (EditText) alertDialogSettingsAuth.findViewById(R.id.et_edittext1);
-                etUsername.setText("dev");
-                etPassword.setText("P@ssw0rd" + Helper.getReqDate(0, ""));
+//                EditText etUsername = (EditText) alertDialogSettingsAuth.findViewById(R.id.et_edittext1);
+//                etUsername.setText("dev");
+//                etPassword.setText("P@ssw0rd" + Helper.getReqDate(0, ""));
 
                 LinearLayout ll_add_user = (LinearLayout) alertDialogSettingsAuth.findViewById(R.id.ll_add_user);
                 ll_add_user.setVisibility(View.GONE);
@@ -673,7 +684,9 @@ public class LoginActivity extends BaseActivity {
         MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                alertDialog.dismiss();
+                if (alertDialog != null) alertDialog.dismiss();
+                if (alertDialogSettings != null) alertDialogSettings.dismiss();
+                if (alertDialogSettingsAuth != null) alertDialogSettingsAuth.dismiss();
             }
         });
 
@@ -899,6 +912,11 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void refreshUsers() {
+        if (!Helper.isNetworkAvailable(this)) {
+            Toast.makeText(ctx, "This app requires internet to initialize.  Please check your connection.",
+                    Toast.LENGTH_SHORT).show(); return;
+        }
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -999,18 +1017,69 @@ public class LoginActivity extends BaseActivity {
                                         for (int i = 0; i < objArr.length(); i++) {
                                             JSONObject rowObj = objArr.getJSONObject(i);
                                             aBranchlist br = new aBranchlist(
-                                                    rowObj.getInt("branchid"),
-                                                    rowObj.getString("branchcode").trim(),
-                                                    rowObj.getString("deviceid"),
-                                                    rowObj.getString("description").trim(),
-                                                    rowObj.getString("deviceID1").trim(),
-                                                    rowObj.getString("active").trim()
+                                                rowObj.getInt("branchid"),
+                                                rowObj.getString("branchcode").trim(),
+                                                rowObj.getString("deviceid"),
+                                                rowObj.getString("description").trim(),
+                                                rowObj.getString("deviceID1").trim(),
+                                                rowObj.getString("active").trim()
                                             );
                                             DcBranchlist.getInstance(ctx).insertBranches(br);
                                         }
                                     }
 
-                                    loadSpinnerBranches();
+                                    if (strRef[1].equals("reinit")) {
+//                                        Toast.makeText(ctx, "Validate", Toast.LENGTH_SHORT).show();
+                                        LinkedList<aBranchlist> abl =
+                                            DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                                                aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+                                                new String[] { refSelectedBranchId, Helper.getImei(ctx) }
+                                            );
+                                        if (abl.size() > 0) {
+                                            int flgx = 0;
+                                            aBranchlist ab = null;
+                                            for (int i = 0; i < abl.size(); i++) {
+                                                ab = abl.get(i);
+                                                if(ab.getActive().equals("true")) {
+                                                    flgx = 1;
+                                                }
+                                            }
+                                            if (flgx == 1) {
+                                                sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
+                                                sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
+                                                sp.saveData(SharedKey.BRANCH_CODE.getKey(), ab.getBranchcode());
+                                                sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ab.getDescription());
+
+                                                Helper.dismissSpinnerDialog(loader);
+                                                alertDialogSettings.dismiss();
+                                                Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                BounceView.addAnimTo( Helper.okDialog( ctx,
+                                                    "Device Registration",
+                                                    "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
+                                                    "OK", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                            loadSpinnerBranches();
+                                                        }
+                                                    }, false) );
+                                            }
+                                        } else {
+                                            BounceView.addAnimTo( Helper.okDialog( ctx,
+                                                "Device Registration",
+                                                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
+                                                "OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                        loadSpinnerBranches();
+                                                    }
+                                                }, false) );
+                                        }
+                                    } else {
+                                        loadSpinnerBranches();
+                                    }
                                 } catch (JSONException e) {
                                     Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                                     e.printStackTrace();
@@ -1021,6 +1090,7 @@ public class LoginActivity extends BaseActivity {
                 }
                 @Override
                 public void onRequestFail(VolleyError response, String type) {
+                    Helper.dismissSpinnerDialog(loader);
                     Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -1039,7 +1109,6 @@ public class LoginActivity extends BaseActivity {
         if (alertDialogSettings == null) {
             Toast.makeText(ctx, "Fatal error, please contact IT support.", Toast.LENGTH_SHORT).show(); return;
         }
-
         if(tvBranchdescription != null) tvBranchdescription.setText("Select branch....");
         refSelectedBranchId = "";
 
@@ -1049,8 +1118,12 @@ public class LoginActivity extends BaseActivity {
             aBranchlist abr = new aBranchlist(0, "Select branch....", "", "","", "");
             arrBranches.add(abr);
             for(int k=0; k<refAbx.size(); k++){
-                if (DcBranchlist.getInstance(ctx).searchBranchViaBranchCode(refAbx.get(k)).size() > 0) {
-                    abr = DcBranchlist.getInstance(ctx).searchBranchViaBranchCode(refAbx.get(k)).get(0);
+                if (DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                    aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }
+                ).size() > 0) {
+                    abr = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                            aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }
+                    ).get(0);
                     arrBranches.add(abr);
                 }
             }
@@ -1092,6 +1165,143 @@ public class LoginActivity extends BaseActivity {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
         msBranches.setAdapter(sadapter);
+
+        if(!sp.getData(SharedKey.BRANCH_ID.getKey()).equals("")) {
+            if ( DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                    aBranchlistKey.BRANCHID.getKey() + " = ? ", new String[] { sp.getData(SharedKey.BRANCH_ID.getKey()) }
+            ).size() > 0) {
+                aBranchlist rsBl = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                        aBranchlistKey.BRANCHID.getKey() + " = ? ", new String[] { sp.getData(SharedKey.BRANCH_ID.getKey()) }
+                ).get(0);
+                tvBranchdescription.setText(rsBl.getBranchcode() + " (" + rsBl.getDescription() + ")");
+                refSelectedBranchId = String.valueOf(rsBl.getBranchid());
+            }
+        }
+    }
+
+    private void postBranchImei() {
+        if (!Helper.isNetworkAvailable(this)) {
+            Toast.makeText(ctx, "This app requires internet to initialize.  Please check your connection.",
+                Toast.LENGTH_SHORT).show(); return;
+        }
+
+        if (loader != null) Helper.dismissSpinnerDialog(loader);
+        loader = Helper.showSpinnerDialog(ctx, "Processing Registration", "Please wait..."); loader.show();
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+        params.put("branchid", refSelectedBranchId);
+        params.put("deviceid", Helper.getImei(ctx));
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+            it.remove();
+        }
+        VolleyInteractor viri = new VolleyInteractor();
+        viri.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(final String response, String type) {
+                Helper.dismissSpinnerDialog(loader);
+                if (response.toLowerCase().equals("true")) {
+                    getDeviceProfile("reinit");
+                } else {
+                    BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Device Registration","Registration failed. Please contact IT support.",
+                        "CLOSE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            }
+                        }, false) );
+                }
+            }
+            @Override
+            public void onRequestFail(VolleyError response, String type) {
+                Helper.dismissSpinnerDialog(loader);
+                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+            }
+        });
+        viri.postBranchImei(getApplicationContext(), params,
+                strParams.replaceAll(" ", "%20"));
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        refreshUsers();
+        sp = SharedData.getInstance(this);
+        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
+        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
+        new checkVersionUpdate().execute("");
+    }
+    private Storage storageinit;
+    private class checkVersionUpdate extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                InputStream ins = getResources().openRawResource(
+                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
+                storageinit = StorageOptions.newBuilder()
+                        .setCredentials(credentials)
+                        .setClock(NanoClock.getDefaultClock())
+                        .setProjectId(GlobalConstants.GCP_PROJECTID)
+                        .build()
+                        .getService();
+                try {
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION, "version.log");
+                    Blob blob = storageinit.get(blobId);
+                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
+                    return "Success|" + new String(bytes, "UTF-8");
+                } catch (Exception e) {
+                    return "Error| exception = " + e.getLocalizedMessage();
+                }
+            } catch (IOException io) {
+                return "Error| io";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            String[] resMsg = result.split("\\|");
+            if (resMsg[0].equals("Success")) {
+                try {
+                    Log.d("gcp",  resMsg[1]);
+                    JSONArray objArr = new JSONArray(resMsg[1]);
+                    if (objArr.length() > 0) {
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
+                                String strVersionName = rowObj.getString("version_name");
+                                if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
+                                    BounceView.addAnimTo( Helper.okDialog( ctx,
+                                            "App Update",
+                                            "A new version of this app is now available.",
+                                            "UPDATE", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/testing/" + ctx.getPackageName())));
+                                                }
+                                            }, false) );
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        @Override
+        protected void onPreExecute() {
+            Log.d("gcpe", "Task Upload Starting");
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.d("gcpu", "Running " + + values[0]);
+        }
     }
 }
 

@@ -81,26 +81,10 @@ public class DcBranchlist extends DBHelper {
         return stringBranches;
     }
 
-    public LinkedList<aBranchlist> searchBranch(String searchStr, String strImei) {
+    public LinkedList<aBranchlist> searchBranchFilterMultiple(String strCol, String[] strMultiple) {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName()
-                + " WHERE " + aBranchlistKey.BRANCHID.getKey() + " = " + searchStr
-                + " AND " + aBranchlistKey.DEVICEID.getKey() + " = '" + strImei + "'";
-        Cursor c = db.rawQuery(strQry, null);
-        LinkedList<aBranchlist> list = new LinkedList<>();
-        while (c.moveToNext()) {
-            list.add(setBranchlist(c));
-        }
-        c.close();
-        db.close();
-        return list;
-    }
-
-    public LinkedList<aBranchlist> searchBranchViaBranchCode(String searchStr) {
-        SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName()
-                + " WHERE " + aBranchlistKey.BRANCHCODE.getKey() + " = '" + searchStr + "'";
-        Cursor c = db.rawQuery(strQry, null);
+        String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName() + " WHERE " + strCol;
+        Cursor c = db.rawQuery(strQry, strMultiple);
         LinkedList<aBranchlist> list = new LinkedList<>();
         while (c.moveToNext()) {
             list.add(setBranchlist(c));
