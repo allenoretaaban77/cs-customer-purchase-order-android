@@ -275,7 +275,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                     return view;
                 }
             };
-
             tvBranchdescription = (TextView) alertdialogBL.findViewById(R.id.tv_branchdescription);
             tvBranchdescription.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -715,7 +714,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 
     private void getDeviceProfile(String type) {
         if (loader != null) Helper.dismissSpinnerDialog(loader);
-        loader = Helper.showSpinnerDialog(ctx, "Requesting Device Info", "Please wait..."); loader.show();
+        loader = Helper.showSpinnerDialog(ctx, "Requesting Info", "Please wait..."); loader.show();
 
         if (Helper.isNetworkAvailable(this)) {
             HashMap<String, String> params = new HashMap<>();
