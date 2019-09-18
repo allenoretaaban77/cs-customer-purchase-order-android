@@ -32,6 +32,7 @@ import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
+import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
@@ -46,6 +47,7 @@ import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.model.aAdminGroupings;
+import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.VolleyInteractor;
@@ -89,7 +91,7 @@ public class LoginActivity extends BaseActivity {
     private RelativeLayout relPassword;
     private Context ctx;
     private Boolean isSubmit = false;
-    private AlertDialog alertDialog, alertDialogUser;
+    private AlertDialog alertDialog, alertDialogSettingsAuth, alertDialogSettings, alertDialogUser;
     private RequestQueue requestQueue;
     private SharedData sp;
     private VolleyCallback callback;
@@ -232,7 +234,7 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alertDialog = actionDialog(ctx, "SETTINGS",
+                alertDialogSettingsAuth = actionDialog(ctx, "SETTINGS",
                     "Validate settings security account",
                     "Username", "Password",
                     "SUBMIT", new View.OnClickListener() {
@@ -241,11 +243,11 @@ public class LoginActivity extends BaseActivity {
                             EditText etUsername = (EditText) layout.findViewById(R.id.et_edittext1);
                             EditText etPassword = (EditText) layout.findViewById(R.id.et_edittext2);
                             SharedData spx = SharedData.getInstance(ctx);
-                            alertDialog.dismiss();
+                            alertDialogSettingsAuth.dismiss();
 
                             if (spx.getData(SharedKey.DEV_USERNAME.getKey()).equals(etUsername.getText().toString()) &&
                                     spx.getData(SharedKey.DEV_PASSWORD.getKey()).equals(etPassword.getText().toString())) {
-                                alertDialog = actionDialog(ctx, "SETTINGS",
+                                    alertDialogSettings = actionDialog(ctx, "SETTINGS",
                                         "Customize settings per client as required",
                                         "Server", "Database",
                                         "UPDATE", new View.OnClickListener() {
@@ -256,7 +258,7 @@ public class LoginActivity extends BaseActivity {
                                                 Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
                                                 Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
                                                 Switch sw_saveitems = (Switch) layout.findViewById(R.id.sw_saveitems);
-                                                alertDialog.dismiss();
+                                                alertDialogSettings.dismiss();
                                                 SharedData spx = SharedData.getInstance(ctx);
                                                 spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
                                                 spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
@@ -268,7 +270,7 @@ public class LoginActivity extends BaseActivity {
                                                 DcAitemlist.getInstance(ctx).emptyaItemlist();
                                                 DcOrdered.getInstance(ctx).emptyOrderedlist();
                                                 DcMenulist.getInstance(ctx).emptyMenulist();
-                                                DcStaffs.getInstance(ctx).emptyStaffslist();
+                                                DcStaffs.getInstance(ctx).emptyStaffslist(); refreshUsers();
                                             }
                                         },
                                         "CHANGE BRANCH", new View.OnClickListener() {
@@ -277,32 +279,52 @@ public class LoginActivity extends BaseActivity {
                                             }
                                         },1);
 
-                                LinearLayout ll_skuvalid = (LinearLayout) alertDialog.findViewById(R.id.ll_validations);
+                                LinearLayout ll_skuvalid = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_validations);
                                 ll_skuvalid.setVisibility(View.VISIBLE);
 
-                                EditText etDomainServerName = (EditText) alertDialog.findViewById(R.id.et_edittext1);
+                                EditText etDomainServerName = (EditText) alertDialogSettings.findViewById(R.id.et_edittext1);
                                 String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
                                 etDomainServerName.setText(strSN);
-                                EditText etDatabase = (EditText) alertDialog.findViewById(R.id.et_edittext2);
-                                etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()));
+                                EditText etDatabase = (EditText) alertDialogSettings.findViewById(R.id.et_edittext2);
+                                etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()).toLowerCase());
 
-                                Switch sw_skuvalid = (Switch) alertDialog.findViewById(R.id.sw_skuvalid);
+                                Switch sw_skuvalid = (Switch) alertDialogSettings.findViewById(R.id.sw_skuvalid);
                                 sw_skuvalid.setChecked(spx.getInt(SharedKey.SKU_VALIDATION.getKey()) == 1 ? true : false);
 
-                                Switch sw_preloaditems = (Switch) alertDialog.findViewById(R.id.sw_preloaditems);
+                                Switch sw_preloaditems = (Switch) alertDialogSettings.findViewById(R.id.sw_preloaditems);
                                 sw_preloaditems.setChecked(spx.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1 ? true : false);
 
-                                Switch sw_saveitems = (Switch) alertDialog.findViewById(R.id.sw_saveitems);
+                                Switch sw_saveitems = (Switch) alertDialogSettings.findViewById(R.id.sw_saveitems);
                                 sw_saveitems.setChecked(spx.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1 ? true : false);
 
-                                LinearLayout ll_add_user = (LinearLayout) alertDialog.findViewById(R.id.ll_add_user);
+                                LinearLayout ll_add_user = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_add_user);
 //                                ll_add_user.setVisibility(View.VISIBLE);
-                                LinearLayout ll_branch_box = (LinearLayout) alertDialog.findViewById(R.id.ll_branch_box);
+
+                                LinearLayout ll_branch_box = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_branch_box);
 //                                ll_branch_box.setVisibility(View.VISIBLE);
 
-                                alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
-                                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                BounceView.addAnimTo(alertDialog);
+                                tvBranchdescription = (TextView) alertDialogSettings.findViewById(R.id.tv_branchdescription);
+                                tvBranchdescription.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        msBranches.performClick();
+                                    }
+                                });
+                                msBranches = (Spinner) alertDialogSettings.findViewById(R.id.ms_branches);
+                                loadSpinnerBranches();
+
+                                MaterialRippleLayout mlrReload = (MaterialRippleLayout) alertDialogSettings.findViewById(R.id.mrl_reload);
+                                mlrReload.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait...."); loader.show();
+                                        getDeviceProfile("reload");
+                                    }
+                                });
+
+                                alertDialogSettings.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                alertDialogSettings.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                BounceView.addAnimTo(alertDialogSettings);
                             } else {
                                 Toast.makeText(ctx, "Access denied. Invalid credentials.", Toast.LENGTH_SHORT).show();
                             }
@@ -310,23 +332,27 @@ public class LoginActivity extends BaseActivity {
                     },
                     "Cancel", new View.OnClickListener() {
                         public void onClick(View v) {
-                            alertDialog.dismiss();
+                            alertDialogSettingsAuth.dismiss();
                         }
                     },
                     2);
 
-                EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
+                EditText etPassword = (EditText) alertDialogSettingsAuth.findViewById(R.id.et_edittext2);
 //                etPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
-                LinearLayout ll_add_user = (LinearLayout) alertDialog.findViewById(R.id.ll_add_user);
+                EditText etUsername = (EditText) alertDialogSettingsAuth.findViewById(R.id.et_edittext1);
+                etUsername.setText("dev");
+                etPassword.setText("P@ssw0rd" + Helper.getReqDate(0, ""));
+
+                LinearLayout ll_add_user = (LinearLayout) alertDialogSettingsAuth.findViewById(R.id.ll_add_user);
                 ll_add_user.setVisibility(View.GONE);
-                LinearLayout ll_branch_box = (LinearLayout) alertDialog.findViewById(R.id.ll_branch_box);
+                LinearLayout ll_branch_box = (LinearLayout) alertDialogSettingsAuth.findViewById(R.id.ll_branch_box);
                 ll_branch_box.setVisibility(View.GONE);
 
-                alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
-                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                BounceView.addAnimTo(alertDialog);
+                alertDialogSettingsAuth.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+                alertDialogSettingsAuth.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                BounceView.addAnimTo(alertDialogSettingsAuth);
             }
         });
     }
@@ -937,6 +963,135 @@ public class LoginActivity extends BaseActivity {
                 vipr.getPreRequisite(getApplicationContext(), params, strParams.replaceAll(" ", "%20"));
             }
         }, 500);
+    }
+
+    private void getDeviceProfile(String type) {
+        if (loader != null) Helper.dismissSpinnerDialog(loader);
+        loader = Helper.showSpinnerDialog(ctx, "Requesting Info", "Please wait..."); loader.show();
+
+        if (Helper.isNetworkAvailable(this)) {
+            HashMap<String, String> params = new HashMap<>();
+            params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+            params.put("deviceid", "n/a");
+            Iterator it = params.entrySet().iterator();
+            String strParams = "";
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                it.remove();
+            }
+            VolleyInteractor vidp = new VolleyInteractor();
+            vidp.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) {
+                    Helper.dismissSpinnerDialog(loader);
+                    if (response.equals("[]")) {
+                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                    } else {
+                        final String[] strRef = type.split("\\|");
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    JSONArray objArr = new JSONArray(response);
+                                    if (objArr.length() > 0) {
+                                        DcBranchlist.getInstance(ctx).emptyBranchlist();
+                                        for (int i = 0; i < objArr.length(); i++) {
+                                            JSONObject rowObj = objArr.getJSONObject(i);
+                                            aBranchlist br = new aBranchlist(
+                                                    rowObj.getInt("branchid"),
+                                                    rowObj.getString("branchcode").trim(),
+                                                    rowObj.getString("deviceid"),
+                                                    rowObj.getString("description").trim(),
+                                                    rowObj.getString("deviceID1").trim(),
+                                                    rowObj.getString("active").trim()
+                                            );
+                                            DcBranchlist.getInstance(ctx).insertBranches(br);
+                                        }
+                                    }
+
+                                    loadSpinnerBranches();
+                                } catch (JSONException e) {
+                                    Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, 300);
+                    }
+                }
+                @Override
+                public void onRequestFail(VolleyError response, String type) {
+                    Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                }
+            });
+            vidp.getDeviceProfile(getApplicationContext(), params, strParams
+                    .replaceAll(" ", "%20"), type);
+        } else {
+            Toast.makeText(ctx, "This app requires internet to initialize.  Please check your connection.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private LinkedList<aBranchlist> arrBranches = new LinkedList<>();
+    private Spinner msBranches;
+    private TextView tvBranchdescription;
+    private String refSelectedBranchId = "";
+    private void loadSpinnerBranches() {
+        if (alertDialogSettings == null) {
+            Toast.makeText(ctx, "Fatal error, please contact IT support.", Toast.LENGTH_SHORT).show(); return;
+        }
+
+        if(tvBranchdescription != null) tvBranchdescription.setText("Select branch....");
+        refSelectedBranchId = "";
+
+        ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
+        arrBranches = new LinkedList<>();
+        if (refAbx.size() > 0) {
+            aBranchlist abr = new aBranchlist(0, "Select branch....", "", "","", "");
+            arrBranches.add(abr);
+            for(int k=0; k<refAbx.size(); k++){
+                if (DcBranchlist.getInstance(ctx).searchBranchViaBranchCode(refAbx.get(k)).size() > 0) {
+                    abr = DcBranchlist.getInstance(ctx).searchBranchViaBranchCode(refAbx.get(k)).get(0);
+                    arrBranches.add(abr);
+                }
+            }
+        }
+        ArrayAdapter<aBranchlist> sadapter = new ArrayAdapter<aBranchlist>(ctx,
+                android.R.layout.simple_spinner_dropdown_item, arrBranches) {
+            @Override
+            public boolean isEnabled(int position) {
+                if(position == 0) { return false; }
+                else { return true; }
+            }
+            @Override
+            public View getDropDownView(int pos, View cv, ViewGroup prnt) {
+                View view = super.getDropDownView(pos, cv, prnt);
+                TextView tv = (TextView) view;
+                if(pos == 0){
+                    tv.setTextColor(Color.GRAY);
+                    tv.setText(arrBranches.get(pos).getBranchcode());
+                } else {
+                    tv.setTextColor(Color.DKGRAY);
+                    tv.setText(arrBranches.get(pos).getBranchcode() + " (" + arrBranches.get(pos).getDescription() + ")");
+                }
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT, 88);
+                params.setMargins(20,0,10,0);
+                tv.setLayoutParams(params);
+                return view;
+            }
+        };
+        msBranches.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
+                if (pos != 0) {
+                    tvBranchdescription.setText(arrBranches.get(pos).getBranchcode() +
+                            " (" + arrBranches.get(pos).getDescription() + ")");
+                    refSelectedBranchId = String.valueOf(arrBranches.get(pos).getBranchid());
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+        msBranches.setAdapter(sadapter);
     }
 }
 
