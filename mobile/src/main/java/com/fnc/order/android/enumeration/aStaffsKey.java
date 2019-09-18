@@ -4,14 +4,15 @@ import com.fnc.order.android.database.DataType;
 
 public enum aStaffsKey {
     EMPID("empId", DataType.INTEGER),
-    REFEMPNO( "refempno", DataType.INTEGER),
+    REFEMPNO( "refempno", DataType.TEXT),
     EMPNO("empNo", DataType.TEXT),
     EMAIL("Email", DataType.TEXT),
     NAME("name", DataType.TEXT),
     BRANCH("Branch", DataType.INTEGER),
     JOBTITLE("Jobtitle", DataType.INTEGER),
     PASS("pass", DataType.TEXT),
-    ACTIVE("active", DataType.TEXT);
+    ACTIVE("active", DataType.TEXT),
+    ISMOBILEADMIN("ismobileadmin", DataType.TEXT);
 
     private String key;
     private String dataType;

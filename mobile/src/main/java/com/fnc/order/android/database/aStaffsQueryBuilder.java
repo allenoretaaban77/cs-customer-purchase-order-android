@@ -18,6 +18,7 @@ public class aStaffsQueryBuilder {
         values.put(aStaffsKey.JOBTITLE.getKey(), sl.getJobtitle());
         values.put(aStaffsKey.PASS.getKey(), sl.getPass());
         values.put(aStaffsKey.ACTIVE.getKey(), sl.getActive());
+        values.put(aStaffsKey.ISMOBILEADMIN.getKey(), sl.getIsmobileadmin());
         return values;
     }
 }

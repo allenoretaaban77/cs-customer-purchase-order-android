@@ -555,11 +555,20 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 headersMap.put("customer_integ_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
                 headersMap.put("deliver_date", refStringDate);
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
-                headersMap.put("createdby", sp.getData(SharedKey.IDENTITY_ID.getKey()));
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals("backoffice")) {
+                    headersMap.put("createdby", sp.getData(SharedKey.REF_EMP_NO.getKey()));
+                } else {
+                    headersMap.put("createdby", sp.getData(SharedKey.EMP_NO.getKey()));
+                }
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
                 headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
-                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
+//                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals("backoffice")) {
+                    headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
+                } else {
+                    headersMap.put("reference_employee_no", sp.getData(SharedKey.EMP_NO.getKey()));
+                }
                 headersMap.put("branch_encoding", "1");
                 String gt = tv_grandtotal.getText().toString().trim().replace(",", "");
                 headersMap.put("grand_total", gt);
@@ -572,9 +581,19 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setCustomerRecid(sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
                 ol.setCustomerName(sp.getData(SharedKey.CURRENT_STORE.getKey()));
                 ol.setDeliveryDate(refStringDate);
-                ol.setCreatedBy(sp.getData(SharedKey.IDENTITY_ID.getKey()));
+//                ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals("backoffice")) {
+                    ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
+                } else {
+                    ol.setCreatedBy(sp.getData(SharedKey.EMP_NO.getKey()));
+                }
                 ol.setRemarks(et_remarks.getText().toString().trim());
-                ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
+//                ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals("backoffice")) {
+                    ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
+                } else {
+                    ol.setReferenceEmployeeNo(sp.getData(SharedKey.EMP_NO.getKey()));
+                }
                 ol.setJson(paramsArrayStr);
                 ol.setJsonComplete(new JSONArray(detailsArrayListC).toString());
                 ol.setGrandtotal(gt);

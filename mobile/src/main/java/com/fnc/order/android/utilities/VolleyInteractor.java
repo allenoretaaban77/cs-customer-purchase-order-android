@@ -496,8 +496,58 @@ public class VolleyInteractor {
         }).start();
     }
 
+    public void postBranchImei(final Context ctx, final HashMap<String, String> params,
+                                 final String strParams) {
+        new Thread(new Runnable(){
+            public void run(){
+                String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                        + API.POST_BRANCH_IMEI.getApi()+ "?" + strParams;
+                Log.d("dsx", url);
+                StringRequest strRequest = new StringRequest( Request.Method.POST, url,
+                        null, null) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        return ServerConstants.getHeaderOrder();
+                    }
+                    public Map<String, String> getParams(){
+                        return params;
+                    }
+
+                };
+                requestQueue = Volley.newRequestQueue(ctx);
+                int socketTimeout = 10000;
+                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                strRequest.setRetryPolicy(policy);
+                requestQueue.getCache().clear();
+                requestQueue.add(strRequest);
+                VolleyX.init(ctx);
+                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<String>() {
+                            @Override
+                            public void onCompleted() {
+                                Log.d("dsxoc", "getpostbranchimei");
+                            }
+                            @Override
+                            public void onError(Throwable e) {
+                                VolleyError ve = new VolleyError();
+                                Log.d("dsxe getpostbranchimei", String.valueOf(ve.getMessage()));
+                                callback.onRequestFail(ve, "getpostbranchimei");
+                            }
+                            @Override
+                            public void onNext(String response) {
+                                Log.d("dsx", response);
+                                callback.onRequestSuccess(response, "getpostbranchimei");
+                            }
+                        });
+                VolleyX.setRequestQueue(requestQueue);
+            }
+        }).start();
+    }
+
     public void postBranchSignUp(final Context ctx, final HashMap<String, String> params,
-                                  final String strParams) {
+                                 final String strParams) {
         new Thread(new Runnable(){
             public void run(){
                 String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
@@ -523,24 +573,74 @@ public class VolleyInteractor {
                 requestQueue.add(strRequest);
                 VolleyX.init(ctx);
                 VolleyX.from(strRequest).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<String>() {
-                        @Override
-                        public void onCompleted() {
-                            Log.d("dsxoc", "getpostsignup");
-                        }
-                        @Override
-                        public void onError(Throwable e) {
-                            VolleyError ve = new VolleyError();
-                            Log.d("dsxe getpostsignup", String.valueOf(ve.getMessage()));
-                            callback.onRequestFail(ve, "getpostsignup");
-                        }
-                        @Override
-                        public void onNext(String response) {
-                            Log.d("dsx", response);
-                            callback.onRequestSuccess(response, "getpostsignup");
-                        }
-                    });
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<String>() {
+                            @Override
+                            public void onCompleted() {
+                                Log.d("dsxoc", "getpostsignup");
+                            }
+                            @Override
+                            public void onError(Throwable e) {
+                                VolleyError ve = new VolleyError();
+                                Log.d("dsxe getpostsignup", String.valueOf(ve.getMessage()));
+                                callback.onRequestFail(ve, "getpostsignup");
+                            }
+                            @Override
+                            public void onNext(String response) {
+                                Log.d("dsx", response);
+                                callback.onRequestSuccess(response, "getpostsignup");
+                            }
+                        });
+                VolleyX.setRequestQueue(requestQueue);
+            }
+        }).start();
+    }
+
+    public void postAddJobTitle(final Context ctx, final HashMap<String, String> params,
+                                 final String strParams) {
+        new Thread(new Runnable(){
+            public void run(){
+                String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                        + API.POST_ADMIN_GROUPINGS_SET.getApi()+ "?" + strParams;
+                Log.d("dsx", url);
+                StringRequest strRequest = new StringRequest( Request.Method.POST, url,
+                        null, null) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        return ServerConstants.getHeaderOrder();
+                    }
+                    public Map<String, String> getParams(){
+                        return params;
+                    }
+
+                };
+                requestQueue = Volley.newRequestQueue(ctx);
+                int socketTimeout = 10000;
+                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                strRequest.setRetryPolicy(policy);
+                requestQueue.getCache().clear();
+                requestQueue.add(strRequest);
+                VolleyX.init(ctx);
+                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<String>() {
+                            @Override
+                            public void onCompleted() {
+                                Log.d("dsxoc", "getpags");
+                            }
+                            @Override
+                            public void onError(Throwable e) {
+                                VolleyError ve = new VolleyError();
+                                Log.d("dsxe getpags", String.valueOf(ve.getMessage()));
+                                callback.onRequestFail(ve, "getpags");
+                            }
+                            @Override
+                            public void onNext(String response) {
+                                Log.d("dsx", response);
+                                callback.onRequestSuccess(response, "getpags");
+                            }
+                        });
                 VolleyX.setRequestQueue(requestQueue);
             }
         }).start();

@@ -35,9 +35,10 @@ public enum SharedKey {
     IDENTITY_ID("identityId"),
     EMP_NO("reference_employee_no"),
     EMP_ID("employee_id"),
-    REF_EMP_NO("reference_employee_no"),
+    REF_EMP_NO("reference_employee_no_x"),
     EMP_NAME("employee_name"),
-    EMP_POSITION("employee_position");
+    EMP_POSITION("employee_position"),
+    EMP_ISMOBILEADMIN("employee_ismobileadmin");
 
     private String key;
     SharedKey(String key) { this.key = key; }

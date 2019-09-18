@@ -32,6 +32,28 @@
                 android:textSize="19sp"
                 android:text="SETTINGS"/>
             <LinearLayout
+                android:id="@+id/ll_info"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginRight="44dp"
+                android:padding="3dp"
+                style="@style/btnTransparentStyleSmallWrap">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:id="@+id/btn_info"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="3dp">
+                    <Button
+                        android:backgroundTint="@color/white"
+                        android:background="@drawable/baseline_info_24"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+            <LinearLayout
                 android:id="@+id/ll_closebox"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
@@ -204,6 +226,68 @@
                 </LinearLayout>
             </LinearLayout>
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="-40dp"
+            android:layout_marginBottom="45dp"
+            android:id="@+id/ll_branch_box"
+            android:layout_height="36dp"
+            android:layout_width="match_parent"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:paddingTop="0dp"
+                android:background="@drawable/background_green_3_border"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_weight="1">
+                <TextView
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center|left"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/regular"
+                    android:hint="Select branch...."
+                    android:id="@+id/tv_branchdescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <Spinner
+                    android:visibility="invisible"
+                    android:id="@+id/ms_branches"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/transparent"
+                    android:spinnerMode="dialog" />
+                <!--com.tiper.MaterialSpinner
+                    android:background="@null"
+                    app:spinnerMode="dialog"
+                    android:layout_height="53dp"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="-10dp"
+                    android:paddingTop="0dp"
+                    android:id="@+id/ms_branches"/-->
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginLeft="5dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="3dp"
+                style="@style/btnTransparentStyleSmallWrap">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:id="@+id/mrl_reload"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="3dp">
+                    <Button
+                        android:backgroundTint="@color/white"
+                        android:background="@drawable/sharp_refresh_24"
+                        android:id="@+id/btn_refresh"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

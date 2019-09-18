@@ -5,19 +5,27 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.andreabaccega.widget.FormEditText;
 import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
@@ -41,6 +50,7 @@ import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
+import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
@@ -83,16 +93,18 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private AlphaGridAdapter adapterAlpha;
     private LinearLayout alphagridview_box, storelistview_box;
     private LinearLayout ll_version_box;
-    private AlertDialog alertDialog;
+    private AlertDialog alertDialog, alertDialogUser, alertDialogJobTitle;
     private DroppyMenuPopup.Builder boxMenu;
     private DroppyMenuPopup sortMenuObj;
     private String updateCustomerMessage = "Please wait while updating customer lists...";
+    private SharedData sp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_menu, container, false);
         ctx = v.getContext();
         Helper.setPreviousPage(ctx, "main_page");
+        sp = SharedData.getInstance(ctx);
 
         initViews(v);
         initListeners(v);
@@ -175,10 +187,13 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         ll_version_box = (LinearLayout) v.findViewById(R.id.ll_version_box);
         boxMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
         boxMenu.setXOffset(85);
-        boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "))
-                .addSeparator()
-                .addMenuItem(new DroppyMenuItem("  Update Users "))
-                .addMenuItem(new DroppyMenuItem("  Log-out "));
+        boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions ")).addSeparator();
+        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
+            sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
+            boxMenu.addMenuItem(new DroppyMenuItem("  Update Users "));
+            boxMenu.addMenuItem(new DroppyMenuItem("  Add User ")).addSeparator();
+        }
+        boxMenu.addMenuItem(new DroppyMenuItem("  Log-out "));
     }
 
     private void initListeners(View v) {
@@ -259,17 +274,18 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                             new TransactionFragment(), "transaction_fragment", "customer_fragment");
                         break;
                     case 1:
-                        alertDialog = Helper.okCancelDialog(ctx,
+                        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
+                                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
+                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
                                 "Update Users", "Are you sure you want to update user records?",
                                 "Ok", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         updateUsers();
                                     }
-                                }, "Cancel", null, false);
-                        break;
-                    case 2:
-                        alertDialog = Helper.okCancelDialog(ctx,
+                                }, "Cancel", null, false) );
+                        } else {
+                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
                                 "Log Out", "Are you sure you want to log-out?",
                                 "Ok", new DialogInterface.OnClickListener() {
                                     @Override
@@ -277,8 +293,34 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                         getActivity().finishAndRemoveTask();
                                         startActivity(new Intent(ctx, LoginActivity.class));
                                     }
-                                }, "Cancel", null, false);
-                        BounceView.addAnimTo(alertDialog);
+                                }, "Cancel", null, false) );
+                        }
+                        break;
+                    case 2:
+                        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
+                                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
+                            addUser();
+                        } else {
+                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                                "Add User", "Access Denied!",
+                                "Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }, "Cancel", null, false) );
+                        }
+                        break;
+                    case 3:
+                        BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                                "Log Out", "Are you sure you want to log-out?",
+                                "Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        getActivity().finishAndRemoveTask();
+                                        startActivity(new Intent(ctx, LoginActivity.class));
+                                    }
+                                }, "Cancel", null, false) );
                         break;
                 }
             }
@@ -507,20 +549,21 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                 JSONObject rowObj = sArr.getJSONObject(i);
                                 aStaffs sl = new aStaffs(
                                         rowObj.getInt("empId"),
-                                        rowObj.getString("refempno").equals("null") ? -1 : rowObj.getInt("refempno"),
+                                        rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
                                         rowObj.getString("empNo"),
                                         rowObj.getString("Email"),
                                         rowObj.getString("name"),
                                         rowObj.getInt("Branch"),
                                         rowObj.getInt("Jobtitle"),
                                         rowObj.getString("pass"),
-                                        rowObj.getString("active")
+                                        rowObj.getString("active"),
+                                        rowObj.getString("ismobileadmin")
                                 );
                                 DcStaffs.getInstance(ctx).insertStaffs(sl);
                             }
                         }
                         Helper.dismissSpinnerDialog(loader);
-                        Toast.makeText(ctx, "Update success...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, "Request success...", Toast.LENGTH_SHORT).show();
                     } else {
                         Helper.dismissSpinnerDialog(loader);
                         BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -732,5 +775,299 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     }
                 }, false) );
         }
+    }
+
+    private Spinner btnAddJobTitle;
+    private FormEditText et_jobtitle;
+    private EditText et_jobtitle_id;
+    private ArrayAdapter<aAdminGroupings> spinneradapter;
+    private void addUser() {
+        alertDialogUser = addUserDialog(ctx);
+        et_jobtitle = (FormEditText) alertDialogUser.findViewById(R.id.et_jobtitle);
+        et_jobtitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnAddJobTitle.performClick();
+            }
+        });
+        et_jobtitle_id = (EditText) alertDialogUser.findViewById(R.id.et_jobtitle_id);
+        btnAddJobTitle = (Spinner) alertDialogUser.findViewById(R.id.btnAddJobTitle);
+
+        MaterialRippleLayout mrlAddJobtitle = (MaterialRippleLayout) alertDialogUser.findViewById(R.id.mrl_add_jobtitle);
+        mrlAddJobtitle.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addJobtitle();
+            }
+        });
+
+        Button btnSubmit = (Button) alertDialogUser.findViewById(R.id.btn_submit);
+        btnSubmit.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FormEditText et_employeeno = (FormEditText) alertDialogUser.findViewById(R.id.et_employeeno);
+                FormEditText et_firstname = (FormEditText) alertDialogUser.findViewById(R.id.et_firstname);
+                FormEditText et_middlename = (FormEditText) alertDialogUser.findViewById(R.id.et_middlename);
+                FormEditText et_lastname = (FormEditText) alertDialogUser.findViewById(R.id.et_lastname);
+                FormEditText et_password = (FormEditText) alertDialogUser.findViewById(R.id.et_password);
+                FormEditText et_repeatpassword = (FormEditText) alertDialogUser.findViewById(R.id.et_repeatpassword);
+
+                if (et_employeeno.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid employee number.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_firstname.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid first name.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_middlename.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid middle name.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_lastname.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid last name.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_jobtitle_id.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Please select job title.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_password.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_repeatpassword.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (!et_repeatpassword.getText().toString().trim().equals(et_password.getText().toString().trim())) {
+                    Toast.makeText(ctx, "Psssword does not match.", Toast.LENGTH_SHORT).show(); return;
+                }
+
+                loader = Helper.showSpinnerDialog(ctx, "Posting User Info", "Please wait..."); loader.show();
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("cnstr", sp.getData(SharedKey.DATABASE.getKey()));
+                params.put("empNo", et_employeeno.getText().toString().trim());
+                params.put("email", "");
+                params.put("pass", et_password.getText().toString().trim());
+                params.put("fname", et_firstname.getText().toString().trim());
+                params.put("mname", et_middlename.getText().toString().trim());
+                params.put("lname", et_lastname.getText().toString().trim());
+                params.put("branch", sp.getData(SharedKey.BRANCH_ID.getKey()));
+                params.put("jobtitle", et_jobtitle_id.getText().toString().trim());
+                Iterator it = params.entrySet().iterator();
+                String strParams = "";
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                    it.remove();
+                }
+                final VolleyInteractor vidp = new VolleyInteractor();
+                vidp.registerCallback(new VolleyCallback() {
+                    @Override
+                    public void onRequestSuccess(final String response, String type) {
+                        try {
+                            Helper.dismissSpinnerDialog(loader);
+                            JSONArray objArr = new JSONArray(response);
+                            JSONObject obj = new JSONObject(objArr.get(0).toString());
+                            if (obj.getString("error").equals("true")) {
+                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.d("DSX signup success", response);
+                                Toast.makeText(ctx, "User successfully added!", Toast.LENGTH_SHORT).show();
+                                updateUsers();
+                                alertDialogUser.dismiss();
+                            }
+                        } catch (JSONException e) {
+                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onRequestFail(VolleyError response, String type) {
+                        Helper.dismissSpinnerDialog(loader);
+                        Log.d("DSX signup success: ", String.valueOf(response.getMessage()));
+                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Log.d("dsx", strParams);
+                vidp.postBranchSignUp(ctx, params, strParams.replaceAll(" ", "%20"));
+            }
+        });
+
+        alertDialogUser.getWindow().setLayout(Helper.getDialogWidthSignup(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        alertDialogUser.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        BounceView.addAnimTo(alertDialog);
+
+        loadAdminJobTitles();
+    }
+
+    private AlertDialog addUserDialog(final Context activity) {
+
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.dialog_add_user, null);
+
+        MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                alertDialogUser.dismiss();
+            }
+        });
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
+        builder.setView(layout);
+        builder.create();
+        builder.setCancelable(false);
+        return builder.show();
+    }
+
+    private void addJobtitle() {
+        alertDialogJobTitle = addJobTitleDialog(ctx);
+
+        Button btnSubmit = (Button) alertDialogJobTitle.findViewById(R.id.btn_submit);
+        btnSubmit.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FormEditText et_jobtitle_code = (FormEditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_code);
+                FormEditText et_jobtitle_description = (FormEditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_description);
+
+                if (et_jobtitle_code.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid job title code.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_jobtitle_description.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid description.", Toast.LENGTH_SHORT).show(); return;
+                }
+                loader = Helper.showSpinnerDialog(ctx, "Posting Job Title Info", "Please wait..."); loader.show();
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+                params.put("type", "5");
+                params.put("code", et_jobtitle_code.getText().toString().trim());
+                params.put("desc", et_jobtitle_description.getText().toString().trim());
+                Iterator it = params.entrySet().iterator();
+                String strParams = "";
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                    it.remove();
+                }
+                final VolleyInteractor vijt = new VolleyInteractor();
+                vijt.registerCallback(new VolleyCallback() {
+                    @Override
+                    public void onRequestSuccess(final String response, String type) {
+                        if (response.trim().toLowerCase().equals("true")) {
+                            Helper.dismissSpinnerDialog(loader);
+                            alertDialogJobTitle.dismiss();
+                            loadAdminJobTitles();
+                        } else {
+                            Toast.makeText(ctx, "Adding jobtitle failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onRequestFail(VolleyError response, String type) {
+                        Helper.dismissSpinnerDialog(loader);
+                        Log.d("DSX signup success: ", String.valueOf(response.getMessage()));
+                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Log.d("dsx", strParams);
+                vijt.postAddJobTitle(ctx, params, strParams.replaceAll(" ", "%20"));
+            }
+        });
+
+        alertDialogJobTitle.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        alertDialogJobTitle.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        BounceView.addAnimTo(alertDialogJobTitle);
+    }
+
+    private AlertDialog addJobTitleDialog(final Context activity) {
+
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.dialog_add_jobtitle, null);
+
+        MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                alertDialogJobTitle.dismiss();
+            }
+        });
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
+        builder.setView(layout);
+        builder.create();
+        builder.setCancelable(false);
+        return builder.show();
+    }
+
+    private void loadAdminJobTitles() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+        params.put("type", "5");
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+            it.remove();
+        }
+        VolleyInteractor viag = new VolleyInteractor();
+        viag.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(String response, String type) {
+                try {
+                    response = response.replace("\r\n ", "");
+                    Log.d("DSX post response: ", response);
+                    JSONArray objArr = new JSONArray(response);
+                    final LinkedList<aAdminGroupings> sl = new LinkedList<>();
+                    if(objArr.length() > 0) {
+                        aAdminGroupings cjt = new aAdminGroupings();
+                        cjt.setRecid(0);
+                        cjt.setCode("0");
+                        cjt.setDescription("Select Job Title:");
+                        cjt.setDeleted("false");
+                        sl.add(cjt);
+                        for (int ix = 0; ix < objArr.length(); ix++) {
+                            JSONObject rowObj = objArr.getJSONObject(ix);
+                            cjt = new aAdminGroupings();
+                            cjt.setRecid(rowObj.getInt("recid"));
+                            cjt.setCode(rowObj.getString("code"));
+                            cjt.setDescription(rowObj.getString("Description"));
+                            cjt.setDeleted(rowObj.getString("deleted"));
+                            sl.add(cjt);
+                        }
+                        spinneradapter = new ArrayAdapter<aAdminGroupings>(ctx, android.R.layout.simple_spinner_dropdown_item, sl) {
+                            @Override
+                            public boolean isEnabled(int position) {
+                                if(position == 0) { return false; }
+                                else { return true; }
+                            }
+                            @Override
+                            public View getDropDownView(int pos, View cv, ViewGroup prnt) {
+                                View view = super.getDropDownView(pos, cv, prnt);
+                                TextView tv = (TextView) view;
+                                if(pos == 0){ tv.setTextColor(Color.GRAY);  }
+                                else { tv.setTextColor(Color.DKGRAY); }
+                                tv.setText(sl.get(pos).getDescription());
+                                return view;
+                            }
+                        };
+                        btnAddJobTitle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
+                                if (pos != 0) {
+                                    et_jobtitle.setText(sl.get(pos).getDescription());
+                                    et_jobtitle_id.setText(sl.get(pos).getRecid().toString());
+                                }
+                            }
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) { }
+                        });
+                        btnAddJobTitle.setAdapter(spinneradapter);
+                    } else {
+                        Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onRequestFail(VolleyError response, String type) {
+                Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        viag.getAdminGroupings(ctx, params, strParams.replaceAll(" ", "%20"));
     }
 }

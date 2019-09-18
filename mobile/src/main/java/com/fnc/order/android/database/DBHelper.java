@@ -141,6 +141,7 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(aStaffsKey.JOBTITLE);
         fields.add(aStaffsKey.PASS);
         fields.add(aStaffsKey.ACTIVE);
+        fields.add(aStaffsKey.ISMOBILEADMIN);
         return fields;
     }
 
@@ -150,6 +151,8 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(aBranchlistKey.BRANCHCODE);
         fields.add(aBranchlistKey.DEVICEID);
         fields.add(aBranchlistKey.DESCRIPTION);
+        fields.add(aBranchlistKey.DEVICEID1);
+        fields.add(aBranchlistKey.ACTIVE);
         return fields;
     }
 

@@ -65,10 +65,10 @@ public class DcBranchlist extends DBHelper {
 
     public ArrayList<String> getDescriptions() {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT " + aBranchlistKey.DESCRIPTION.getKey()
+        String strQry = "SELECT " + aBranchlistKey.BRANCHCODE.getKey()
                 + "  FROM " + Table.BRANCHLIST.getName()
-                + " GROUP BY " + aBranchlistKey.DESCRIPTION.getKey()
-                + " ORDER BY " + aBranchlistKey.DESCRIPTION.getKey() + " ASC";
+                + " GROUP BY " + aBranchlistKey.BRANCHCODE.getKey()
+                + " ORDER BY " + aBranchlistKey.BRANCHCODE.getKey() + " ASC";
         Cursor c = db.rawQuery(strQry, null);
         ArrayList<String> stringBranches = new ArrayList<String>();
         while (c.moveToNext()) {
@@ -84,8 +84,22 @@ public class DcBranchlist extends DBHelper {
     public LinkedList<aBranchlist> searchBranch(String searchStr, String strImei) {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName()
-                + " WHERE " + aBranchlistKey.DESCRIPTION.getKey() + " = '" + searchStr + "'"
+                + " WHERE " + aBranchlistKey.BRANCHID.getKey() + " = " + searchStr
                 + " AND " + aBranchlistKey.DEVICEID.getKey() + " = '" + strImei + "'";
+        Cursor c = db.rawQuery(strQry, null);
+        LinkedList<aBranchlist> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setBranchlist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    public LinkedList<aBranchlist> searchBranchViaBranchCode(String searchStr) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName()
+                + " WHERE " + aBranchlistKey.BRANCHCODE.getKey() + " = '" + searchStr + "'";
         Cursor c = db.rawQuery(strQry, null);
         LinkedList<aBranchlist> list = new LinkedList<>();
         while (c.moveToNext()) {
@@ -101,7 +115,9 @@ public class DcBranchlist extends DBHelper {
             c.getInt(c.getColumnIndex(aBranchlistKey.BRANCHID.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.BRANCHCODE.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.DEVICEID.getKey())),
-            c.getString(c.getColumnIndex(aBranchlistKey.DESCRIPTION.getKey()))
+            c.getString(c.getColumnIndex(aBranchlistKey.DESCRIPTION.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.DEVICEID1.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.ACTIVE.getKey()))
         );
         return bl;
     }
