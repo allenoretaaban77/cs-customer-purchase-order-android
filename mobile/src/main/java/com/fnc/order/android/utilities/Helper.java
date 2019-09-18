@@ -16,10 +16,12 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -49,16 +51,28 @@ import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.model.aStaffs;
+import com.google.api.core.NanoClock;
+import com.google.api.gax.paging.Page;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -68,6 +82,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,6 +95,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.callback.Callback;
 
 import static android.content.Context.WINDOW_SERVICE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Helper {
 
@@ -430,7 +446,7 @@ public class Helper {
 
     public static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(-777, "1", "2", "aban.allen@yahoo.com",
+        aStaffs cs = new aStaffs(-777, "-2", "2", "aban.allen@yahoo.com",
             "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
             1912072415, "P@ssw0rd" + Helper.getReqDate(0, ""),
             "true", "true");

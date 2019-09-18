@@ -36,6 +36,7 @@ import com.fnc.order.android.R;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
@@ -150,8 +151,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@massive.com");
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@massive.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -180,7 +181,11 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 "SUBMIT", new View.OnClickListener() {
                     public void onClick(View v) {
                         if (!refSelectedBranchId.equals("")) {
-                            LinkedList<aBranchlist> abl = DcBranchlist.getInstance(ctx).searchBranch(refSelectedBranchId, Helper.getImei(ctx));
+                            LinkedList<aBranchlist> abl =
+                                DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                                    aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+                                    new String[] { refSelectedBranchId, Helper.getImei(ctx) }
+                                );
                             if (abl.size() > 0) {
                                 int flgx = 0;
                                 aBranchlist ab = null;
@@ -245,8 +250,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 aBranchlist abr = new aBranchlist(0, "Select branch....", "", "","", "");
                 arrBranches.add(abr);
                 for(int k=0; k<refAbx.size(); k++){
-                    if (DcBranchlist.getInstance(ctx).searchBranchViaBranchCode(refAbx.get(k)).size() > 0) {
-                        abr = DcBranchlist.getInstance(ctx).searchBranchViaBranchCode(refAbx.get(k)).get(0);
+                    if (DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                            aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }
+                    ).size() > 0) {
+                        abr = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                                aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }
+                        ).get(0);
                         arrBranches.add(abr);
                     }
                 }
@@ -542,7 +551,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                 }
 
                                 if (strRef[1].equals("reinit")) {
-                                    LinkedList<aBranchlist> abl = DcBranchlist.getInstance(ctx).searchBranch(refSelectedBranchId, Helper.getImei(ctx));
+                                    LinkedList<aBranchlist> abl =
+//                                        DcBranchlist.getInstance(ctx).searchBranch(refSelectedBranchId, Helper.getImei(ctx));
+                                        DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                                            aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+                                            new String[] { refSelectedBranchId, Helper.getImei(ctx) }
+                                        );
                                     if (abl.size() > 0) {
                                         int flgx = 0;
                                         aBranchlist ab = null;
@@ -561,25 +575,27 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                             getPreRequisite();
                                         } else {
                                             BounceView.addAnimTo( Helper.okDialog( ctx,
-                                                    "Device Registration",
-                                                    "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
-                                                    "OK", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            showBranchDialog(strRef[1]);
-                                                        }
-                                                    }, false) );
-                                        }
-                                    } else {
-                                        BounceView.addAnimTo( Helper.okDialog( ctx,
                                                 "Device Registration",
-                                                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
+                                                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
                                                 "OK", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
                                                         showBranchDialog(strRef[1]);
                                                     }
                                                 }, false) );
+                                        }
+                                    } else {
+                                        BounceView.addAnimTo( Helper.okDialog( ctx,
+                                            "Device Registration",
+                                            "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
+                                            "OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    showBranchDialog(strRef[1]);
+                                                }
+                                            }, false) );
                                     }
                                 } else {
                                     showBranchDialog(strRef[1]);
