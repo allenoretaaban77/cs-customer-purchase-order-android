@@ -94,7 +94,10 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.callback.Callback;
 
+import hari.bounceview.BounceView;
+
 import static android.content.Context.WINDOW_SERVICE;
+import static androidx.core.content.pm.PackageInfoCompat.getLongVersionCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Helper {
@@ -407,9 +410,8 @@ public class Helper {
             return getImeiOld(ctx);
         }
     }
-
     @TargetApi(Build.VERSION_CODES.M)
-    public static String getImeiOld(Context ctx) {
+    private static String getImeiOld(Context ctx) {
         try {
             TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             return tm.getDeviceId();
@@ -418,15 +420,41 @@ public class Helper {
             return "";
         }
     }
-
     @TargetApi(Build.VERSION_CODES.O)
-    public static String getImeiNew(Context ctx) {
+    private static String getImeiNew(Context ctx) {
         try {
             TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             return tm.getImei();
         } catch(SecurityException e) {
             e.printStackTrace();
             return "";
+        }
+    }
+
+    public static int getVersionCode(Context ctx) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            return getVersionCodeNew(ctx);
+        } else {
+            return getVersionCodOld(ctx);
+        }
+    }
+    @TargetApi(Build.VERSION_CODES.P)
+    private static int getVersionCodeNew(Context ctx) {
+        try {
+            PackageInfo pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
+            return Integer.parseInt(String.valueOf(getLongVersionCode(pInfo)));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    private static int getVersionCodOld(Context ctx) {
+        try {
+            PackageInfo pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
+            return pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -488,4 +516,5 @@ public class Helper {
                 return monthNumber + day;
         }
     }
+
 }

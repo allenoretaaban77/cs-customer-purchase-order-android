@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.text.Editable;
@@ -30,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
@@ -56,6 +59,12 @@ import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PasswordVisibility;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.R;
+import com.google.api.core.NanoClock;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -70,6 +79,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -113,19 +124,6 @@ public class LoginActivity extends BaseActivity {
 //        addUser();
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        refreshUsers();
-
-        sp = SharedData.getInstance(this);
-        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
-        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
-
-//        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), this);
-    }
-
     private void initViews() {
         relPassword = (RelativeLayout) findViewById(R.id.relPassword);
         usernameText = (FormEditText) findViewById(R.id.username);
@@ -139,8 +137,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("7771");
-//        passwordEText.setText("1");
+//        usernameText.setText("2");
+//        passwordEText.setText("P@ssw0rd" + Helper.getReqDate(0, ""));
     }
 
     private void initListeners(){
@@ -1227,6 +1225,83 @@ public class LoginActivity extends BaseActivity {
         });
         viri.postBranchImei(getApplicationContext(), params,
                 strParams.replaceAll(" ", "%20"));
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        refreshUsers();
+        sp = SharedData.getInstance(this);
+        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
+        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
+        new checkVersionUpdate().execute("");
+    }
+    private Storage storageinit;
+    private class checkVersionUpdate extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                InputStream ins = getResources().openRawResource(
+                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
+                storageinit = StorageOptions.newBuilder()
+                        .setCredentials(credentials)
+                        .setClock(NanoClock.getDefaultClock())
+                        .setProjectId(GlobalConstants.GCP_PROJECTID)
+                        .build()
+                        .getService();
+                try {
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION, "version.log");
+                    Blob blob = storageinit.get(blobId);
+                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
+                    return "Success|" + new String(bytes, "UTF-8");
+                } catch (Exception e) {
+                    return "Error| exception = " + e.getLocalizedMessage();
+                }
+            } catch (IOException io) {
+                return "Error| io";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            String[] resMsg = result.split("\\|");
+            if (resMsg[0].equals("Success")) {
+                try {
+                    Log.d("gcp",  resMsg[1]);
+                    JSONArray objArr = new JSONArray(resMsg[1]);
+                    if (objArr.length() > 0) {
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
+                                String strVersionName = rowObj.getString("version_name");
+                                if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
+                                    BounceView.addAnimTo( Helper.okDialog( ctx,
+                                            "App Update",
+                                            "A new version of this app is now available.",
+                                            "UPDATE", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/testing/" + ctx.getPackageName())));
+                                                }
+                                            }, false) );
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        @Override
+        protected void onPreExecute() {
+            Log.d("gcpe", "Task Upload Starting");
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.d("gcpu", "Running " + + values[0]);
+        }
     }
 }
 

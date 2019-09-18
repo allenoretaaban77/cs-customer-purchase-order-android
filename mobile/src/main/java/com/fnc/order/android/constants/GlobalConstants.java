@@ -32,6 +32,7 @@ public class GlobalConstants {
     public static final String ACTION_PLAY = "action_play_fnc_order";
 
     public static String GCP_BUCKET_TARGET = "requested_imei";
+    public static String GCP_BUCKET_TARGET_FOR_VERSION = "app_updates";
     public static String GCP_PROJECTID = "customerdata-246518";
     public static String GCP_CREDENTIAL = "credentials";
 }
