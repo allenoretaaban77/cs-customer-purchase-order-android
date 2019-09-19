@@ -47,6 +47,7 @@ import com.fnc.order.android.activity.SplashActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.fragment.CustomerFragment;
@@ -472,12 +473,30 @@ public class Helper {
         }
     }
 
-    public static aStaffs defaultStaff(Context ctx) {
+    public static void insertDefaultStaffs(Context ctx) {
+        DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add dev
+        DcStaffs.getInstance(ctx).insertStaffs(Helper.adminStaff(ctx)); // add admin
+    }
+
+    private static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(-777, "-2", "2", "aban.allen@yahoo.com",
+        aStaffs cs = new aStaffs(-777, "-2", "administrator", "aban.allen@yahoo.com",
             "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
             1912072415, "P@ssw0rd" + Helper.getReqDate(0, ""),
             "true", "true");
+        return cs;
+    }
+
+    private static aStaffs adminStaff(Context ctx) {
+        SharedData sp = SharedData.getInstance(ctx);
+        aStaffs cs = new aStaffs(-777,
+                "-2",
+                sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
+                sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
+                sp.getData(SharedKey.REF_ADMIN_FULLNAME.getKey()),
+                Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
+                1912072415, sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
+                "true", "true");
         return cs;
     }
 

@@ -322,11 +322,18 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         btn_submit.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
                         BounceView.addAnimTo( Helper.okDialog(ctx,
                             "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
                             null, false) );
+                        return;
+                    }
+                } else {
+                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
+                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                                "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                null, false) );
                         return;
                     }
                 }
@@ -560,7 +567,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 headersMap.put("customer_integ_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
                 headersMap.put("deliver_date", refStringDate);
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     headersMap.put("createdby", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     headersMap.put("createdby", sp.getData(SharedKey.EMP_NO.getKey()));
@@ -569,7 +576,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 headersMap.put("pcortab_id", android_id);
                 headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
 //                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.EMP_NO.getKey()));
@@ -587,14 +594,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setCustomerName(sp.getData(SharedKey.CURRENT_STORE.getKey()));
                 ol.setDeliveryDate(refStringDate);
 //                ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     ol.setCreatedBy(sp.getData(SharedKey.EMP_NO.getKey()));
                 }
                 ol.setRemarks(et_remarks.getText().toString().trim());
 //                ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     ol.setReferenceEmployeeNo(sp.getData(SharedKey.EMP_NO.getKey()));
