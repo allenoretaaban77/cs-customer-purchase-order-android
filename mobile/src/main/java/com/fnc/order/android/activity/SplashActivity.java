@@ -51,6 +51,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.rpc.Help;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.tiper.MaterialSpinner;
@@ -71,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 
 import hari.bounceview.BounceView;
+import rx.internal.util.LinkedArrayList;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -103,6 +105,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 //        if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) {
 //            sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
 //        }
+        if(sp.getData(SharedKey.REF_DATABASE.getKey()).trim().equals("")) {
+            sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
+        }
         if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) {
             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
         }
@@ -476,7 +481,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                             }
                         }, false) );
                 } else {
-                    JSONArray objArr = new JSONArray(obj.getString("dtcompany").toString());
+                    JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
                     JSONObject objx = new JSONObject(objArr.get(0).toString());
                     if (objx.getString("DatabaseID").equals("")) {
                         Helper.dismissSpinnerDialog(loader);
@@ -492,10 +497,10 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         alertDialog.dismiss();
                         String strCN = "";
                         if (objx.getString("DatabaseID").equals("BackofficeLive")) {
-                            strCN = ServerConstants.CN;
                             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
                             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
                             sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), 0);
+                            strCN = sp.getData(SharedKey.REF_DATABASE.getKey()).trim();
                         } else {
                             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 0);
                             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
@@ -503,6 +508,24 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                             strCN = objx.getString("DatabaseID");
                         }
                         sp.saveData(SharedKey.DATABASE.getKey(), strCN);
+
+                        JSONArray objArrY = new JSONArray(obj.getString("dtuser"));
+                        JSONObject objy = new JSONObject(objArrY.get(0).toString());
+                        sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
+                        sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
+                        String strFN = objy.getString("FirstName") + "|" +
+                                objy.getString("MiddleName") + "|" +
+                                objy.getString("LastName");
+                        String[] arrFN = strFN.split("\\|");
+                        if (arrFN.length > 0) {
+                            strFN = "";
+                            for (int k = 0; k < arrFN.length; k++) {
+                                if (!String.valueOf(arrFN[k]).trim().equals(""))
+                                    strFN = strFN + arrFN[k] + " ";
+                            }
+                            sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
+                        }
+
                         String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
                         if (strImeiId.equals("")) {
                             getDeviceProfile("init");
@@ -520,6 +543,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
+                            alertDialog.show();
                         }
                     }, false) );
             }
@@ -618,7 +642,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 if (obj.length() > 0) {
                     JSONArray sArr = obj.getJSONArray("staff");
                     if (sArr.length() > 0) {
-                        DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add main
+                        DcStaffs.getInstance(ctx).emptyStaffslist();
+                        Helper.insertDefaultStaffs(ctx);
                         for (int i = 0; i < sArr.length(); i++) {
                             JSONObject rowObj = sArr.getJSONObject(i);
                             aStaffs sl = new aStaffs(

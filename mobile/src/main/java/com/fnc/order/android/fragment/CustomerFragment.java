@@ -544,7 +544,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         JSONArray sArr = obj.getJSONArray("staff");
                         if (sArr.length() > 0) {
                             DcStaffs.getInstance(ctx).emptyStaffslist();
-                            DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add main
+                            Helper.insertDefaultStaffs(ctx);
                             for (int i = 0; i < sArr.length(); i++) {
                                 JSONObject rowObj = sArr.getJSONObject(i);
                                 aStaffs sl = new aStaffs(
@@ -818,9 +818,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 if (et_firstname.getText().toString().trim().equals("")) {
                     Toast.makeText(ctx, "Invalid first name.", Toast.LENGTH_SHORT).show(); return;
                 }
-                if (et_middlename.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid middle name.", Toast.LENGTH_SHORT).show(); return;
-                }
+//                if (et_middlename.getText().toString().trim().equals("")) {
+//                    Toast.makeText(ctx, "Invalid middle name.", Toast.LENGTH_SHORT).show(); return;
+//                }
                 if (et_lastname.getText().toString().trim().equals("")) {
                     Toast.makeText(ctx, "Invalid last name.", Toast.LENGTH_SHORT).show(); return;
                 }
@@ -845,7 +845,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 params.put("email", "");
                 params.put("pass", et_password.getText().toString().trim());
                 params.put("fname", et_firstname.getText().toString().trim());
-                params.put("mname", et_middlename.getText().toString().trim());
+                params.put("mname", et_middlename.getText().toString().trim().equals("") ? "Null" : et_middlename.getText().toString().trim() );
                 params.put("lname", et_lastname.getText().toString().trim());
                 params.put("branch", sp.getData(SharedKey.BRANCH_ID.getKey()));
                 params.put("jobtitle", et_jobtitle_id.getText().toString().trim());

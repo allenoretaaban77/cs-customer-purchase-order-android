@@ -193,7 +193,7 @@ public class LoginActivity extends BaseActivity {
                     if (slUP.size() > 0 ) {
                         aStaffs slx = slUP.get(0);
                         if (slx.getRefempno().equals("-1")) {
-                            if(sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                            if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                                 isSubmit = false;
                                 BounceView.addAnimTo( Helper.okDialog( ctx,
                                         "Error","Reference employee number not recognized", "CLOSE",
@@ -209,7 +209,7 @@ public class LoginActivity extends BaseActivity {
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_ISMOBILEADMIN.getKey(), String.valueOf(slx.getIsmobileadmin()));
                         isSubmit = true;
                         showActivity(MainActivity.class);
-                        Toast.makeText(ctx, "Welcome!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ctx, "Welcome " + slx.getName() + "!", Toast.LENGTH_SHORT).show();
                     } else {
                         isSubmit = false;
                         BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -243,99 +243,108 @@ public class LoginActivity extends BaseActivity {
                             SharedData spx = SharedData.getInstance(ctx);
                             alertDialogSettingsAuth.dismiss();
 
-                            if (spx.getData(SharedKey.DEV_USERNAME.getKey()).equals(etUsername.getText().toString()) &&
-                                    spx.getData(SharedKey.DEV_PASSWORD.getKey()).equals(etPassword.getText().toString())) {
+                            LinkedList<aStaffs> slUP = DcStaffs.getInstance(ctx).checkStaff(
+                                etUsername.getText().toString().trim(),
+                                etPassword.getText().toString().trim() );
+                            if (slUP.size() > 0 ) {
+                                aStaffs slx = slUP.get(0);
+                                if (slx.getIsmobileadmin().equals("true") && slx.getName().equals("IT Support")) {
+//                                  if (spx.getData(SharedKey.DEV_USERNAME.getKey()).equals(etUsername.getText().toString()) &&
+//                                  spx.getData(SharedKey.DEV_PASSWORD.getKey()).equals(etPassword.getText().toString())) {
                                     alertDialogSettings = actionDialog(ctx, "SETTINGS",
-                                        "Customize settings per client as required",
-                                        "Server", "Database",
-                                        "UPDATE", new View.OnClickListener() {
-                                            public void onClick(View v) {
-                                                LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
-                                                EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
-                                                EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
-                                                Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
-                                                Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
-                                                Switch sw_saveitems = (Switch) layout.findViewById(R.id.sw_saveitems);
-                                                SharedData spx = SharedData.getInstance(ctx);
-                                                spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
-                                                spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
-                                                spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
-                                                spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
-                                                spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
+                                            "Customize settings per client as required",
+                                            "Server", "Database",
+                                            "UPDATE", new View.OnClickListener() {
+                                                public void onClick(View v) {
+                                                    LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
+                                                    EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
+                                                    EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
+                                                    Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
+                                                    Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
+                                                    Switch sw_saveitems = (Switch) layout.findViewById(R.id.sw_saveitems);
+                                                    SharedData spx = SharedData.getInstance(ctx);
+                                                    spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
+                                                    spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
+                                                    spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
+                                                    spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
+                                                    spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
 
-                                                DcAitemlist.getInstance(ctx).emptyaItemlist();
-                                                DcOrdered.getInstance(ctx).emptyOrderedlist();
-                                                DcMenulist.getInstance(ctx).emptyMenulist();
-                                                DcStaffs.getInstance(ctx).emptyStaffslist(); refreshUsers();
+                                                    DcAitemlist.getInstance(ctx).emptyaItemlist();
+                                                    DcOrdered.getInstance(ctx).emptyOrderedlist();
+                                                    DcMenulist.getInstance(ctx).emptyMenulist();
+                                                    DcStaffs.getInstance(ctx).emptyStaffslist(); refreshUsers();
 
-                                                postBranchImei(); // check branch before success
+                                                    postBranchImei(); // check branch before success
 //                                                alertDialogSettings.dismiss();
 //                                                Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
-                                            }
-                                        },
-                                        "CHANGE BRANCH", new View.OnClickListener() {
-                                            public void onClick(View v) {
-                                                addUser();
-                                            }
-                                        },1);
+                                                }
+                                            },
+                                            "CHANGE BRANCH", new View.OnClickListener() {
+                                                public void onClick(View v) {
+                                                    addUser();
+                                                }
+                                            },1);
 
-                                LinearLayout ll_skuvalid = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_validations);
-                                ll_skuvalid.setVisibility(View.VISIBLE);
+                                    LinearLayout ll_skuvalid = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_validations);
+                                    ll_skuvalid.setVisibility(View.VISIBLE);
 
-                                EditText etDomainServerName = (EditText) alertDialogSettings.findViewById(R.id.et_edittext1);
-                                String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
-                                etDomainServerName.setText(strSN);
-                                EditText etDatabase = (EditText) alertDialogSettings.findViewById(R.id.et_edittext2);
-                                etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()).toLowerCase());
+                                    EditText etDomainServerName = (EditText) alertDialogSettings.findViewById(R.id.et_edittext1);
+                                    String strSN = spx.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).replace("http://","").replace("/","");
+                                    etDomainServerName.setText(strSN);
+                                    EditText etDatabase = (EditText) alertDialogSettings.findViewById(R.id.et_edittext2);
+                                    etDatabase.setText(spx.getData(SharedKey.DATABASE.getKey()).toLowerCase());
 
-                                Switch sw_skuvalid = (Switch) alertDialogSettings.findViewById(R.id.sw_skuvalid);
-                                sw_skuvalid.setChecked(spx.getInt(SharedKey.SKU_VALIDATION.getKey()) == 1 ? true : false);
+                                    Switch sw_skuvalid = (Switch) alertDialogSettings.findViewById(R.id.sw_skuvalid);
+                                    sw_skuvalid.setChecked(spx.getInt(SharedKey.SKU_VALIDATION.getKey()) == 1 ? true : false);
 
-                                Switch sw_preloaditems = (Switch) alertDialogSettings.findViewById(R.id.sw_preloaditems);
-                                sw_preloaditems.setChecked(spx.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1 ? true : false);
+                                    Switch sw_preloaditems = (Switch) alertDialogSettings.findViewById(R.id.sw_preloaditems);
+                                    sw_preloaditems.setChecked(spx.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1 ? true : false);
 
-                                Switch sw_saveitems = (Switch) alertDialogSettings.findViewById(R.id.sw_saveitems);
-                                sw_saveitems.setChecked(spx.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1 ? true : false);
+                                    Switch sw_saveitems = (Switch) alertDialogSettings.findViewById(R.id.sw_saveitems);
+                                    sw_saveitems.setChecked(spx.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1 ? true : false);
 
-                                LinearLayout ll_add_user = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_add_user);
+                                    LinearLayout ll_add_user = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_add_user);
 //                                ll_add_user.setVisibility(View.VISIBLE);
 
-                                LinearLayout ll_branch_box = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_branch_box);
+                                    LinearLayout ll_branch_box = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_branch_box);
 //                                ll_branch_box.setVisibility(View.VISIBLE);
 
-                                tvBranchdescription = (TextView) alertDialogSettings.findViewById(R.id.tv_branchdescription);
-                                tvBranchdescription.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        msBranches.performClick();
-                                    }
-                                });
-                                msBranches = (Spinner) alertDialogSettings.findViewById(R.id.ms_branches);
-                                loadSpinnerBranches();
+                                    tvBranchdescription = (TextView) alertDialogSettings.findViewById(R.id.tv_branchdescription);
+                                    tvBranchdescription.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            msBranches.performClick();
+                                        }
+                                    });
+                                    msBranches = (Spinner) alertDialogSettings.findViewById(R.id.ms_branches);
+                                    loadSpinnerBranches();
 
-                                MaterialRippleLayout mlrReload = (MaterialRippleLayout) alertDialogSettings.findViewById(R.id.mrl_reload);
-                                mlrReload.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        EditText etDomainServerName = (EditText) alertDialogSettings.findViewById(R.id.et_edittext1);
-                                        EditText etDatabase = (EditText) alertDialogSettings.findViewById(R.id.et_edittext2);
-                                        Switch sw_skuvalid = (Switch) alertDialogSettings.findViewById(R.id.sw_skuvalid);
-                                        Switch sw_preloaditems = (Switch) alertDialogSettings.findViewById(R.id.sw_preloaditems);
-                                        Switch sw_saveitems = (Switch) alertDialogSettings.findViewById(R.id.sw_saveitems);
-                                        SharedData spx = SharedData.getInstance(ctx);
-                                        spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
-                                        spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
-                                        spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
-                                        spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
-                                        spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
-                                        loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait...."); loader.show();
-                                        getDeviceProfile("reload");
-                                    }
-                                });
+                                    MaterialRippleLayout mlrReload = (MaterialRippleLayout) alertDialogSettings.findViewById(R.id.mrl_reload);
+                                    mlrReload.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            EditText etDomainServerName = (EditText) alertDialogSettings.findViewById(R.id.et_edittext1);
+                                            EditText etDatabase = (EditText) alertDialogSettings.findViewById(R.id.et_edittext2);
+                                            Switch sw_skuvalid = (Switch) alertDialogSettings.findViewById(R.id.sw_skuvalid);
+                                            Switch sw_preloaditems = (Switch) alertDialogSettings.findViewById(R.id.sw_preloaditems);
+                                            Switch sw_saveitems = (Switch) alertDialogSettings.findViewById(R.id.sw_saveitems);
+                                            SharedData spx = SharedData.getInstance(ctx);
+                                            spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
+                                            spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
+                                            spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
+                                            spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
+                                            spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
+                                            loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait...."); loader.show();
+                                            getDeviceProfile("reload");
+                                        }
+                                    });
 
-                                alertDialogSettings.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
-                                alertDialogSettings.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                BounceView.addAnimTo(alertDialogSettings);
+                                    alertDialogSettings.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                    alertDialogSettings.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                    BounceView.addAnimTo(alertDialogSettings);
+                                } else {
+                                    Toast.makeText(ctx, "Access denied. Invalid credentials.", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
                                 Toast.makeText(ctx, "Access denied. Invalid credentials.", Toast.LENGTH_SHORT).show();
                             }
@@ -932,7 +941,7 @@ public class LoginActivity extends BaseActivity {
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
                                     DcStaffs.getInstance(ctx).emptyStaffslist();
-                                    DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add main
+                                    Helper.insertDefaultStaffs(ctx);
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
@@ -951,7 +960,7 @@ public class LoginActivity extends BaseActivity {
                                     }
                                 } else {
                                     DcStaffs.getInstance(ctx).emptyStaffslist();
-                                    DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add main
+                                    Helper.insertDefaultStaffs(ctx); // add main
                                 }
                             } else {
                                 Log.d("dsxe getuser", response);
@@ -1232,7 +1241,7 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         refreshUsers();
         sp = SharedData.getInstance(this);
-        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "dev");
+        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "admin");
         sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
         new checkVersionUpdate().execute("");
     }
