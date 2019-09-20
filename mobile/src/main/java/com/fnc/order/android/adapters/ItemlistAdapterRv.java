@@ -103,7 +103,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
 //                holder.tvUnit.setTextColor(ctx.getResources().getColor(R.color.gold_3));
 ////                holder.item_box.setAlpha(0.7f);
 //            }else{
-                holder.tvName.setTextColor(ctx.getResources().getColor(R.color.red_2));
+                holder.tvName.setTextColor(ctx.getResources().getColor(R.color.gray_8));
                 holder.tvUnit.setTextColor(ctx.getResources().getColor(R.color.orange_1));
 //                holder.item_box.setAlpha(ctx.getResources().getDrawable(R.color.transparent));
                 holder.cb_select.setVisibility(View.VISIBLE);

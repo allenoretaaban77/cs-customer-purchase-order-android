@@ -403,7 +403,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        alertDialog.dismiss();
+                                        if (alertDialog != null) alertDialog.dismiss();
                                         Helper.hideSoftKeyboard(getActivity());
                                         new Handler().postDelayed(new Runnable() {
                                             @Override

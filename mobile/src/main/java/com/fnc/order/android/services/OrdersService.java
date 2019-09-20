@@ -135,7 +135,7 @@ public class OrdersService extends Service {
 
                         @Override
                         public void onRequestFail(VolleyError response, String type) {
-                            Log.d("DSX post error: ", response.getMessage());
+//                            Log.d("DSX post error: ", response.getMessage());
 
                             DcOrdered.getInstance(getApplicationContext())
                                     .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);

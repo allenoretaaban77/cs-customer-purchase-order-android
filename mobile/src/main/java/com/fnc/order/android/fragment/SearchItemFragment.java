@@ -267,7 +267,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         } catch (Exception e) {
             tv_no_data.setVisibility(View.VISIBLE);
             rvItems.setVisibility(View.GONE);
-            Log.d("dsx", "search error " + e.getMessage());
+//            Log.d("dsx", "search error " + e.getMessage());
             Toast.makeText(ctx, "Search items error.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
