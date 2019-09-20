@@ -25,7 +25,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
@@ -37,13 +36,11 @@ import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
-import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.api.core.NanoClock;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
@@ -51,28 +48,20 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.google.rpc.Help;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
-import com.tiper.MaterialSpinner;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import hari.bounceview.BounceView;
-import rx.internal.util.LinkedArrayList;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
