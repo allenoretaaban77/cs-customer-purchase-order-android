@@ -403,8 +403,8 @@ public class Helper {
         return SharedData.getInstance(ctx).getData(SharedKey.CURRENT_PAGE.getKey());
     }
 
-
     public static String getImei(Context ctx) {
+//        return "353800100112222";
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             return getImeiNew(ctx); // + "70";
         } else {

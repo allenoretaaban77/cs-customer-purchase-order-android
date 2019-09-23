@@ -42,6 +42,7 @@ public enum SharedKey {
     REF_EMP_NO("reference_employee_no_x"),
     EMP_NAME("employee_name"),
     EMP_POSITION("employee_position"),
+    REF_JOBTITLES("ref_jobtitles"),
     EMP_ISMOBILEADMIN("employee_ismobileadmin");
 
     private String key;
