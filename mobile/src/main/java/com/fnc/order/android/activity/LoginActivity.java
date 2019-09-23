@@ -39,20 +39,10 @@ import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
-import com.fnc.order.android.datacontroller.DcUserslist;
-import com.fnc.order.android.enumeration.API;
-import com.fnc.order.android.enumeration.ItemlistKey;
-import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
-import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
-import com.fnc.order.android.enumeration.aItemlistKey;
-import com.fnc.order.android.model.Itemlist;
-import com.fnc.order.android.model.MenuList;
-import com.fnc.order.android.model.Userslist;
 import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aBranchlist;
-import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.VolleyInteractor;
 import com.fnc.order.android.utilities.Helper;
@@ -67,7 +57,6 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -85,7 +74,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import hari.bounceview.BounceView;
@@ -137,8 +125,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("2");
-//        passwordEText.setText("P@ssw0rd" + Helper.getReqDate(0, ""));
+//        usernameText.setText("admin@massive.com");
+//        passwordEText.setText("admin123");
     }
 
     private void initListeners(){
@@ -160,7 +148,8 @@ public class LoginActivity extends BaseActivity {
             public void afterTextChanged(Editable editable) { }
         });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(
+                new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(isSubmit == true) { return; }
@@ -989,7 +978,7 @@ public class LoginActivity extends BaseActivity {
                 }
                 vipr.getPreRequisite(getApplicationContext(), params, strParams.replaceAll(" ", "%20"));
             }
-        }, 500);
+        }, 300);
     }
 
     private void getDeviceProfile(String type) {

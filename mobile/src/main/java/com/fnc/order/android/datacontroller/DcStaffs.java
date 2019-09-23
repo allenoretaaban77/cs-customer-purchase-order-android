@@ -62,6 +62,21 @@ public class DcStaffs extends DBHelper {
         return list;
     }
 
+    public LinkedList<aStaffs> getStaffswihtOrder() {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.STAFFS.getName() +
+                " WHERE " + aStaffsKey.REFEMPNO.getKey() + " != '-2' " +
+                " ORDER BY " + aStaffsKey.NAME.getKey() + " ASC";
+        Cursor c = db.rawQuery(strQry, null);
+        LinkedList<aStaffs> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setStaffs(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
     public LinkedList<aStaffs> checkStaff(String strUn, String strPw) {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.STAFFS.getName()

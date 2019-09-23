@@ -14,7 +14,7 @@
 
             <TextView
                 android:layout_marginTop="5dp"
-                android:textColor="@color/green_5"
+                android:textColor="@color/white"
                 android:fontFamily="@font/medium"
                 android:textSize="90sp"
                 android:gravity="center"

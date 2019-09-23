@@ -251,7 +251,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                         showDatePicker();
                     }
-                }, 500);
+                }, 300);
             }
         });
         et_remarks.setOnClickListener(new View.OnClickListener() {
@@ -261,7 +261,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     public void run() {
                         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                     }
-                }, 500);
+                }, 300);
             }
         });
         bsCalc.setOnClickListener(new View.OnClickListener() {
@@ -411,7 +411,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                                 bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                                                 showDatePicker();
                                             }
-                                        }, 500);
+                                        }, 300);
                                     }
                                 }
                                 , false

@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -56,6 +57,7 @@ import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
+import com.liaoinstan.springview.widget.SpringView;
 import com.shehabic.droppy.DroppyClickCallbackInterface;
 import com.shehabic.droppy.DroppyMenuItem;
 import com.shehabic.droppy.DroppyMenuPopup;
@@ -98,42 +100,20 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private DroppyMenuPopup sortMenuObj;
     private String updateCustomerMessage = "Please wait while updating customer lists...";
     private SharedData sp;
+    private Fragment thisFragment;
+    private static final int USER_DIALOG_FRAGMENT = 7;
+    private SpringView springView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_menu, container, false);
         ctx = v.getContext();
+        thisFragment = this;
         Helper.setPreviousPage(ctx, "main_page");
         sp = SharedData.getInstance(ctx);
 
         initViews(v);
         initListeners(v);
-
-        /*v.setFocusableInTouchMode(true);
-        v.requestFocus();
-        v.setOnKeyListener( new View.OnKeyListener() {
-            @Override
-            public boolean onKey( View v, int keyCode, KeyEvent event ) {
-                Log.d("dsx", "backpressed on CustomerFragment");
-                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if (isUpdateCustomer) {
-                        Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show();
-                    } else {
-                        alertDialog = Helper.okCancelDialog(ctx,
-                                "Closing Application", "Are you sure you want to close this app?",
-                                "Ok", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        getActivity().finishAndRemoveTask();
-                                    }
-                                }, "Cancel", null, false);
-                        BounceView.addAnimTo(alertDialog);
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });*/
 
         if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
                 .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
@@ -187,13 +167,26 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         ll_version_box = (LinearLayout) v.findViewById(R.id.ll_version_box);
         boxMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
         boxMenu.setXOffset(85);
-        boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions ")).addSeparator();
+        boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "));
+        boxMenu.addMenuItem(new DroppyMenuItem("  Reload Items ")).addSeparator();
         if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
             sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
-            boxMenu.addMenuItem(new DroppyMenuItem("  Update Users "));
-            boxMenu.addMenuItem(new DroppyMenuItem("  Add User ")).addSeparator();
+            boxMenu.addMenuItem(new DroppyMenuItem("  Users ")).addSeparator();
+//            boxMenu.addMenuItem(new DroppyMenuItem("  Add User ")).addSeparator();
         }
         boxMenu.addMenuItem(new DroppyMenuItem("  Log-out "));
+
+        springView = (SpringView) v.findViewById(R.id.mysv);
+        springView.setListener(new SpringView.OnFreshListener() {
+            @Override
+            public void onRefresh() {
+                springView.stopNestedScroll();
+            }
+            @Override
+            public void onLoadmore() {
+                Log.d("dsx", "load more");
+            }
+        });
     }
 
     private void initListeners(View v) {
@@ -267,23 +260,35 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             @Override
             public void call(View v, int id) {
                 if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
-
                 switch(id){
                     case 0:
                         Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
                             new TransactionFragment(), "transaction_fragment", "customer_fragment");
                         break;
                     case 1:
+                        BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                            "Update Customers", "Are you sure you want to re-fetch customer list?",
+                            "Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    storelistview_box.setVisibility(View.GONE);
+                                    alphagridview_box.setVisibility(View.VISIBLE);
+                                    requestCustomers("");
+                                }
+                            }, "Cancel", null, false) );
+                        break;
+                    case 2:
                         if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
                                 sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
-                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-                                "Update Users", "Are you sure you want to update user records?",
-                                "Ok", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        updateUsers();
-                                    }
-                                }, "Cancel", null, false) );
+//                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+//                                "Update Users", "Are you sure you want to update user records?",
+//                                "Ok", new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        updateUsers();
+//                                    }
+//                                }, "Cancel", null, false) );
+                            loadUsers();
                         } else {
                             BounceView.addAnimTo( Helper.okCancelDialog(ctx,
                                 "Log Out", "Are you sure you want to log-out?",
@@ -296,21 +301,21 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                 }, "Cancel", null, false) );
                         }
                         break;
-                    case 2:
-                        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
-                                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
-                            addUser();
-                        } else {
-                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-                                "Add User", "Access Denied!",
-                                "Ok", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }, "Cancel", null, false) );
-                        }
-                        break;
+//                    case 3:
+//                        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
+//                                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
+//                            addUser();
+//                        } else {
+//                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+//                                "Add User", "Access Denied!",
+//                                "Ok", new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        dialog.dismiss();
+//                                    }
+//                                }, "Cancel", null, false) );
+//                        }
+//                        break;
                     case 3:
                         BounceView.addAnimTo( Helper.okCancelDialog(ctx,
                                 "Log Out", "Are you sure you want to log-out?",
@@ -330,24 +335,28 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     }
 
     private void requestCustomers(String stringSearch) {
-        showSpinnerDialog();
-        Toast.makeText(ctx, updateCustomerMessage, Toast.LENGTH_SHORT).show();
+        if (Helper.isNetworkAvailable(ctx)) {
+            showSpinnerDialog();
+            Toast.makeText(ctx, updateCustomerMessage, Toast.LENGTH_SHORT).show();
 
-        VolleyInteractor vic = new VolleyInteractor();
-        vic.registerCallback(this);
-        HashMap<String, String> params = new HashMap<>();
-        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
-        params.put("customer", stringSearch);
+            VolleyInteractor vic = new VolleyInteractor();
+            vic.registerCallback(this);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
+            params.put("customer", stringSearch);
 
-        Iterator it = params.entrySet().iterator();
-        String strParams = "";
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
-            it.remove();
+            Iterator it = params.entrySet().iterator();
+            String strParams = "";
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                it.remove();
+            }
+            strParams = strParams.replaceAll(" ", "%20");
+            vic.getCustomers(ctx, params, strParams);
+        } else {
+            Toast.makeText(ctx, "Please check internet connectoin", Toast.LENGTH_SHORT).show();
         }
-        strParams = strParams.replaceAll(" ", "%20");
-        vic.getCustomers(ctx, params, strParams);
     }
 
     private void fillData(View v, String stringSearch, Boolean isAlpha) {
@@ -424,7 +433,6 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             loader.dismiss();
         }
     }
-
 
     private ProgressBar progressBarx;
     private Boolean isUpdateCustomer = false;
@@ -777,219 +785,78 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         }
     }
 
-    private Spinner btnAddJobTitle;
-    private FormEditText et_jobtitle;
-    private EditText et_jobtitle_id;
-    private ArrayAdapter<aAdminGroupings> spinneradapter;
-    private void addUser() {
-        alertDialogUser = addUserDialog(ctx);
-        et_jobtitle = (FormEditText) alertDialogUser.findViewById(R.id.et_jobtitle);
-        et_jobtitle.setOnClickListener(new View.OnClickListener() {
+    private void loadUsers() {
+        if (!Helper.isNetworkAvailable(ctx)) {
+            Toast.makeText(ctx, "User fetch failed.  Please check your connection.",
+                    Toast.LENGTH_SHORT).show(); return;
+        }
+
+        loader = Helper.showSpinnerDialog(ctx, "Reloading Users", "Please wait..."); loader.show();
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-                btnAddJobTitle.performClick();
-            }
-        });
-        et_jobtitle_id = (EditText) alertDialogUser.findViewById(R.id.et_jobtitle_id);
-        btnAddJobTitle = (Spinner) alertDialogUser.findViewById(R.id.btnAddJobTitle);
-
-        MaterialRippleLayout mrlAddJobtitle = (MaterialRippleLayout) alertDialogUser.findViewById(R.id.mrl_add_jobtitle);
-        mrlAddJobtitle.setOnClickListener (new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addJobtitle();
-            }
-        });
-
-        Button btnSubmit = (Button) alertDialogUser.findViewById(R.id.btn_submit);
-        btnSubmit.setOnClickListener (new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FormEditText et_employeeno = (FormEditText) alertDialogUser.findViewById(R.id.et_employeeno);
-                FormEditText et_firstname = (FormEditText) alertDialogUser.findViewById(R.id.et_firstname);
-                FormEditText et_middlename = (FormEditText) alertDialogUser.findViewById(R.id.et_middlename);
-                FormEditText et_lastname = (FormEditText) alertDialogUser.findViewById(R.id.et_lastname);
-                FormEditText et_password = (FormEditText) alertDialogUser.findViewById(R.id.et_password);
-                FormEditText et_repeatpassword = (FormEditText) alertDialogUser.findViewById(R.id.et_repeatpassword);
-
-                if (et_employeeno.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid employee number.", Toast.LENGTH_SHORT).show(); return;
-                }
-                if (et_firstname.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid first name.", Toast.LENGTH_SHORT).show(); return;
-                }
-//                if (et_middlename.getText().toString().trim().equals("")) {
-//                    Toast.makeText(ctx, "Invalid middle name.", Toast.LENGTH_SHORT).show(); return;
-//                }
-                if (et_lastname.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid last name.", Toast.LENGTH_SHORT).show(); return;
-                }
-                if (et_jobtitle_id.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Please select job title.", Toast.LENGTH_SHORT).show(); return;
-                }
-                if (et_password.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
-                }
-                if (et_repeatpassword.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
-                }
-                if (!et_repeatpassword.getText().toString().trim().equals(et_password.getText().toString().trim())) {
-                    Toast.makeText(ctx, "Psssword does not match.", Toast.LENGTH_SHORT).show(); return;
-                }
-
-                loader = Helper.showSpinnerDialog(ctx, "Posting User Info", "Please wait..."); loader.show();
-
-                HashMap<String, String> params = new HashMap<>();
-                params.put("cnstr", sp.getData(SharedKey.DATABASE.getKey()));
-                params.put("empNo", et_employeeno.getText().toString().trim());
-                params.put("email", "");
-                params.put("pass", et_password.getText().toString().trim());
-                params.put("fname", et_firstname.getText().toString().trim());
-                params.put("mname", et_middlename.getText().toString().trim().equals("") ? "Null" : et_middlename.getText().toString().trim() );
-                params.put("lname", et_lastname.getText().toString().trim());
-                params.put("branch", sp.getData(SharedKey.BRANCH_ID.getKey()));
-                params.put("jobtitle", et_jobtitle_id.getText().toString().trim());
-                Iterator it = params.entrySet().iterator();
-                String strParams = "";
-                while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry)it.next();
-                    strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
-                    it.remove();
-                }
-                final VolleyInteractor vidp = new VolleyInteractor();
-                vidp.registerCallback(new VolleyCallback() {
+            public void run() {
+                final VolleyInteractor vipr = new VolleyInteractor();
+                vipr.registerCallback(new VolleyCallback() {
                     @Override
                     public void onRequestSuccess(final String response, String type) {
+                        Log.d("dsxs getuser", response);
                         try {
-                            Helper.dismissSpinnerDialog(loader);
-                            JSONArray objArr = new JSONArray(response);
-                            JSONObject obj = new JSONObject(objArr.get(0).toString());
-                            if (obj.getString("error").equals("true")) {
-                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                            JSONObject obj = new JSONObject(response);
+                            if (obj.length() > 0) {
+                                JSONArray sArr = obj.getJSONArray("staff");
+                                if (sArr.length() > 0) {
+                                    DcStaffs.getInstance(ctx).emptyStaffslist();
+                                    Helper.insertDefaultStaffs(ctx);
+                                    for (int i = 0; i < sArr.length(); i++) {
+                                        JSONObject rowObj = sArr.getJSONObject(i);
+                                        aStaffs sl = new aStaffs(
+                                                rowObj.getInt("empId"),
+                                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                                rowObj.getString("empNo"),
+                                                rowObj.getString("Email"),
+                                                rowObj.getString("name"),
+                                                rowObj.getInt("Branch"),
+                                                rowObj.getInt("Jobtitle"),
+                                                rowObj.getString("pass"),
+                                                rowObj.getString("active"),
+                                                rowObj.getString("ismobileadmin")
+                                        );
+                                        DcStaffs.getInstance(ctx).insertStaffs(sl);
+                                    }
+                                } else {
+                                    DcStaffs.getInstance(ctx).emptyStaffslist();
+                                    Helper.insertDefaultStaffs(ctx); // add main
+                                }
+                                loadAdminJobTitles();
                             } else {
-                                Log.d("DSX signup success", response);
-                                Toast.makeText(ctx, "User successfully added!", Toast.LENGTH_SHORT).show();
-                                updateUsers();
-                                alertDialogUser.dismiss();
+                                Log.d("dsxe getuser", response);
+//                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
-                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                            Log.d("dsxe getuser", response);
+//                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                         }
                     }
                     @Override
                     public void onRequestFail(VolleyError response, String type) {
                         Helper.dismissSpinnerDialog(loader);
-                        Log.d("DSX signup success: ", String.valueOf(response.getMessage()));
-                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                        Log.d("dsxe getuser", String.valueOf(response));
+//                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                     }
                 });
-                Log.d("dsx", strParams);
-                vidp.postBranchSignUp(ctx, params, strParams.replaceAll(" ", "%20"));
-            }
-        });
-
-        alertDialogUser.getWindow().setLayout(Helper.getDialogWidthSignup(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
-        alertDialogUser.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        BounceView.addAnimTo(alertDialog);
-
-        loadAdminJobTitles();
-    }
-
-    private AlertDialog addUserDialog(final Context activity) {
-
-        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.dialog_add_user, null);
-
-        MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                alertDialogUser.dismiss();
-            }
-        });
-
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
-        builder.setView(layout);
-        builder.create();
-        builder.setCancelable(false);
-        return builder.show();
-    }
-
-    private void addJobtitle() {
-        alertDialogJobTitle = addJobTitleDialog(ctx);
-
-        Button btnSubmit = (Button) alertDialogJobTitle.findViewById(R.id.btn_submit);
-        btnSubmit.setOnClickListener (new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FormEditText et_jobtitle_code = (FormEditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_code);
-                FormEditText et_jobtitle_description = (FormEditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_description);
-
-                if (et_jobtitle_code.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid job title code.", Toast.LENGTH_SHORT).show(); return;
-                }
-                if (et_jobtitle_description.getText().toString().trim().equals("")) {
-                    Toast.makeText(ctx, "Invalid description.", Toast.LENGTH_SHORT).show(); return;
-                }
-                loader = Helper.showSpinnerDialog(ctx, "Posting Job Title Info", "Please wait..."); loader.show();
-
                 HashMap<String, String> params = new HashMap<>();
                 params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
-                params.put("type", "5");
-                params.put("code", et_jobtitle_code.getText().toString().trim());
-                params.put("desc", et_jobtitle_description.getText().toString().trim());
+                params.put("branchid", sp.getData(SharedKey.BRANCH_ID.getKey()));
                 Iterator it = params.entrySet().iterator();
                 String strParams = "";
                 while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry)it.next();
-                    strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                    Map.Entry pair = (Map.Entry) it.next();
+                    strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
                     it.remove();
                 }
-                final VolleyInteractor vijt = new VolleyInteractor();
-                vijt.registerCallback(new VolleyCallback() {
-                    @Override
-                    public void onRequestSuccess(final String response, String type) {
-                        if (response.trim().toLowerCase().equals("true")) {
-                            Helper.dismissSpinnerDialog(loader);
-                            alertDialogJobTitle.dismiss();
-                            loadAdminJobTitles();
-                        } else {
-                            Toast.makeText(ctx, "Adding jobtitle failed", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    @Override
-                    public void onRequestFail(VolleyError response, String type) {
-                        Helper.dismissSpinnerDialog(loader);
-                        Log.d("DSX signup success: ", String.valueOf(response.getMessage()));
-                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                Log.d("dsx", strParams);
-                vijt.postAddJobTitle(ctx, params, strParams.replaceAll(" ", "%20"));
+                vipr.getPreRequisite(ctx, params, strParams.replaceAll(" ", "%20"));
             }
-        });
-
-        alertDialogJobTitle.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
-        alertDialogJobTitle.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        BounceView.addAnimTo(alertDialogJobTitle);
-    }
-
-    private AlertDialog addJobTitleDialog(final Context activity) {
-
-        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.dialog_add_jobtitle, null);
-
-        MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                alertDialogJobTitle.dismiss();
-            }
-        });
-
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
-        builder.setView(layout);
-        builder.create();
-        builder.setCancelable(false);
-        return builder.show();
+        }, 300);
     }
 
     private void loadAdminJobTitles() {
@@ -1007,64 +874,20 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         viag.registerCallback(new VolleyCallback() {
             @Override
             public void onRequestSuccess(String response, String type) {
-                try {
-                    response = response.replace("\r\n ", "");
-                    Log.d("DSX post response: ", response);
-                    JSONArray objArr = new JSONArray(response);
-                    final LinkedList<aAdminGroupings> sl = new LinkedList<>();
-                    if(objArr.length() > 0) {
-                        aAdminGroupings cjt = new aAdminGroupings();
-                        cjt.setRecid(0);
-                        cjt.setCode("0");
-                        cjt.setDescription("Select Job Title:");
-                        cjt.setDeleted("false");
-                        sl.add(cjt);
-                        for (int ix = 0; ix < objArr.length(); ix++) {
-                            JSONObject rowObj = objArr.getJSONObject(ix);
-                            cjt = new aAdminGroupings();
-                            cjt.setRecid(rowObj.getInt("recid"));
-                            cjt.setCode(rowObj.getString("code"));
-                            cjt.setDescription(rowObj.getString("Description"));
-                            cjt.setDeleted(rowObj.getString("deleted"));
-                            sl.add(cjt);
-                        }
-                        spinneradapter = new ArrayAdapter<aAdminGroupings>(ctx, android.R.layout.simple_spinner_dropdown_item, sl) {
-                            @Override
-                            public boolean isEnabled(int position) {
-                                if(position == 0) { return false; }
-                                else { return true; }
-                            }
-                            @Override
-                            public View getDropDownView(int pos, View cv, ViewGroup prnt) {
-                                View view = super.getDropDownView(pos, cv, prnt);
-                                TextView tv = (TextView) view;
-                                if(pos == 0){ tv.setTextColor(Color.GRAY);  }
-                                else { tv.setTextColor(Color.DKGRAY); }
-                                tv.setText(sl.get(pos).getDescription());
-                                return view;
-                            }
-                        };
-                        btnAddJobTitle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
-                                if (pos != 0) {
-                                    et_jobtitle.setText(sl.get(pos).getDescription());
-                                    et_jobtitle_id.setText(sl.get(pos).getRecid().toString());
-                                }
-                            }
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) { }
-                        });
-                        btnAddJobTitle.setAdapter(spinneradapter);
-                    } else {
-                        Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
-                }
+                Helper.dismissSpinnerDialog(loader);
+                response = response.replace("\r\n ", "");
+                Log.d("DSX post response: ", response);
+
+                SharedData.getInstance(ctx).saveData(SharedKey.REF_JOBTITLES.getKey(), response);
+
+                DialogFragment dialogFrag = UserFragment.searchInstance();
+                dialogFrag.setTargetFragment(thisFragment, USER_DIALOG_FRAGMENT);
+                dialogFrag.setCancelable(false);
+                dialogFrag.show(getActivity().getSupportFragmentManager(), "user_search_item");
             }
             @Override
             public void onRequestFail(VolleyError response, String type) {
+                Helper.dismissSpinnerDialog(loader);
                 Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
             }
         });
