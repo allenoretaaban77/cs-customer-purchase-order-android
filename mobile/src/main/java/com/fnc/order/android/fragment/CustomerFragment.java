@@ -13,9 +13,11 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -62,6 +64,7 @@ import com.shehabic.droppy.DroppyClickCallbackInterface;
 import com.shehabic.droppy.DroppyMenuItem;
 import com.shehabic.droppy.DroppyMenuPopup;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -141,10 +144,46 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         alphaSort = (MaterialRippleLayout) v.findViewById(R.id.layout_alpha);
         refreshAll = (MaterialRippleLayout) v.findViewById(R.id.layout_refresh);
         etCustomerName = (EditText) v.findViewById(R.id.et_customername);
+
         listview = (ListView) v.findViewById(R.id.storelistview);
+        listview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent agvm) {
+                if (agvm.getPointerCount() > 1) {
+                    if (!springView.isEnableHeader()) {
+                        springView.setEnableHeader(true);
+                    }
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (springView.isEnableHeader()) {
+                                springView.setEnableHeader(false);
+                            }
+                        }
+                    }, 300);
+                } else {
+                    if (springView.isEnableHeader()) {
+                        springView.setEnableHeader(false);
+                    }
+                }
+                return false;
+            }
+        });
 
         TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
+
+        springView = (SpringView) v.findViewById(R.id.mysv);
+        springView.setListener(new SpringView.OnFreshListener() {
+            @Override
+            public void onRefresh() {
+            }
+            @Override
+            public void onLoadmore() {
+                Log.d("dsx", "load more");
+            }
+        });
+        springView.callFreshDelay(9999999);
 
         alphagridview = (GridView) v.findViewById(R.id.alphagridview);
         if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
@@ -160,6 +199,38 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         }
         adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
         alphagridview.setAdapter(adapterAlpha);
+        alphagridview.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//                EventBus.getDefault().post(AttachUtil.isAdapterViewAttach(view));
+            }
+        });
+        alphagridview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent agvm) {
+                if (agvm.getPointerCount() > 1) {
+                    if (!springView.isEnableHeader()) {
+                        springView.setEnableHeader(true);
+                    }
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (springView.isEnableHeader()) {
+                                springView.setEnableHeader(false);
+                            }
+                        }
+                    }, 300);
+                } else {
+                    if (springView.isEnableHeader()) {
+                        springView.setEnableHeader(false);
+                    }
+                }
+                return false;
+            }
+        });
 
         alphagridview_box = (LinearLayout) v.findViewById(R.id.alphagridview_box);
         storelistview_box = (LinearLayout) v.findViewById(R.id.storelistview_box);
@@ -175,18 +246,6 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 //            boxMenu.addMenuItem(new DroppyMenuItem("  Add User ")).addSeparator();
         }
         boxMenu.addMenuItem(new DroppyMenuItem("  Log-out "));
-
-        springView = (SpringView) v.findViewById(R.id.mysv);
-        springView.setListener(new SpringView.OnFreshListener() {
-            @Override
-            public void onRefresh() {
-                springView.stopNestedScroll();
-            }
-            @Override
-            public void onLoadmore() {
-                Log.d("dsx", "load more");
-            }
-        });
     }
 
     private void initListeners(View v) {

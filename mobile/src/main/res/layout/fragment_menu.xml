@@ -61,6 +61,7 @@
             </RelativeLayout>
 
             <LinearLayout
+                android:id="@+id/ll_content_box"
                 android:layout_marginTop="3dp"
                 style="@style/layoutStyleMenu"
                 android:orientation="vertical"
