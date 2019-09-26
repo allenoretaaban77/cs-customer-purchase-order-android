@@ -9,9 +9,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
-//import com.android.volley.error.AuthFailureError;
-//import com.android.volley.error.VolleyError;
-//import com.android.volley.request.StringRequest;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -22,7 +19,6 @@ import com.fnc.order.android.enumeration.SharedKey;
 import com.github.yangweigbh.volleyx.VolleyX;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import rx.Observer;
@@ -40,7 +36,6 @@ public class VolleyInteractor {
 
     public void login(final Context ctx, final HashMap<String, String> params) {
         params.put("logdb", ServerConstants.LOGDB);
-
         new Thread(new Runnable(){
             public void run(){
                 String strUrl = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())

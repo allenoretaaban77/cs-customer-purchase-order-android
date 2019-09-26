@@ -60,4 +60,5 @@ dependencies {
     implementation 'com.github.ruzhan123:Double-Pull-Delegate:v1.0' // double pull
     implementation 'com.dc.easyadapter:easyadapter:2.0.3' // swipe and adapter
     implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.github.roiacult:BackdropLayout:1.0'
 }

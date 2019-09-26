@@ -11,6 +11,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -33,6 +36,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -59,7 +63,9 @@ import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
+import com.google.android.material.snackbar.Snackbar;
 import com.liaoinstan.springview.widget.SpringView;
+import com.roacult.backdrop.BackdropLayout;
 import com.shehabic.droppy.DroppyClickCallbackInterface;
 import com.shehabic.droppy.DroppyMenuItem;
 import com.shehabic.droppy.DroppyMenuPopup;
@@ -132,48 +138,46 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         return v;
     }
 
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-//        // TODO: Use the ViewModel
-//    }
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        // TODO: Use the ViewModel
 
+//        Snackbar snack = Snackbar.make(v, "tbtG!", Snackbar.LENGTH_INDEFINITE);
+//        CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT,
+//                CoordinatorLayout.LayoutParams.WRAP_CONTENT);
+//        params.gravity = Gravity.TOP;
+//        View view = snack.getView();
+//        view.setLayoutParams(params);
+//        snack.show();
+    }
+
+    private BackdropLayout containerbdl;
     private void initViews(View v) {
-        imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
-        alphaSort = (MaterialRippleLayout) v.findViewById(R.id.layout_alpha);
-        refreshAll = (MaterialRippleLayout) v.findViewById(R.id.layout_refresh);
-        etCustomerName = (EditText) v.findViewById(R.id.et_customername);
-
-        listview = (ListView) v.findViewById(R.id.storelistview);
-        listview.setOnTouchListener(new View.OnTouchListener() {
+        containerbdl = (BackdropLayout) v.findViewById(R.id.containerbdl);
+        LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
+        ll_content_box_main.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent agvm) {
-                if (agvm.getPointerCount() > 1) {
-                    if (!springView.isEnableHeader()) {
-                        springView.setEnableHeader(true);
-                    }
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (springView.isEnableHeader()) {
-                                springView.setEnableHeader(false);
-                            }
-                        }
-                    }, 300);
-                } else {
-                    if (springView.isEnableHeader()) {
-                        springView.setEnableHeader(false);
-                    }
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("dsxof", String.valueOf(event.getX()) + " & " + String.valueOf(event.getY()));
+                if (event.getX() > event.getY()) {
+                    containerbdl.open();
                 }
                 return false;
             }
         });
 
+        imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
+        alphaSort = (MaterialRippleLayout) v.findViewById(R.id.layout_alpha);
+        refreshAll = (MaterialRippleLayout) v.findViewById(R.id.layout_refresh);
+        etCustomerName = (EditText) v.findViewById(R.id.et_customername);
+        listview = (ListView) v.findViewById(R.id.storelistview);
+
         TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
 
-        springView = (SpringView) v.findViewById(R.id.mysv);
+        /*springView = (SpringView) v.findViewById(R.id.mysv);
         springView.setListener(new SpringView.OnFreshListener() {
             @Override
             public void onRefresh() {
@@ -182,8 +186,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             public void onLoadmore() {
                 Log.d("dsx", "load more");
             }
-        });
-        springView.callFreshDelay(9999999);
+        });*/
 
         alphagridview = (GridView) v.findViewById(R.id.alphagridview);
         if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
@@ -199,6 +202,36 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         }
         adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
         alphagridview.setAdapter(adapterAlpha);
+        alphagridview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("dsxof", String.valueOf(event.getX()) + " & " + String.valueOf(event.getY()));
+                if (event.getX() > event.getY()) {
+                    containerbdl.close();
+                }
+                return false;
+            }
+        });
+        /*alphagridview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int x = (int)event.getX();
+                int y = (int)event.getY();
+                Log.d("dsxte", String.valueOf(x) + " & "+ String.valueOf(y));
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+//                        Log.d("dsxte", "down");
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+//                        Log.d("dsxte", "move");
+                        break;
+                    case MotionEvent.ACTION_UP:
+//                        Log.d("dsxte", "up");
+                        break;
+                }
+                return false;
+            }
+        });
         alphagridview.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -230,7 +263,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 }
                 return false;
             }
-        });
+        }); */
 
         alphagridview_box = (LinearLayout) v.findViewById(R.id.alphagridview_box);
         storelistview_box = (LinearLayout) v.findViewById(R.id.storelistview_box);
@@ -247,6 +280,66 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         }
         boxMenu.addMenuItem(new DroppyMenuItem("  Log-out "));
     }
+
+    private static final int SWIPTE_MAX_DISTANCE = 120;
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private final GestureDetector.SimpleOnGestureListener mglx = new GestureDetector.SimpleOnGestureListener() {
+        public boolean onFling(MotionEvent e1, MotionEvent e2,
+                               float velocityX, float velocityY) {
+            Log.d("dsxof", String.valueOf(velocityX) + " & " + String.valueOf(velocityY));
+            if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                return false; // Right to left
+            }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                return false; // Left to right
+            }
+            if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                Log.d("dsxof", "up");
+//                containerbdl.close();
+                return false; // Bottom to top
+            }  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                Log.d("dsxof", "down");
+//                containerbdl.open();
+                return false; // Top to bottom
+            }
+            return true;
+        }
+    };
+
+    /*private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            return false;
+        }
+    }*/
+
+    /*private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                               float velocityY) {
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH){
+                    return false;
+                }
+                // right to left swipe
+                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    onLeftSwipe();
+                }
+                // left to right swipe
+                else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    onRightSwipe();
+                }
+            } catch (Exception e) {
+
+            }
+            return false;
+        }
+    }*/
 
     private void initListeners(View v) {
         etCustomerName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
