@@ -63,9 +63,6 @@ public class OrdersService extends Service {
 
             notificationManager.createNotificationChannel(notificationChannel);
             Notification notification = new Notification.Builder(this, channelId)
-    //                .setContentTitle(getString(R.string.app_name))
-    //                .setContentText("Connected through SDL")
-    //                .setSmallIcon(R.mipmap.ic_launcher_order)
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .build();
             startForeground(111, notification);

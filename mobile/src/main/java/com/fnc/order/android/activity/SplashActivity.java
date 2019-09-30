@@ -451,7 +451,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                     "CLOSE", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
+                            finishAndRemoveTask();
                         }
                     }, false) );
             }

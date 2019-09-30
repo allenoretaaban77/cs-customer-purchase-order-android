@@ -42,7 +42,6 @@ public class DcMenulist extends DBHelper {
         db.beginTransaction();
         ContentValues value = MenulistQueryBuilder.prepareMenulistInsertValues(ml, context);
         db.insertWithOnConflict(Table.MENULIST.getName(), null, value, SQLiteDatabase.CONFLICT_IGNORE);
-//        db.insert(Table.MENULIST.getName(), null, value);
         db.setTransactionSuccessful();
         db.endTransaction();
 //        db.close();
