@@ -37,6 +37,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
         db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
         db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
+        db.execSQL(createTables(Table.STAFFS_INACTIVE, setStaffsFields()));
         db.execSQL(createTables(Table.BRANCHLIST, setBranchlistFields()));
         Log.i(TAG,"Database created path : " + db.getPath());
     }
@@ -167,6 +168,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
                 db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
                 db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
+                db.execSQL(createTables(Table.STAFFS_INACTIVE, setStaffsFields()));
                 db.execSQL(createTables(Table.BRANCHLIST, setBranchlistFields()));
         }
     }

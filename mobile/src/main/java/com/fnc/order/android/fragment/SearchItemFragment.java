@@ -145,7 +145,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                         public void run() {
                             String searchStr = s.toString().trim().equals("") ? "noitem" : s.toString() ;
                             Log.d("dsx", searchStr);
-                            requestItemLocal(v, searchStr);
+                            requestItemLocal(v, "%"+searchStr+"%");
                             flagTaskRun = false;
                             tv_no_data.setText("No record found...");
                         }
@@ -174,9 +174,8 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                     if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
                         requestItemLocal(v, "noitem");
                     } else {
-                        alertDialog = Helper.okDialog(ctx, "Error","Please input item name.", "OK",
-                            null, false);
-                        BounceView.addAnimTo(alertDialog);
+                        BounceView.addAnimTo( Helper.okDialog(ctx, "Error","Please input item name.", "OK",
+                            null, false) );
                     }
 
                 }

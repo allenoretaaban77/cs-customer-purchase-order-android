@@ -14,6 +14,7 @@ public enum Table {
     CUSTOMERLIST("customerlists"),
     A_ITEMLIST("aitemlist"),
     STAFFS("aStaffs"),
+    STAFFS_INACTIVE("aStaffsInactive"),
     BRANCHLIST("abranchlist");
 
     private String name;
