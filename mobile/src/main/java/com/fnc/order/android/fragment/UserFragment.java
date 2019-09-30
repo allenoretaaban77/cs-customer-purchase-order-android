@@ -3,19 +3,28 @@ package com.fnc.order.android.fragment;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -39,6 +48,7 @@ import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
+import com.roacult.backdrop.BackdropLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,13 +67,15 @@ public class UserFragment extends DialogFragment {
     public Context ctx;
     private View v;
     private SharedData sp;
-    private MaterialRippleLayout btn_close, btn_add, btn_search;
+    private MaterialRippleLayout btn_close, btn_add, btn_user_search;
     private EasyAdapter adapter;
     private RecyclerView rv_user;
     private TextView tv_no_data;
     private LinkedList<aAdminGroupings> llJobtitles = new LinkedList<>();
     private ProgressDialog loader;
     private AlertDialog alertDialog, alertDialogUser, alertDialogJobTitle;
+    private EditText et_item_name;
+    private LinearLayout ll_content_box_main;
 
     public static UserFragment searchInstance(){
         UserFragment dialogFragment = new UserFragment();
@@ -97,15 +109,22 @@ public class UserFragment extends DialogFragment {
         return v;
     }
 
+    private BackdropLayout containerbdl;
     private void initViews(View v) {
+        containerbdl = (BackdropLayout) v.findViewById(R.id.containerbdl);
+        ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
         btn_close = (MaterialRippleLayout) v.findViewById(R.id.btn_close);
         btn_add = (MaterialRippleLayout) v.findViewById(R.id.btn_add);
-        btn_search = (MaterialRippleLayout) v.findViewById(R.id.btn_search);
+        btn_user_search = (MaterialRippleLayout) v.findViewById(R.id.btn_user_search);
+        et_item_name = (EditText) v.findViewById(R.id.et_item_name);
         rv_user = (RecyclerView) v.findViewById(R.id.rv_user);
         tv_no_data = (TextView) v.findViewById(R.id.tv_no_data);
-        displayUsers();
+
+        displayUsers("%");
+
     }
 
+    private Boolean flagTaskRun = false; private Handler m_handler; private Runnable m_runnable;
     private void initListeners(View v) {
         btn_close.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
@@ -115,6 +134,80 @@ public class UserFragment extends DialogFragment {
         btn_add.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
                 addUser();
+            }
+        });
+        et_item_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    btn_user_search.callOnClick();
+                    return true;
+                }
+                return false;
+            }
+        });
+        et_item_name.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        et_item_name.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(final Editable s) {
+                tv_no_data.setVisibility(View.VISIBLE); tv_no_data.setText("Searching...");
+                rv_user.setVisibility(View.GONE);
+
+                if (flagTaskRun) { m_handler.removeCallbacks(m_runnable); }
+                m_handler = new Handler();
+                m_runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        displayUsers("%"+s.toString()+"%");
+                        flagTaskRun = false;
+                        tv_no_data.setText("No record found...");
+                    }
+                };
+                flagTaskRun = m_handler.postDelayed(m_runnable, 700);
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        });
+        btn_user_search.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                if(!et_item_name.getText().toString().trim().equals("")) {
+                    displayUsers(et_item_name.getText().toString().trim());
+                } else {
+                    BounceView.addAnimTo( Helper.okDialog(ctx, "Error","Invalid user.", "OK",
+                        null, false) );
+                }
+            }
+        });
+        ll_content_box_main.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getX() > event.getY()) {
+                    containerbdl.open();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            rv_user.setLayoutParams(
+                                    new LinearLayout.LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
+                                            Math.round(Helper.convertDpToPixel(ctx, 528f)))
+                            );
+                        }
+                    }, 500);
+                }
+                return false;
+            }
+        });
+        rv_user.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getX() > event.getY()) {
+                    containerbdl.close();
+                    rv_user.setLayoutParams(
+                            new LinearLayout.LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
+                                    Math.round(Helper.convertDpToPixel(ctx, 586f)))
+                    );
+                }
+                return false;
             }
         });
     }
@@ -230,16 +323,16 @@ public class UserFragment extends DialogFragment {
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
-                                                rowObj.getInt("empId"),
-                                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                                rowObj.getString("empNo"),
-                                                rowObj.getString("Email"),
-                                                rowObj.getString("name"),
-                                                rowObj.getInt("Branch"),
-                                                rowObj.getInt("Jobtitle"),
-                                                rowObj.getString("pass"),
-                                                rowObj.getString("active"),
-                                                rowObj.getString("ismobileadmin")
+                                            rowObj.getInt("empId"),
+                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                            rowObj.getString("empNo"),
+                                            rowObj.getString("Email"),
+                                            rowObj.getString("name"),
+                                            rowObj.getInt("Branch"),
+                                            rowObj.getInt("Jobtitle"),
+                                            rowObj.getString("pass"),
+                                            rowObj.getString("active"),
+                                            rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
@@ -247,7 +340,7 @@ public class UserFragment extends DialogFragment {
                                     DcStaffs.getInstance(ctx).emptyStaffslist();
                                     Helper.insertDefaultStaffs(ctx); // add main
                                 }
-                                displayUsers();
+                                displayUsers("%");
                                 loadAdminJobTitles();
                             } else {
                                 Log.d("dsxe getuser", response);
@@ -282,7 +375,7 @@ public class UserFragment extends DialogFragment {
         }, 300);
     }
 
-    private void displayUsers() {
+    private void displayUsers(String strName) {
         try {
             JSONArray objArr = new JSONArray(sp.getData(SharedKey.REF_JOBTITLES.getKey()));
             llJobtitles = new LinkedList<>();
@@ -304,13 +397,13 @@ public class UserFragment extends DialogFragment {
                 }
             }
             // DcStaffs.getInstance(ctx).emptyStaffslist();
-            LinkedList<aStaffs> rsSt = DcStaffs.getInstance(ctx).getStaffswihtOrder();
+            LinkedList<aStaffs> rsSt = DcStaffs.getInstance(ctx).getStaffswihtOrder(strName);
             if (rsSt.size() > 0) {
                 rv_user.setVisibility(View.VISIBLE);
                 tv_no_data.setVisibility(View.GONE);
                 adapter = new EasyAdapter<aStaffs, ItemUserBinding>(R.layout.item_user) {
                     @Override
-                    public void onBind(@NonNull ItemUserBinding binding, @NonNull final aStaffs model) {
+                    public void onBind(@NonNull final ItemUserBinding binding, @NonNull final aStaffs model) {
                         binding.tvUsername.setText(model.getName());
 
                         binding.tvPosition.setText("");
@@ -320,6 +413,38 @@ public class UserFragment extends DialogFragment {
                                 binding.tvPosition.setText(String.valueOf(rsAG.getDescription()));
                             }
                         }
+
+                        LinkedList<aStaffs> iaRs = DcStaffs.getInstance(ctx).checkIfActive(model.getEmpId());
+                        if (iaRs.size() > 0) {
+                            binding.cbActive.setChecked(false);
+                        } else {
+                            binding.cbActive.setChecked(true);
+                        }
+                        binding.cbActive.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if( binding.cbActive.isChecked() ) {
+                                    DcStaffs.getInstance(ctx).setActive(model);
+                                    adapter.notifyDataSetChanged();
+                                } else {
+                                    BounceView.addAnimTo( Helper.okCancelDialog( ctx,
+                                        "Change User Status",
+                                        "Are you sure you want to deactivate this user?.",
+                                        "YES", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                DcStaffs.getInstance(ctx).setInActive(model);
+                                                adapter.notifyDataSetChanged();
+                                            } },
+                                        "CANCEL", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                    }, false) );
+                                }
+                            }
+                        });
                     }
                 };
                 adapter.addAll(rsSt, false);

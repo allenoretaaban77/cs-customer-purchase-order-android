@@ -43,6 +43,33 @@ public class DcStaffs extends DBHelper {
         db.close();
     }
 
+    public void setInActive(aStaffs sl) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues value = aStaffsQueryBuilder.prepareStaffsInsertValues(sl, context);
+        db.insertWithOnConflict(Table.STAFFS_INACTIVE.getName(), null, value, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
+    public void setActive(aStaffs sl) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(Table.STAFFS_INACTIVE.getName(), "empId = ?", new String[]{ String.valueOf(sl.getEmpId()) });
+        db.close();
+    }
+
+    public LinkedList<aStaffs> checkIfActive(Integer intEmpId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.STAFFS_INACTIVE.getName() +
+            " WHERE " + aStaffsKey.EMPID.getKey() + " = ?";
+        Cursor c = db.rawQuery(strQry, new String[] { String.valueOf(intEmpId) } );
+        LinkedList<aStaffs> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setStaffs(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
     public void deleteStaffsViaId(String identityId) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(Table.STAFFS.getName(), "empId = ?", new String[]{identityId});
@@ -62,12 +89,13 @@ public class DcStaffs extends DBHelper {
         return list;
     }
 
-    public LinkedList<aStaffs> getStaffswihtOrder() {
+    public LinkedList<aStaffs> getStaffswihtOrder(String strName) {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.STAFFS.getName() +
                 " WHERE " + aStaffsKey.REFEMPNO.getKey() + " != '-2' " +
+                " AND " + aStaffsKey.NAME.getKey() + " LIKE ? " +
                 " ORDER BY " + aStaffsKey.NAME.getKey() + " ASC";
-        Cursor c = db.rawQuery(strQry, null);
+        Cursor c = db.rawQuery(strQry, new String[] { strName });
         LinkedList<aStaffs> list = new LinkedList<>();
         while (c.moveToNext()) {
             list.add(setStaffs(c));
@@ -80,10 +108,9 @@ public class DcStaffs extends DBHelper {
     public LinkedList<aStaffs> checkStaff(String strUn, String strPw) {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.STAFFS.getName()
-                + " WHERE " + aStaffsKey.EMPNO.getKey() + " = '" + strUn
-                + "' AND " + aStaffsKey.PASS.getKey() + " = '" + strPw
-                + "'";
-        Cursor c = db.rawQuery(strQry, null);
+                + " WHERE " + aStaffsKey.EMPNO.getKey() + " = ?"
+                + " AND " + aStaffsKey.PASS.getKey() + " = ?";
+        Cursor c = db.rawQuery(strQry, new String[] { strUn, strPw });
         LinkedList<aStaffs> list = new LinkedList<>();
         while (c.moveToNext()) {
             list.add(setStaffs(c));

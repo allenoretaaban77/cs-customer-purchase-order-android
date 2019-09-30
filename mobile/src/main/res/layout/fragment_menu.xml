@@ -88,7 +88,7 @@
                         android:id="@+id/includedFront"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="640dp">
                         <LinearLayout
                             android:id="@+id/storelistview_box"
                             android:visibility="gone"

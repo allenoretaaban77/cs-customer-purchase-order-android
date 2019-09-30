@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:background="@android:color/transparent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+
+    <LinearLayout
+        android:layout_marginBottom="5dp"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:padding="4dp"
+        android:orientation="horizontal"
+        style="@style/mHeader">
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <FrameLayout
+                android:id="@+id/layout_calendar"
+                android:background="@drawable/background_input_round_border"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_width="0px"
+                    android:layout_height="0px"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
+                <EditText
+                    android:fontFamily="@font/regular"
+                    android:textSize="16sp"
+                    android:hint="Input item name here to search..."
+                    android:id="@+id/et_item_name"
+                    android:background="@color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:maxLines="1"
+                    android:lines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:textColorHint="@color/gray_4"
+                    android:textColor="@color/green_1"
+                    android:nextFocusUp="@id/ll_dummy"
+                    android:nextFocusLeft="@id/ll_dummy"
+                    android:paddingLeft="17dp"/>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:id="@+id/ll_dummy"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:layout_width="0px"
+                    android:layout_height="0px"/>
+            </FrameLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_centerVertical="true"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="6dp"
+            android:layout_alignParentRight="true"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="3dp"
+            style="@style/btnTransparentStyleSmallWrap">
+            <com.balysv.materialripple.MaterialRippleLayout
+                android:id="@+id/btn_user_search"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="3dp">
+                <Button
+                    android:backgroundTint="@color/white"
+                    android:background="@drawable/baseline_search_24"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </com.balysv.materialripple.MaterialRippleLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
