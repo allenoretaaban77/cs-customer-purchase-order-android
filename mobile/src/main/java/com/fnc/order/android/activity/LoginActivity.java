@@ -125,8 +125,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        usernameText.setText("7771");
-        passwordEText.setText("1");
+//        usernameText.setText("7771");
+//        passwordEText.setText("1");
     }
 
     private void initListeners(){
@@ -185,7 +185,7 @@ public class LoginActivity extends BaseActivity {
                             if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                                 isSubmit = false;
                                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                                        "Error","Reference employee number not recognized", "CLOSE",
+                                        "Account Error","Reference employee number not recognized. Please contact IT support to update your account.", "CLOSE",
                                         null, false) );
                                 return;
                             }
