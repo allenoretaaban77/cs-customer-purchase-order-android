@@ -73,7 +73,7 @@ public class UserFragment extends DialogFragment {
     private TextView tv_no_data;
     private LinkedList<aAdminGroupings> llJobtitles = new LinkedList<>();
     private ProgressDialog loader;
-    private AlertDialog alertDialog, alertDialogUser, alertDialogJobTitle;
+    private AlertDialog alertDialog, alertDialogUser, alertDialogJobTitle, alertDialogUpdatePassword;
     private EditText et_item_name;
     private LinearLayout ll_content_box_main;
 
@@ -440,9 +440,18 @@ public class UserFragment extends DialogFragment {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 dialog.dismiss();
+                                                DcStaffs.getInstance(ctx).setActive(model);
+                                                adapter.notifyDataSetChanged();
                                             }
                                     }, false) );
                                 }
+                            }
+                        });
+
+                        binding.mlItemBox.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                updatePassword(model);
                             }
                         });
                     }
@@ -498,9 +507,9 @@ public class UserFragment extends DialogFragment {
                             Helper.dismissSpinnerDialog(loader);
                             alertDialogJobTitle.dismiss();
                             loadAdminJobTitles();
+                            Toast.makeText(ctx, "Update success", Toast.LENGTH_SHORT).show();
                         } else {
                             Helper.dismissSpinnerDialog(loader);
-                            alertDialogJobTitle.dismiss();
                             Toast.makeText(ctx, "Adding jobtitle failed", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -613,7 +622,7 @@ public class UserFragment extends DialogFragment {
                 params.put("email", "");
                 params.put("pass", et_password.getText().toString().trim());
                 params.put("fname", et_firstname.getText().toString().trim());
-                params.put("mname", et_middlename.getText().toString().trim().equals("") ? "Null" : et_middlename.getText().toString().trim() );
+                params.put("mname", et_middlename.getText().toString().trim().equals("") ? "N/A" : et_middlename.getText().toString().trim() );
                 params.put("lname", et_lastname.getText().toString().trim());
                 params.put("branch", sp.getData(SharedKey.BRANCH_ID.getKey()));
                 params.put("jobtitle", et_jobtitle_id.getText().toString().trim());
@@ -624,6 +633,7 @@ public class UserFragment extends DialogFragment {
                     strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
                     it.remove();
                 }
+                Log.d("dsx", strParams);
                 final VolleyInteractor vidp = new VolleyInteractor();
                 vidp.registerCallback(new VolleyCallback() {
                     @Override
@@ -641,7 +651,7 @@ public class UserFragment extends DialogFragment {
                                 alertDialogUser.dismiss();
                             }
                         } catch (JSONException e) {
-                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ctx, "Post error. This user is already assign at the other store. Please contact IT support.", Toast.LENGTH_SHORT).show();
                         }
                     }
                     @Override
@@ -672,6 +682,109 @@ public class UserFragment extends DialogFragment {
         btnClose.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 alertDialogUser.dismiss();
+            }
+        });
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(activity);
+        builder.setView(layout);
+        builder.create();
+        builder.setCancelable(false);
+        return builder.show();
+    }
+
+    private void updatePassword(final aStaffs sl) {
+        alertDialogUpdatePassword = updatePasswordDialog(ctx);
+
+        Button btnSubmit = (Button) alertDialogUpdatePassword.findViewById(R.id.btn_submit);
+        btnSubmit.setOnClickListener (new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FormEditText et_old_password = (FormEditText) alertDialogUpdatePassword.findViewById(R.id.et_old_password);
+                FormEditText et_password = (FormEditText) alertDialogUpdatePassword.findViewById(R.id.et_password);
+                FormEditText et_repeatpassword = (FormEditText) alertDialogUpdatePassword.findViewById(R.id.et_repeatpassword);
+
+                if (et_old_password.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid old password.", Toast.LENGTH_SHORT).show(); return;
+                } else {
+                    if ( !sl.getPass().equals(et_old_password.getText().toString()) ) {
+                        Toast.makeText(ctx, "Invalid old password.", Toast.LENGTH_SHORT).show(); return;
+                    }
+                }
+                if (et_password.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (et_repeatpassword.getText().toString().trim().equals("")) {
+                    Toast.makeText(ctx, "Invalid password.", Toast.LENGTH_SHORT).show(); return;
+                }
+                if (!et_repeatpassword.getText().toString().trim().equals(et_password.getText().toString().trim())) {
+                    Toast.makeText(ctx, "Psssword does not match.", Toast.LENGTH_SHORT).show(); return;
+                }
+                loader = Helper.showSpinnerDialog(ctx, "Updating Psssword", "Please wait..."); loader.show();
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("logdb", sp.getData(SharedKey.DATABASE.getKey()));
+                params.put("empid", String.valueOf(sl.getEmpId()));
+                params.put("password", et_password.getText().toString());
+                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                    params.put("updatedby", sp.getData(SharedKey.REF_EMP_ID.getKey()));
+                } else {
+                    params.put("updatedby", sp.getData(SharedKey.REF_EMP_ID.getKey()));
+                }
+                Iterator it = params.entrySet().iterator();
+                String strParams = "";
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry)it.next();
+                    strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                    it.remove();
+                }
+                final VolleyInteractor viup = new VolleyInteractor();
+                viup.registerCallback(new VolleyCallback() {
+                    @Override
+                    public void onRequestSuccess(final String response, String type) {
+                        if (response.trim().toLowerCase().equals("true")) {
+                            Helper.dismissSpinnerDialog(loader);
+                            alertDialogUpdatePassword.dismiss();
+                            loadUsers();
+                            Toast.makeText(ctx, "Update success", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Helper.dismissSpinnerDialog(loader);
+                            Toast.makeText(ctx, "Update password failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onRequestFail(VolleyError response, String type) {
+                        Helper.dismissSpinnerDialog(loader);
+                        Log.d("DSX signup success: ", String.valueOf(response.getMessage()));
+                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Log.d("dsx", strParams);
+                viup.postUpdatePassword(ctx, params, strParams.replaceAll(" ", "%20"));
+            }
+        });
+
+
+        ((TextView) alertDialogUpdatePassword.findViewById(R.id.tv_employee_number))
+                .setText("Employee Number: " + sl.getEmpNo());
+        ((TextView) alertDialogUpdatePassword.findViewById(R.id.tv_user_name))
+                .setText("Name: " + sl.getName());
+        ((TextView) alertDialogUpdatePassword.findViewById(R.id.tv_job_title)).setVisibility(View.GONE);
+//                .setText("Job Title: " + sl.getJobtitle());
+
+        alertDialogUpdatePassword.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        alertDialogUpdatePassword.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        BounceView.addAnimTo(alertDialogJobTitle);
+    }
+
+    private AlertDialog updatePasswordDialog(final Context activity) {
+
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.dialog_update_password, null);
+
+        MaterialRippleLayout btnClose = (MaterialRippleLayout) layout.findViewById(R.id.btn_close);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                alertDialogUpdatePassword.dismiss();
             }
         });
 

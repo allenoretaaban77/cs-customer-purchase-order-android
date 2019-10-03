@@ -149,24 +149,35 @@ public class MainActivity extends BaseActivity {
                 .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
                 .addToBackStack(null).commit();
         } else if (refPage.equals("customer_fragment")) {
-            getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, new CustomerFragment(), "customer_fragment")
-                .addToBackStack(null).commit();
+            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, new CustomerFragment(), "customer_fragment")
+                    .addToBackStack(null).commit();
+            } else {
+                BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                        "Closing Application", "Are you sure you want to close this app?",
+                        "Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finishAndRemoveTask();
+                            }
+                        }, "Cancel", null, false
+                ) );
+            }
         } else if (refPage.equals("order_fragment")) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, new OrderFragment(), "order_fragment")
                     .addToBackStack(null).commit();
         } else {
-            alertDialog = Helper.okCancelDialog(ctx,
-                    "Closing Application", "Are you sure you want to close this app?",
-                    "Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finishAndRemoveTask();
-                        }
-                    }, "Cancel", null, false
-            );
-            BounceView.addAnimTo(alertDialog);
+            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                "Closing Application", "Are you sure you want to close this app?",
+                "Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finishAndRemoveTask();
+                    }
+                }, "Cancel", null, false
+            ) );
         }
     }
 

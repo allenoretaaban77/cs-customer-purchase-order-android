@@ -44,6 +44,7 @@ public enum SharedKey {
     EMP_NO("reference_employee_no"),
     EMP_ID("employee_id"),
     REF_EMP_NO("reference_employee_no_x"),
+    REF_EMP_ID("reference_employee_id_x"),
     EMP_NAME("employee_name"),
     EMP_POSITION("employee_position"),
     REF_JOBTITLES("ref_jobtitles"),

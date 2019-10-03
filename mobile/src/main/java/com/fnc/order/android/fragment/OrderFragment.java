@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.datacontroller.DcOrdered;
+import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.MenulistKey;
@@ -56,6 +58,7 @@ import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.model.aBranchlist;
+import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PopupMenu;
@@ -126,7 +129,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private ArrayList<Order> curRefArrayListErr;
     private SharedData sp;
     private MenuList refMenulist;
-    private aBranchlist refBranchlist;
+    private static final int USER_DIALOG_FRAGMENT = 7;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -147,6 +150,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             MenulistKey.CUSTOMER_ID.getKey() + " = ?",
             new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) }
         ).get(0);
+
         if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
             strBranchEncoding = "1";
         } else {
@@ -183,8 +187,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    backItNow(v);
-                    return true;
+                    if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                        backItNow(v);
+                        return true;
+                    } else{
+                        return false;
+                    }
                 }
                 return false;
             }
@@ -238,13 +246,19 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         rl_content_box = (CoordinatorLayout) v.findViewById(R.id.content_box);
         et_date = (EditText) v.findViewById(R.id.et_date);
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
+
         pageMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         pageMenu.setXOffset(8).setYOffset(0);
-        pageMenu.addMenuItem(new DroppyMenuItem("  View Transactions  ")).addSeparator();
+        pageMenu.addMenuItem(new DroppyMenuItem("  View Transactions  ").setId(1)).addSeparator();
         if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
-            pageMenu.addMenuItem(new DroppyMenuItem("  Update Product Items  ")).addSeparator();
+            pageMenu.addMenuItem(new DroppyMenuItem("  Update Product Items  ").setId(2)).addSeparator();
         }
-        pageMenu.addMenuItem(new DroppyMenuItem("  Log-out  "));
+        if (SharedData.getInstance(ctx).getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
+                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
+            pageMenu.addMenuItem(new DroppyMenuItem("  Users ").setId(3)).addSeparator();
+        }
+        pageMenu.addMenuItem(new DroppyMenuItem("  Log-out  ").setId(0));
+
         btn_submit = (MaterialRippleLayout) v.findViewById(R.id.btn_submit);
         et_remarks = (EditText) v.findViewById(R.id.et_remarks);
         bsCalc = (LinearLayout) v.findViewById(R.id.bs_calculator);
@@ -255,6 +269,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         list_view = (ListView) v.findViewById(R.id.list_view);
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
+
+        if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+            ((RelativeLayout) v.findViewById(R.id.rl_back_box)).setVisibility(View.GONE);
+        }
     }
 
     private void initListeners(View v) {
@@ -316,15 +334,17 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             @Override
             public void call(View v, int id) {
                 switch(id){
-                    case 0:
-//                        getActivity().getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
-//                            .addToBackStack(null)
-//                            .commit();
+                    case 1:
                         Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
                             new TransactionFragment(), "transaction_fragment", "order_fragment");
                         break;
-                    default:
+                    case 2:
+                        callRefreshItems();
+                        break;
+                    case 3:
+                        loadUsers();
+                        break;
+                    case 0:
                         BounceView.addAnimTo( Helper.okCancelDialog(ctx,
                             "Log Out", "Are you sure you want to log-out?",
                             "Ok", new DialogInterface.OnClickListener() {
@@ -475,59 +495,63 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         btn_refresh.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-                } else {
-                    builder = new AlertDialog.Builder(ctx);
-                }
-                builder.setCancelable(false);
-                BounceView.addAnimTo(
-                    builder.setTitle("Post Transaction").setMessage("Are you sure want to refresh the list? All items will reset.")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-                            curRefArrayList = new ArrayList<Order>();
-                            curRefArrayListErr = new ArrayList<Order>();
-
-                            mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
-                            mainTableBox.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    maintableViewHeight = mainTableBox.getHeight();
-                                    maintableViewWidth = mainTableBox.getWidth();
-                                    try {
-                                        tblContentBox = new LinearLayout(ctx);
-                                        tblContentBox.setLayoutParams(new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                                        mainTableBox.addView(tblContentBox);
-                                    } finally {
-                                        LinearLayout ll = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_table_content, null);
-                                        tl = (TableLayout) ll.findViewById(R.id.checklist_table_layout);
-                                        tl.setLayoutParams(new LinearLayout.LayoutParams(maintableViewWidth,
-                                                LinearLayout.LayoutParams.WRAP_CONTENT));
-                                        tblContentBox.addView(ll);
-                                    }
-                                }
-                            });
-
-                            fillItems(rootView);
-
-                            tv_grandtotal.setText("0.00");
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            isPosted = false;
-                        }
-                    })
-                    .show()
-                );
+                callRefreshItems();
             }
         });
+    }
+
+    private void callRefreshItems() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        } else {
+            builder = new AlertDialog.Builder(ctx);
+        }
+        builder.setCancelable(false);
+        BounceView.addAnimTo(
+            builder.setTitle("Post Transaction").setMessage("Are you sure want to refresh the list? All items will reset.")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+                    curRefArrayList = new ArrayList<Order>();
+                    curRefArrayListErr = new ArrayList<Order>();
+
+                    mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
+                    mainTableBox.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            maintableViewHeight = mainTableBox.getHeight();
+                            maintableViewWidth = mainTableBox.getWidth();
+                            try {
+                                tblContentBox = new LinearLayout(ctx);
+                                tblContentBox.setLayoutParams(new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                mainTableBox.addView(tblContentBox);
+                            } finally {
+                                LinearLayout ll = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_table_content, null);
+                                tl = (TableLayout) ll.findViewById(R.id.checklist_table_layout);
+                                tl.setLayoutParams(new LinearLayout.LayoutParams(maintableViewWidth,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT));
+                                tblContentBox.addView(ll);
+                            }
+                        }
+                    });
+
+                    fillItems(rootView);
+
+                    tv_grandtotal.setText("0.00");
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isPosted = false;
+                    }
+                })
+                .show()
+        );
     }
 
     View.OnClickListener cancelCallback = new View.OnClickListener() {
@@ -1293,5 +1317,114 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 int prevday = c.get(Calendar.DAY_OF_MONTH);
             }
         });
+    }
+
+    private void loadUsers() {
+        if (!Helper.isNetworkAvailable(ctx)) {
+            Toast.makeText(ctx, "User fetch failed.  Please check your connection.",
+                    Toast.LENGTH_SHORT).show(); return;
+        }
+
+        loader = Helper.showSpinnerDialog(ctx, "Reloading Users", "Please wait..."); loader.show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final VolleyInteractor vipr = new VolleyInteractor();
+                vipr.registerCallback(new VolleyCallback() {
+                    @Override
+                    public void onRequestSuccess(final String response, String type) {
+                        Log.d("dsxs getuser", response);
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            if (obj.length() > 0) {
+                                JSONArray sArr = obj.getJSONArray("staff");
+                                if (sArr.length() > 0) {
+                                    DcStaffs.getInstance(ctx).emptyStaffslist();
+                                    Helper.insertDefaultStaffs(ctx);
+                                    for (int i = 0; i < sArr.length(); i++) {
+                                        JSONObject rowObj = sArr.getJSONObject(i);
+                                        aStaffs sl = new aStaffs(
+                                                rowObj.getInt("empId"),
+                                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                                rowObj.getString("empNo"),
+                                                rowObj.getString("Email"),
+                                                rowObj.getString("name"),
+                                                rowObj.getInt("Branch"),
+                                                rowObj.getInt("Jobtitle"),
+                                                rowObj.getString("pass"),
+                                                rowObj.getString("active"),
+                                                rowObj.getString("ismobileadmin")
+                                        );
+                                        DcStaffs.getInstance(ctx).insertStaffs(sl);
+                                    }
+                                } else {
+                                    DcStaffs.getInstance(ctx).emptyStaffslist();
+                                    Helper.insertDefaultStaffs(ctx); // add main
+                                }
+                                loadAdminJobTitles();
+                            } else {
+                                Log.d("dsxe getuser", response);
+//                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            Log.d("dsxe getuser", response);
+//                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onRequestFail(VolleyError response, String type) {
+                        Helper.dismissSpinnerDialog(loader);
+                        Log.d("dsxe getuser", String.valueOf(response));
+//                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                HashMap<String, String> params = new HashMap<>();
+                params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+                params.put("branchid", sp.getData(SharedKey.BRANCH_ID.getKey()));
+                Iterator it = params.entrySet().iterator();
+                String strParams = "";
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next();
+                    strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+                    it.remove();
+                }
+                vipr.getPreRequisite(ctx, params, strParams.replaceAll(" ", "%20"));
+            }
+        }, 300);
+    }
+
+    private void loadAdminJobTitles() {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+        params.put("type", "5");
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+            it.remove();
+        }
+        VolleyInteractor viag = new VolleyInteractor();
+        viag.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(String response, String type) {
+                Helper.dismissSpinnerDialog(loader);
+                response = response.replace("\r\n ", "");
+                Log.d("DSX post response: ", response);
+
+                SharedData.getInstance(ctx).saveData(SharedKey.REF_JOBTITLES.getKey(), response);
+
+                DialogFragment dialogFrag = UserFragment.searchInstance();
+                dialogFrag.setTargetFragment(thisFragment, USER_DIALOG_FRAGMENT);
+                dialogFrag.setCancelable(false);
+                dialogFrag.show(getActivity().getSupportFragmentManager(), "user_search_item");
+            }
+            @Override
+            public void onRequestFail(VolleyError response, String type) {
+                Helper.dismissSpinnerDialog(loader);
+                Toast.makeText(ctx, "Error on loading Job Title.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        viag.getAdminGroupings(ctx, params, strParams.replaceAll(" ", "%20"));
     }
 }

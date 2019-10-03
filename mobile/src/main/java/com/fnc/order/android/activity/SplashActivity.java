@@ -388,7 +388,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     private void clientSignin() {
         String strUsername = ((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString();
         String strPassword = ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString();
-        strUsername = "admin@backoffice.com"; strPassword = "admin123";
+//        strUsername = "admin@backoffice.com"; strPassword = "admin123";
 //        String strBranch = ((EditText) alertDialog.findViewById(R.id.et_edittext3)).getText().toString();
 
         if(strUsername.matches("")){

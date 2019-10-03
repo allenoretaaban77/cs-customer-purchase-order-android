@@ -129,8 +129,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        usernameText.setText("admin@backoffice.com");
-        passwordEText.setText("admin123");
+//        usernameText.setText("17082");
+//        passwordEText.setText("123");
     }
 
     private void initListeners(){
@@ -196,6 +196,7 @@ public class LoginActivity extends BaseActivity {
                         }
                         SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
+                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID.getKey(), String.valueOf(slx.getEmpId()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
@@ -369,7 +370,7 @@ public class LoginActivity extends BaseActivity {
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
 //                EditText etUsername = (EditText) alertDialogSettingsAuth.findViewById(R.id.et_edittext1);
-//                etUsername.setText("dev");
+//                etUsername.setText("administrator");
 //                etPassword.setText("P@ssw0rd" + Helper.getReqDate(0, ""));
 
                 LinearLayout ll_add_user = (LinearLayout) alertDialogSettingsAuth.findViewById(R.id.ll_add_user);
