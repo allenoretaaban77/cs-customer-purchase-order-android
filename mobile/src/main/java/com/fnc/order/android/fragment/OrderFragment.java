@@ -40,16 +40,22 @@ import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.datacontroller.DcBranchlist;
+import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.ItemlistKey;
+import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.listeners.DatePickerListener;
 import com.fnc.order.android.model.Itemlist;
+import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
+import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PopupMenu;
@@ -110,8 +116,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private PopupMenu menuPop;
     private VolleyInteractor vi;
     private Boolean isItemClicked = false;
-    private String refDate;
-    private String refStringDate;
+    private String refDate, refStringDate, strBranchEncoding;
     private ListView list_view;
     private OrderlistAdapter adapter;
     private SwipeLayout swipeLayout;
@@ -120,6 +125,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private Boolean oldskuerr = false;
     private ArrayList<Order> curRefArrayListErr;
     private SharedData sp;
+    private MenuList refMenulist;
+    private aBranchlist refBranchlist;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -135,6 +142,19 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         curRefArrayList = new ArrayList<Order>();
         curRefArrayListErr = new ArrayList<Order>();
+
+        refMenulist = DcMenulist.getInstance(ctx).searchMenuFilterMultiple(
+            MenulistKey.CUSTOMER_ID.getKey() + " = ?",
+            new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) }
+        ).get(0);
+        if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+            strBranchEncoding = "1";
+        } else {
+            strBranchEncoding = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                    aBranchlistKey.CUSTOMERID.getKey() + " = ?",
+                    new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) }
+            ).get(0).getOld_branchid();
+        }
 
         mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
         mainTableBox.post(new Runnable() {
@@ -195,7 +215,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         HashMap<String, String> params = new HashMap<>();
         params.put("itemname", "");
         params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
-        params.put("customerid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
+        params.put("customerid", refMenulist.getCustomerID());
         Iterator it = params.entrySet().iterator();
         String strParams = "";
         while (it.hasNext()) {
@@ -214,8 +234,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         btn_add_item = (MaterialRippleLayout) v.findViewById(R.id.btn_add_item);
         btn_back = (MaterialRippleLayout) v.findViewById(R.id.btn_back);
         tv_name = (TextView) v.findViewById(R.id.tv_name);
-        SharedData sd = SharedData.getInstance(ctx);
-        tv_name.setText(sd.getData(SharedKey.CURRENT_STORE.getKey()));
+        tv_name.setText(refMenulist.getCustomerName());
         rl_content_box = (CoordinatorLayout) v.findViewById(R.id.content_box);
         et_date = (EditText) v.findViewById(R.id.et_date);
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
@@ -563,8 +582,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                 LinkedHashMap<String, String> headersMap = new LinkedHashMap();
                 headersMap.put("companydb", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
-                headersMap.put("customer_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
-                headersMap.put("customer_integ_recid", sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
+                headersMap.put("customer_recid", refMenulist.getCustomerID());
+                headersMap.put("customer_integ_recid", refMenulist.getCustomerIntegrationId());
                 headersMap.put("deliver_date", refStringDate);
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
                 if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
@@ -581,7 +600,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 } else {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.EMP_NO.getKey()));
                 }
-                headersMap.put("branch_encoding", "1");
+                headersMap.put("branch_encoding", strBranchEncoding);
                 String gt = tv_grandtotal.getText().toString().trim().replace(",", "");
                 headersMap.put("grand_total", gt);
                 paramsArray.put("header", headersMap);
@@ -589,9 +608,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
 
                 Ordered ol = new Ordered();
-                ol.setCustomerIntegRecid(sp.getData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey()));
-                ol.setCustomerRecid(sp.getData(SharedKey.CURRENT_CUSTOMER_ID.getKey()));
-                ol.setCustomerName(sp.getData(SharedKey.CURRENT_STORE.getKey()));
+                ol.setCustomerIntegRecid(refMenulist.getCustomerIntegrationId());
+                ol.setCustomerRecid(refMenulist.getCustomerID());
+                ol.setCustomerName(refMenulist.getCustomerName());
                 ol.setDeliveryDate(refStringDate);
 //                ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
@@ -610,7 +629,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setJsonComplete(new JSONArray(detailsArrayListC).toString());
                 ol.setGrandtotal(gt);
                 ol.setDateTime(Helper.getPostingDate());
-                ol.setStatus(0);
+                ol.setStatus(1);
                 ol.setReferenceRecid("null");
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
 

@@ -15,6 +15,9 @@ public class aBranchlistQueryBuilder {
         values.put(aBranchlistKey.DESCRIPTION.getKey(), abl.getDescription());
         values.put(aBranchlistKey.DEVICEID1.getKey(), abl.getDeviceID1());
         values.put(aBranchlistKey.ACTIVE.getKey(), abl.getActive());
+        values.put(aBranchlistKey.CUSTOMERID.getKey(), abl.getCustomerID());
+        values.put(aBranchlistKey.OLDBRANCHID.getKey(), abl.getOld_branchid());
+        values.put(aBranchlistKey.OLDCUSTOMERID.getKey(), abl.getOld_customerid());
         return values;
     }
 }

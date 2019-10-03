@@ -499,6 +499,8 @@ public class UserFragment extends DialogFragment {
                             alertDialogJobTitle.dismiss();
                             loadAdminJobTitles();
                         } else {
+                            Helper.dismissSpinnerDialog(loader);
+                            alertDialogJobTitle.dismiss();
                             Toast.makeText(ctx, "Adding jobtitle failed", Toast.LENGTH_SHORT).show();
                         }
                     }

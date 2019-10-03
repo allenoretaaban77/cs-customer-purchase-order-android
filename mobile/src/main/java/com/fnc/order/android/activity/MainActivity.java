@@ -2,6 +2,7 @@ package com.fnc.order.android.activity;
 
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentTransaction;
@@ -17,11 +21,14 @@ import androidx.fragment.app.FragmentTransaction;
 import com.android.volley.VolleyError;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.R;
+import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
+import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrdered;
+import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
@@ -30,6 +37,7 @@ import com.fnc.order.android.fragment.OrderFragment;
 import com.fnc.order.android.fragment.SearchItemFragment;
 import com.fnc.order.android.fragment.TransactionFragment;
 import com.fnc.order.android.model.Itemlist;
+import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.services.OrdersService;
@@ -73,6 +81,7 @@ public class MainActivity extends BaseActivity {
 
     Context ctx;
     private AlertDialog alertDialog;
+    private ProgressDialog loader;
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -114,8 +123,20 @@ public class MainActivity extends BaseActivity {
 //        openFragment(new OrderFragment(), "order");
 //        openFragment(new CustomerFragment(), "customer");
 
-        Helper.changePage(ctx, getSupportFragmentManager(), new CustomerFragment(),
-            "customer_fragment", "main_page");
+        if (Helper.checkBranchProfile(ctx).size() > 0) {
+            aBranchlist mBl = Helper.checkBranchProfile(ctx).get(0);
+            if(mBl.getDescription().equals("Commissary")) {
+                Helper.changePage(ctx, getSupportFragmentManager(), new CustomerFragment(),
+                    "customer_fragment", "main_page");
+            } else {
+                SharedData.getInstance(ctx).saveData( SharedKey.ORDER_CUSTOMER_ID.getKey(), mBl.getCustomerID() );
+                Helper.changePage(ctx, getSupportFragmentManager(), new OrderFragment(),
+                    "order_fragment", "customer_fragment");
+            }
+        } else {
+            finishAndRemoveTask();
+            Toast.makeText(ctx, "Login Error, please contact IT support.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

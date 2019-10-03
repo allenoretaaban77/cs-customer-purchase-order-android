@@ -39,8 +39,11 @@ import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
+import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
+import com.fnc.order.android.fragment.OrderFragment;
+import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
@@ -55,6 +58,7 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.rpc.Help;
 
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -125,8 +129,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("7771");
-//        passwordEText.setText("1");
+        usernameText.setText("admin@backoffice.com");
+        passwordEText.setText("admin123");
     }
 
     private void initListeners(){
@@ -185,8 +189,8 @@ public class LoginActivity extends BaseActivity {
                             if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                                 isSubmit = false;
                                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                                        "Account Error","Reference employee number not recognized. Please contact IT support to update your account.", "CLOSE",
-                                        null, false) );
+                                    "Account Error","Reference employee number not recognized. Please contact IT support to update your account.", "CLOSE",
+                                    null, false) );
                                 return;
                             }
                         }
@@ -197,8 +201,22 @@ public class LoginActivity extends BaseActivity {
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_ISMOBILEADMIN.getKey(), String.valueOf(slx.getIsmobileadmin()));
                         isSubmit = true;
-                        showActivity(MainActivity.class);
-                        Toast.makeText(ctx, "Welcome " + slx.getName() + "!", Toast.LENGTH_SHORT).show();
+
+                        if (Helper.checkBranchProfile(ctx).size() > 0) {
+                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                                showActivity(MainActivity.class);
+                            } else {
+                                LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
+                                if (llr.size() > 0) {
+                                    showActivity(MainActivity.class);
+                                } else {
+                                    requestCustomers("");
+                                }
+                            }
+                            Toast.makeText(ctx, "Welcome " + slx.getName() + "!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(ctx, "Login Error, please contact IT support.", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         isSubmit = false;
                         BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -211,7 +229,7 @@ public class LoginActivity extends BaseActivity {
                         "CLOSE", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                finishAndRemoveTask();
+                            finishAndRemoveTask();
                             }
                         }, false) );
                 }
@@ -1020,7 +1038,10 @@ public class LoginActivity extends BaseActivity {
                                                 rowObj.getString("deviceid"),
                                                 rowObj.getString("description").trim(),
                                                 rowObj.getString("deviceID1").trim(),
-                                                rowObj.getString("active").trim()
+                                                rowObj.getString("active").trim(),
+                                                rowObj.getString("customerID").trim(),
+                                                rowObj.getString("old_branchid").trim(),
+                                                rowObj.getString("old_customerid").trim()
                                             );
                                             DcBranchlist.getInstance(ctx).insertBranches(br);
                                         }
@@ -1045,9 +1066,6 @@ public class LoginActivity extends BaseActivity {
                                             if (flgx == 1) {
                                                 sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                                 sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                                sp.saveData(SharedKey.BRANCH_CODE.getKey(), ab.getBranchcode());
-                                                sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ab.getDescription());
-
                                                 Helper.dismissSpinnerDialog(loader);
                                                 alertDialogSettings.dismiss();
                                                 Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
@@ -1113,7 +1131,8 @@ public class LoginActivity extends BaseActivity {
         ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
         arrBranches = new LinkedList<>();
         if (refAbx.size() > 0) {
-            aBranchlist abr = new aBranchlist(0, "Select branch....", "", "","", "");
+            aBranchlist abr = new aBranchlist(0, "Select branch....",
+                "", "","", "", "", "", "");
             arrBranches.add(abr);
             for(int k=0; k<refAbx.size(); k++){
                 if (DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
@@ -1142,7 +1161,8 @@ public class LoginActivity extends BaseActivity {
                     tv.setText(arrBranches.get(pos).getBranchcode());
                 } else {
                     tv.setTextColor(Color.DKGRAY);
-                    tv.setText(arrBranches.get(pos).getBranchcode() + " (" + arrBranches.get(pos).getDescription() + ")");
+//                    tv.setText(arrBranches.get(pos).getBranchcode() + " (" + arrBranches.get(pos).getDescription() + ")");
+                    tv.setText(arrBranches.get(pos).getDescription() + " (" + arrBranches.get(pos).getBranchcode() + ")");
                 }
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT, 88);
                 params.setMargins(20,0,10,0);
@@ -1154,8 +1174,10 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
                 if (pos != 0) {
-                    tvBranchdescription.setText(arrBranches.get(pos).getBranchcode() +
-                            " (" + arrBranches.get(pos).getDescription() + ")");
+                    /* tvBranchdescription.setText(arrBranches.get(pos).getBranchcode() +
+                            " (" + arrBranches.get(pos).getDescription() + ")"); */
+                    tvBranchdescription.setText(arrBranches.get(pos).getDescription() +
+                            " (" + arrBranches.get(pos).getBranchcode() + ")");
                     refSelectedBranchId = String.valueOf(arrBranches.get(pos).getBranchid());
                 }
             }
@@ -1299,6 +1321,96 @@ public class LoginActivity extends BaseActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             Log.d("gcpu", "Running " + + values[0]);
+        }
+    }
+
+    private void requestCustomers(String stringSearch) {
+        if (Helper.isNetworkAvailable(ctx)) {
+            loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait...."); loader.show();
+            VolleyInteractor vic = new VolleyInteractor();
+            vic.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) {
+                    try {
+                        JSONArray objArr = new JSONArray(response);
+                        if(objArr.length() > 0) {
+                            new customerAT().execute(response);
+                        } else {
+                            Toast.makeText(ctx, "Customer record empty, pleas contact developer", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        Helper.dismissSpinnerDialog(loader);
+                        Toast.makeText(ctx, "Customer record fetch error, pleas contact developer", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onRequestFail(VolleyError response, String type) {
+                    Helper.dismissSpinnerDialog(loader);
+                    Toast.makeText(ctx, "Customer record fetch error, pleas contact developer", Toast.LENGTH_SHORT).show();
+                }
+            });
+            HashMap<String, String> params = new HashMap<>();
+            params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
+            params.put("customer", stringSearch);
+            Iterator it = params.entrySet().iterator();
+            String strParams = "";
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                it.remove();
+            }
+            strParams = strParams.replaceAll(" ", "%20");
+            vic.getCustomers(ctx, params, strParams);
+        } else {
+            Toast.makeText(ctx, "Please check internet connectoin", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class customerAT extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                String response = params[0].replace("\r\n", "");
+                JSONArray objArr = new JSONArray(response);
+                if(objArr.length() > 0) {
+                    DcMenulist.getInstance(ctx).emptyMenulist();
+                    for (int i = 0; i < objArr.length(); i++) {
+                        JSONObject obj = objArr.getJSONObject(i);
+                        MenuList mlList = new MenuList();
+                        mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
+                        mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
+                        String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                        mlList.setCustomerName(strCustomerName);
+                        mlList.setRecordCount(0);
+                        mlList.setRemarks("");
+                        if (!strCustomerName.equals("")) {
+                            if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
+                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
+                            } else {
+                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)).toUpperCase());
+                            }
+                            DcMenulist.getInstance(ctx).insertMenulist(mlList);
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return "Task Error";
+            }
+            return "Task Completed.";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            Helper.dismissSpinnerDialog(loader);
+            showActivity(MainActivity.class);
+        }
+        @Override
+        protected void onPreExecute() {
+            Log.d("asynctask", "Task Starting");
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.d("asynctask", "Running " + + values[0]);
         }
     }
 }

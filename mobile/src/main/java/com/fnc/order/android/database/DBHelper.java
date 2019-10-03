@@ -154,6 +154,9 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(aBranchlistKey.DESCRIPTION);
         fields.add(aBranchlistKey.DEVICEID1);
         fields.add(aBranchlistKey.ACTIVE);
+        fields.add(aBranchlistKey.CUSTOMERID);
+        fields.add(aBranchlistKey.OLDBRANCHID);
+        fields.add(aBranchlistKey.OLDCUSTOMERID);
         return fields;
     }
 

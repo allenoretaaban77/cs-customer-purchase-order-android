@@ -50,14 +50,17 @@ import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcAitemlist;
+import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.aAdminGroupings;
+import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
@@ -128,7 +131,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             SharedData.getInstance(ctx).saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             requestCustomers("");
         } else {
-            LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "");
+            LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
             if (llr.size() < 1) {
                 requestCustomers("");
             }
@@ -309,7 +312,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     if(!etCustomerName.getText().toString().trim().equals("")) {
                         Helper.hideSoftKeyboard(getActivity());
-                        fillData(v, etCustomerName.getText().toString().trim(), false);
+                        fillData(v, "%" +etCustomerName.getText().toString().trim() + "%", false);
                     }else{
 //                        Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
                         alertDialog = Helper.okDialog(ctx,
@@ -328,7 +331,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 
                 if(!etCustomerName.getText().toString().trim().equals("")) {
                     Helper.hideSoftKeyboard(getActivity());
-                    fillData(v, etCustomerName.getText().toString().trim(), false);
+                    fillData(v, "%" + etCustomerName.getText().toString().trim() + "%", false);
                 }else{
 //                    Toast.makeText(ctx, "Please input item name.", Toast.LENGTH_SHORT).show();
                     alertDialog = Helper.okDialog(ctx,
@@ -443,7 +446,6 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             }
         });
         boxMenu.build();
-
     }
 
     private void requestCustomers(String stringSearch) {
@@ -514,17 +516,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 @Override
                 public void onItemClick(View view,  int aid) {
                     MenuList mlRS = mlRSx.get(aid);
-                    SharedData sp = SharedData.getInstance(ctx);
-                    sp.saveData(SharedKey.CURRENT_REMARKS.getKey(), mlRS.getRemarks());
-                    sp.saveData(SharedKey.CURRENT_STORE.getKey(), mlRS.getCustomerName());
-                    sp.saveData(SharedKey.CURRENT_CUSTOMER_ID.getKey(), mlRS.getCustomerID());
-                    sp.saveData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey(), mlRS.getCustomerIntegrationId());
-//                    getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.container, new OrderFragment(), "order_fragment")
-//                        .addToBackStack(null)
-//                        .commit();
+                    SharedData.getInstance(ctx).saveData( SharedKey.ORDER_CUSTOMER_ID.getKey(), String.valueOf(mlRS.getCustomerID()) );
                     Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
-                        new OrderFragment(), "order_fragment", "customer_fragment");
+                            new OrderFragment(), "order_fragment", "customer_fragment");
                 }
             });
         }
@@ -595,51 +589,66 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         @Override
         protected void onPostExecute(String result) {
             Log.d("dsxcf", "searchcustomer saved");
-
             progressBarx.setVisibility(View.GONE);
 
-            alphagridview = (GridView) v.findViewById(R.id.alphagridview);
-            ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
-            if (refStringAlpha.size() > 0) { stringAlpha = refStringAlpha; }
-            adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
-            adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
-                @Override
-                public void onItemClick(View v, int pos) {
-                    if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
-                    Helper.hideSoftKeyboard(getActivity());
-                    fillData(v, stringAlpha.get(pos), true);
-                }
-            });
+//            if(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()).equals("Commissary")) {
+                alphagridview = (GridView) v.findViewById(R.id.alphagridview);
+                ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
+                if (refStringAlpha.size() > 0) { stringAlpha = refStringAlpha; }
+                adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
+                adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
+                    @Override
+                    public void onItemClick(View v, int pos) {
+                        if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
+                        Helper.hideSoftKeyboard(getActivity());
+                        fillData(v, stringAlpha.get(pos), true);
+                    }
+                });
 
-            dismissSpinnerDialog();
-            storelistview_box.setVisibility(View.GONE);
-            alphagridview_box.setVisibility(View.VISIBLE);
-            alphagridview_box.setAlpha(0.0f);
-            alphagridview_box.animate().translationY(0)
-                    .alpha(1.0f).setListener(null);
-            alphagridview.setAdapter(adapterAlpha);
+                dismissSpinnerDialog();
+                storelistview_box.setVisibility(View.GONE);
+                alphagridview_box.setVisibility(View.VISIBLE);
+                alphagridview_box.setAlpha(0.0f);
+                alphagridview_box.animate().translationY(0)
+                        .alpha(1.0f).setListener(null);
+                alphagridview.setAdapter(adapterAlpha);
 
-            isUpdateCustomer = false;
+                isUpdateCustomer = false;
 
-            new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
-                            LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
-                            if (ailRs.size() < 1) {
-                                loader = Helper.showSpinnerDialog(ctx,"Syncing Product Items", "Please wait..."); loader.show();
-                                requestProductItems();
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+                                LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
+                                if (ailRs.size() < 1) {
+                                    loader = Helper.showSpinnerDialog(ctx,"Syncing Product Items", "Please wait..."); loader.show();
+                                    requestProductItems();
+                                } else {
+                                    Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
                                 Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                },
-                500
-            );
+                    },
+                    500
+                );
 
+            /*} else {
+                loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait..."); loader.show();
+
+                SharedData sp = SharedData.getInstance(ctx);
+                LinkedList<MenuList> rsMl =  DcMenulist.getInstance(ctx).searchCustomer(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()));
+                if (rsMl.size() > 0) {
+                    MenuList mlRS = rsMl.get(0);
+                    sp.saveData(SharedKey.CURRENT_REMARKS.getKey(), mlRS.getRemarks());
+                    sp.saveData(SharedKey.CURRENT_STORE.getKey(), mlRS.getCustomerName());
+                    sp.saveData(SharedKey.CURRENT_CUSTOMER_ID.getKey(), mlRS.getCustomerID());
+                    sp.saveData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey(), mlRS.getCustomerIntegrationId());
+                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
+                        new OrderFragment(), "order_fragment", "customer_fragment");
+                }
+            }*/
         }
         @Override
         protected void onPreExecute() {
@@ -717,7 +726,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     new customerAT().execute(response);
                     Log.d("dsxcf", "searchcustomer saved");
                 } else {
-                    Toast.makeText(ctx, "Customer record empty, pleas contact developer", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "Customer record empty, please contact developer", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 JSONArray objArr = new JSONArray(response);
