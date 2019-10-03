@@ -67,8 +67,8 @@ public class DcBranchlist extends DBHelper {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT " + aBranchlistKey.BRANCHCODE.getKey()
                 + "  FROM " + Table.BRANCHLIST.getName()
-                + " GROUP BY " + aBranchlistKey.BRANCHCODE.getKey()
-                + " ORDER BY " + aBranchlistKey.BRANCHCODE.getKey() + " ASC";
+                + " GROUP BY " + aBranchlistKey.BRANCHID.getKey()
+                + " ORDER BY " + aBranchlistKey.DESCRIPTION.getKey() + " ASC";
         Cursor c = db.rawQuery(strQry, null);
         ArrayList<String> stringBranches = new ArrayList<String>();
         while (c.moveToNext()) {
@@ -101,7 +101,10 @@ public class DcBranchlist extends DBHelper {
             c.getString(c.getColumnIndex(aBranchlistKey.DEVICEID.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.DESCRIPTION.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.DEVICEID1.getKey())),
-            c.getString(c.getColumnIndex(aBranchlistKey.ACTIVE.getKey()))
+            c.getString(c.getColumnIndex(aBranchlistKey.ACTIVE.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.CUSTOMERID.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.OLDBRANCHID.getKey())),
+            c.getString(c.getColumnIndex(aBranchlistKey.OLDCUSTOMERID.getKey()))
         );
         return bl;
     }

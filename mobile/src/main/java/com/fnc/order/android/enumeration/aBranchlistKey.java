@@ -8,7 +8,10 @@ public enum aBranchlistKey {
     DEVICEID("deviceid", DataType.TEXT),
     DESCRIPTION("description", DataType.TEXT),
     DEVICEID1("deviceID1", DataType.TEXT),
-    ACTIVE("active", DataType.TEXT);
+    ACTIVE("active", DataType.TEXT),
+    CUSTOMERID("customerID", DataType.TEXT),
+    OLDBRANCHID("old_branchid", DataType.TEXT),
+    OLDCUSTOMERID("old_customerid", DataType.TEXT);
 
     private String key;
     private String dataType;

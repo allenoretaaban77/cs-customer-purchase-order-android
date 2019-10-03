@@ -163,7 +163,6 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
 
         btn_search.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-
                 if(!et_item_name.getText().toString().trim().equals("")) {
                     if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
                         requestItemLocal(v, et_item_name.getText().toString().trim());
@@ -177,7 +176,6 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                         BounceView.addAnimTo( Helper.okDialog(ctx, "Error","Please input item name.", "OK",
                             null, false) );
                     }
-
                 }
             }
         });

@@ -86,21 +86,48 @@ public class DcMenulist extends DBHelper {
         return stringAlpha;
     }
 
+    public LinkedList<MenuList> searchCustomer(String searchStr) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.MENULIST.getName()
+                + " WHERE " + MenulistKey.CUSTOMER_ID.getKey() + " = ?";
+        Cursor c = db.rawQuery(strQry, new String[] { searchStr });
+        LinkedList<MenuList> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setMenulist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
     public LinkedList<MenuList> getAllMenulist(Boolean isAlpha, String stringSearch) {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "";
         if (isAlpha) {
             strQry = "SELECT *" +
                     " FROM " + Table.MENULIST.getName() +
-                    " WHERE " + MenulistKey.ALPHA_CHAR.getKey() + " = '" + stringSearch + "'" +
+                    " WHERE " + MenulistKey.ALPHA_CHAR.getKey() + " = ?" +
                     " ORDER BY " + MenulistKey.CUSTOMER_NAME.getKey() + " ASC";
         } else {
             strQry = "SELECT *" +
                     " FROM " + Table.MENULIST.getName() +
-                    " WHERE " + MenulistKey.CUSTOMER_NAME.getKey() + " LIKE '%" + stringSearch + "%'" +
+                    " WHERE " + MenulistKey.CUSTOMER_NAME.getKey() + " LIKE ?" +
                     " ORDER BY " + MenulistKey.CUSTOMER_NAME.getKey() + " ASC";
         }
-        Cursor c = db.rawQuery(strQry, null);
+        Cursor c = db.rawQuery(strQry, new String[] { stringSearch });
+        LinkedList<MenuList> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setMenulist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    public LinkedList<MenuList> searchMenuFilterMultiple(String strCol, String[] strMultiple) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.MENULIST.getName() + " WHERE " + strCol;
+        Cursor c = db.rawQuery(strQry, strMultiple);
         LinkedList<MenuList> list = new LinkedList<>();
         while (c.moveToNext()) {
             list.add(setMenulist(c));

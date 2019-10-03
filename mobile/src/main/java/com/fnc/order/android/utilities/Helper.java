@@ -49,10 +49,13 @@ import com.fnc.order.android.activity.SplashActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.fragment.CustomerFragment;
+import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
 import com.google.api.core.NanoClock;
 import com.google.api.gax.paging.Page;
@@ -90,6 +93,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
@@ -406,7 +410,7 @@ public class Helper {
     }
 
     public static String getImei(Context ctx) {
-//        return "353800100112222";
+//        return "353800100566385";
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             return getImeiNew(ctx); // + "70";
         } else {
@@ -543,6 +547,13 @@ public class Helper {
     }
     public static float convertDpToPixel(Context context, float dp){
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static LinkedList<aBranchlist> checkBranchProfile(Context ctx) {
+        return DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+                new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx) }
+        );
     }
 
 }

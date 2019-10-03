@@ -193,8 +193,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                     loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                                     sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                     sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                    sp.saveData(SharedKey.BRANCH_CODE.getKey(), ab.getBranchcode());
-                                    sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ab.getDescription());
                                     getPreRequisite();
                                 } else {
                                     postBranchImei();
@@ -241,7 +239,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
             arrBranches = new LinkedList<>();
             if (refAbx.size() > 0) {
-                aBranchlist abr = new aBranchlist(0, "Select branch....", "", "","", "");
+                aBranchlist abr = new aBranchlist(0, "Select branch....",
+                    "", "","", "", "", "", "");
                 arrBranches.add(abr);
                 for(int k=0; k<refAbx.size(); k++){
                     if (DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
@@ -270,7 +269,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         tv.setText(arrBranches.get(pos).getBranchcode());
                     } else {
                         tv.setTextColor(Color.DKGRAY);
-                        tv.setText(arrBranches.get(pos).getBranchcode() + " (" + arrBranches.get(pos).getDescription() + ")");
+//                        tv.setText(arrBranches.get(pos).getBranchcode() + " (" + arrBranches.get(pos).getDescription() + ")");
+                        tv.setText(arrBranches.get(pos).getDescription() + " (" + arrBranches.get(pos).getBranchcode() + ")");
                     }
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT, 88);
                     params.setMargins(20,0,10,0);
@@ -290,10 +290,11 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, final int pos, long id) {
                     if (pos != 0) {
-                        tvBranchdescription.setText(arrBranches.get(pos).getBranchcode() +
-                                " (" + arrBranches.get(pos).getDescription() + ")");
+                        /* tvBranchdescription.setText(arrBranches.get(pos).getBranchcode() +
+                                " (" + arrBranches.get(pos).getDescription() + ")"); */
+                        tvBranchdescription.setText(arrBranches.get(pos).getDescription() +
+                                " (" + arrBranches.get(pos).getBranchcode() + ")");
                         refSelectedBranchId = String.valueOf(arrBranches.get(pos).getBranchid());
-//                        sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(arrBranches.get(pos).getBranchid()));
                     }
                 }
                 @Override
@@ -558,7 +559,10 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                         rowObj.getString("deviceid"),
                                         rowObj.getString("description").trim(),
                                         rowObj.getString("deviceID1").trim(),
-                                        rowObj.getString("active").trim()
+                                        rowObj.getString("active").trim(),
+                                        rowObj.getString("customerID").trim(),
+                                        rowObj.getString("old_branchid").trim(),
+                                        rowObj.getString("old_customerid").trim()
                                     );
                                     DcBranchlist.getInstance(ctx).insertBranches(br);
                                 }
@@ -583,8 +587,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                             loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                                             sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                             sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), ab.getBranchcode());
-                                            sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ab.getDescription());
                                             getPreRequisite();
                                         } else {
                                             BounceView.addAnimTo( Helper.okDialog( ctx,

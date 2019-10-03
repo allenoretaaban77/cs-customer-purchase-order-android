@@ -13,6 +13,7 @@ public enum API {
     GET_VERIFIED("api/getVerified_linkOldEmployeeNo"),
     POST_UPDATE_EMPLOYEE("api/updateRefEmployeeID"),
     POST_ORDER("api/PostCOrder"),
+    POST_UPDATE_PASSWORD("api/updateLocalPassword"),
     GET_DEVICE_PROFILE("api/getCoDeviceProfile"),
     GET_ADMIN_GROUPINGS("api/getCoAdminGroupings"),
     POST_BRANCH_SIGNUP("api/postCoBranchSignUp"),
