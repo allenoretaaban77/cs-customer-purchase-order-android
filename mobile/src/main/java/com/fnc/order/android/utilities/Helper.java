@@ -410,7 +410,7 @@ public class Helper {
     }
 
     public static String getImei(Context ctx) {
-//        return "353800100566385";
+//        return "353800100565635";
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             return getImeiNew(ctx); // + "70";
         } else {
@@ -486,7 +486,7 @@ public class Helper {
 
     private static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(-777, "-2", "administrator", "aban.allen@yahoo.com",
+        aStaffs cs = new aStaffs(1910454835, "-2", "administrator", "jparallag@fncnathaniel.com",
             "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
             1912072415, "P@ssw0rd" + Helper.getReqDate(0, ""),
             "true", "true");
