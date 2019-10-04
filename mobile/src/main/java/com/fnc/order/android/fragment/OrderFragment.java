@@ -112,7 +112,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private TableLayout tl;
     private Integer calcRefId = 0;
     private String refPersonIdentityId = "";
-    private static AlertDialog alertDialog;
+    private static AlertDialog alertDialog, alertDialogRemarks;
     private Boolean isBacked = false;
     private LinearLayout bsCalc;
     private BottomSheetBehavior bsBh;
@@ -558,7 +558,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         public void onClick(View v) {
             Helper.hideSoftKeyboard(getActivity());
             dismissSpinnerDialog();
-            alertDialog.dismiss();
+            alertDialogRemarks.dismiss();
         }
     };
 
@@ -617,7 +617,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
-                headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
+
+                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                    headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
+                } else {
+                    headersMap.put("order_type", "2"); // int (customer order: 1 / store order: 2)
+                }
 //                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
@@ -653,7 +658,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setJsonComplete(new JSONArray(detailsArrayListC).toString());
                 ol.setGrandtotal(gt);
                 ol.setDateTime(Helper.getPostingDate());
-                ol.setStatus(1);
+                ol.setStatus(0);
                 ol.setReferenceRecid("null");
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
 
@@ -741,9 +746,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         public void onItemClick(View view,  int position) {
                             bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                             adapter.setCurPos(position);
-                            BounceView.addAnimTo( okCancelInputRemarksDialogBuilder(ctx,
+                            alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
                                     "Add Remarks",
-                                    "SAVE", null, "CANCEL", cancelCallback ) );
+                                    "SAVE", null, "CANCEL", cancelCallback );
+                            BounceView.addAnimTo(alertDialogRemarks);
                         }
                     });
                     list_view.setAdapter(adapter);
@@ -838,9 +844,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         @Override
                         public void onItemClick(View view,  int position) {
                             adapter.setCurPos(position);
-                            BounceView.addAnimTo( okCancelInputRemarksDialogBuilder(ctx,
+                            alertDialogRemarks =  okCancelInputRemarksDialogBuilder(ctx,
                                     "Add Remarks",
-                                    "Save", null, "Cancel", cancelCallback ) );
+                                    "Save", null, "Cancel", cancelCallback );
+                            BounceView.addAnimTo(alertDialogRemarks);
                         }
                     });
                     list_view.setAdapter(adapter);
@@ -1204,9 +1211,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 public void onClick(View v) {
                     menuPop.dismiss();
                     bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                    BounceView.addAnimTo( okCancelInputRemarksDialogBuilder(ctx,
+                    alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
                         "Add Remarks",
-                        "SAVE", null, "CANCEL", cancelCallback ) );
+                        "SAVE", null, "CANCEL", cancelCallback );
+                    BounceView.addAnimTo( alertDialogRemarks );
                 }
             });
             menuPop.getBtnDelete().setOnClickListener(new View.OnClickListener() {
@@ -1262,7 +1270,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         btnOK.setText(okButtonCaption);
         btnOK.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                alertDialog.dismiss();
+                alertDialogRemarks.dismiss();
                 Toast.makeText(activity, "Remarks saved successfully.", Toast.LENGTH_SHORT).show();
                 Order ol =  curRefArrayList.get(adapter.getCurPos());
                 ol.setRemarks(etText.getText().toString());
