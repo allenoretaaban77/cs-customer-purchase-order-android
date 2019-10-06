@@ -254,8 +254,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             pageMenu.addMenuItem(new DroppyMenuItem("  Update Product Items  ").setId(2)).addSeparator();
         }
         if (SharedData.getInstance(ctx).getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
-                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
-            pageMenu.addMenuItem(new DroppyMenuItem("  Users ").setId(3)).addSeparator();
+                SharedData.getInstance(ctx).getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
+            pageMenu.addMenuItem(new DroppyMenuItem("  Users  ").setId(3)).addSeparator();
         }
         pageMenu.addMenuItem(new DroppyMenuItem("  Log-out  ").setId(0));
 

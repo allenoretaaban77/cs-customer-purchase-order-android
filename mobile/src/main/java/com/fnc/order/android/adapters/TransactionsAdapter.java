@@ -39,13 +39,13 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
         private TextView tv_date;
         private TextView tv_name;
         private TextView tv_grandtotal;
-        private TextView tv_remarks;
+        private TextView tv_status;
         private LinearLayout ll_item_box;
         public ViewHolder(View v) {
             tv_date = (TextView) v.findViewById(R.id.tv_date);
             tv_name = (TextView) v.findViewById(R.id.tv_name);
             tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
-            tv_remarks = (TextView) v.findViewById(R.id.tv_remarks);
+            tv_status = (TextView) v.findViewById(R.id.tv_status);
             ll_item_box = (LinearLayout) v.findViewById(R.id.item_box);
 
         }
@@ -71,7 +71,11 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
         holder.tv_name.setText(od.getCustomerName());
         holder.tv_grandtotal.setText(String.valueOf(new DecimalFormat("#,###,###.00")
                 .format(Double.parseDouble(od.getGrandtotal()))));
-        holder.tv_remarks.setText(od.getRemarks());
+        if (od.getStatus() == 1) {
+            holder.tv_status.setText("SENT");
+        } else {
+            holder.tv_status.setText("UNSENT");
+        }
 
         holder.ll_item_box.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -88,12 +92,12 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
             holder.tv_date.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
             holder.tv_name.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
             holder.tv_grandtotal.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
-            holder.tv_remarks.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
+            holder.tv_status.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
         } else {
             holder.tv_date.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
             holder.tv_name.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
             holder.tv_grandtotal.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
-            holder.tv_remarks.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
+            holder.tv_status.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
         }
 
         return convertView;
