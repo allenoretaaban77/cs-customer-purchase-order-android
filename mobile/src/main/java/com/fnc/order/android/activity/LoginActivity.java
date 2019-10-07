@@ -129,8 +129,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("administrator");
-//        passwordEText.setText("P@ssw0rd1004");
+//        usernameText.setText("051581");
+//        passwordEText.setText("77");
     }
 
     private void initListeners(){
@@ -1303,7 +1303,7 @@ public class LoginActivity extends BaseActivity {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     dialog.dismiss();
-                                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/testing/" + ctx.getPackageName())));
+                                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
                                                 }
                                             }, false) );
                                 }

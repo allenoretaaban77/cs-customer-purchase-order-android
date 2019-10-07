@@ -48,12 +48,12 @@
                 <TextView
                     android:textSize="14sp"
                     android:lineHeight="14sp"
-                    android:id="@+id/tv_remarks"
+                    android:id="@+id/tv_status"
                     android:gravity="top|left"
                     style="@style/tblCellTextView"
                     android:layout_width="90dp"
                     android:layout_column="3"
-                    android:text="Remarks" />
+                    android:text="Status" />
 
             </TableRow>
 
