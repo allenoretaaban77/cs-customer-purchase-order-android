@@ -42,7 +42,6 @@ import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
-import com.fnc.order.android.fragment.OrderFragment;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aBranchlist;

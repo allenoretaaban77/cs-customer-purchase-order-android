@@ -1,6 +1,5 @@
 package com.fnc.order.android.callback;
 
-
 import com.android.volley.VolleyError;
 
 public interface VolleyCallback {
