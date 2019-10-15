@@ -31,10 +31,10 @@ import java.util.LinkedList;
 public class OrdersService extends Service {
 
     public int counter = 0;
-    public VolleyCallback refVB;
     Context c;
     LocalBroadcastManager broadcaster = null;
     Handler handler = new Handler();
+    Runnable runner;
 
     @Override
     public void onCreate() {

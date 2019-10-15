@@ -57,7 +57,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.google.rpc.Help;
 
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -1254,10 +1253,11 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         refreshUsers();
         sp = SharedData.getInstance(this);
-        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "admin");
-        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
+//        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "admin");
+//        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
         new checkVersionUpdate().execute("");
     }
+
     private Storage storageinit;
     private class checkVersionUpdate extends AsyncTask<String, Integer, String> {
         @Override
