@@ -244,7 +244,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     String refStrArr = SharedData.getInstance(ctx).getData(SharedKey.SS_PRELOAD_ITEMS.getKey());
                     JSONArray objArr = new JSONArray(refStrArr);
                     if (objArr.length() > 0) {
-                        DcBranchlist.getInstance(ctx).emptyBranchlist();
                         for (int i = 0; i < objArr.length(); i++) {
                             JSONObject rowObj = objArr.getJSONObject(i);
                             Order ol = new Order();
@@ -771,7 +770,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     }
 
                     ArrayList<HashMap> detailsArrayListC = new ArrayList();
-                    LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
                     for(Itemlist il : iRs){
                         Order ol = new Order();
                         ol.setQuantity("");
@@ -790,6 +788,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                         // get preloaded
 //                        detailMap.put("quantity", "");
+                        LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
                         detailMap.put("item_recid", il.getRecid());
                         detailMap.put("itemname", il.getItemName());
                         detailMap.put("unitName", il.getUnitName());

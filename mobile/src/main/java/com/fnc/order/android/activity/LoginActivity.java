@@ -210,12 +210,13 @@ public class LoginActivity extends BaseActivity {
                                 LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
                                 if (llr.size() > 0) {
                                     showActivity(MainActivity.class);
+                                    Toast.makeText(ctx, "Welcome " + slx.getName() + "!", Toast.LENGTH_SHORT).show();
                                 } else {
                                     requestCustomers("");
                                 }
                             }
-                            Toast.makeText(ctx, "Welcome " + slx.getName() + "!", Toast.LENGTH_SHORT).show();
                         } else {
+                            isSubmit = false;
                             Toast.makeText(ctx, "Login Error, please contact IT support.", Toast.LENGTH_SHORT).show();
                         }
                     } else {
@@ -930,7 +931,7 @@ public class LoginActivity extends BaseActivity {
 
     private void refreshUsers() {
         if (!Helper.isNetworkAvailable(this)) {
-            Toast.makeText(ctx, "This app requires internet to initialize.  Please check your connection.",
+            Toast.makeText(ctx, "Users update process failed. Please check internet connection.",
                     Toast.LENGTH_SHORT).show(); return;
         }
 
@@ -1340,12 +1341,14 @@ public class LoginActivity extends BaseActivity {
                             Toast.makeText(ctx, "Customer record empty, pleas contact developer", Toast.LENGTH_SHORT).show();
                         }
                     } catch (JSONException e) {
+                        isSubmit = false;
                         Helper.dismissSpinnerDialog(loader);
                         Toast.makeText(ctx, "Customer record fetch error, pleas contact developer", Toast.LENGTH_SHORT).show();
                     }
                 }
                 @Override
                 public void onRequestFail(VolleyError response, String type) {
+                    isSubmit = false;
                     Helper.dismissSpinnerDialog(loader);
                     Toast.makeText(ctx, "Customer record fetch error, pleas contact developer", Toast.LENGTH_SHORT).show();
                 }
@@ -1363,7 +1366,8 @@ public class LoginActivity extends BaseActivity {
             strParams = strParams.replaceAll(" ", "%20");
             vic.getCustomers(ctx, params, strParams);
         } else {
-            Toast.makeText(ctx, "Please check internet connectoin", Toast.LENGTH_SHORT).show();
+            isSubmit = false;
+            Toast.makeText(ctx, "Fetch customer failed. Please check internet connection", Toast.LENGTH_SHORT).show();
         }
     }
 
