@@ -26,7 +26,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
@@ -40,13 +39,11 @@ import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
-import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
-import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.PersonsKey;
@@ -57,7 +54,6 @@ import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
-import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
@@ -74,6 +70,8 @@ import com.fnc.order.android.utilities.RelativePopupWindow;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
+import org.json.JSONTokener;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -82,11 +80,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import hari.bounceview.BounceView;
 
@@ -215,26 +215,85 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private void fillItems(View v) {
-        final SharedData sp = SharedData.getInstance(ctx);
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
-                Context.INPUT_METHOD_SERVICE);
+        if (Helper.isNetworkAvailable(ctx)) {
+            final SharedData sp = SharedData.getInstance(ctx);
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
 
-        showSpinnerDialog(v);
-        HashMap<String, String> params = new HashMap<>();
-        params.put("itemname", "");
-        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
-        params.put("customerid", refMenulist.getCustomerID());
-        Iterator it = params.entrySet().iterator();
-        String strParams = "";
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
-            it.remove();
+            showSpinnerDialog(v);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("itemname", "");
+            params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
+            params.put("customerid", refMenulist.getCustomerID());
+            Iterator it = params.entrySet().iterator();
+            String strParams = "";
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+                it.remove();
+            }
+            VolleyInteractor vi = new VolleyInteractor();
+            vi.registerCallback(this);
+            strParams = strParams.replaceAll(" ", "%20");
+            vi.getItemlist(ctx, params, strParams);
+        } else {
+            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                Toast.makeText(ctx, "Please check internet connection....", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    String refStrArr = SharedData.getInstance(ctx).getData(SharedKey.SS_PRELOAD_ITEMS.getKey());
+                    JSONArray objArr = new JSONArray(refStrArr);
+                    if (objArr.length() > 0) {
+                        DcBranchlist.getInstance(ctx).emptyBranchlist();
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            Order ol = new Order();
+                            ol.setQuantity("");
+                            ol.setItemRecid(rowObj.getString("item_recid"));
+                            ol.setItemName(rowObj.getString("itemname"));
+                            ol.setUnitName(rowObj.getString("unitName"));
+                            ol.setRemarks("");
+                            ol.setOldSku(rowObj.getString("old_sku"));
+                            ol.setSellingPrice(rowObj.getString("selling_price"));
+                            ol.setTotal("null");
+                            ol.setIsChecked(false);
+                            ol.setIsError(false);
+                            ol.setIsLocked(true);
+                            curRefArrayList.add(ol);
+                        }
+
+                        adapter = new OrderlistAdapter(ctx, curRefArrayList);
+                        adapter.setCurPos(curRefPos);
+                        adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                adapter.setCurPos(position);
+                                adapter.notifyDataSetChanged();
+                                bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                curRefPos = adapter.getCurPos();
+                            }
+                        });
+                        adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                adapter.setCurPos(position);
+                                alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
+                                        "Add Remarks",
+                                        "SAVE", null, "CANCEL", cancelCallback);
+                                BounceView.addAnimTo(alertDialogRemarks);
+                            }
+                        });
+                        list_view.setAdapter(adapter);
+                    } else {
+                        Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
+                }
+            }
+
         }
-        VolleyInteractor vi = new VolleyInteractor();
-        vi.registerCallback(this);
-        strParams = strParams.replaceAll(" ", "%20");
-        vi.getItemlist(ctx, params, strParams);
     }
 
     private void initViews(View v) {
@@ -579,7 +638,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             for (int i = 0; i < curRefArrayList.size(); i++) {
                 Order rowOl = curRefArrayList.get(i);
                 if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
-                    HashMap<String, Object> detailMap = new HashMap();
+                    LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
                     String rqty = rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity();
                     rqty = rqty.replace(",", "");
                     detailMap.put("quantity", rqty);
@@ -698,17 +757,21 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
                         irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
                         irsx.setIsChecked(false);
-                        sp = SharedData.getInstance(ctx);
+                        /* sp = SharedData.getInstance(ctx);
                         if (sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == 1) {
-                            if (rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null")) {
+                            if (rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null") || rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("0")) {
                                 oldskuerr = true;
                             }
-                        }
+                        } */
                         irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
                         irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));
-                        iRs.add(irsx);
+                        if (!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null") && !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("0")) {
+                            iRs.add(irsx);
+                        }
                     }
 
+                    ArrayList<HashMap> detailsArrayListC = new ArrayList();
+                    LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
                     for(Itemlist il : iRs){
                         Order ol = new Order();
                         ol.setQuantity("");
@@ -725,10 +788,25 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setIsLocked(true);
                         curRefArrayList.add(ol);
 
-                        if (String.valueOf(il.getOldSku()).equals("null")) {
+                        // get preloaded
+//                        detailMap.put("quantity", "");
+                        detailMap.put("item_recid", il.getRecid());
+                        detailMap.put("itemname", il.getItemName());
+                        detailMap.put("unitName", il.getUnitName());
+//                        detailMap.put("remarks", "");
+                        detailMap.put("old_sku", String.valueOf(il.getOldSku()));
+                        detailMap.put("selling_price", strSP);
+//                        detailMap.put("total", "null");
+//                        detailMap.put("is_checked", false);
+//                        detailMap.put("is_error", false);
+//                        detailMap.put("is_locked", false);
+                        detailsArrayListC.add(detailMap);
+
+                        /* if (String.valueOf(il.getOldSku()).equals("null")) {
                             curRefArrayListErr.add(ol);
-                        }
+                        } */
                     }
+                    SharedData.getInstance(ctx).saveData(SharedKey.SS_PRELOAD_ITEMS.getKey(), new JSONArray(detailsArrayListC).toString());
 
                     adapter = new OrderlistAdapter(ctx, curRefArrayList);
                     adapter.setCurPos(curRefPos);

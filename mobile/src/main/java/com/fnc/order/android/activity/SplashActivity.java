@@ -73,6 +73,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     private AlertDialog alertDialog;
     private ProgressDialog loader;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,9 +93,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         if(sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).trim().equals("")) {
             sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
         }
-//        if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) {
-//            sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
-//        }
         if(sp.getData(SharedKey.REF_DATABASE.getKey()).trim().equals("")) {
             sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
         }
@@ -151,7 +149,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
                 etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@massive.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
 //                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -633,14 +631,13 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             }
         }
         if (type.equals("getprerequisite")) {
-            DcStaffs.getInstance(ctx).emptyStaffslist();
             try {
                 JSONObject obj = new JSONObject(response);
                 if (obj.length() > 0) {
+                    DcStaffs.getInstance(ctx).emptyStaffslist();
+                    Helper.insertDefaultStaffs(ctx);
                     JSONArray sArr = obj.getJSONArray("staff");
                     if (sArr.length() > 0) {
-                        DcStaffs.getInstance(ctx).emptyStaffslist();
-                        Helper.insertDefaultStaffs(ctx);
                         for (int i = 0; i < sArr.length(); i++) {
                             JSONObject rowObj = sArr.getJSONObject(i);
                             aStaffs sl = new aStaffs(

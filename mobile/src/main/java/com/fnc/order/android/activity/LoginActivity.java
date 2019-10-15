@@ -128,8 +128,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("051581");
-//        passwordEText.setText("77");
+//        usernameText.setText("12100");
+//        passwordEText.setText("0527");
     }
 
     private void initListeners(){
@@ -204,6 +204,7 @@ public class LoginActivity extends BaseActivity {
 
                         if (Helper.checkBranchProfile(ctx).size() > 0) {
                             if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+//                                SharedData.getInstance(ctx).saveData(SharedKey.DATABASE.getKey());
                                 showActivity(MainActivity.class);
                             } else {
                                 LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
