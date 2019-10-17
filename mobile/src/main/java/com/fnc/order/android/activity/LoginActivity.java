@@ -260,38 +260,36 @@ public class LoginActivity extends BaseActivity {
 //                                  if (spx.getData(SharedKey.DEV_USERNAME.getKey()).equals(etUsername.getText().toString()) &&
 //                                  spx.getData(SharedKey.DEV_PASSWORD.getKey()).equals(etPassword.getText().toString())) {
                                     alertDialogSettings = actionDialog(ctx, "SETTINGS",
-                                            "Customize settings per client as required",
-                                            "Server", "Database",
-                                            "UPDATE", new View.OnClickListener() {
-                                                public void onClick(View v) {
-                                                    LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
-                                                    EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
-                                                    EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
-                                                    Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
-                                                    Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
-                                                    Switch sw_saveitems = (Switch) layout.findViewById(R.id.sw_saveitems);
-                                                    SharedData spx = SharedData.getInstance(ctx);
-                                                    spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
-                                                    spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
-                                                    spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
-                                                    spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
-                                                    spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
+                                        "Customize settings per client as required",
+                                        "Server", "Database",
+                                        "UPDATE", new View.OnClickListener() {
+                                            public void onClick(View v) {
+                                                LinearLayout layout = (LinearLayout) ((ViewGroup) v.getParent()).getParent().getParent();
+                                                EditText etDomainServerName = (EditText) layout.findViewById(R.id.et_edittext1);
+                                                EditText etDatabase = (EditText) layout.findViewById(R.id.et_edittext2);
+                                                Switch sw_skuvalid = (Switch) layout.findViewById(R.id.sw_skuvalid);
+                                                Switch sw_preloaditems = (Switch) layout.findViewById(R.id.sw_preloaditems);
+                                                Switch sw_saveitems = (Switch) layout.findViewById(R.id.sw_saveitems);
+                                                SharedData spx = SharedData.getInstance(ctx);
+                                                spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://" + etDomainServerName.getText().toString().trim() + "/");
+                                                spx.saveData(SharedKey.DATABASE.getKey(), etDatabase.getText().toString().trim());
+                                                spx.saveInt(SharedKey.SKU_VALIDATION.getKey(), sw_skuvalid.isChecked() ? 1 : 0);
+                                                spx.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), sw_preloaditems.isChecked() ? 1 : 0);
+                                                spx.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), sw_saveitems.isChecked() ? 1 : 0);
 
-                                                    DcAitemlist.getInstance(ctx).emptyaItemlist();
-                                                    DcOrdered.getInstance(ctx).emptyOrderedlist();
-                                                    DcMenulist.getInstance(ctx).emptyMenulist();
-                                                    DcStaffs.getInstance(ctx).emptyStaffslist(); refreshUsers();
+                                                DcAitemlist.getInstance(ctx).emptyaItemlist();
+                                                DcOrdered.getInstance(ctx).emptyOrderedlist();
+                                                DcMenulist.getInstance(ctx).emptyMenulist();
+                                                DcStaffs.getInstance(ctx).emptyStaffslist();
 
-                                                    postBranchImei(); // check branch before success
-//                                                alertDialogSettings.dismiss();
-//                                                Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
-                                                }
-                                            },
-                                            "CHANGE BRANCH", new View.OnClickListener() {
-                                                public void onClick(View v) {
-                                                    addUser();
-                                                }
-                                            },1);
+                                                postBranchImei(); // check branch before success
+                                            }
+                                        },
+                                        "CHANGE BRANCH", new View.OnClickListener() {
+                                            public void onClick(View v) {
+                                                addUser();
+                                            }
+                                        },1);
 
                                     LinearLayout ll_skuvalid = (LinearLayout) alertDialogSettings.findViewById(R.id.ll_validations);
                                     ll_skuvalid.setVisibility(View.VISIBLE);
@@ -826,7 +824,7 @@ public class LoginActivity extends BaseActivity {
                             } else {
                                 Log.d("DSX signup success", response);
                                 Toast.makeText(ctx, "User successfully added!", Toast.LENGTH_SHORT).show();
-                                refreshUsers();
+                                new getUsersAsync().execute("");
                                 alertDialogUser.dismiss();
                             }
                         } catch (JSONException e) {
@@ -928,78 +926,6 @@ public class LoginActivity extends BaseActivity {
         viag.getAdminGroupings(ctx, params, strParams.replaceAll(" ", "%20"));
     }
 
-    private void refreshUsers() {
-        if (!Helper.isNetworkAvailable(this)) {
-            Toast.makeText(ctx, "Users update process failed. Please check internet connection.",
-                    Toast.LENGTH_SHORT).show(); return;
-        }
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final VolleyInteractor vipr = new VolleyInteractor();
-                vipr.registerCallback(new VolleyCallback() {
-                    @Override
-                    public void onRequestSuccess(final String response, String type) {
-                        Helper.dismissSpinnerDialog(loader);
-                        Log.d("dsxs getuser", response);
-                        try {
-                            JSONObject obj = new JSONObject(response);
-                            if (obj.length() > 0) {
-                                JSONArray sArr = obj.getJSONArray("staff");
-                                if (sArr.length() > 0) {
-                                    DcStaffs.getInstance(ctx).emptyStaffslist();
-                                    Helper.insertDefaultStaffs(ctx);
-                                    for (int i = 0; i < sArr.length(); i++) {
-                                        JSONObject rowObj = sArr.getJSONObject(i);
-                                        aStaffs sl = new aStaffs(
-                                            rowObj.getInt("empId"),
-                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                            rowObj.getString("empNo"),
-                                            rowObj.getString("Email"),
-                                            rowObj.getString("name"),
-                                            rowObj.getInt("Branch"),
-                                            rowObj.getInt("Jobtitle"),
-                                            rowObj.getString("pass"),
-                                            rowObj.getString("active"),
-                                            rowObj.getString("ismobileadmin")
-                                        );
-                                        DcStaffs.getInstance(ctx).insertStaffs(sl);
-                                    }
-                                } else {
-                                    DcStaffs.getInstance(ctx).emptyStaffslist();
-                                    Helper.insertDefaultStaffs(ctx); // add main
-                                }
-                            } else {
-                                Log.d("dsxe getuser", response);
-//                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            Log.d("dsxe getuser", response);
-//                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    @Override
-                    public void onRequestFail(VolleyError response, String type) {
-                        Log.d("dsxe getuser", String.valueOf(response));
-//                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                HashMap<String, String> params = new HashMap<>();
-                params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
-                params.put("branchid", sp.getData(SharedKey.BRANCH_ID.getKey()));
-                Iterator it = params.entrySet().iterator();
-                String strParams = "";
-                while (it.hasNext()) {
-                    Map.Entry pair = (Map.Entry) it.next();
-                    strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
-                    it.remove();
-                }
-                vipr.getPreRequisite(getApplicationContext(), params, strParams.replaceAll(" ", "%20"));
-            }
-        }, 300);
-    }
-
     private void getDeviceProfile(String type) {
         if (loader != null) Helper.dismissSpinnerDialog(loader);
         loader = Helper.showSpinnerDialog(ctx, "Requesting Info", "Please wait..."); loader.show();
@@ -1070,6 +996,7 @@ public class LoginActivity extends BaseActivity {
                                                 Helper.dismissSpinnerDialog(loader);
                                                 alertDialogSettings.dismiss();
                                                 Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
+                                                new getUsersAsync().execute("");
                                             } else {
                                                 BounceView.addAnimTo( Helper.okDialog( ctx,
                                                     "Device Registration",
@@ -1114,6 +1041,7 @@ public class LoginActivity extends BaseActivity {
             vidp.getDeviceProfile(getApplicationContext(), params, strParams
                     .replaceAll(" ", "%20"), type);
         } else {
+            Helper.dismissSpinnerDialog(loader);
             Toast.makeText(ctx, "This app requires internet to initialize.  Please check your connection.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -1251,11 +1179,79 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onResume(){
         super.onResume();
-        refreshUsers();
         sp = SharedData.getInstance(this);
-//        sp.saveData(SharedKey.DEV_USERNAME.getKey(), "admin");
-//        sp.saveData(SharedKey.DEV_PASSWORD.getKey(), "P@ssw0rd" + Helper.getNumericMonthDay());
+
+        new getUsersAsync().execute("");
+        Helper.updtaeAdministratorPasswor(ctx);
         new checkVersionUpdate().execute("");
+    }
+
+    private class getUsersAsync extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            VolleyInteractor viu = new VolleyInteractor();
+            viu.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(String response, String type) {
+                    Helper.dismissSpinnerDialog(loader);
+                    Log.d("dsxs getuser", response);
+                    try {
+                        JSONObject obj = new JSONObject(response);
+                        if (obj.length() > 0) {
+                            DcStaffs.getInstance(ctx).emptyStaffslist();
+                            Helper.insertDefaultStaffs(ctx);
+                            JSONArray sArr = obj.getJSONArray("staff");
+                            if (sArr.length() > 0) {
+                                for (int i = 0; i < sArr.length(); i++) {
+                                    JSONObject rowObj = sArr.getJSONObject(i);
+                                    aStaffs sl = new aStaffs(
+                                            rowObj.getInt("empId"),
+                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                            rowObj.getString("empNo"),
+                                            rowObj.getString("Email"),
+                                            rowObj.getString("name"),
+                                            rowObj.getInt("Branch"),
+                                            rowObj.getInt("Jobtitle"),
+                                            rowObj.getString("pass"),
+                                            rowObj.getString("active"),
+                                            rowObj.getString("ismobileadmin")
+                                    );
+                                    DcStaffs.getInstance(ctx).insertStaffs(sl);
+                                }
+                            }
+                        } else {
+                            Log.d("dsxe getuser", response);
+                        }
+                    } catch (JSONException e) {
+                        Log.d("dsxe getuser", response);
+                    }
+                }
+                @Override
+                public void onRequestFail(VolleyError response, String type) {
+                    Log.d("dsxe getuser", String.valueOf(response));
+                }
+            });
+            HashMap<String, String> viparams = new HashMap<>();
+            viparams.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+            viparams.put("branchid", sp.getData(SharedKey.BRANCH_ID.getKey()));
+            Iterator it = viparams.entrySet().iterator();
+            String strParams = "";
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+                it.remove();
+            }
+            viu.getPreRequisite(getApplicationContext(), viparams, strParams.replaceAll(" ", "%20"));
+
+            return "Task Done";
+        }
+        @Override
+        protected void onPostExecute(String result) {
+        }
+        @Override
+        protected void onPreExecute() { }
+        @Override
+        protected void onProgressUpdate(Integer... values) { }
     }
 
     private Storage storageinit;

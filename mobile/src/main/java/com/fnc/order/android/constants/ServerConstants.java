@@ -27,18 +27,4 @@ public class ServerConstants {
         headers.put("api_class", "custopo");
         return headers;
     }
-
-    public static final HashMap<String,String> getHeaderOdPos() {
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("api_key", "ginataang_munggo");
-        headers.put("api_class", "MBREC");
-        return headers;
-    }
-
-    public static final HashMap<String,String> getHeaderPO() {
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("api_key", "ginataang_munggo");
-        headers.put("api_class", "simplePOS");
-        return headers;
-    }
 }

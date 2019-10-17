@@ -571,35 +571,40 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-                    curRefArrayList = new ArrayList<Order>();
-                    curRefArrayListErr = new ArrayList<Order>();
-
-                    mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
-                    mainTableBox.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            maintableViewHeight = mainTableBox.getHeight();
-                            maintableViewWidth = mainTableBox.getWidth();
-                            try {
-                                tblContentBox = new LinearLayout(ctx);
-                                tblContentBox.setLayoutParams(new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                                mainTableBox.addView(tblContentBox);
-                            } finally {
-                                LinearLayout ll = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_table_content, null);
-                                tl = (TableLayout) ll.findViewById(R.id.checklist_table_layout);
-                                tl.setLayoutParams(new LinearLayout.LayoutParams(maintableViewWidth,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT));
-                                tblContentBox.addView(ll);
-                            }
+                        if (!Helper.isNetworkAvailable(ctx)) {
+                            Toast.makeText(ctx, "Fetch items  process failed. Please check internet connection.",
+                                    Toast.LENGTH_SHORT).show(); return;
                         }
-                    });
 
-                    fillItems(rootView);
+                        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-                    tv_grandtotal.setText("0.00");
+                        curRefArrayList = new ArrayList<Order>();
+                        curRefArrayListErr = new ArrayList<Order>();
+
+                        mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
+                        mainTableBox.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                maintableViewHeight = mainTableBox.getHeight();
+                                maintableViewWidth = mainTableBox.getWidth();
+                                try {
+                                    tblContentBox = new LinearLayout(ctx);
+                                    tblContentBox.setLayoutParams(new LinearLayout.LayoutParams(
+                                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+                                    mainTableBox.addView(tblContentBox);
+                                } finally {
+                                    LinearLayout ll = (LinearLayout) getLayoutInflater().inflate(R.layout.layout_table_content, null);
+                                    tl = (TableLayout) ll.findViewById(R.id.checklist_table_layout);
+                                    tl.setLayoutParams(new LinearLayout.LayoutParams(maintableViewWidth,
+                                            LinearLayout.LayoutParams.WRAP_CONTENT));
+                                    tblContentBox.addView(ll);
+                                }
+                            }
+                        });
+
+                        fillItems(rootView);
+
+                        tv_grandtotal.setText("0.00");
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1422,10 +1427,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         try {
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
+                                DcStaffs.getInstance(ctx).emptyStaffslist();
+                                Helper.insertDefaultStaffs(ctx);
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
-                                    DcStaffs.getInstance(ctx).emptyStaffslist();
-                                    Helper.insertDefaultStaffs(ctx);
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
@@ -1442,9 +1447,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
-                                } else {
-                                    DcStaffs.getInstance(ctx).emptyStaffslist();
-                                    Helper.insertDefaultStaffs(ctx); // add main
                                 }
                                 loadAdminJobTitles();
                             } else {
