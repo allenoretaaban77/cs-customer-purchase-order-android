@@ -8,11 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +28,6 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.R;
 import com.fnc.order.android.datacontroller.DcBranchlist;
@@ -42,20 +39,11 @@ import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
-import com.google.api.core.NanoClock;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,8 +51,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import hari.bounceview.BounceView;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SplashActivity extends BaseActivity implements VolleyCallback {
 
@@ -162,7 +148,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
             if (strImeiId.equals("")) {
                 getDeviceProfile("init");
-//                new requestToRegImei().execute(Helper.getImei(ctx));
             } else {
                 proceedNormal();
             }
@@ -307,54 +292,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
     }
 
-    private Storage storageinit;
-    private class requestToRegImei extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            String strImei = params[0].replace("\r\n", ""),
-                strCn = sp.getData(SharedKey.DATABASE.getKey()),
-                strRefBranch = "", strContents = "";
-            try {
-                InputStream ins = getResources().openRawResource(
-                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw",ctx.getPackageName()));
-                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
-                storageinit = StorageOptions.newBuilder()
-                        .setCredentials(credentials)
-                        .setClock(NanoClock.getDefaultClock())
-                        .setProjectId(GlobalConstants.GCP_PROJECTID)
-                        .build()
-                        .getService();
-                BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET,
-                        strImei + "_" + strCn + ".log");
-                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").build();
-
-                try {
-                    strContents = strImei + "\n\n" + strCn + "\n\n" + strRefBranch + "\n\n" + Helper.getPostingDate();
-                    Blob blob = storageinit.create(blobInfo, strContents.getBytes(UTF_8));
-                    return "Success: Upload reference = " + blob.getBlobId() + "|" + strImei + "_" + strCn;
-                } catch (Exception e) {
-                    return "Error: exception = " + e.getLocalizedMessage();
-                }
-            } catch (IOException io) {
-                return "Error: io";
-            }
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d("gcp",  result);
-            String[] resMsg = result.split(":");
-            if (resMsg[0].equals("Success")) { } else { }
-        }
-        @Override
-        protected void onPreExecute() {
-            Log.d("gcpe", "Task Upload Starting");
-        }
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            Log.d("gcpu", "Running " + + values[0]);
-        }
-    }
-
     private void getPreRequisite() {
         HashMap<String, String> params = new HashMap<>();
         params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
@@ -368,7 +305,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
         VolleyInteractor vipr = new VolleyInteractor();
         vipr.registerCallback(this);
-        vipr.getPreRequisite(getApplicationContext(), params,
+        vipr.getPreRequisite(ctx, params,
                 strParams.replaceAll(" ", "%20"));
     }
 
@@ -412,7 +349,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         params.put("pass", strPassword);
         VolleyInteractor vil = new VolleyInteractor();
         vil.registerCallback(this);
-        vil.login(getApplicationContext(), params, "");
+        vil.login(ctx, params, "");
     }
 
     private void alertRequireInternet() {
@@ -430,7 +367,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(getApplicationContext(), cls));
+                startActivity(new Intent(ctx, cls));
                 finish();
             }
         }, 3000);
@@ -662,7 +599,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         "OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                                startActivity(new Intent(ctx, LoginActivity.class));
                                 finish();
                             }
                         }, false) );
@@ -766,7 +703,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             }
             VolleyInteractor vidp = new VolleyInteractor();
             vidp.registerCallback(this);
-            vidp.getDeviceProfile(getApplicationContext(), params, strParams
+            vidp.getDeviceProfile(ctx, params, strParams
                     .replaceAll(" ", "%20"), type);
         } else {
             alertRequireInternet();
@@ -793,7 +730,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             }
             VolleyInteractor viri = new VolleyInteractor();
             viri.registerCallback(this);
-            viri.postBranchImei(getApplicationContext(), params,
+            viri.postBranchImei(ctx, params,
                     strParams.replaceAll(" ", "%20"));
         } else {
                 alertRequireInternet();
