@@ -484,6 +484,11 @@ public class Helper {
         DcStaffs.getInstance(ctx).insertStaffs(Helper.adminStaff(ctx)); // add admin
     }
 
+    public static void updtaeAdministratorPasswor(Context ctx) {
+        DcStaffs.getInstance(ctx).deleteStaffsViaId("1910454835");
+        DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add dev
+    }
+
     private static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
         aStaffs cs = new aStaffs(1910454835, "-2", "administrator", "jparallag@fncnathaniel.com",

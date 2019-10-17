@@ -87,7 +87,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             return;
         }
         setContentView(R.layout.activity_splash);
-//        Helper.setLogo((ImageView) findViewById(R.id.iv_logo), ctx);
 
         sp = SharedData.getInstance(ctx);
         if(sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).trim().equals("")) {
@@ -408,11 +407,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 
         loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
         HashMap<String, String> params = new HashMap<>();
+        params.put("logdb", ServerConstants.LOGDB);
         params.put("userid", strUsername);
         params.put("pass", strPassword);
         VolleyInteractor vil = new VolleyInteractor();
         vil.registerCallback(this);
-        vil.login(getApplicationContext(), params);
+        vil.login(getApplicationContext(), params, "");
     }
 
     private void alertRequireInternet() {

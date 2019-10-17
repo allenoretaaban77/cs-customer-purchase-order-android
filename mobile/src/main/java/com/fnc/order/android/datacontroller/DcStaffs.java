@@ -70,9 +70,9 @@ public class DcStaffs extends DBHelper {
         return list;
     }
 
-    public void deleteStaffsViaId(String identityId) {
+    public void deleteStaffsViaId(String id) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(Table.STAFFS.getName(), "empId = ?", new String[]{identityId});
+        db.delete(Table.STAFFS.getName(), aStaffsKey.EMPID.getKey() + " = ?", new String[]{ id });
         db.close();
     }
 
