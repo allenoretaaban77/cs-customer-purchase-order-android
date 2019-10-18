@@ -6,7 +6,6 @@ public class ServerConstants {
 
     public static final String CERTIFICATE_PATH = "";
     public static final boolean IS_HTTPS = false;
-//    public static final String SERVER_URL = "http://192.168.1.200:81/";
     public static final String SERVER_URL = "http://apics.fncnathaniel.com/";
 //    public static final String SERVER_URL = "http://beta.apics.fncnathaniel.com/";
     public static final String CN = "backoffice";

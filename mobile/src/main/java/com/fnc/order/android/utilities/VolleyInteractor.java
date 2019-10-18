@@ -64,7 +64,7 @@ public class VolleyInteractor {
                     .subscribe(new Observer<String>() {
                         @Override
                         public void onCompleted() {
-                            Log.d("login", "postupdatepassword");
+                            Log.d("dsx", "login");
                         }
                         @Override
                         public void onError(Throwable e) {
