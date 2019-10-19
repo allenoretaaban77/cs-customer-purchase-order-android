@@ -32,6 +32,7 @@ public enum SharedKey {
     SEARCHED_ITEMS("searched_items"),
     IMEI_ID("imei_identification_01"),
     BRANCH_ID("branch_id"),
+    BRANCH_CODE("branch_code"),
     ORDER_BRANCH_ID("order_branch_id"),
     ORDER_CUSTOMER_ID("order_customer_id"),
 //    BRANCH_CODE("branch_code"),
