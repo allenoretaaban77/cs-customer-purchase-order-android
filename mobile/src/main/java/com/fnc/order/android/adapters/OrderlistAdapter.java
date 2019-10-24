@@ -15,8 +15,11 @@ import androidx.core.content.ContextCompat;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.daimajia.swipe.SwipeLayout;
 import com.fnc.order.android.R;
+import com.fnc.order.android.datacontroller.DcOrder;
+import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.Order;
+import com.fnc.order.android.utilities.SharedData;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -157,7 +160,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
                 }
             }
         });
-        if (iRs.getIsLocked()) {
+        if (iRs.getIsLocked() == 1) {
 //            Toast.makeText(context, "Item cannot be deleted", Toast.LENGTH_LONG).show();
             holder.btn_delete.setVisibility(View.GONE);
         } else {
@@ -186,7 +189,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             holder.cell_total.setTextColor(context.getResources().getColor(R.color.gray_8));
         }
 
-        if (iRs.getIsError()) {
+        if (iRs.getIsError() == 1) {
             holder.cell_qty.setTextColor(context.getResources().getColor(R.color.red_2));
             holder.cell_unit.setTextColor(context.getResources().getColor(R.color.red_2));
             holder.cell_description.setTextColor(context.getResources().getColor(R.color.red_2));
@@ -223,6 +226,16 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
                 holder.cell_total.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
             }
         }
+
+        if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
+                SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+            holder.cell_price.setVisibility(View.GONE);
+            holder.cell_total.setVisibility(View.GONE);
+        } else {
+            holder.cell_price.setVisibility(View.VISIBLE);
+            holder.cell_total.setVisibility(View.VISIBLE);
+        }
+
         return convertView;
     }
 
@@ -230,6 +243,8 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Order ol = item_values.get(position);
+                DcOrder.getInstance(getContext()).deleteOrderItemViaId(ol.getItemRecid());
                 item_values.remove(position);
                 holder.swipeLayout.close();
                 notifyDataSetChanged();

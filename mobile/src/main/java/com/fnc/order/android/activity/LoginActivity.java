@@ -127,8 +127,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("12100");
-//        passwordEText.setText("0527");
+        usernameText.setText("18015");
+        passwordEText.setText("1629");
     }
 
     private void initListeners(){
@@ -928,7 +928,9 @@ public class LoginActivity extends BaseActivity {
 
     private void getDeviceProfile(String type) {
         if (loader != null) Helper.dismissSpinnerDialog(loader);
-        loader = Helper.showSpinnerDialog(ctx, "Requesting Info", "Please wait..."); loader.show();
+        if (type.equals("default")) {
+            loader = Helper.showSpinnerDialog(ctx, "Requesting Info", "Please wait..."); loader.show();
+        }
 
         if (Helper.isNetworkAvailable(this)) {
             HashMap<String, String> params = new HashMap<>();
@@ -944,12 +946,11 @@ public class LoginActivity extends BaseActivity {
             VolleyInteractor vidp = new VolleyInteractor();
             vidp.registerCallback(new VolleyCallback() {
                 @Override
-                public void onRequestSuccess(final String response, String type) {
+                public void onRequestSuccess(final String response, String typex) {
                     Helper.dismissSpinnerDialog(loader);
                     if (response.equals("[]")) {
                         Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                     } else {
-                        final String[] strRef = type.split("\\|");
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -974,6 +975,7 @@ public class LoginActivity extends BaseActivity {
                                         }
                                     }
 
+                                    final String[] strRef = typex.split("\\|");
                                     if (strRef[1].equals("reinit")) {
 //                                        Toast.makeText(ctx, "Validate", Toast.LENGTH_SHORT).show();
                                         LinkedList<aBranchlist> abl =
@@ -1009,7 +1011,7 @@ public class LoginActivity extends BaseActivity {
                                                         }
                                                     }, false) );
                                             }
-                                        } else {
+                                        } else  {
                                             BounceView.addAnimTo( Helper.okDialog( ctx,
                                                 "Device Registration",
                                                 "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
@@ -1021,8 +1023,10 @@ public class LoginActivity extends BaseActivity {
                                                     }
                                                 }, false) );
                                         }
-                                    } else {
+                                    } else if (strRef[1].equals("reload")) {
                                         loadSpinnerBranches();
+                                    } else {
+                                        Log.d("dsx", "branch list successfully loaded");
                                     }
                                 } catch (JSONException e) {
                                     Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
@@ -1184,6 +1188,9 @@ public class LoginActivity extends BaseActivity {
         new getUsersAsync().execute("");
         Helper.updtaeAdministratorPasswor(ctx);
         new checkVersionUpdate().execute("");
+        if (DcBranchlist.getInstance(ctx).getBranchlist().size() < 1) {
+            getDeviceProfile("default");
+        }
     }
 
     private class getUsersAsync extends AsyncTask<String, Integer, String> {

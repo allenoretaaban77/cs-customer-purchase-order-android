@@ -47,7 +47,6 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
             tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
             tv_status = (TextView) v.findViewById(R.id.tv_status);
             ll_item_box = (LinearLayout) v.findViewById(R.id.item_box);
-
         }
     }
 

@@ -111,34 +111,38 @@ public class OrdersService extends Service {
                         public void onRequestSuccess(String response, String type) {
                             try {
                                 response = response.replace("\r\n ", "");
-                                Log.d("DSX post response: ", response);
+//                                Log.d("DSX post response: ", response);
                                 JSONArray objArr = new JSONArray(response);
                                 if(objArr.length() > 0) {
                                     JSONObject rowObj = objArr.getJSONObject(0);
                                     if (!rowObj.getBoolean("error")) {
-                                        Log.d("DSX post success > ", "error:" + rowObj.getString("error") + " | msg:"
-                                                + rowObj.getString("tag") + " | id:" + rowObj.getString("reference_recid"));
+//                                        Log.d("DSX post success > ", "error:" + rowObj.getString("error") + " | msg:"
+//                                                + rowObj.getString("tag") + " | id:" + rowObj.getString("reference_recid"));
                                         DcOrdered.getInstance(getApplicationContext())
                                                 .updateStatusViaRecId(rsOD.getCustomerRecid(), 1);
                                     } else {
-                                        Log.d("DSX post error: ", rowObj.getString("error_msg"));
+                                        DcOrdered.getInstance(getApplicationContext())
+                                                .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
+//                                        Log.d("DSX post error: ", rowObj.getString("error_msg"));
                                     }
                                 } else {
-                                    Log.d("DSX post error: ", "json value error");
+                                    DcOrdered.getInstance(getApplicationContext())
+                                            .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
+//                                    Log.d("DSX post error: ", "json value error");
                                 }
                             } catch (JSONException e) {
+                                DcOrdered.getInstance(getApplicationContext())
+                                        .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
                             }
                         }
 
                         @Override
                         public void onRequestFail(VolleyError response, String type) {
-//                            Log.d("DSX post error: ", response.getMessage());
-
                             DcOrdered.getInstance(getApplicationContext())
                                     .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
                         }
                     });
-                    vi.postOrders(getApplicationContext(), rsOD.getJson());
+//                    vi.postOrders(getApplicationContext(), rsOD.getJson());
                 }
             }
 
