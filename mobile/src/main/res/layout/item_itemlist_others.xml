@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:bind="http://schemas.android.com/apk/res/android">
+    <data>
+        <import type="com.fnc.order.android.model.Order" />
+    </data>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/item_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff">
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:paddingTop="3dp"
+                    android:paddingRight="5dp"
+                    android:textAlignment="center"
+                    android:id="@+id/cell_item_recid"
+                    style="@style/tblCellTextView"
+                    android:layout_width="100dp"
+                    android:layout_column="0"
+                    android:text="Price" />
+                <TextView
+                    android:lineHeight="15sp"
+                    android:textSize="15sp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:paddingRight="5dp"
+                    android:paddingLeft="5dp"
+                    android:id="@+id/cell_description"
+                    style="@style/tblCellTextView"
+                    android:layout_weight="1"
+                    android:layout_column="1"
+                    android:text="Description" />
+                <TextView
+                    android:paddingTop="3dp"
+                    android:paddingRight="5dp"
+                    android:textAlignment="center"
+                    android:id="@+id/cell_unit"
+                    style="@style/tblCellTextView"
+                    android:layout_width="100dp"
+                    android:layout_column="2"
+                    android:text="Price" />
+                <TextView
+                    android:textSize="17dp"
+                    android:paddingTop="3dp"
+                    android:paddingLeft="5dp"
+                    android:textAlignment="textEnd"
+                    android:id="@+id/cell_price"
+                    style="@style/tblCellTextView"
+                    android:layout_width="100dp"
+                    android:layout_column="3"
+                    android:text="Quantity" />
+            </TableRow>
+        </LinearLayout>
+    </LinearLayout>
+</layout>

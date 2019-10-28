@@ -10,6 +10,7 @@ import com.fnc.order.android.database.OrderlistQueryBuilder;
 import com.fnc.order.android.database.Table;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.model.Order;
+import com.fnc.order.android.model.aBranchlist;
 
 import java.util.LinkedList;
 
@@ -49,6 +50,15 @@ public class DcOrder extends DBHelper {
         db.close();
     }
 
+    public void updateOrderlist(String recid, OrderKey column, String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(column.getKey(), value);
+        db.updateWithOnConflict(Table.ORDER.getName(), cv, "item_recid = ?",
+                new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
     public void updateOrderlistTallyString(String recid, String qtyString, Boolean isInitial) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -83,11 +93,24 @@ public class DcOrder extends DBHelper {
         return list;
     }
 
-    public LinkedList<Order> getOrderlist(Integer recid) {
+    public LinkedList<Order> searchOrderFilterMultiple(String strCol, String[] strMultiple) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.ORDER.getName() + " WHERE " + strCol;
+        Cursor c = db.rawQuery(strQry, strMultiple);
+        LinkedList<Order> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setOrderlist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    public LinkedList<Order> getOrderlist() {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT *" +
-                " FROM " + Table.ORDER.getName() +
-                " WHERE " + OrderKey.ITEM_RECID + " = " + recid.toString();
+            " FROM " + Table.ORDER.getName()
+            + " ORDER BY " + OrderKey.ITEM_NAME.getKey() + " ASC";
         Cursor c = db.rawQuery(strQry, null);
         LinkedList<Order> list = new LinkedList<>();
         while (c.moveToNext()) {
@@ -107,6 +130,10 @@ public class DcOrder extends DBHelper {
         order.setRemarks(c.getString(c.getColumnIndex(OrderKey.REMARKS.getKey())));
         order.setOldSku(c.getString(c.getColumnIndex(OrderKey.OLD_SKU.getKey())));
         order.setSellingPrice(c.getString(c.getColumnIndex(OrderKey.SELLING_PRICE.getKey())));
+        order.setTotal(c.getString(c.getColumnIndex(OrderKey.TOTAL.getKey())));
+        order.setIsChecked(c.getInt(c.getColumnIndex(OrderKey.IS_CHECKED.getKey())));
+        order.setIsError(c.getInt(c.getColumnIndex(OrderKey.IS_ERROR.getKey())));
+        order.setIsLocked(c.getInt(c.getColumnIndex(OrderKey.IS_LOCKED.getKey())));
         return order;
     }
 }

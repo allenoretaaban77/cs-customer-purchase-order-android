@@ -85,9 +85,9 @@ public class TrasactionItemsFragment extends DialogFragment {
                     ol.setQuantity(obj.getString("quantity"));
                     ol.setUnitName(obj.getString("unitName"));
                     ol.setItemName(obj.getString("itemname"));
-                    ol.setIsChecked(false);
-                    ol.setIsError(false);
-                    ol.setIsLocked(true);
+                    ol.setIsChecked(0);
+                    ol.setIsError(0);
+                    ol.setIsLocked(0);
                     arrLst.add(ol);
                 }
 

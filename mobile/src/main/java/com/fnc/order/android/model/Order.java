@@ -11,9 +11,9 @@ public class Order implements Serializable {
     private String old_sku;
     private String selling_price;
     private String total;
-    private Boolean is_checked;
-    private Boolean is_error;
-    private Boolean is_locked;
+    private Integer is_checked;
+    private Integer is_error;
+    private Integer is_locked;
 
     public String getQuantity() { return quantity; }
     public void setQuantity(String quantity) { this.quantity = quantity; }
@@ -41,18 +41,18 @@ public class Order implements Serializable {
     public String getTotal() { return total; }
     public void setTotal(String total) { this.total = total; }
 
-    public Boolean getIsChecked() {
+    public Integer getIsChecked() {
         return is_checked;
     }
-    public void setIsChecked(Boolean is_checked) { this.is_checked = is_checked; }
+    public void setIsChecked(Integer is_checked) { this.is_checked = is_checked; }
 
-    public Boolean getIsError() {
+    public Integer getIsError() {
         return is_error;
     }
-    public void setIsError(Boolean is_error) { this.is_error = is_error; }
+    public void setIsError(Integer is_error) { this.is_error = is_error; }
 
-    public Boolean getIsLocked() {
+    public Integer getIsLocked() {
         return is_locked;
     }
-    public void setIsLocked(Boolean is_locked) { this.is_locked = is_locked; }
+    public void setIsLocked(Integer is_locked) { this.is_locked = is_locked; }
 }

@@ -16,6 +16,10 @@ public class OrderlistQueryBuilder {
         values.put(OrderKey.REMARKS.getKey(), orders.getRemarks());
         values.put(OrderKey.OLD_SKU.getKey(), orders.getOldSku());
         values.put(OrderKey.SELLING_PRICE.getKey(), orders.getSellingPrice());
+        values.put(OrderKey.TOTAL.getKey(), orders.getTotal());
+        values.put(OrderKey.IS_CHECKED.getKey(), orders.getIsChecked());
+        values.put(OrderKey.IS_ERROR.getKey(), orders.getIsError());
+        values.put(OrderKey.IS_LOCKED.getKey(), orders.getIsLocked());
         return values;
     }
 }

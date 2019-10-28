@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/transparent"
+    android:layout_gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="700dp"
+        android:id="@+id/ll_content_box_main"
+        style="@style/layoutStyleMenu"
+        android:orientation="vertical"
+        android:background="@drawable/background_round_border"
+        android:padding="5dp">
+
+        <RelativeLayout
+            style="@style/mHeader"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_marginTop="5dp"
+                android:id="@+id/headertitle"
+                android:gravity="center"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text="CONFLICTED ITEMS"
+                android:fontFamily="@font/medium"
+                android:textSize="20sp"
+                android:textColor="@color/gray_6" />
+            <LinearLayout
+                android:layout_centerVertical="true"
+                android:layout_marginRight="6dp"
+                android:layout_alignParentRight="true"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="3dp"
+                style="@style/btnTransparentStyleSmallWrap">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:id="@+id/btn_close"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="3dp">
+                    <Button
+                        android:backgroundTint="@color/white"
+                        android:background="@drawable/baseline_close_24"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            style="@style/layoutStyleMenu"
+            android:layout_width="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            style="@style/tblCellTextViewHeader"
+                            android:layout_width="100dp"
+                            android:layout_column="0"
+                            android:text="Item Rec ID" />
+                        <TextView
+                            style="@style/tblCellTextViewHeader"
+                            android:layout_weight="1"
+                            android:layout_column="1"
+                            android:text="Description" />
+                        <TextView
+                            style="@style/tblCellTextViewHeader"
+                            android:layout_width="100dp"
+                            android:layout_column="2"
+                            android:text="Unit" />
+                        <TextView
+                            style="@style/tblCellTextViewHeader"
+                            android:layout_width="100dp"
+                            android:layout_column="3"
+                            android:text="Price" />
+                    </TableRow>
+                </TableLayout>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:background="@drawable/background_green_3_border"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:orientation="horizontal">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:visibility="gone"
+                    android:id="@+id/rv_others"
+                    android:scrollingCache="false"
+                    android:cacheColorHint="#0000"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"/>
+                <TextView
+                    android:visibility="gone"
+                    android:textColor="@color/gray_5"
+                    android:textAlignment="center"
+                    android:padding="40dp"
+                    android:id="@+id/tv_no_data"
+                    android:text="No record found..."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

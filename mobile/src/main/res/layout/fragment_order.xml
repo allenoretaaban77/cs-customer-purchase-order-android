@@ -99,12 +99,223 @@
             android:padding="3dp">
 
             <LinearLayout
+                android:padding="5dp"
+                android:id="@+id/poincluded_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/name_box"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_name_label"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:text="Customer :"
+                            android:textColor="@color/gray_6"
+                            android:fontFamily="@font/medium"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:layout_gravity="center_vertical"
+                            android:text="ABC DEF"
+                            android:id="@+id/tv_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/brown_5"
+                            android:fontFamily="@font/regular"
+                            android:textSize="18sp" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="@color/gray_5" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:paddingRight="5dp"
+                            android:id="@+id/tv_date"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:text="Booking Date :"
+                            android:textColor="@color/gray_6"
+                            android:fontFamily="@font/medium"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/et_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/background_round_border_inner"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:gravity="top"
+                            android:hint="Click here to add booking date..."
+                            android:imeOptions="actionNext"
+                            android:inputType="text"
+                            android:maxLines="2"
+                            android:paddingLeft="7dp"
+                            android:paddingTop="3dp"
+                            android:paddingRight="5dp"
+                            android:text=""
+                            android:textColor="@color/brown_5"
+                            android:textColorHint="@color/gray_4"
+                            android:fontFamily="@font/regular"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_remarks"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:text="Remarks :"
+                            android:textColor="@color/gray_6"
+                            android:fontFamily="@font/medium"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/et_remarks"
+                            android:layout_width="match_parent"
+                            android:layout_height="47dp"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/background_round_border_inner"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
+                            android:gravity="top"
+                            android:hint="Input remarks here...."
+                            android:imeOptions="actionNext"
+                            android:inputType="text"
+                            android:maxLines="2"
+                            android:paddingLeft="7dp"
+                            android:paddingTop="3dp"
+                            android:paddingRight="5dp"
+                            android:text=""
+                            android:textColor="@color/brown_5"
+                            android:textColorHint="@color/gray_4"
+                            android:fontFamily="@font/regular"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1px"
+                        android:layout_marginTop="5dp"
+                        android:background="@color/gray_5" />
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:layout_marginTop="2dp"
+                                android:id="@+id/tv_items"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Item Lists:"
+                                android:textColor="@color/brown_5"
+                                android:fontFamily="@font/medium"
+                                android:textSize="18sp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:backgroundTint="@color/colorPrimary"
+                            android:layout_marginLeft="3dp"
+                            android:layout_width="wrap_content"
+                            android:layout_alignParentRight="true"
+                            style="@style/btnTransparentStyleSmallWrap">
+                            <com.balysv.materialripple.MaterialRippleLayout
+                                android:id="@+id/btn_search"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:padding="3dp">
+                                <Button
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/baseline_search_24"
+                                    android:backgroundTint="@color/white" />
+                            </com.balysv.materialripple.MaterialRippleLayout>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_marginLeft="3dp"
+                            android:layout_width="wrap_content"
+                            android:layout_alignParentRight="true"
+                            style="@style/btnTransparentStyleSmallWrap">
+                            <com.balysv.materialripple.MaterialRippleLayout
+                                android:id="@+id/btn_refresh"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:padding="3dp">
+                                <Button
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/sharp_refresh_24"
+                                    android:backgroundTint="@color/white" />
+                            </com.balysv.materialripple.MaterialRippleLayout>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:visibility="gone"
+                            android:id="@+id/btn_others_box"
+                            android:backgroundTint="@color/red_2"
+                            android:layout_marginLeft="3dp"
+                            android:layout_width="wrap_content"
+                            android:layout_alignParentRight="true"
+                            style="@style/btnTransparentStyleSmallWrap">
+                            <com.balysv.materialripple.MaterialRippleLayout
+                                android:id="@+id/btn_others"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:padding="3dp">
+                                <Button
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/baseline_notification_important_24"
+                                    android:backgroundTint="@color/white" />
+                            </com.balysv.materialripple.MaterialRippleLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/ref_coordinateor_box"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="175dp"
-                android:orientation="vertical"
-                android:paddingBottom="55dp">
+                android:layout_marginTop="165dp"
+                android:layout_marginBottom="45dp"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -147,12 +358,14 @@
                                     android:text="Description" />
 
                                 <TextView
+                                    android:id="@+id/tv_header_price"
                                     style="@style/tblCellTextViewHeader"
                                     android:layout_width="80dp"
                                     android:layout_column="3"
                                     android:text="Price" />
 
                                 <TextView
+                                    android:id="@+id/tv_header_total"
                                     style="@style/tblCellTextViewHeader"
                                     android:layout_width="80dp"
                                     android:layout_column="4"
@@ -185,8 +398,7 @@
                         android:layout_width="38dp"
                         android:layout_height="38dp"
                         android:layout_gravity="right"
-                        android:layout_marginTop="7dp"
-                        android:layout_marginRight="6dp">
+                        android:layout_marginTop="5dp">
                         <com.balysv.materialripple.MaterialRippleLayout
                             android:id="@+id/btn_add_item"
                             android:layout_width="37dp"
@@ -205,184 +417,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/poincluded_box"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:orientation="vertical">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:orientation="vertical"
-                    android:paddingLeft="5dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:paddingRight="5dp"
-                            android:id="@+id/tv_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Booking Date :"
-                            android:textColor="@color/gray_6"
-                            android:fontFamily="@font/medium"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_date"
-                            android:layout_width="match_parent"
-                            android:layout_height="27dp"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="7dp"
-                            android:background="@drawable/background_round_border_inner"
-                            android:focusable="false"
-                            android:focusableInTouchMode="false"
-                            android:gravity="top"
-                            android:hint="Click here to add booking date..."
-                            android:imeOptions="actionNext"
-                            android:inputType="text"
-                            android:maxLines="2"
-                            android:paddingLeft="7dp"
-                            android:paddingTop="3dp"
-                            android:paddingRight="5dp"
-                            android:text=""
-                            android:textColor="@color/brown_5"
-                            android:textColorHint="@color/gray_4"
-                            android:fontFamily="@font/regular"
-                            android:textSize="16sp" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginTop="36dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@color/gray_5" />
-
-                    <LinearLayout
-                        android:layout_marginTop="38dp"
-                        android:id="@+id/name_box"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tv_name_label"
-                            android:paddingRight="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Customer :"
-                            android:textColor="@color/gray_6"
-                            android:fontFamily="@font/medium"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tv_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:textColor="@color/brown_5"
-                            android:fontFamily="@font/regular"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="70dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tv_remarks"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingRight="5dp"
-                            android:text="Remarks :"
-                            android:textColor="@color/gray_6"
-                            android:fontFamily="@font/medium"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_remarks"
-                            android:layout_width="match_parent"
-                            android:layout_height="47dp"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginLeft="3dp"
-                            android:layout_marginRight="7dp"
-                            android:background="@drawable/background_round_border_inner"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
-                            android:gravity="top"
-                            android:hint="Input remarks here...."
-                            android:imeOptions="actionNext"
-                            android:inputType="text"
-                            android:maxLines="2"
-                            android:paddingLeft="7dp"
-                            android:paddingTop="3dp"
-                            android:paddingRight="5dp"
-                            android:text=""
-                            android:textColor="@color/brown_5"
-                            android:textColorHint="@color/gray_4"
-                            android:fontFamily="@font/regular"
-                            android:textSize="16sp" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginTop="125dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@color/gray_5" />
-
-                    <RelativeLayout
-                        android:layout_marginTop="132dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_marginTop="2dp"
-                            android:id="@+id/tv_items"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Item Lists:"
-                            android:textColor="@color/brown_5"
-                            android:fontFamily="@font/medium"
-                            android:textSize="18sp" />
-                        <LinearLayout
-                            android:layout_alignParentRight="true"
-                            style="@style/btnTransparentStyleSmallWrap"
-                            android:layout_marginRight="7dp"
-                            android:layout_marginBottom="120dp">
-                            <com.balysv.materialripple.MaterialRippleLayout
-                                android:id="@+id/btn_refresh"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:padding="3dp">
-                                <Button
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:background="@drawable/sharp_refresh_24"
-                                    android:backgroundTint="@color/white" />
-                            </com.balysv.materialripple.MaterialRippleLayout>
-                        </LinearLayout>
-                    </RelativeLayout>
-
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
                 android:layout_gravity="bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -395,15 +429,13 @@
 
                     <TableLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:paddingLeft="1dp"
-                        android:paddingRight="1dp">
+                        android:layout_height="match_parent">
 
                         <TableRow
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:focusable="true"
-                            android:padding="5dp">
+                            android:padding="0dp">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -423,6 +455,7 @@
                                         android:layout_height="match_parent">
 
                                         <TextView
+                                            android:id="@+id/tv_grandtotal_lbl"
                                             android:layout_margin="1dp"
                                             android:layout_height="match_parent"
                                             style="@style/tblCellTextViewHeader"

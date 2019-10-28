@@ -46,6 +46,7 @@ import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.MenulistKey;
+import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
@@ -99,8 +100,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private View rootView;
     private Fragment thisFragment;
     private ProgressDialog loader;
-    private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh;
-    private TextView tv_name, tv_grandtotal;
+    private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh, btn_others;
+    private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total;
     private EditText et_date;
     private CoordinatorLayout rl_content_box;
     private EditText et_remarks;
@@ -123,13 +124,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private ListView list_view;
     private OrderlistAdapter adapter;
     private SwipeLayout swipeLayout;
-    private ArrayList<Order> curRefArrayList;
+    private LinkedList<Order> curRefArrayList;
     private Integer curRefPos = 0;
     private Boolean oldskuerr = false;
-    private ArrayList<Order> curRefArrayListErr;
+    private LinkedList<Order> curRefArrayListErr;
     private SharedData sp;
     private MenuList refMenulist;
     private static final int USER_DIALOG_FRAGMENT = 7;
+    private static final int OTHER_ITEMS_DIALOG_FRAGMENT = 8;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -143,8 +145,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         thisFragment = this;
         Helper.setPreviousPage(ctx, "customer_fragment");
 
-        curRefArrayList = new ArrayList<Order>();
-        curRefArrayListErr = new ArrayList<Order>();
+        curRefArrayList = new LinkedList<Order>();
+        curRefArrayListErr = new LinkedList<Order>();
 
         refMenulist = DcMenulist.getInstance(ctx).searchMenuFilterMultiple(
             MenulistKey.CUSTOMER_ID.getKey() + " = ?",
@@ -199,16 +201,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         } );
 
         initViews(rootView);
-
         initListeners(rootView);
-        // empty order table
-        DcOrder.getInstance(ctx).emptyOrderlist();
-
         initCalc(rootView);
 
         sp = SharedData.getInstance(ctx);
+        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
         if (sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1) {
             fillItems(rootView);
+        } else {
+            DcOrder.getInstance(ctx).emptyOrderlist();
         }
 
         return rootView;
@@ -240,25 +241,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
                 Toast.makeText(ctx, "Please check internet connection....", Toast.LENGTH_SHORT).show();
             } else {
-                try {
-                    String refStrArr = SharedData.getInstance(ctx).getData(SharedKey.SS_PRELOAD_ITEMS.getKey());
-                    JSONArray objArr = new JSONArray(refStrArr);
-                    if (objArr.length() > 0) {
-                        for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject rowObj = objArr.getJSONObject(i);
-                            Order ol = new Order();
-                            ol.setQuantity("");
-                            ol.setItemRecid(rowObj.getString("item_recid"));
-                            ol.setItemName(rowObj.getString("itemname"));
-                            ol.setUnitName(rowObj.getString("unitName"));
-                            ol.setRemarks("");
-                            ol.setOldSku(rowObj.getString("old_sku"));
-                            ol.setSellingPrice(rowObj.getString("selling_price"));
-                            ol.setTotal("null");
-                            ol.setIsChecked(false);
-                            ol.setIsError(false);
-                            ol.setIsLocked(true);
-                            curRefArrayList.add(ol);
+//                try {
+                    LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                    if (llOrderRs.size() > 0) {
+                        for (int i = 0; i < llOrderRs.size(); i++) {
+                            Order ol = llOrderRs.get(i);
+                            if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
+                                curRefArrayList.add(ol);
+                            }
                         }
 
                         adapter = new OrderlistAdapter(ctx, curRefArrayList);
@@ -287,9 +277,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     } else {
                         Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
                     }
-                } catch (JSONException e) {
-                    Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
-                }
+//                } catch (JSONException e) {
+//                    Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
+//                }
             }
 
         }
@@ -297,6 +287,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
     private void initViews(View v) {
         btn_refresh = (MaterialRippleLayout) v.findViewById(R.id.btn_refresh);
+        btn_others = (MaterialRippleLayout) v.findViewById(R.id.btn_others);
         btn_add_item = (MaterialRippleLayout) v.findViewById(R.id.btn_add_item);
         btn_back = (MaterialRippleLayout) v.findViewById(R.id.btn_back);
         tv_name = (TextView) v.findViewById(R.id.tv_name);
@@ -304,6 +295,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         rl_content_box = (CoordinatorLayout) v.findViewById(R.id.content_box);
         et_date = (EditText) v.findViewById(R.id.et_date);
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
+        tv_header_price = (TextView) v.findViewById(R.id.tv_header_price);
+        tv_header_total = (TextView) v.findViewById(R.id.tv_header_total);
 
         pageMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         pageMenu.setXOffset(8).setYOffset(0);
@@ -327,9 +320,21 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         list_view = (ListView) v.findViewById(R.id.list_view);
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
+        tv_grandtotal_lbl = (TextView) v.findViewById(R.id.tv_grandtotal_lbl);
 
         if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
             ((RelativeLayout) v.findViewById(R.id.rl_back_box)).setVisibility(View.GONE);
+        }
+
+        if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
+                SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+            tv_grandtotal_lbl.setText("Count Total:");
+            tv_header_price.setVisibility(View.GONE);
+            tv_header_total.setVisibility(View.GONE);
+        } else {
+            tv_grandtotal_lbl.setText("Grand Total:");
+            tv_header_price.setVisibility(View.VISIBLE);
+            tv_header_total.setVisibility(View.VISIBLE);
         }
     }
 
@@ -419,6 +424,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         btn_submit.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
+
                 if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
                         BounceView.addAnimTo( Helper.okDialog(ctx,
@@ -436,7 +442,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
 
                 if (oldskuerr == true) {
-
                     String strSkuMsg = "";
                     for (int i = 0; i < curRefArrayListErr.size(); i++) {
                         Order rowRl = curRefArrayListErr.get(i);
@@ -458,13 +463,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     Boolean errFlag = false;
                     for (int i = 0; i < curRefArrayList.size(); i++) {
                         Order rowRl = curRefArrayList.get(i);
-                        if(rowRl.getQuantity().equals("") || rowRl.getQuantity().equals("0")) {
-                            if(rowRl.getRemarks().equals("") || rowRl.getRemarks().equals("null")) {
+                        if(rowRl.getQuantity().equals("")) {
+//                            if(rowRl.getRemarks().equals("") || rowRl.getRemarks().equals("null")) {
                                 errFlag = true;
 //                            errFlag = false;
-                                curRefArrayList.get(i).setIsError(true);
+                                curRefArrayList.get(i).setIsError(1);
 //                            curRefArrayList.get(i).setIsError(false);
-                                curRefArrayList.get(i).setQuantity("0");
+//                            curRefArrayList.get(i).setQuantity("0");
 
 //                            TableRow trx = (TableRow) tl.findViewById(Integer.parseInt(rowRl.getItemRecid()));
 //                            TextView tvQty = (TextView) trx.getChildAt(0);
@@ -478,19 +483,18 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //                            tvPrice.setTextColor(getResources().getColor(R.color.red_2));
 //                            TextView tvTotal = (TextView) trx.getChildAt(4);
 //                            tvTotal.setTextColor(getResources().getColor(R.color.red_2));
-                            }
+//                            }
                         }else{
-                            curRefArrayList.get(i).setIsError(false);
+                            curRefArrayList.get(i).setIsError(0);
                         }
                     }
 
                     if (errFlag) {
-                        isPosted = false;
                         dismissSpinnerDialog();
                         adapter.notifyDataSetChanged();
 //                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
                         BounceView.addAnimTo( Helper.okDialog(ctx,
-                                "Error","Please set a remarks on items with 0 or empty quantity.", "OK",
+                                "Error","Please set 0 value on EMPTY quantity.", "OK",
                                 null, false) );
                     } else {
                         if (refStringDate == null) {
@@ -556,6 +560,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 callRefreshItems();
             }
         });
+
+        btn_others.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                DialogFragment dialogFrag = OtherItemFragment.searchInstance();
+                dialogFrag.setTargetFragment(thisFragment, OTHER_ITEMS_DIALOG_FRAGMENT);
+                dialogFrag.setCancelable(false);
+                dialogFrag.show(getActivity().getSupportFragmentManager(), "other_item");
+            }
+        });
     }
 
     private void callRefreshItems() {
@@ -578,8 +591,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-                        curRefArrayList = new ArrayList<Order>();
-                        curRefArrayListErr = new ArrayList<Order>();
+                        curRefArrayList = new LinkedList<Order>();
+                        curRefArrayListErr = new LinkedList<Order>();
 
                         mainTableBox = (LinearLayout) rootView.findViewById(R.id.actual_table_box);
                         mainTableBox.post(new Runnable() {
@@ -747,9 +760,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         try {
             response = response.replace("\r\n", "");
             JSONArray objArr = new JSONArray(response);
-            if (type.equals("searchemployee")) {
-            } else if (type.equals("searchitem")) {
+            if (type.equals("searchitem")) {
                 if(objArr.length() > 0) {
+                    DcOrder.getInstance(ctx).emptyOrderlist();
                     List<Itemlist> iRs = new ArrayList<Itemlist>();
 
                     oldskuerr = false;
@@ -769,13 +782,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         } */
                         irsx.setOldSku(rowObj.getString(ItemlistKey.OLD_SKU.getKey()));
                         irsx.setSellingPrice(rowObj.getString(ItemlistKey.SELLING_PRICE.getKey()));
-                        if (!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null") && !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("0")) {
+//                        if (!rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("null") && !rowObj.getString(ItemlistKey.OLD_SKU.getKey()).equals("0")) {
                             iRs.add(irsx);
-                        }
+//                        }
                     }
 
                     ArrayList<HashMap> detailsArrayListC = new ArrayList();
-                    for(Itemlist il : iRs){
+                    for(Itemlist il : iRs) {
                         Order ol = new Order();
                         ol.setQuantity("");
                         ol.setItemRecid(String.valueOf(il.getRecid()));
@@ -783,13 +796,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setUnitName(String.valueOf(il.getUnitName()));
                         ol.setRemarks("");
                         ol.setOldSku(String.valueOf(il.getOldSku()));
-                        String strSP = String.valueOf(il.getSellingPrice()).equals("null") ? "0" : String.valueOf(il.getSellingPrice()) ;
+                        String strSP = String.valueOf(il.getSellingPrice()).equals("null") ? "0" : String.valueOf(il.getSellingPrice());
                         ol.setSellingPrice(strSP);
                         ol.setTotal("null");
-                        ol.setIsChecked(false);
-                        ol.setIsError(false);
-                        ol.setIsLocked(true);
-                        curRefArrayList.add(ol);
+                        ol.setIsChecked(0);
+                        ol.setIsError(0);
+                        ol.setIsLocked(1);
+                        if (!il.getOldSku().equals("null") && !il.getOldSku().equals("0")) {
+                            curRefArrayList.add(ol);
+                        }
+                        DcOrder.getInstance(ctx).insertOrderlist(ol);
 
                         // get preloaded
 //                        detailMap.put("quantity", "");
@@ -806,11 +822,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //                        detailMap.put("is_locked", false);
                         detailsArrayListC.add(detailMap);
 
-                        /* if (String.valueOf(il.getOldSku()).equals("null")) {
+                        if (String.valueOf(il.getOldSku()).equals("null")) {
                             curRefArrayListErr.add(ol);
-                        } */
+                        }
                     }
-                    SharedData.getInstance(ctx).saveData(SharedKey.SS_PRELOAD_ITEMS.getKey(), new JSONArray(detailsArrayListC).toString());
 
                     adapter = new OrderlistAdapter(ctx, curRefArrayList);
                     adapter.setCurPos(curRefPos);
@@ -847,6 +862,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             "Warning","Some items does not have reference SKU, " +
                                     "please contact the developer for assistance.\n" + strSkuMsg, "OK",
                             null, false) );
+                    }
+
+                    LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" });
+                    if (olRs.size() > 0) {
+                        ((LinearLayout) rootView.findViewById(R.id.btn_others_box)).setVisibility(View.VISIBLE);
+                    } else {
+                        ((LinearLayout) rootView.findViewById(R.id.btn_others_box)).setVisibility(View.GONE);
                     }
                 }
             } else {
@@ -905,10 +927,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         String strSP = String.valueOf(il.getSellingPrice()).equals("null") ? "0" : String.valueOf(il.getSellingPrice()) ;
                         ol.setSellingPrice(strSP);
                         ol.setTotal("null");
-                        ol.setIsChecked(false);
-                        ol.setIsError(false);
-                        ol.setIsLocked(false);
+                        ol.setIsChecked(0);
+                        ol.setIsError(0);
+                        ol.setIsLocked(0);
                         curRefArrayList.add(ol);
+                        DcOrder.getInstance(ctx).insertOrderlist(ol);
                     }
 
                     adapter = new OrderlistAdapter(ctx, curRefArrayList);
@@ -1261,23 +1284,33 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             DecimalFormat df2 = new DecimalFormat("#,###,###.00");
             ol.setTotal(df2.format(u_total));
         }
+        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.QUANTITY, ol.getQuantity());
+        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.TOTAL, ol.getTotal());
 
         adapter.notifyDataSetChanged();
 
         // recompute grand total
-        ArrayList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
+        LinkedList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
         if(refOS.size() > 0) {
-            double gt = 0.00;
+            double gt = 0.00, ct = 0.00;
             for (int i = 0; i < refOS.size(); i++) {
                 Order olx = refOS.get(i);
+                String refCountTotal = String.valueOf(olx.getQuantity().trim()).replace(",", "");
+                ct = refCountTotal.equals("") || refCountTotal.equals("null") ? ct + 0.0 : ct + Double.parseDouble(refCountTotal) ;
                 String refTotal = String.valueOf(olx.getTotal().trim()).replace(",", "");
                 gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
             }
             DecimalFormat df = new DecimalFormat("#,###,###.00");
-            tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
+            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
+                    SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
+            } else {
+                tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
+            }
         } else {
             tv_grandtotal.setText("0.00");
         }
+
     }
 
     private void showMenuPopup(View v) {
@@ -1356,6 +1389,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 Toast.makeText(activity, "Remarks saved successfully.", Toast.LENGTH_SHORT).show();
                 Order ol =  curRefArrayList.get(adapter.getCurPos());
                 ol.setRemarks(etText.getText().toString());
+                DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.REMARKS, ol.getRemarks());
                 adapter.notifyDataSetChanged();
             }
         });

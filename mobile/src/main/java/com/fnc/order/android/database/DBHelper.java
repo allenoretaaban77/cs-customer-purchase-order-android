@@ -55,6 +55,10 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(OrderKey.REMARKS);
         fields.add(OrderKey.OLD_SKU);
         fields.add(OrderKey.SELLING_PRICE);
+        fields.add(OrderKey.TOTAL);
+        fields.add(OrderKey.IS_CHECKED);
+        fields.add(OrderKey.IS_ERROR);
+        fields.add(OrderKey.IS_LOCKED);
         return fields;
     }
 
@@ -173,6 +177,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
                 db.execSQL(createTables(Table.STAFFS_INACTIVE, setStaffsFields()));
                 db.execSQL(createTables(Table.BRANCHLIST, setBranchlistFields()));
+//                db.execSQL("ALTER TABLE " + Table.ORDER.getName() + " ADD COLUMN " + OrderKey.TOTAL.getKey() + " TEXT SET DEFAULT ''");
         }
     }
 }
