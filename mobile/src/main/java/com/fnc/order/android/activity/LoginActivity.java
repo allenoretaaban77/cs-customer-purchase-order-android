@@ -1185,11 +1185,11 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         sp = SharedData.getInstance(this);
 
-        new getUsersAsync().execute("");
+//        new getUsersAsync().execute("");
         Helper.updtaeAdministratorPasswor(ctx);
         new checkVersionUpdate().execute("");
         if (DcBranchlist.getInstance(ctx).getBranchlist().size() < 1) {
-            getDeviceProfile("default");
+//            getDeviceProfile("default");
         }
     }
 

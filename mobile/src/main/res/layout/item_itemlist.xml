@@ -67,6 +67,7 @@
                 style="@style/tblCellTextView">
             </TextView>
             <TextView
+                android:textSize="15sp"
                 android:layout_width="100dp"
                 android:paddingLeft="7dp"
                 android:gravity="center|center_vertical"

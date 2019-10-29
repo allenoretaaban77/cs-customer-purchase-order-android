@@ -23,6 +23,7 @@ import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.database.DbConstants;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.model.Ordered;
+import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.VolleyInteractor;
 
 import org.json.JSONArray;
@@ -107,57 +108,63 @@ public class OrdersService extends Service {
             Log.i("dsxo", "order service in counting "+ (counter++));
             Context ctx = getApplicationContext();
 
-            SQLiteDatabase checkDB = null;
-            try {
-                checkDB = SQLiteDatabase.openDatabase(DBPath + getApplicationContext().getPackageName()
-                        + File.separator + DbConstants.DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
-                checkDB.close();
+            if (Helper.isNetworkAvailable(ctx)) {
+                SQLiteDatabase checkDB = null;
+                try {
+                    checkDB = SQLiteDatabase.openDatabase(DBPath + getApplicationContext().getPackageName()
+                            + File.separator + DbConstants.DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+                    checkDB.close();
 
-                LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext())
-                        .getPostedSingle();
-                if(od.size() > 0 ) {
-                    Ordered rsOD = od.get(0);
-                    VolleyInteractor vi = new VolleyInteractor();
-                    vi.registerCallback(new VolleyCallback() {
-                        @Override
-                        public void onRequestSuccess(String response, String type) {
-                            Log.d("dsxo", response);
-                            try {
-                                response = response.replace("\r\n ", "");
-                                JSONArray objArr = new JSONArray(response);
-                                if(objArr.length() > 0) {
-                                    JSONObject rowObj = objArr.getJSONObject(0);
-                                    if (!rowObj.getBoolean("error")) {
-                                        DcOrdered.getInstance(getApplicationContext())
-                                            .updateStatusViaRecId(rsOD.getCustomerRecid(), 1);
+                    LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext()).getPostedSingle();
+                    if(od.size() > 0 ) {
+                        Ordered rsOD = od.get(0);
+                        VolleyInteractor vi = new VolleyInteractor();
+                        vi.registerCallback(new VolleyCallback() {
+                            @Override
+                            public void onRequestSuccess(String response, String type) {
+                                Log.d("dsxo", response);
+                                try {
+                                    response = response.replace("\r\n ", "");
+                                    JSONArray objArr = new JSONArray(response);
+                                    if(objArr.length() > 0) {
+                                        JSONObject rowObj = objArr.getJSONObject(0);
+                                        if (!rowObj.getBoolean("error")) {
+                                            Log.d("dsxo", rsOD.getReferenceRecid());
+                                            DcOrdered.getInstance(getApplicationContext())
+                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 1);
+                                        } else {
+                                            DcOrdered.getInstance(getApplicationContext())
+                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+                                        }
                                     } else {
                                         DcOrdered.getInstance(getApplicationContext())
-                                            .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
+                                        .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                     }
-                                } else {
+                                } catch (JSONException e) {
                                     DcOrdered.getInstance(getApplicationContext())
-                                    .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
+                                            .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                 }
-                            } catch (JSONException e) {
-                                DcOrdered.getInstance(getApplicationContext())
-                                        .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
+                                handler.postDelayed(postRunnable, 1000);
                             }
-                            handler.postDelayed(postRunnable, 1000);
-                        }
-                        @Override
-                        public void onRequestFail(VolleyError response, String type) {
-                            DcOrdered.getInstance(getApplicationContext())
-                                .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
-                            handler.postDelayed(postRunnable, 1000);
-                        }
-                    });
-                    vi.postOrders(getApplicationContext(), rsOD.getJson());
-                } else {
+                            @Override
+                            public void onRequestFail(VolleyError response, String type) {
+                                DcOrdered.getInstance(getApplicationContext())
+                                    .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+                                handler.postDelayed(postRunnable, 1000);
+                            }
+                        });
+                        vi.postOrders(getApplicationContext(), rsOD.getJson());
+                    } else {
+                        Log.d("dsxo", "no order to post");
+                        handler.postDelayed(this, 1000);
+                    }
+                } catch (SQLiteException e) {
                     handler.postDelayed(this, 1000);
+                    Log.d("dsxo", "database doesn't exist yet.");
                 }
-            } catch (SQLiteException e) {
+            } else {
+                Log.d("dsxo", "no internet connection");
                 handler.postDelayed(this, 1000);
-                Log.d("dsxs", "database doesn't exist yet.");
             }
         }
     };

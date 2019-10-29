@@ -207,8 +207,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         initCalc(rootView);
 
         sp = SharedData.getInstance(ctx);
-        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
+        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
         if (sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1) {
+            DcOrder.getInstance(ctx).updateSetAllQuantity("");
             fillItems(rootView);
         } else {
             DcOrder.getInstance(ctx).emptyOrderlist();
@@ -587,8 +588,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (!Helper.isNetworkAvailable(ctx)) {
-                            Toast.makeText(ctx, "Fetch items  process failed. Please check internet connection.",
-                                    Toast.LENGTH_SHORT).show(); return;
+                            Toast.makeText(ctx, "Fetch items  process failed. Please check internet connection.", Toast.LENGTH_SHORT).show(); return;
                         }
 
                         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -679,8 +679,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
             if(!errFlag) {
                 SharedData sp = SharedData.getInstance(ctx);
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
-                sp.saveData(SharedKey.DATABASE.getKey(), "beta");
+//                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
+//                sp.saveData(SharedKey.DATABASE.getKey(), "beta");
 
                 paramsArray.put("details", detailsArrayList);
 
@@ -739,17 +739,30 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setGrandtotal(gt);
                 ol.setDateTime(Helper.getPostingDate());
                 ol.setStatus(0);
-                ol.setReferenceRecid("null");
+                ol.setReferenceRecid(Helper.getReqDate(5, ""));
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
 
                 Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
                 dismissSpinnerDialog();
 
-                if (Helper.checkBranchProfile(ctx).size() > 0) {
-                    aBranchlist mBl = Helper.checkBranchProfile(ctx).get(0);
-                    if(mBl.getDescription().equals("Commissary")) {
-                        getActivity().onBackPressed();
-                    }
+                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                    getActivity().onBackPressed();
+                } else {
+                    /* curRefArrayList = new LinkedList<Order>();
+                    curRefArrayListErr = new LinkedList<Order>();
+                    refMenulist = DcMenulist.getInstance(ctx).searchMenuFilterMultiple(MenulistKey.CUSTOMER_ID.getKey() + " = ?",
+                        new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) } ).get(0);
+                    strBranchEncoding = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(aBranchlistKey.CUSTOMERID.getKey() + " = ?",
+                        new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) } ).get(0).getOld_branchid();
+
+                    et_date.setText("");
+                    et_remarks.setText("");
+                    tv_grandtotal.setText("0.00");
+                    adapter = new OrderlistAdapter(ctx, curRefArrayList);
+                    list_view.setAdapter(adapter);
+                    isPosted = false; */
+
+                    getActivity().finishAndRemoveTask();
                 }
 
                 Log.v("post_params", String.valueOf(paramsArrayStr));

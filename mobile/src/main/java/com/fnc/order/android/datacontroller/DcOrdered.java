@@ -64,7 +64,7 @@ public class DcOrdered extends DBHelper {
         ContentValues cv = new ContentValues();
         cv.put(OrderedKey.STATUS.getKey(), intx);
         db.updateWithOnConflict(Table.ORDERED.getName(), cv,
-                OrderedKey.CUSTOMER_RECID.getKey()+ " = ?",
+                OrderedKey.REF_RECID.getKey()+ " = ?",
                 new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }

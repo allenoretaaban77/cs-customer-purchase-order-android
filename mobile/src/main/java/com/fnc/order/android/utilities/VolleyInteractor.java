@@ -185,7 +185,7 @@ public class VolleyInteractor {
             public void run(){
                 String urlStr = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
                         + API.POST_ORDER.getApi();
-                Log.i("DSX", urlStr + " | " + param);
+                Log.i("dsxo", urlStr + " | " + param);
                 StringRequest strRequest = new StringRequest( Request.Method.POST, urlStr,
                         new Response.Listener<String>() {
                             @Override

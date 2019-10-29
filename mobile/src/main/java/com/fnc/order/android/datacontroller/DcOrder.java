@@ -9,6 +9,7 @@ import com.fnc.order.android.database.DBHelper;
 import com.fnc.order.android.database.OrderlistQueryBuilder;
 import com.fnc.order.android.database.Table;
 import com.fnc.order.android.enumeration.OrderKey;
+import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.aBranchlist;
 
@@ -56,6 +57,14 @@ public class DcOrder extends DBHelper {
         cv.put(column.getKey(), value);
         db.updateWithOnConflict(Table.ORDER.getName(), cv, "item_recid = ?",
                 new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
+    public void updateSetAllQuantity(String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put( OrderKey.QUANTITY.getKey(), value);
+        db.updateWithOnConflict(Table.ORDER.getName(), cv, null, null, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }
 
