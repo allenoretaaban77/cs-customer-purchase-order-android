@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -18,15 +20,20 @@ import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
 import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.database.DbConstants;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.model.Ordered;
+import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.VolleyInteractor;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.LinkedList;
+
+import static com.fnc.order.android.database.DBHelper.DBPath;
 
 public class OrdersService extends Service {
 
@@ -51,7 +58,7 @@ public class OrdersService extends Service {
 
         handler.removeCallbacks(postRunnable);
         counter = 0;
-        handler.postDelayed(postRunnable, 2000);
+        handler.postDelayed(postRunnable, 1000);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
@@ -85,7 +92,7 @@ public class OrdersService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i("DSX", "service destroyed");
+        Log.i("dsxo", "service destroyed");
         startService(new Intent(getBaseContext(), OrdersService.class));
     }
 
@@ -98,65 +105,74 @@ public class OrdersService extends Service {
     public Runnable postRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.i("DSX", "order service in counting "+ (counter++));
-            LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext())
-                    .getOrderedlistCheckStatus();
-            if(od.size() > 0 ) {
-                for (int i = 0; i < od.size(); i++) {
-                    final Ordered rsOD = od.get(i);
+            Log.i("dsxo", "order service in counting "+ (counter++));
+            Context ctx = getApplicationContext();
 
-                    VolleyInteractor vi = new VolleyInteractor();
-                    vi.registerCallback(new VolleyCallback() {
-                        @Override
-                        public void onRequestSuccess(String response, String type) {
-                            try {
-                                response = response.replace("\r\n ", "");
-//                                Log.d("DSX post response: ", response);
-                                JSONArray objArr = new JSONArray(response);
-                                if(objArr.length() > 0) {
-                                    JSONObject rowObj = objArr.getJSONObject(0);
-                                    if (!rowObj.getBoolean("error")) {
-//                                        Log.d("DSX post success > ", "error:" + rowObj.getString("error") + " | msg:"
-//                                                + rowObj.getString("tag") + " | id:" + rowObj.getString("reference_recid"));
-                                        DcOrdered.getInstance(getApplicationContext())
-                                                .updateStatusViaRecId(rsOD.getCustomerRecid(), 1);
+            if (Helper.isNetworkAvailable(ctx)) {
+                SQLiteDatabase checkDB = null;
+                try {
+                    checkDB = SQLiteDatabase.openDatabase(DBPath + getApplicationContext().getPackageName()
+                            + File.separator + DbConstants.DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+                    checkDB.close();
+
+                    LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext()).getPostedSingle();
+                    if(od.size() > 0 ) {
+                        Ordered rsOD = od.get(0);
+                        VolleyInteractor vi = new VolleyInteractor();
+                        vi.registerCallback(new VolleyCallback() {
+                            @Override
+                            public void onRequestSuccess(String response, String type) {
+                                Log.d("dsxo", response);
+                                try {
+                                    response = response.replace("\r\n ", "");
+                                    JSONArray objArr = new JSONArray(response);
+                                    if(objArr.length() > 0) {
+                                        JSONObject rowObj = objArr.getJSONObject(0);
+                                        if (!rowObj.getBoolean("error")) {
+                                            Log.d("dsxo", rsOD.getReferenceRecid());
+                                            DcOrdered.getInstance(getApplicationContext())
+                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 1);
+                                        } else {
+                                            DcOrdered.getInstance(getApplicationContext())
+                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+                                        }
                                     } else {
                                         DcOrdered.getInstance(getApplicationContext())
-                                                .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
-//                                        Log.d("DSX post error: ", rowObj.getString("error_msg"));
+                                        .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                     }
-                                } else {
+                                } catch (JSONException e) {
                                     DcOrdered.getInstance(getApplicationContext())
-                                            .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
-//                                    Log.d("DSX post error: ", "json value error");
+                                            .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                 }
-                            } catch (JSONException e) {
-                                DcOrdered.getInstance(getApplicationContext())
-                                        .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
+                                handler.postDelayed(postRunnable, 1000);
                             }
-                        }
-
-                        @Override
-                        public void onRequestFail(VolleyError response, String type) {
-                            DcOrdered.getInstance(getApplicationContext())
-                                    .updateStatusViaRecId(rsOD.getCustomerRecid(), 0);
-                        }
-                    });
-//                    vi.postOrders(getApplicationContext(), rsOD.getJson());
+                            @Override
+                            public void onRequestFail(VolleyError response, String type) {
+                                DcOrdered.getInstance(getApplicationContext())
+                                    .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+                                handler.postDelayed(postRunnable, 1000);
+                            }
+                        });
+                        vi.postOrders(getApplicationContext(), rsOD.getJson());
+                    } else {
+                        Log.d("dsxo", "no order to post");
+                        handler.postDelayed(this, 1000);
+                    }
+                } catch (SQLiteException e) {
+                    handler.postDelayed(this, 1000);
+                    Log.d("dsxo", "database doesn't exist yet.");
                 }
+            } else {
+                Log.d("dsxo", "no internet connection");
+                handler.postDelayed(this, 1000);
             }
-
-            handler.postDelayed(this, 2000);
         }
     };
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        Log.d("DSX", "on task removed");
-
-//        ExecutorService executorService = Executors.newSingleThreadExecutor();
-//        executorService.submit(runner).cancel(true);
+        Log.d("dsxo", "on task removed");
     }
 }
 

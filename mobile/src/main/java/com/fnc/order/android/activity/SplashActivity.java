@@ -1,6 +1,7 @@
 package com.fnc.order.android.activity;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -36,6 +37,7 @@ import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
+import com.fnc.order.android.services.OrdersService;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
@@ -65,6 +67,18 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         super.onCreate(savedInstanceState);
         ctx = this;
 
+        String svcname = "OrdersService";
+        Boolean isSvcRunning = false;
+        ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
+        for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
+            if(service.service.getClassName().indexOf(svcname)>0){
+                isSvcRunning = true;
+            }
+        }
+        if (!isSvcRunning) {
+            startService(new Intent(getBaseContext(), OrdersService.class));
+        }
+
         if (!isTaskRoot()
                 && getIntent().hasCategory(Intent.CATEGORY_LAUNCHER)
                 && getIntent().getAction() != null
@@ -81,6 +95,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         if(sp.getData(SharedKey.REF_DATABASE.getKey()).trim().equals("")) {
             sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
         }
+
+        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
+        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
+        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
+        sp.saveData(SharedKey.DATABASE.getKey(), "beta");
+
         if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) {
             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
         }
