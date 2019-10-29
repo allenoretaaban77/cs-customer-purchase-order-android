@@ -127,8 +127,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        usernameText.setText("18015");
-        passwordEText.setText("1629");
+        usernameText.setText("12100");
+        passwordEText.setText("0527");
     }
 
     private void initListeners(){
@@ -1261,74 +1261,6 @@ public class LoginActivity extends BaseActivity {
         protected void onProgressUpdate(Integer... values) { }
     }
 
-    private Storage storageinit;
-    private class checkVersionUpdate extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                InputStream ins = getResources().openRawResource(
-                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
-                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
-                storageinit = StorageOptions.newBuilder()
-                        .setCredentials(credentials)
-                        .setClock(NanoClock.getDefaultClock())
-                        .setProjectId(GlobalConstants.GCP_PROJECTID)
-                        .build()
-                        .getService();
-                try {
-                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION, "version.log");
-                    Blob blob = storageinit.get(blobId);
-                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
-                    return "Success|" + new String(bytes, "UTF-8");
-                } catch (Exception e) {
-                    return "Error| exception = " + e.getLocalizedMessage();
-                }
-            } catch (IOException io) {
-                return "Error| io";
-            }
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            String[] resMsg = result.split("\\|");
-            if (resMsg[0].equals("Success")) {
-                try {
-                    Log.d("gcp",  resMsg[1]);
-                    JSONArray objArr = new JSONArray(resMsg[1]);
-                    if (objArr.length() > 0) {
-                        for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject rowObj = objArr.getJSONObject(i);
-                            if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
-                                String strVersionName = rowObj.getString("version_name");
-                                if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
-                                    BounceView.addAnimTo( Helper.okDialog( ctx,
-                                            "App Update",
-                                            "A new version of this app is now available.",
-                                            "UPDATE", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
-                                                }
-                                            }, false) );
-                                }
-                            }
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        @Override
-        protected void onPreExecute() {
-            Log.d("gcpe", "Task Upload Starting");
-        }
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            Log.d("gcpu", "Running " + + values[0]);
-        }
-    }
-
     private void requestCustomers(String stringSearch) {
         if (Helper.isNetworkAvailable(ctx)) {
             loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait...."); loader.show();
@@ -1419,6 +1351,79 @@ public class LoginActivity extends BaseActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             Log.d("asynctask", "Running " + + values[0]);
+        }
+    }
+
+    private Storage storageinit;
+    private class checkVersionUpdate extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                InputStream ins = getResources().openRawResource(
+                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
+                storageinit = StorageOptions.newBuilder()
+                        .setCredentials(credentials)
+                        .setClock(NanoClock.getDefaultClock())
+                        .setProjectId(GlobalConstants.GCP_PROJECTID)
+                        .build()
+                        .getService();
+                try {
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION, "version.log");
+                    Blob blob = storageinit.get(blobId);
+                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
+                    return "Success|" + new String(bytes, "UTF-8");
+                } catch (Exception e) {
+                    return "Error| exception = " + e.getLocalizedMessage();
+                }
+            } catch (IOException io) {
+                return "Error| io";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            String[] resMsg = result.split("\\|");
+            if (resMsg[0].equals("Success")) {
+                try {
+                    Log.d("gcp",  resMsg[1]);
+                    JSONArray objArr = new JSONArray(resMsg[1]);
+                    if (objArr.length() > 0) {
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
+                                String strVersionName = rowObj.getString("version_name");
+                                if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
+                                    BounceView.addAnimTo( Helper.okCancelDialog( ctx,
+                                            "App Update",
+                                            "App Update\n\nA new version of this app is now available.\n\n*** It is REQUIRED TO UPDATE your app before you start any transactions.",
+                                            "PROCEED UPDATE", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
+                                                }
+                                            }, "CANCEL", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            }, false) );
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        @Override
+        protected void onPreExecute() {
+            Log.d("gcpe", "Task Upload Starting");
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.d("gcpu", "Running " + + values[0]);
         }
     }
 }

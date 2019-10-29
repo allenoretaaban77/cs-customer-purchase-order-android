@@ -99,18 +99,17 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         ctx = this;
 
-        String svcname = "OrdersService";
-        Boolean isSvcRunning = false;
-        ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
-            if(service.service.getClassName().indexOf(svcname)>0){
-                isSvcRunning = true;
-            }
-        }
-
-        if (!isSvcRunning) {
-            startService(new Intent(getBaseContext(), OrdersService.class));
-        }
+//        String svcname = "OrdersService";
+//        Boolean isSvcRunning = false;
+//        ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
+//        for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
+//            if(service.service.getClassName().indexOf(svcname)>0){
+//                isSvcRunning = true;
+//            }
+//        }
+//        if (!isSvcRunning) {
+//            startService(new Intent(getBaseContext(), OrdersService.class));
+//        }
 
 //        OrdersService mSensorService = new OrdersService(getApplicationContext());
 //        Intent mServiceIntent = new Intent(getApplicationContext(), mSensorService.getClass());

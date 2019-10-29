@@ -39,6 +39,7 @@ import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrder;
@@ -55,6 +56,7 @@ import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
+import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
 import com.fnc.order.android.utilities.Helper;
@@ -205,7 +207,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         initCalc(rootView);
 
         sp = SharedData.getInstance(ctx);
-        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
+        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
         if (sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1) {
             fillItems(rootView);
         } else {
@@ -677,6 +679,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
             if(!errFlag) {
                 SharedData sp = SharedData.getInstance(ctx);
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
+                sp.saveData(SharedKey.DATABASE.getKey(), "beta");
 
                 paramsArray.put("details", detailsArrayList);
 
@@ -739,8 +743,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
 
                 Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
-                getActivity().onBackPressed();
                 dismissSpinnerDialog();
+
+                if (Helper.checkBranchProfile(ctx).size() > 0) {
+                    aBranchlist mBl = Helper.checkBranchProfile(ctx).get(0);
+                    if(mBl.getDescription().equals("Commissary")) {
+                        getActivity().onBackPressed();
+                    }
+                }
 
                 Log.v("post_params", String.valueOf(paramsArrayStr));
             }

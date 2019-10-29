@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.fnc.order.android.database.DBHelper;
 import com.fnc.order.android.database.OrderedlistQueryBuilder;
 import com.fnc.order.android.database.Table;
+import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.model.Ordered;
 
@@ -41,6 +42,21 @@ public class DcOrdered extends DBHelper {
         ContentValues value = OrderedlistQueryBuilder.prepareOrderedlistInsertValues(od, context);
         db.insertWithOnConflict(Table.ORDERED.getName(), null, value, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
+    }
+
+    public LinkedList<Ordered> getPostedSingle() {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.ORDERED.getName()
+                + " WHERE " + OrderedKey.STATUS.getKey() + " = 0"
+                + " ORDER BY " + OrderedKey.DATETIME.getKey() + " DESC LIMIT 1";
+        Cursor c = db.rawQuery(strQry, null);
+        LinkedList<Ordered> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setOrderedlist(c));
+        }
+        c.close();
+        db.close();
+        return list;
     }
 
     public void updateStatusViaRecId(String recid, Integer intx){
