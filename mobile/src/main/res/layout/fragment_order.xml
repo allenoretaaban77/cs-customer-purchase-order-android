@@ -506,11 +506,11 @@
             </LinearLayout>
 
             <LinearLayout
-                android:visibility="gone"
+                android:visibility="visible"
                 android:backgroundTint="@color/transparent"
                 android:layout_gravity="right"
                 android:id="@+id/bs_calculator"
-                android:paddingBottom="7dp"
+                android:paddingBottom="2dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/darker_gray"
@@ -521,13 +521,39 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
                     <GridLayout
-                        android:background="@drawable/popupbg_left"
-                        android:alpha="0.8"
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
+                        android:paddingTop="2dp"
+                        android:background="@color/transparent"
+                        android:alpha="0.7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:columnCount="3">
+                        <Button
+                            style="@style/calculatorButtonAssertive"
+                            android:id="@+id/cal_delete"
+                            android:layout_width="144dp"
+                            android:text="DEL"/>
+                        <Button
+                            style="@style/calculatorButtonPassive"
+                            android:id="@+id/cal_cancel"
+                            android:text="CLOSE"/>
+                    </GridLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <GridLayout
+                        android:background="@color/transparent"
+                        android:alpha="0.7"
                         android:id="@+id/calc_box"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:columnCount="3"
-                        android:padding="2dp">
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
+                        android:paddingBottom="2dp">
                         <Button
                             style="@style/calculatorButton"
                             android:id="@+id/cal_7"
@@ -598,15 +624,15 @@
                             android:id="@+id/cal_delete"
                             android:text="DEL"/-->
                     </GridLayout>
-                    <LinearLayout
+                    <!--LinearLayout
+                        android:background="@color/transparent"
                         android:paddingRight="2dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="0dp"
                         android:paddingLeft="-2dp"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:background="@drawable/popupbg_right"
-                        android:alpha="0.8"
+                        android:alpha="0.7"
                         android:orientation="vertical">
                         <Button
                             style="@style/calculatorButtonPassive"
@@ -616,12 +642,12 @@
                             style="@style/calculatorButtonAssertive"
                             android:id="@+id/cal_delete"
                             android:text="DEL"/>
-                        <!--Button
+                        <Button
                             style="@style/calculatorButtonWarning"
                             android:id="@+id/cal_plus"
                             android:layout_height="124dp"
-                            android:text="+"/-->
-                    </LinearLayout>
+                            android:text="+"/>
+                    </LinearLayout-->
                 </LinearLayout>
             </LinearLayout>
 

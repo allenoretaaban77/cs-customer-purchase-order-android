@@ -58,7 +58,7 @@ public class OrdersService extends Service {
 
         handler.removeCallbacks(postRunnable);
         counter = 0;
-        handler.postDelayed(postRunnable, 1000);
+        handler.postDelayed(postRunnable, 2000);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
@@ -117,7 +117,7 @@ public class OrdersService extends Service {
 
                     LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext()).getPostedSingle();
                     if(od.size() > 0 ) {
-                        Ordered rsOD = od.get(0);
+                        final Ordered rsOD = od.get(0);
                         VolleyInteractor vi = new VolleyInteractor();
                         vi.registerCallback(new VolleyCallback() {
                             @Override
@@ -133,38 +133,38 @@ public class OrdersService extends Service {
                                             DcOrdered.getInstance(getApplicationContext())
                                                 .updateStatusViaRecId(rsOD.getReferenceRecid(), 1);
                                         } else {
-                                            DcOrdered.getInstance(getApplicationContext())
-                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+//                                            DcOrdered.getInstance(getApplicationContext())
+//                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                         }
                                     } else {
-                                        DcOrdered.getInstance(getApplicationContext())
-                                        .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+//                                        DcOrdered.getInstance(getApplicationContext())
+//                                        .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                     }
                                 } catch (JSONException e) {
-                                    DcOrdered.getInstance(getApplicationContext())
-                                            .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+//                                    DcOrdered.getInstance(getApplicationContext())
+//                                            .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                 }
                                 handler.postDelayed(postRunnable, 1000);
                             }
                             @Override
                             public void onRequestFail(VolleyError response, String type) {
-                                DcOrdered.getInstance(getApplicationContext())
-                                    .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+//                                DcOrdered.getInstance(getApplicationContext())
+//                                    .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                 handler.postDelayed(postRunnable, 1000);
                             }
                         });
                         vi.postOrders(getApplicationContext(), rsOD.getJson());
                     } else {
                         Log.d("dsxo", "no order to post");
-                        handler.postDelayed(this, 1000);
+                        handler.postDelayed(this, 2000);
                     }
                 } catch (SQLiteException e) {
-                    handler.postDelayed(this, 1000);
+                    handler.postDelayed(this, 2000);
                     Log.d("dsxo", "database doesn't exist yet.");
                 }
             } else {
                 Log.d("dsxo", "no internet connection");
-                handler.postDelayed(this, 1000);
+                handler.postDelayed(this, 2000);
             }
         }
     };

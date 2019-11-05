@@ -742,11 +742,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setReferenceRecid(Helper.getReqDate(5, ""));
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
 
-                Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
                 dismissSpinnerDialog();
 
                 if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
-                    getActivity().onBackPressed();
+                    loader = Helper.showSpinnerDialog(ctx, "Posting Transaction", "Please wait..."); loader.show();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            getActivity().onBackPressed();
+                        }
+                    }, 2000);
                 } else {
                     /* curRefArrayList = new LinkedList<Order>();
                     curRefArrayListErr = new LinkedList<Order>();
@@ -762,7 +767,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     list_view.setAdapter(adapter);
                     isPosted = false; */
 
-                    getActivity().finishAndRemoveTask();
+                    loader = Helper.showSpinnerDialog(ctx, "Posting Transaction", "Please wait..."); loader.show();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Helper.dismissSpinnerDialog(loader);
+                            Toast.makeText(ctx, "Purchase order save successfully.", Toast.LENGTH_LONG).show();
+                            getActivity().finishAndRemoveTask();
+                        }
+                    }, 2000);
                 }
 
                 Log.v("post_params", String.valueOf(paramsArrayStr));
