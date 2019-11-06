@@ -519,6 +519,9 @@ public class Helper {
         String monthNumber  = (String) DateFormat.format("MM",   date); // 06
         String year         = (String) DateFormat.format("yyyy", date); // 2019
         switch (type) {
+            case 5:
+                java.text.DateFormat dfy = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_GCP);
+                return dfy.format(date);
             case 4:
                 java.text.DateFormat dfx = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_POST);
                 return dfx.format(date);

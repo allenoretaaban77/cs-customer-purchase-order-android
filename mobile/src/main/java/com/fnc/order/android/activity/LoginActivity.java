@@ -127,8 +127,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        usernameText.setText("12100");
-        passwordEText.setText("0527");
+//        usernameText.setText("12100");
+//        passwordEText.setText("0527");
     }
 
     private void initListeners(){
@@ -1185,11 +1185,11 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         sp = SharedData.getInstance(this);
 
-//        new getUsersAsync().execute("");
+        new getUsersAsync().execute("");
         Helper.updtaeAdministratorPasswor(ctx);
         new checkVersionUpdate().execute("");
         if (DcBranchlist.getInstance(ctx).getBranchlist().size() < 1) {
-//            getDeviceProfile("default");
+            getDeviceProfile("default");
         }
     }
 

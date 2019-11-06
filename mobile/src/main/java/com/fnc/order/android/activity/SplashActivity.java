@@ -97,9 +97,11 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
 
         sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
+        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
         sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
-        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
-        sp.saveData(SharedKey.DATABASE.getKey(), "beta");
+//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
+//        sp.saveData(SharedKey.REF_DATABASE.getKey(), "beta");
+//        sp.saveData(SharedKey.DATABASE.getKey(), "beta");
 
         if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) {
             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
@@ -153,9 +155,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                     }, "", null, 0
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
-                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
+//                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
