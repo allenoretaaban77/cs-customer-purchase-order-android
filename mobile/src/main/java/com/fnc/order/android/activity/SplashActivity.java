@@ -96,9 +96,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
         }
 
-        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
-        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
+//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
+//        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
+//        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
 //        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
 //        sp.saveData(SharedKey.REF_DATABASE.getKey(), "beta");
 //        sp.saveData(SharedKey.DATABASE.getKey(), "beta");

@@ -129,6 +129,8 @@ public class LoginActivity extends BaseActivity {
 
 //        usernameText.setText("12100");
 //        passwordEText.setText("0527");
+//        usernameText.setText("administrator");
+//        passwordEText.setText("P@ssw0rd1109");
     }
 
     private void initListeners(){
@@ -202,7 +204,7 @@ public class LoginActivity extends BaseActivity {
                         isSubmit = true;
 
                         if (Helper.checkBranchProfile(ctx).size() > 0) {
-                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
 //                                SharedData.getInstance(ctx).saveData(SharedKey.DATABASE.getKey());
                                 showActivity(MainActivity.class);
                             } else {
