@@ -96,9 +96,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
         }
 
-        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
-        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
+//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
+//        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
+//        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
 //        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
 //        sp.saveData(SharedKey.REF_DATABASE.getKey(), "beta");
 //        sp.saveData(SharedKey.DATABASE.getKey(), "beta");
@@ -204,6 +204,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                     sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                     sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
                                     sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                    sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
                                     getPreRequisite();
                                 } else {
                                     postBranchImei();
@@ -552,6 +553,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                             sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                             sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
                                             sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                            sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
                                             getPreRequisite();
                                         } else {
                                             BounceView.addAnimTo( Helper.okDialog( ctx,

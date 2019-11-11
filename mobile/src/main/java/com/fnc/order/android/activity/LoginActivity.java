@@ -129,6 +129,8 @@ public class LoginActivity extends BaseActivity {
 
 //        usernameText.setText("12100");
 //        passwordEText.setText("0527");
+//        usernameText.setText("administrator");
+//        passwordEText.setText("P@ssw0rd1109");
     }
 
     private void initListeners(){
@@ -202,7 +204,7 @@ public class LoginActivity extends BaseActivity {
                         isSubmit = true;
 
                         if (Helper.checkBranchProfile(ctx).size() > 0) {
-                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
 //                                SharedData.getInstance(ctx).saveData(SharedKey.DATABASE.getKey());
                                 showActivity(MainActivity.class);
                             } else {
@@ -995,6 +997,8 @@ public class LoginActivity extends BaseActivity {
                                             if (flgx == 1) {
                                                 sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                                 sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
+                                                sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                                sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
                                                 Helper.dismissSpinnerDialog(loader);
                                                 alertDialogSettings.dismiss();
                                                 Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
