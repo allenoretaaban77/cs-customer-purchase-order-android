@@ -332,10 +332,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
             ((RelativeLayout) v.findViewById(R.id.rl_back_box)).setVisibility(View.GONE);
-        }
-
-        if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
-                SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
             tv_grandtotal_lbl.setText("Count Total:");
             tv_header_price.setVisibility(View.GONE);
             tv_header_total.setVisibility(View.GONE);
@@ -344,6 +340,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             tv_header_price.setVisibility(View.VISIBLE);
             tv_header_total.setVisibility(View.VISIBLE);
         }
+
+        /* if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
+                SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+        } else {
+            tv_grandtotal_lbl.setText("Grand Total:");
+            tv_header_price.setVisibility(View.VISIBLE);
+            tv_header_total.setVisibility(View.VISIBLE);
+        } */
     }
 
     private void initListeners(View v) {
@@ -1345,8 +1349,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
             }
             DecimalFormat df = new DecimalFormat("#,###,###.00");
-            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
-                    SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+            if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+//            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                 tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
             } else {
                 tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));

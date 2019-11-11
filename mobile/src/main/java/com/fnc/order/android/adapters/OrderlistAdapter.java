@@ -19,6 +19,7 @@ import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.Order;
+import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 
 import java.text.DecimalFormat;
@@ -227,13 +228,13 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             }
         }
 
-        if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
-                SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
-            holder.cell_price.setVisibility(View.GONE);
-            holder.cell_total.setVisibility(View.GONE);
-        } else {
+//        if(Helper.checkBranchProfile(getContext()).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(getContext()).get(0).getDescription().equals("Main")) {
+        if (SharedData.getInstance(getContext()).getData(SharedKey.BRANCH_DESCRIPTION.getKey()).equals("Commissary") || SharedData.getInstance(getContext()).getData(SharedKey.BRANCH_DESCRIPTION.getKey()).equals("Main")) {
             holder.cell_price.setVisibility(View.VISIBLE);
             holder.cell_total.setVisibility(View.VISIBLE);
+        } else {
+            holder.cell_price.setVisibility(View.GONE);
+            holder.cell_total.setVisibility(View.GONE);
         }
 
         return convertView;

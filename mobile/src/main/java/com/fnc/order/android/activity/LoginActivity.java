@@ -997,6 +997,8 @@ public class LoginActivity extends BaseActivity {
                                             if (flgx == 1) {
                                                 sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                                 sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
+                                                sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                                sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
                                                 Helper.dismissSpinnerDialog(loader);
                                                 alertDialogSettings.dismiss();
                                                 Toast.makeText(ctx, "App settings successfully updated.", Toast.LENGTH_SHORT).show();
