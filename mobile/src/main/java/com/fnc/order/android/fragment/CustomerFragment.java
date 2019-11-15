@@ -131,8 +131,17 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             SharedData.getInstance(ctx).saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             requestCustomers("");
         } else {
-            LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
-            if (llr.size() < 1) {
+            String eiOld = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID_OLD.getKey());
+            String inNew = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey());
+            if (inNew.equals(eiOld)) {
+                LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
+                if (llr.size() < 1) {
+                    requestCustomers("");
+                } else {
+                    loadSavedItems();
+                }
+            } else {
+                SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), inNew);
                 requestCustomers("");
             }
         }
@@ -155,54 +164,28 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 //        snack.show();
     }
 
-    private BackdropLayout containerbdl;
-    private void initViews(View v) {
-        includedFront = (LinearLayout) v.findViewById(R.id.includedFront);
-        containerbdl = (BackdropLayout) v.findViewById(R.id.containerbdl);
-        LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
-        ll_content_box_main.setOnTouchListener(new View.OnTouchListener() {
+    private void openBackdrop(BackdropLayout bdl, LinearLayout layout) {
+        bdl.open();
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d("dsxof", String.valueOf(event.getX()) + " & " + String.valueOf(event.getY()));
-                if (event.getX() > event.getY()) {
-                    containerbdl.open();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            includedFront.setLayoutParams(
-                                new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT,
-                                        Math.round(Helper.convertDpToPixel(ctx, 580f)))
-                            );
-                        }
-                    }, 500);
-                }
-                return false;
+            public void run() {
+                layout.setLayoutParams( new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, Math.round(Helper.convertDpToPixel(ctx, 580f))) );
             }
-        });
+        }, 300);
+    }
 
-        imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
-        alphaSort = (MaterialRippleLayout) v.findViewById(R.id.layout_alpha);
-        refreshAll = (MaterialRippleLayout) v.findViewById(R.id.layout_refresh);
-        etCustomerName = (EditText) v.findViewById(R.id.et_customername);
-        listview = (ListView) v.findViewById(R.id.storelistview);
-        listview.setOnTouchListener(new View.OnTouchListener() {
+    private void closeBackdrop(BackdropLayout bdl, LinearLayout layout) {
+        bdl.close();
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getX() > event.getY()) {
-                    containerbdl.close();
-                    includedFront.setLayoutParams(
-                        new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT,
-                            Math.round(Helper.convertDpToPixel(ctx, 640f)))
-                    );
-                }
-                return false;
+            public void run() {
+                layout.setLayoutParams( new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, Math.round(Helper.convertDpToPixel(ctx, 640f))) );
             }
-        });
+        }, 100);
+    }
 
-        TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
-        tvVersion.setText(Helper.getVersion(ctx, getActivity()));
-
-        alphagridview = (GridView) v.findViewById(R.id.alphagridview);
+    private void loadSavedItems(){
+        // load alpha grid view
         if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
                 .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
             ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
@@ -215,32 +198,84 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             stringAlpha = new ArrayList<String>();
         }
         adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
+        adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
+            @Override
+            public void onItemClick(View v, int pos) {
+                if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
+                Helper.hideSoftKeyboard(getActivity());
+                showListBox();
+                fillData(v, stringAlpha.get(pos), true);
+                openBackdrop(containerbdl, includedFront);
+            }
+        });
         alphagridview.setAdapter(adapterAlpha);
         alphagridview.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d("dsxof", String.valueOf(event.getX()) + " & " + String.valueOf(event.getY()));
                 if (event.getX() > event.getY()) {
-                    containerbdl.close();
-                    includedFront.setLayoutParams(
-                        new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT,
-                            Math.round(Helper.convertDpToPixel(ctx, 640f)))
-                    );
+                    closeBackdrop(containerbdl, includedFront);
                 }
                 return false;
             }
         });
 
-        alphagridview_box = (LinearLayout) v.findViewById(R.id.alphagridview_box);
+        // load list view
+        fillData(v, "%", false);
+
+        LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
+        if (llr.size() > 15) {
+            storelistview_box.setVisibility(View.GONE);
+            alphagridview_box.setVisibility(View.VISIBLE);
+            closeBackdrop(containerbdl, includedFront);
+        } else {
+            alphagridview_box.setVisibility(View.GONE);
+            storelistview_box.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    openBackdrop(containerbdl, includedFront);
+                }
+            }, 500);
+        }
+    }
+
+    private BackdropLayout containerbdl;
+    private void initViews(View v) {
+        includedFront = (LinearLayout) v.findViewById(R.id.includedFront);
+        containerbdl = (BackdropLayout) v.findViewById(R.id.containerbdl);
+
+        LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
+        ll_content_box_main.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d("dsxof", String.valueOf(event.getX()) + " & " + String.valueOf(event.getY()));
+                if (event.getX() > event.getY()) {
+                    openBackdrop(containerbdl, includedFront);
+                }
+                return false;
+            }
+        });
+
         storelistview_box = (LinearLayout) v.findViewById(R.id.storelistview_box);
+        listview = (ListView) v.findViewById(R.id.storelistview);
+        alphagridview_box = (LinearLayout) v.findViewById(R.id.alphagridview_box);
+        alphagridview = (GridView) v.findViewById(R.id.alphagridview);
+
+        imgSearch = (MaterialRippleLayout) v.findViewById(R.id.layout_search);
+        alphaSort = (MaterialRippleLayout) v.findViewById(R.id.layout_alpha);
+        refreshAll = (MaterialRippleLayout) v.findViewById(R.id.layout_refresh);
+        etCustomerName = (EditText) v.findViewById(R.id.et_customername);
+
+        TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
+        tvVersion.setText(Helper.getVersion(ctx, getActivity()));
 
         ll_version_box = (LinearLayout) v.findViewById(R.id.ll_version_box);
         boxMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
         boxMenu.setXOffset(85);
         boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "));
         boxMenu.addMenuItem(new DroppyMenuItem("  Reload Items ")).addSeparator();
-        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
-            sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
+        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") || sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
             boxMenu.addMenuItem(new DroppyMenuItem("  Users ")).addSeparator();
         }
         boxMenu.addMenuItem(new DroppyMenuItem("  Log-out "));
@@ -305,6 +340,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     }*/
 
     private void initListeners(View v) {
+
         etCustomerName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return false; }
@@ -324,6 +360,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 return false;
             }
         });
+
         imgSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -341,33 +378,23 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 }
             }
         });
+
         alphaSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
-                storelistview_box.setVisibility(View.GONE);
-                alphagridview_box.setVisibility(View.VISIBLE);
-                alphagridview_box.setAlpha(0.0f);
-                alphagridview_box.animate().translationY(0)
-                        .alpha(1.0f).setListener(null);
+                showAlphaBox();
+                closeBackdrop(containerbdl, includedFront);
             }
         });
+
         refreshAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
-//                showSpinnerDialog(v);
                 storelistview_box.setVisibility(View.GONE);
                 alphagridview_box.setVisibility(View.VISIBLE);
                 requestCustomers("");
-            }
-        });
-        adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
-            @Override
-            public void onItemClick(View v, int pos) {
-                if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
-                Helper.hideSoftKeyboard(getActivity());
-                fillData(v, stringAlpha.get(pos), true);
             }
         });
 
@@ -458,6 +485,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
+            if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                params.put("agentid", "");
+            } else {
+                params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
+            }
 
             Iterator it = params.entrySet().iterator();
             String strParams = "";
@@ -473,30 +505,22 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         }
     }
 
-    private void fillData(View v, String stringSearch, Boolean isAlpha) {
+    private void showAlphaBox() {
+        storelistview_box.setVisibility(View.GONE);
+        alphagridview_box.setVisibility(View.VISIBLE);
+        alphagridview_box.setAlpha(0.0f);
+        alphagridview_box.animate().translationY(0).alpha(1.0f).setListener(null);
+    }
+
+    private void showListBox() {
         alphagridview_box.setVisibility(View.GONE);
         storelistview_box.setVisibility(View.VISIBLE);
         storelistview_box.setAlpha(0.0f);
-        storelistview_box.animate().translationY(0)
-                .alpha(1.0f).setListener(null);
+        storelistview_box.animate().translationY(0).alpha(1.0f).setListener(null);
+    }
 
+    private void fillData(View v, String stringSearch, Boolean isAlpha) {
         showSpinnerDialog();
-//        vi = new VolleyInteractor();
-//        vi.registerCallback(this);
-//        HashMap<String, String> params = new HashMap<>();
-//        params.put("cn", ServerConstants.CN);
-//        params.put("customer", stringSearch);
-//
-//        Iterator it = params.entrySet().iterator();
-//        String strParams = "";
-//        while (it.hasNext()) {
-//            Map.Entry pair = (Map.Entry)it.next();
-//            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
-//            it.remove();
-//        }
-//        strParams = strParams.replaceAll(" ", "%20");
-//        vi.getCustomers(v.getContext(), params, strParams);
-
         final LinkedList<MenuList> mlRSx = DcMenulist.getInstance(ctx).getAllMenulist(isAlpha, stringSearch);
         if (mlRSx.size() == 0) {
             MenuList mlList = new MenuList();
@@ -509,7 +533,6 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             mlRSx.add(mlList);
         }
         adapter = new MenuStoresAdapter(ctx, mlRSx);
-        dismissSpinnerDialog();
         listview.setAdapter(adapter);
         if (mlRSx.size() > 0) {
             adapter.setOnButtonClickListener(new MenuStoresAdapter.OnButtonClickListener() {
@@ -517,11 +540,16 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 public void onItemClick(View view,  int aid) {
                     MenuList mlRS = mlRSx.get(aid);
                     SharedData.getInstance(ctx).saveData( SharedKey.ORDER_CUSTOMER_ID.getKey(), String.valueOf(mlRS.getCustomerID()) );
-                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
-                            new OrderFragment(), "order_fragment", "customer_fragment");
+                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(), new OrderFragment(), "order_fragment", "customer_fragment");
                 }
             });
         }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dismissSpinnerDialog();
+            }
+        }, 300);
     }
 
     private void showSpinnerDialog(){
@@ -591,64 +619,28 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             Log.d("dsxcf", "searchcustomer saved");
             progressBarx.setVisibility(View.GONE);
 
-//            if(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()).equals("Commissary")) {
-                alphagridview = (GridView) v.findViewById(R.id.alphagridview);
-                ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
-                if (refStringAlpha.size() > 0) { stringAlpha = refStringAlpha; }
-                adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
-                adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
-                    @Override
-                    public void onItemClick(View v, int pos) {
-                        if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
-                        Helper.hideSoftKeyboard(getActivity());
-                        fillData(v, stringAlpha.get(pos), true);
-                    }
-                });
+            loadSavedItems();
 
-                dismissSpinnerDialog();
-                storelistview_box.setVisibility(View.GONE);
-                alphagridview_box.setVisibility(View.VISIBLE);
-                alphagridview_box.setAlpha(0.0f);
-                alphagridview_box.animate().translationY(0)
-                        .alpha(1.0f).setListener(null);
-                alphagridview.setAdapter(adapterAlpha);
+            isUpdateCustomer = false;
 
-                isUpdateCustomer = false;
-
-                new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
-                                LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
-                                if (ailRs.size() < 1) {
-                                    loader = Helper.showSpinnerDialog(ctx,"Syncing Product Items", "Please wait..."); loader.show();
-                                    requestProductItems();
-                                } else {
-                                    Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
-                                }
+            new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+                            LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
+                            if (ailRs.size() < 1) {
+                                loader = Helper.showSpinnerDialog(ctx,"Syncing Product Items", "Please wait..."); loader.show();
+                                requestProductItems();
                             } else {
                                 Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
                             }
+                        } else {
+                            Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
                         }
-                    },
-                    500
-                );
-
-            /*} else {
-                loader = Helper.showSpinnerDialog(ctx, "Updating", "Please wait..."); loader.show();
-
-                SharedData sp = SharedData.getInstance(ctx);
-                LinkedList<MenuList> rsMl =  DcMenulist.getInstance(ctx).searchCustomer(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()));
-                if (rsMl.size() > 0) {
-                    MenuList mlRS = rsMl.get(0);
-                    sp.saveData(SharedKey.CURRENT_REMARKS.getKey(), mlRS.getRemarks());
-                    sp.saveData(SharedKey.CURRENT_STORE.getKey(), mlRS.getCustomerName());
-                    sp.saveData(SharedKey.CURRENT_CUSTOMER_ID.getKey(), mlRS.getCustomerID());
-                    sp.saveData(SharedKey.CURRENT_CUSTOMER_INTEGRATION_ID.getKey(), mlRS.getCustomerIntegrationId());
-                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
-                        new OrderFragment(), "order_fragment", "customer_fragment");
-                }
-            }*/
+                    }
+                },
+                500
+            );
         }
         @Override
         protected void onPreExecute() {

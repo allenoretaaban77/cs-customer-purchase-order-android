@@ -63,7 +63,7 @@ public class DcAitemlist extends DBHelper {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.A_ITEMLIST.getName()
             + " WHERE " + aItemlistKey.ITEMNAME.getKey() + " LIKE ? "
-            + " ORDER BY " + aItemlistKey.ITEMNAME.getKey() + " DESC";
+            + " ORDER BY " + aItemlistKey.ITEMNAME.getKey() + " ASC";
         Cursor c = db.rawQuery(strQry, new String[] { searchStr });
         LinkedList<aItemlist> list = new LinkedList<>();
         while (c.moveToNext()) {
