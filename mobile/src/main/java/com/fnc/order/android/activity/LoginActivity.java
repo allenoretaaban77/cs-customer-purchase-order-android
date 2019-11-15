@@ -194,6 +194,10 @@ public class LoginActivity extends BaseActivity {
                                 return;
                             }
                         }
+
+                        String refEmpIDOld = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey());
+                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), refEmpIDOld);
+
                         SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID.getKey(), String.valueOf(slx.getEmpId()));
@@ -1295,6 +1299,11 @@ public class LoginActivity extends BaseActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
+            if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                params.put("agentid", "");
+            } else {
+                params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
+            }
             Iterator it = params.entrySet().iterator();
             String strParams = "";
             while (it.hasNext()) {

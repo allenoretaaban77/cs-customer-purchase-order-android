@@ -212,7 +212,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         initCalc(rootView);
 
         sp = SharedData.getInstance(ctx);
-        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
+        if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+            sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
+        } else {
+            sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
+        }
         if (sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1) {
             DcOrder.getInstance(ctx).updateSetAllQuantity("");
             fillItems(rootView);
@@ -229,7 +233,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
                     Context.INPUT_METHOD_SERVICE);
 
-            showSpinnerDialog(v);
+            loader = Helper.showSpinnerDialog(ctx, "", "Updating preloaded items... Please wait..."); loader.show();
+
             HashMap<String, String> params = new HashMap<>();
             params.put("itemname", "");
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
@@ -502,7 +507,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     }
 
                     if (errFlag) {
-                        dismissSpinnerDialog();
+                        Helper.dismissSpinnerDialog(loader);
                         adapter.notifyDataSetChanged();
 //                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
                         BounceView.addAnimTo( Helper.okDialog(ctx,
@@ -644,7 +649,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     View.OnClickListener cancelCallback = new View.OnClickListener() {
         public void onClick(View v) {
             Helper.hideSoftKeyboard(getActivity());
-            dismissSpinnerDialog();
+            Helper.dismissSpinnerDialog(loader);
             alertDialogRemarks.dismiss();
         }
     };
@@ -654,7 +659,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         VolleyInteractor vi = new VolleyInteractor();
         vi.registerCallback(this);
 
-        showSpinnerDialog(rootView);
+        loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
         final HashMap<String, Object> paramsArray = new HashMap();
         paramsArray.clear();
 
@@ -751,7 +756,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setReferenceRecid(Helper.getReqDate(5, ""));
                 DcOrdered.getInstance(ctx).insertOrderedlist(ol);
 
-                dismissSpinnerDialog();
+                Helper.dismissSpinnerDialog(loader);
 
                 if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                     loader = Helper.showSpinnerDialog(ctx, "Posting Transaction", "Please wait..."); loader.show();
@@ -791,7 +796,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 Log.v("post_params", String.valueOf(paramsArrayStr));
             }
         }else{
-            dismissSpinnerDialog();
+            Helper.dismissSpinnerDialog(loader);
 //            Toast.makeText(ctx, "Error request. Please try again.", Toast.LENGTH_SHORT).show();
             BounceView.addAnimTo( Helper.okDialog( ctx,
                     "Error","Error request. Please try again.", "CLOSE",
@@ -802,7 +807,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
     public void onRequestSuccess(String response, String type) {
         isPosted = false;
-        dismissSpinnerDialog();
         try {
             response = response.replace("\r\n", "");
             JSONArray objArr = new JSONArray(response);
@@ -918,8 +922,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             ((LinearLayout) rootView.findViewById(R.id.btn_others_box)).setVisibility(View.GONE);
                         }
                     }
+
+                    Helper.dismissSpinnerDialog(loader);
                 }
             } else {
+                Helper.dismissSpinnerDialog(loader);
                 if (objArr.length() > 0) {
                     JSONObject obj = objArr.getJSONObject(0);
                     Boolean status = obj.getBoolean("error");
@@ -935,13 +942,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
             }
         } catch (JSONException e) {
+            Helper.dismissSpinnerDialog(loader);
             e.printStackTrace();
         }
     }
 
     public void onRequestFail(VolleyError volleyError, String type) {
         isPosted = false;
-        dismissSpinnerDialog();
+        Helper.dismissSpinnerDialog(loader);
         Toast.makeText(ctx, Helper.getVolleyError(volleyError), Toast.LENGTH_SHORT).show();
     }
 
@@ -1152,20 +1160,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private void backItNow(final View v) {
-        dismissSpinnerDialog();
+        Helper.dismissSpinnerDialog(loader);
         Helper.hideSoftKeyboard(getActivity());
         getActivity().onBackPressed();
-    }
-
-    private void showSpinnerDialog(View v) {
-        loader = Helper.buildSpinnerDialog(v.getContext());
-        loader.show();
-    }
-
-    private void dismissSpinnerDialog() {
-        if (loader != null && loader.isShowing()) {
-            loader.dismiss();
-        }
     }
 
     private void initCalc(View v) {

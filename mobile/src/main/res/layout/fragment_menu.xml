@@ -85,6 +85,7 @@
                         layout="@layout/header_customer_fragment"/>
 
                     <LinearLayout
+                        android:background="@drawable/background_green_3_border"
                         android:id="@+id/includedFront"
                         android:orientation="vertical"
                         android:layout_width="match_parent"
@@ -105,6 +106,7 @@
                         </LinearLayout>
                         <LinearLayout
                             android:id="@+id/alphagridview_box"
+                            android:visibility="gone"
                             android:background="@drawable/background_green_3_border"
                             android:layout_height="match_parent"
                             android:layout_width="match_parent"
