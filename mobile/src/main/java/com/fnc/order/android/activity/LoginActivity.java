@@ -129,8 +129,6 @@ public class LoginActivity extends BaseActivity {
 
 //        usernameText.setText("19130");
 //        passwordEText.setText("nathaniels@1994");
-//        usernameText.setText("administrator");
-//        passwordEText.setText("P@ssw0rd1109");
     }
 
     private void initListeners(){
