@@ -54,7 +54,7 @@ public class OrdersService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.i("DSX", "service on start command");
+        Log.i("dsxos", "service on start command");
 
         handler.removeCallbacks(postRunnable);
         counter = 0;
@@ -92,7 +92,7 @@ public class OrdersService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i("dsxo", "service destroyed");
+        Log.i("dsxod", "service destroyed");
         startService(new Intent(getBaseContext(), OrdersService.class));
     }
 
@@ -105,7 +105,7 @@ public class OrdersService extends Service {
     public Runnable postRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.i("dsxo", "order service in counting "+ (counter++));
+            Log.i("dsxoc", "order service in counting "+ (counter++));
             Context ctx = getApplicationContext();
 
             if (Helper.isNetworkAvailable(ctx)) {
@@ -122,49 +122,57 @@ public class OrdersService extends Service {
                         vi.registerCallback(new VolleyCallback() {
                             @Override
                             public void onRequestSuccess(String response, String type) {
-                                Log.d("dsxo", response);
+                                Log.d("dsxor", response);
                                 try {
                                     response = response.replace("\r\n ", "");
                                     JSONArray objArr = new JSONArray(response);
                                     if(objArr.length() > 0) {
                                         JSONObject rowObj = objArr.getJSONObject(0);
                                         if (!rowObj.getBoolean("error")) {
-                                            Log.d("dsxo", rsOD.getReferenceRecid());
+                                            Log.d("dsxos", rsOD.getReferenceRecid());
                                             DcOrdered.getInstance(getApplicationContext())
                                                 .updateStatusViaRecId(rsOD.getReferenceRecid(), 1);
+                                            handler.postDelayed(postRunnable, 2000);
                                         } else {
 //                                            DcOrdered.getInstance(getApplicationContext())
 //                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+                                            Log.d("dsxoe 1", "request error");
+                                            handler.postDelayed(postRunnable, 2000);
                                         }
                                     } else {
 //                                        DcOrdered.getInstance(getApplicationContext())
 //                                        .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+                                        Log.d("dsxoe 2", "request error");
+                                        handler.postDelayed(postRunnable, 2000);
                                     }
                                 } catch (JSONException e) {
 //                                    DcOrdered.getInstance(getApplicationContext())
 //                                            .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
+                                    Log.d("dsxoe 3", "request error");
+                                    handler.postDelayed(postRunnable, 2000);
                                 }
-                                handler.postDelayed(postRunnable, 1000);
                             }
                             @Override
                             public void onRequestFail(VolleyError response, String type) {
 //                                DcOrdered.getInstance(getApplicationContext())
 //                                    .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
-                                handler.postDelayed(postRunnable, 1000);
+                                Log.d("dsxoe 4", "request fail " + response);
+                                handler.postDelayed(postRunnable, 2000);
                             }
                         });
+                        Log.d("dsxop", "posting");
                         vi.postOrders(getApplicationContext(), rsOD.getJson());
                     } else {
-                        Log.d("dsxo", "no order to post");
                         handler.postDelayed(this, 2000);
+                        Log.d("dsxoe 5", "no order to post");
                     }
                 } catch (SQLiteException e) {
+                    Log.d("dsxoe 6", "database doesn't exist yet.");
                     handler.postDelayed(this, 2000);
-                    Log.d("dsxo", "database doesn't exist yet.");
                 }
             } else {
-                Log.d("dsxo", "no internet connection");
                 handler.postDelayed(this, 2000);
+                Log.d("dsxoe 7", "no internet connection");
             }
         }
     };
@@ -172,7 +180,7 @@ public class OrdersService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        Log.d("dsxo", "on task removed");
+        Log.d("dsxorm", "on task removed");
     }
 }
 
