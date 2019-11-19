@@ -127,10 +127,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("12100");
-//        passwordEText.setText("0527");
-//        usernameText.setText("administrator");
-//        passwordEText.setText("P@ssw0rd1109");
+//        usernameText.setText("19130");
+//        passwordEText.setText("nathaniels@1994");
     }
 
     private void initListeners(){
@@ -1192,6 +1190,12 @@ public class LoginActivity extends BaseActivity {
     public void onResume(){
         super.onResume();
         sp = SharedData.getInstance(this);
+        if (Helper.checkBranchProfile(ctx).size() > 0) {
+            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+//                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://192.168.1.200:81/");
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
+            }
+        }
 
         new getUsersAsync().execute("");
         Helper.updtaeAdministratorPasswor(ctx);
@@ -1406,7 +1410,7 @@ public class LoginActivity extends BaseActivity {
                             if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
                                 String strVersionName = rowObj.getString("version_name");
                                 if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
-                                    BounceView.addAnimTo( Helper.okCancelDialog( ctx,
+                                    BounceView.addAnimTo( Helper.okDialog( ctx,
                                             "App Update",
                                             "App Update\n\nA new version of this app is now available.\n\n*** It is REQUIRED TO UPDATE your app before you start any transactions.",
                                             "PROCEED UPDATE", new DialogInterface.OnClickListener() {
@@ -1415,11 +1419,11 @@ public class LoginActivity extends BaseActivity {
                                                     dialog.dismiss();
                                                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
                                                 }
-                                            }, "CANCEL", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                }
+//                                            }, "CANCEL", new DialogInterface.OnClickListener() {
+//                                                @Override
+//                                                public void onClick(DialogInterface dialog, int which) {
+//                                                    dialog.dismiss();
+//                                                }
                                             }, false) );
                                 }
                             }

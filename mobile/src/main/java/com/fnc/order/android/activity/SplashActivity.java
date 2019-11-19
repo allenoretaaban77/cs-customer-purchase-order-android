@@ -99,9 +99,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 //        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
 //        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
 //        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
-//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
-//        sp.saveData(SharedKey.REF_DATABASE.getKey(), "beta");
-//        sp.saveData(SharedKey.DATABASE.getKey(), "beta");
+//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathanielS.com/");
+//        sp.saveData(SharedKey.REF_DATABASE.getKey(), "backoffice");
+//        sp.saveData(SharedKey.DATABASE.getKey(), "backoffice");
 
         if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) {
             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
@@ -146,13 +146,13 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         if(strCN.equals("")) {
             if (Helper.isNetworkAvailable(this)) {
                 alertDialog = actionDialog( ctx, "APP START-UP",
-                    "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
-                    "Username", "Password", "Branch",
-                    "SUBMIT", new View.OnClickListener() {
-                        public void onClick(View v) {
-                            clientSignin();
-                        }
-                    }, "", null, 0
+                        "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
+                        "Username", "Password", "Branch",
+                        "SUBMIT", new View.OnClickListener() {
+                            public void onClick(View v) {
+                                clientSignin();
+                            }
+                        }, "", null, 0
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
@@ -180,43 +180,43 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     private void showBranchDialog(final String type) {
         if (type.equals("init") || type.equals("reinit")) {
             alertdialogBL = actionDialog( ctx, "ASSIGN BRANCH",
-                getString(R.string.branch_dialog_message),
-                "Username", "Password", "Branch",
-                "SUBMIT", new View.OnClickListener() {
-                    public void onClick(View v) {
-                        if (!refSelectedBranchId.equals("")) {
-                            LinkedList<aBranchlist> abl =
-                                DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                                    aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                                    new String[] { refSelectedBranchId, Helper.getImei(ctx) }
-                                );
-                            if (abl.size() > 0) {
-                                int flgx = 0;
-                                aBranchlist ab = null;
-                                for (int i = 0; i < abl.size(); i++) {
-                                    ab = abl.get(i);
-                                    if(ab.getActive().equals("true")) {
-                                        flgx = 1;
+                    getString(R.string.branch_dialog_message),
+                    "Username", "Password", "Branch",
+                    "SUBMIT", new View.OnClickListener() {
+                        public void onClick(View v) {
+                            if (!refSelectedBranchId.equals("")) {
+                                LinkedList<aBranchlist> abl =
+                                        DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                                                aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+                                                new String[] { refSelectedBranchId, Helper.getImei(ctx) }
+                                        );
+                                if (abl.size() > 0) {
+                                    int flgx = 0;
+                                    aBranchlist ab = null;
+                                    for (int i = 0; i < abl.size(); i++) {
+                                        ab = abl.get(i);
+                                        if(ab.getActive().equals("true")) {
+                                            flgx = 1;
+                                        }
                                     }
-                                }
-                                if (flgx == 1) {
-                                    loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
-                                    sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
-                                    sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                    sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
-                                    sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
-                                    getPreRequisite();
+                                    if (flgx == 1) {
+                                        loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+                                        sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
+                                        sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
+                                        sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                        sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
+                                        getPreRequisite();
+                                    } else {
+                                        postBranchImei();
+                                    }
                                 } else {
                                     postBranchImei();
                                 }
                             } else {
-                                postBranchImei();
+                                Toast.makeText(ctx, "Please select a branch.", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                             Toast.makeText(ctx, "Please select a branch.", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                }, "", null, 1
+                    }, "", null, 1
             );
 
             loadSpinnerBranches();
@@ -252,7 +252,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             arrBranches = new LinkedList<>();
             if (refAbx.size() > 0) {
                 aBranchlist abr = new aBranchlist(0, "Select branch....",
-                    "", "","", "", "", "", "");
+                        "", "","", "", "", "", "");
                 arrBranches.add(abr);
                 for(int k=0; k<refAbx.size(); k++){
                     if (DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
@@ -266,7 +266,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 }
             }
             ArrayAdapter<aBranchlist> sadapter = new ArrayAdapter<aBranchlist>(ctx,
-                android.R.layout.simple_spinner_dropdown_item, arrBranches) {
+                    android.R.layout.simple_spinner_dropdown_item, arrBranches) {
                 @Override
                 public boolean isEnabled(int position) {
                     if(position == 0) { return false; }
@@ -357,13 +357,13 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 
         if(strUsername.matches("")){
             BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Error","Please enter username.", "CLOSE",
-                null, false) ); return;
+                    "Error","Please enter username.", "CLOSE",
+                    null, false) ); return;
         }
         if(strPassword.matches("")){
             BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Error","Please enter password.", "CLOSE",
-                null, false) ); return;
+                    "Error","Please enter password.", "CLOSE",
+                    null, false) ); return;
         }
 
         loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
@@ -378,13 +378,13 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 
     private void alertRequireInternet() {
         BounceView.addAnimTo( Helper.okDialog( ctx,
-            "Initialization Error","This app requires internet to initialize.  Please check your connection.",
-            "CLOSE", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finishAndRemoveTask();
-                }
-            }, false) );
+                "Initialization Error","This app requires internet to initialize.  Please check your connection.",
+                "CLOSE", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finishAndRemoveTask();
+                    }
+                }, false) );
     }
 
     private void showActivity(final Class<?> cls) {
@@ -413,13 +413,13 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 getDeviceProfile("reinit");
             } else {
                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Device Registration","Registration failed. Please contact IT support.",
-                    "CLOSE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finishAndRemoveTask();
-                        }
-                    }, false) );
+                        "Device Registration","Registration failed. Please contact IT support.",
+                        "CLOSE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finishAndRemoveTask();
+                            }
+                        }, false) );
             }
         }
         if (type.equals("login")) {
@@ -428,19 +428,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 if (obj.getString("dtcompany").equals("[]")) {
                     Helper.dismissSpinnerDialog(loader);
                     BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Initialization Error","Invalid credentials",
-                        "CLOSE", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }, false) );
-                } else {
-                    JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
-                    JSONObject objx = new JSONObject(objArr.get(0).toString());
-                    if (objx.getString("DatabaseID").equals("")) {
-                        Helper.dismissSpinnerDialog(loader);
-                        BounceView.addAnimTo( Helper.okDialog( ctx,
                             "Initialization Error","Invalid credentials",
                             "CLOSE", new DialogInterface.OnClickListener() {
                                 @Override
@@ -448,6 +435,19 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                     dialog.dismiss();
                                 }
                             }, false) );
+                } else {
+                    JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
+                    JSONObject objx = new JSONObject(objArr.get(0).toString());
+                    if (objx.getString("DatabaseID").equals("")) {
+                        Helper.dismissSpinnerDialog(loader);
+                        BounceView.addAnimTo( Helper.okDialog( ctx,
+                                "Initialization Error","Invalid credentials",
+                                "CLOSE", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }, false) );
                     } else {
                         alertDialog.dismiss();
                         String strCN = "";
@@ -493,14 +493,14 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             } catch (JSONException e) {
                 Helper.dismissSpinnerDialog(loader);
                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Initialization Error","Invalid credentials",
-                    "CLOSE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            alertDialog.show();
-                        }
-                    }, false) );
+                        "Initialization Error","Invalid credentials",
+                        "CLOSE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                alertDialog.show();
+                            }
+                        }, false) );
             }
         }
         if (type.contains("getdeviceprofile|")) {
@@ -519,15 +519,15 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                 for (int i = 0; i < objArr.length(); i++) {
                                     JSONObject rowObj = objArr.getJSONObject(i);
                                     aBranchlist br = new aBranchlist(
-                                        rowObj.getInt("branchid"),
-                                        rowObj.getString("branchcode").trim(),
-                                        rowObj.getString("deviceid"),
-                                        rowObj.getString("description").trim(),
-                                        rowObj.getString("deviceID1").trim(),
-                                        rowObj.getString("active").trim(),
-                                        rowObj.getString("customerID").trim(),
-                                        rowObj.getString("old_branchid").trim(),
-                                        rowObj.getString("old_customerid").trim()
+                                            rowObj.getInt("branchid"),
+                                            rowObj.getString("branchcode").trim(),
+                                            rowObj.getString("deviceid"),
+                                            rowObj.getString("description").trim(),
+                                            rowObj.getString("deviceID1").trim(),
+                                            rowObj.getString("active").trim(),
+                                            rowObj.getString("customerID").trim(),
+                                            rowObj.getString("old_branchid").trim(),
+                                            rowObj.getString("old_customerid").trim()
                                     );
                                     DcBranchlist.getInstance(ctx).insertBranches(br);
                                 }
@@ -535,10 +535,10 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                 if (strRef[1].equals("reinit")) {
                                     LinkedList<aBranchlist> abl =
 //                                        DcBranchlist.getInstance(ctx).searchBranch(refSelectedBranchId, Helper.getImei(ctx));
-                                        DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                                            aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                                            new String[] { refSelectedBranchId, Helper.getImei(ctx) }
-                                        );
+                                            DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                                                    aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+                                                    new String[] { refSelectedBranchId, Helper.getImei(ctx) }
+                                            );
                                     if (abl.size() > 0) {
                                         int flgx = 0;
                                         aBranchlist ab = null;
@@ -557,8 +557,20 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                             getPreRequisite();
                                         } else {
                                             BounceView.addAnimTo( Helper.okDialog( ctx,
+                                                    "Device Registration",
+                                                    "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
+                                                    "OK", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                            showBranchDialog(strRef[1]);
+                                                        }
+                                                    }, false) );
+                                        }
+                                    } else {
+                                        BounceView.addAnimTo( Helper.okDialog( ctx,
                                                 "Device Registration",
-                                                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
+                                                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
                                                 "OK", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
@@ -566,18 +578,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                                         showBranchDialog(strRef[1]);
                                                     }
                                                 }, false) );
-                                        }
-                                    } else {
-                                        BounceView.addAnimTo( Helper.okDialog( ctx,
-                                            "Device Registration",
-                                            "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
-                                            "OK", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                    showBranchDialog(strRef[1]);
-                                                }
-                                            }, false) );
                                     }
                                 } else {
                                     showBranchDialog(strRef[1]);
@@ -604,16 +604,16 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         for (int i = 0; i < sArr.length(); i++) {
                             JSONObject rowObj = sArr.getJSONObject(i);
                             aStaffs sl = new aStaffs(
-                                rowObj.getInt("empId"),
-                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                rowObj.getString("empNo"),
-                                rowObj.getString("Email"),
-                                rowObj.getString("name"),
-                                rowObj.getInt("Branch"),
-                                rowObj.getInt("Jobtitle"),
-                                rowObj.getString("pass"),
-                                rowObj.getString("active"),
-                                rowObj.getString("ismobileadmin")
+                                    rowObj.getInt("empId"),
+                                    rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                    rowObj.getString("empNo"),
+                                    rowObj.getString("Email"),
+                                    rowObj.getString("name"),
+                                    rowObj.getInt("Branch"),
+                                    rowObj.getInt("Jobtitle"),
+                                    rowObj.getString("pass"),
+                                    rowObj.getString("active"),
+                                    rowObj.getString("ismobileadmin")
                             );
                             DcStaffs.getInstance(ctx).insertStaffs(sl);
                         }
@@ -621,14 +621,14 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                     Helper.dismissSpinnerDialog(loader);
                     if (alertdialogBL != null) alertdialogBL.dismiss();
                     BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Initialization Success","You can now login using your registered account.",
-                        "OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startActivity(new Intent(ctx, LoginActivity.class));
-                                finish();
-                            }
-                        }, false) );
+                            "Initialization Success","You can now login using your registered account.",
+                            "OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startActivity(new Intent(ctx, LoginActivity.class));
+                                    finish();
+                                }
+                            }, false) );
                 } else {
                     alertDataSyncError();
                 }
@@ -674,9 +674,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     }
 
     private AlertDialog actionDialog(final Context activity, String title, String message,
-        String strLabel1, String strLabel2, String strLabel3, String okButtonCaption,
-        View.OnClickListener onClickListener, String cancelButtonCaption,
-        View.OnClickListener cancelClickListener, Integer flagType) {
+                                     String strLabel1, String strLabel2, String strLabel3, String okButtonCaption,
+                                     View.OnClickListener onClickListener, String cancelButtonCaption,
+                                     View.OnClickListener cancelClickListener, Integer flagType) {
 
         SharedData spx = SharedData.getInstance(this);
 
@@ -759,7 +759,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             viri.postBranchImei(ctx, params,
                     strParams.replaceAll(" ", "%20"));
         } else {
-                alertRequireInternet();
+            alertRequireInternet();
         }
     }
 
