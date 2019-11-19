@@ -199,7 +199,8 @@ public class LoginActivity extends BaseActivity {
                         SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
                         SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID.getKey(), String.valueOf(slx.getEmpId()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
+                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpId()));
+//                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
                         SharedData.getInstance(ctx).saveData(SharedKey.EMP_ISMOBILEADMIN.getKey(), String.valueOf(slx.getIsmobileadmin()));
@@ -1192,8 +1193,8 @@ public class LoginActivity extends BaseActivity {
         sp = SharedData.getInstance(this);
         if (Helper.checkBranchProfile(ctx).size() > 0) {
             if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
-//                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://192.168.1.200:81/");
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://192.168.1.200:81/");
+//                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
             }
         }
 
