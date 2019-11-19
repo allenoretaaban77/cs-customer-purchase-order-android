@@ -42,6 +42,7 @@ public class OrdersService extends Service {
     LocalBroadcastManager broadcaster = null;
     Handler handler = new Handler();
     Runnable runner;
+    Boolean isNoPendingRequest = true;
 
     @Override
     public void onCreate() {
@@ -132,23 +133,23 @@ public class OrdersService extends Service {
                                             Log.d("dsxos", rsOD.getReferenceRecid());
                                             DcOrdered.getInstance(getApplicationContext())
                                                 .updateStatusViaRecId(rsOD.getReferenceRecid(), 1);
-                                            handler.postDelayed(postRunnable, 2000);
                                         } else {
 //                                            DcOrdered.getInstance(getApplicationContext())
 //                                                .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                             Log.d("dsxoe 1", "request error");
-                                            handler.postDelayed(postRunnable, 2000);
                                         }
                                     } else {
 //                                        DcOrdered.getInstance(getApplicationContext())
 //                                        .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                         Log.d("dsxoe 2", "request error");
-                                        handler.postDelayed(postRunnable, 2000);
                                     }
+                                    isNoPendingRequest = true;
+                                    handler.postDelayed(postRunnable, 2000);
                                 } catch (JSONException e) {
 //                                    DcOrdered.getInstance(getApplicationContext())
 //                                            .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                     Log.d("dsxoe 3", "request error");
+                                    isNoPendingRequest = true;
                                     handler.postDelayed(postRunnable, 2000);
                                 }
                             }
@@ -157,11 +158,15 @@ public class OrdersService extends Service {
 //                                DcOrdered.getInstance(getApplicationContext())
 //                                    .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                 Log.d("dsxoe 4", "request fail " + response);
+                                isNoPendingRequest = true;
                                 handler.postDelayed(postRunnable, 2000);
                             }
                         });
-                        Log.d("dsxop", "posting");
-                        vi.postOrders(getApplicationContext(), rsOD.getJson());
+                        if (isNoPendingRequest) {
+                            Log.d("dsxop", "posting");
+                            vi.postOrders(getApplicationContext(), rsOD.getJson());
+                            isNoPendingRequest = false;
+                        }
                     } else {
                         handler.postDelayed(this, 2000);
                         Log.d("dsxoe 5", "no order to post");
