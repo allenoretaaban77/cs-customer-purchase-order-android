@@ -94,7 +94,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     public View v;
     private MainViewModel mViewModel;
     private MenuStoresAdapter adapter;
-    private ProgressDialog loader;
+    private ProgressDialog loader, floader;
     private VolleyInteractor vi;
     private ListView listview;
     private List<String> customersList = new ArrayList<>();
@@ -477,8 +477,9 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 
     private void requestCustomers(String stringSearch) {
         if (Helper.isNetworkAvailable(ctx)) {
-            showSpinnerDialog();
-            Toast.makeText(ctx, updateCustomerMessage, Toast.LENGTH_SHORT).show();
+            floader = Helper.showSpinnerDialog(ctx, "Fetching Customers", updateCustomerMessage); floader.show();
+//            showSpinnerDialog();
+//            Toast.makeText(ctx, updateCustomerMessage, Toast.LENGTH_SHORT).show();
 
             VolleyInteractor vic = new VolleyInteractor();
             vic.registerCallback(this);
@@ -575,30 +576,36 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         protected String doInBackground(String... params) {
             isUpdateCustomer = true;
             try {
-                String response = params[0].replace("\r\n", "");
-                JSONArray objArr = new JSONArray(response);
-                if(objArr.length() > 0) {
+//                if (!params[0].toString().equals("[]")) {
+                    String response = params[0].replace("\r\n", "");
+                    JSONArray objArr = new JSONArray(response);
                     DcMenulist.getInstance(ctx).emptyMenulist();
-                    for (int i = 0; i < objArr.length(); i++) {
-                        JSONObject obj = objArr.getJSONObject(i);
-                        MenuList mlList = new MenuList();
-                        mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
-                        mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
-                        String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
-                        mlList.setCustomerName(strCustomerName);
-                        mlList.setRecordCount(0);
-                        mlList.setRemarks("");
-                        if (!strCustomerName.equals("")) {
-                            if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
-                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
-                            } else {
-                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)).toUpperCase());
+                    if(objArr.length() > 0) {
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject obj = objArr.getJSONObject(i);
+                            MenuList mlList = new MenuList();
+                            mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
+                            mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
+                            String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                            mlList.setCustomerName(strCustomerName);
+                            mlList.setRecordCount(0);
+                            mlList.setRemarks("");
+                            if (!strCustomerName.equals("")) {
+                                if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
+                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
+                                } else {
+                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)).toUpperCase());
+                                }
+                                DcMenulist.getInstance(ctx).insertMenulist(mlList);
                             }
-                            DcMenulist.getInstance(ctx).insertMenulist(mlList);
+                            publishProgress(i+1);
                         }
-                        publishProgress(i+1);
                     }
-                }
+                    return "Task Completed.";
+//                } else {
+//                    isUpdateCustomer = false;
+//                    return "Task Error";
+//                }
             } catch (JSONException e) {
                 e.printStackTrace();
                 isUpdateCustomer = false;
@@ -612,28 +619,27 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     e.printStackTrace();
                 }
             }*/
-            return "Task Completed.";
         }
         @Override
         protected void onPostExecute(String result) {
             Log.d("dsxcf", "searchcustomer saved");
             progressBarx.setVisibility(View.GONE);
-
             loadSavedItems();
-
             isUpdateCustomer = false;
 
             new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
+                        Helper.dismissSpinnerDialog(floader);
+
                         if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
                             LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
-                            if (ailRs.size() < 1) {
+                            // if (ailRs.size() < 1) {
                                 loader = Helper.showSpinnerDialog(ctx,"Syncing Product Items", "Please wait..."); loader.show();
                                 requestProductItems();
-                            } else {
+                            /*} else {
                                 Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
-                            }
+                            } */
                         } else {
                             Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
                         }
@@ -711,15 +717,17 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             } else if (type.equals("searchcustomer")) {
                 Log.d("dsxcf", "searchcustomer");
                 JSONArray objArr = new JSONArray(response);
-                if(objArr.length() > 0) {
-                    dismissSpinnerDialog();
+//                if(objArr.length() > 0) {
+//                    dismissSpinnerDialog();
                     progressBarx = (ProgressBar) v.findViewById(R.id.progressBar);
                     progressBarx.setMax(objArr.length());
                     new customerAT().execute(response);
                     Log.d("dsxcf", "searchcustomer saved");
-                } else {
-                    Toast.makeText(ctx, "Customer record empty, please contact developer", Toast.LENGTH_SHORT).show();
-                }
+//                } else {
+//                    Helper.dismissSpinnerDialog(loader);
+//                    Helper.dismissSpinnerDialog(floader);
+//                    Toast.makeText(ctx, "Customer record empty, please contact developer", Toast.LENGTH_SHORT).show();
+//                }
             } else {
                 JSONArray objArr = new JSONArray(response);
                 if(objArr.length() > 0) {
@@ -770,6 +778,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     }
 
     public void onRequestFail(VolleyError volleyError, String type){
+        Helper.dismissSpinnerDialog(loader);
+        Helper.dismissSpinnerDialog(floader);
         dismissSpinnerDialog();
         Toast.makeText(ctx, Helper.getVolleyError(volleyError), Toast.LENGTH_SHORT).show();
     }

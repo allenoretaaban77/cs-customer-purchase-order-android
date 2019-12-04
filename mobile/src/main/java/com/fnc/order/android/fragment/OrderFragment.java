@@ -852,9 +852,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setIsChecked(0);
                         ol.setIsError(0);
                         ol.setIsLocked(1);
-                        if (!il.getOldSku().equals("null") && !il.getOldSku().equals("0")) {
-                            curRefArrayList.add(ol);
-                        }
+//                        if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                            if (!il.getOldSku().equals("null") && !il.getOldSku().equals("0")) {
+                                curRefArrayList.add(ol);
+                            }
+//                        } else {
+//                            curRefArrayList.add(ol);
+//                        }
                         DcOrder.getInstance(ctx).insertOrderlist(ol);
 
                         // get preloaded
@@ -923,6 +927,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         }
                     }
 
+                    Helper.dismissSpinnerDialog(loader);
+                } else {
                     Helper.dismissSpinnerDialog(loader);
                 }
             } else {
