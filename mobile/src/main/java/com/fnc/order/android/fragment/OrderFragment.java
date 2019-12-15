@@ -918,7 +918,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             null, false) );
                     }
 
-                    if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals("BackofficeLive")) {
+                    if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
                         LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" });
                         if (olRs.size() > 0) {
                             ((LinearLayout) rootView.findViewById(R.id.btn_others_box)).setVisibility(View.VISIBLE);
