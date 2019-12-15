@@ -127,8 +127,8 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("office");
-//        passwordEText.setText("Office");
+//        usernameText.setText("12179");
+//        passwordEText.setText("924");
 
 //        usernameText.setText("19130");
 //        passwordEText.setText("nathaniels@1994");
@@ -1199,9 +1199,11 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         sp = SharedData.getInstance(this);
         if (Helper.checkBranchProfile(ctx).size() > 0) {
-            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
                 sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://192.168.1.200:81/");
 //                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
+            } else {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
             }
         }
 
