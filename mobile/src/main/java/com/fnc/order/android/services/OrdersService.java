@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -43,6 +45,8 @@ public class OrdersService extends Service {
     Handler handler = new Handler();
     Runnable runner;
     Boolean isNoPendingRequest = true;
+    Service refService;
+    Integer refTimeOut = 2000;
 
     @Override
     public void onCreate() {
@@ -57,9 +61,11 @@ public class OrdersService extends Service {
         super.onStartCommand(intent, flags, startId);
         Log.i("dsxos", "service on start command");
 
+        refService = this;
+
         handler.removeCallbacks(postRunnable);
         counter = 0;
-        handler.postDelayed(postRunnable, 2000);
+        handler.postDelayed(postRunnable, refTimeOut);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
@@ -110,6 +116,9 @@ public class OrdersService extends Service {
             Context ctx = getApplicationContext();
 
             if (Helper.isNetworkAvailable(ctx)) {
+
+                refService.sendBroadcast(new Intent("netConnStat").putExtra("isConnected", "true"));
+
                 SQLiteDatabase checkDB = null;
                 try {
                     checkDB = SQLiteDatabase.openDatabase(DBPath + getApplicationContext().getPackageName()
@@ -144,13 +153,13 @@ public class OrdersService extends Service {
                                         Log.d("dsxoe 2", "request error");
                                     }
                                     isNoPendingRequest = true;
-                                    handler.postDelayed(postRunnable, 2000);
+                                    handler.postDelayed(postRunnable, refTimeOut);
                                 } catch (JSONException e) {
 //                                    DcOrdered.getInstance(getApplicationContext())
 //                                            .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                     Log.d("dsxoe 3", "request error");
                                     isNoPendingRequest = true;
-                                    handler.postDelayed(postRunnable, 2000);
+                                    handler.postDelayed(postRunnable, refTimeOut);
                                 }
                             }
                             @Override
@@ -159,7 +168,7 @@ public class OrdersService extends Service {
 //                                    .updateStatusViaRecId(rsOD.getReferenceRecid(), 0);
                                 Log.d("dsxoe 4", "request fail " + response);
                                 isNoPendingRequest = true;
-                                handler.postDelayed(postRunnable, 2000);
+                                handler.postDelayed(postRunnable, refTimeOut);
                             }
                         });
                         if (isNoPendingRequest) {
@@ -168,15 +177,18 @@ public class OrdersService extends Service {
                             isNoPendingRequest = false;
                         }
                     } else {
-                        handler.postDelayed(this, 2000);
+                        handler.postDelayed(this, refTimeOut);
                         Log.d("dsxoe 5", "no order to post");
                     }
                 } catch (SQLiteException e) {
                     Log.d("dsxoe 6", "database doesn't exist yet.");
-                    handler.postDelayed(this, 2000);
+                    handler.postDelayed(this, refTimeOut);
                 }
             } else {
-                handler.postDelayed(this, 2000);
+
+                refService.sendBroadcast(new Intent("netConnStat").putExtra("isConnected", "false"));
+
+                handler.postDelayed(this, refTimeOut);
                 Log.d("dsxoe 7", "no internet connection");
             }
         }

@@ -23,9 +23,13 @@ import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.adapters.TransactionsAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcOrdered;
+import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.Helper;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class TransactionFragment extends Fragment implements VolleyCallback {
 
@@ -76,6 +80,26 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
         list_view = (ListView) refV.findViewById(R.id.list_view);
 
         final LinkedList<Ordered> odll = DcOrdered.getInstance(ctx).getOrderedlist();
+//        final LinkedList<Ordered> odll = new LinkedList<>();
+//        for(int z=0; z<1000; z++) {
+//            int refVal = 1000 + z;
+//            Ordered ox = new Ordered();
+//            ox.setCustomerIntegRecid("7");
+//            ox.setCustomerRecid("7");
+//            ox.setCustomerName("Sample Customer " + String.valueOf(z));
+//            ox.setDeliveryDate(Helper.getPostingDate());
+//            ox.setCreatedBy("Developer");
+//            ox.setRemarks("Sample Remarks");
+//            ox.setReferenceEmployeeNo("7");
+//            ox.setJson("JSON Ref");
+//            ox.setJsonComplete("JSON Complete Ref");
+//            ox.setGrandtotal(String.valueOf(refVal)+".77");
+//            ox.setDateTime(Helper.getPostingDate());
+//            ox.setStatus(0);
+//            ox.setReferenceRecid("7777777");
+//            odll.add(ox);
+//        }
+
 //        ArrayList<Ordered> arrayList = new ArrayList<Ordered>();
         if(odll.size() > 0) {
             adapter = new TransactionsAdapter(ctx, odll);

@@ -34,15 +34,19 @@ import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
+import com.fnc.order.android.database.DataType;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.MenulistKey;
+import com.fnc.order.android.enumeration.OrderKey;
+import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.model.MenuList;
+import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
@@ -55,6 +59,7 @@ import com.google.api.core.NanoClock;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
@@ -75,10 +80,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import hari.bounceview.BounceView;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class LoginActivity extends BaseActivity {
 
@@ -1007,7 +1015,7 @@ public class LoginActivity extends BaseActivity {
                                             if (flgx == 1) {
                                                 sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                                 sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                                sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                                sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchcode()));
                                                 sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
                                                 Helper.dismissSpinnerDialog(loader);
                                                 alertDialogSettings.dismiss();
@@ -1199,6 +1207,7 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         sp = SharedData.getInstance(this);
         if (Helper.checkBranchProfile(ctx).size() > 0) {
+            sp.saveData(SharedKey.BRANCH_CODE.getKey(), Helper.checkBranchProfile(ctx).get(0).getBranchcode());
             if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
                 sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://192.168.1.200:81/");
 //                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
@@ -1207,9 +1216,16 @@ public class LoginActivity extends BaseActivity {
             }
         }
 
-        new getUsersAsync().execute("");
+        if (Helper.isNetworkAvailable(ctx)) {
+            new getUsersAsync().execute("");
+        }
+
         Helper.updtaeAdministratorPasswor(ctx);
-        new checkVersionUpdate().execute("");
+
+        if (Helper.isNetworkAvailable(ctx)) {
+            new checkVersionUpdate().execute("");
+        }
+
         if (DcBranchlist.getInstance(ctx).getBranchlist().size() < 1) {
             getDeviceProfile("default");
         }
@@ -1421,20 +1437,25 @@ public class LoginActivity extends BaseActivity {
                                 String strVersionName = rowObj.getString("version_name");
                                 if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
                                     BounceView.addAnimTo( Helper.okDialog( ctx,
-                                            "App Update",
-                                            "App Update\n\nA new version of this app is now available.\n\n*** It is REQUIRED TO UPDATE your app before you start any transactions.",
-                                            "PROCEED UPDATE", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
-                                                }
+                                        "App Update",
+                                        "App Update\n\nA new version of this app is now available.\n\n*** It is REQUIRED TO UPDATE your app before you start any transactions.",
+                                        "PROCEED UPDATE", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
+                                            }
 //                                            }, "CANCEL", new DialogInterface.OnClickListener() {
 //                                                @Override
 //                                                public void onClick(DialogInterface dialog, int which) {
 //                                                    dialog.dismiss();
 //                                                }
-                                            }, false) );
+                                        }, false) );
+                                }
+
+                                String referenceDate = rowObj.getString("debug_date");
+                                if (!referenceDate.equals("")) {
+                                    new googleCloudUploadProc().execute("");
                                 }
                             }
                         }
@@ -1442,6 +1463,9 @@ public class LoginActivity extends BaseActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            } else {
+                storageinit.delete();
+                Log.d("Ërr", "Error on fetching version");
             }
         }
         @Override
@@ -1451,6 +1475,84 @@ public class LoginActivity extends BaseActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             Log.d("gcpu", "Running " + + values[0]);
+        }
+    }
+
+    private class googleCloudUploadProc extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                InputStream ins = getResources().openRawResource(
+                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
+                storageinit = StorageOptions.newBuilder()
+                    .setCredentials(credentials)
+                    .setClock(NanoClock.getDefaultClock())
+                    .setProjectId(GlobalConstants.GCP_PROJECTID)
+                    .build()
+                    .getService();
+
+                try {
+                    Blob blob = null;
+
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION,
+                            "Ordered/" + Helper.getBranchCode(ctx) + "/" + Helper.getDateLongInteger() + ".txt");
+                    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").build();
+
+                    LinkedList<Ordered> aCRs = DcOrdered.getInstance(ctx).getOrderedlist();
+                    if (aCRs.size() >  0) {
+                        String uploadString = "";
+                        LinkedHashMap<String, Object> paramsArray = new LinkedHashMap();
+
+                        for (int hx = 0; hx < aCRs.size(); hx++) {
+                            Ordered aCRsx = aCRs.get(hx);
+                            LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
+
+                            ArrayList<HashMap> detailsArrayList = new ArrayList();
+                            detailMap.put(OrderedKey.CUSTOMER_INTEG_RECID.getKey(), aCRsx.getCustomerIntegRecid());
+                            detailMap.put(OrderedKey.CUSTOMER_RECID.getKey(), aCRsx.getCustomerRecid());
+                            detailMap.put(OrderedKey.CUSTOMER_NAME.getKey(), aCRsx.getCustomerName());
+                            detailMap.put(OrderedKey.DELIVERY_DATE.getKey(), aCRsx.getDeliveryDate());
+                            detailMap.put(OrderedKey.CREATED_BY.getKey(), aCRsx.getCreatedBy());
+                            detailMap.put(OrderedKey.REMARKS.getKey(), aCRsx.getRemarks());
+                            detailMap.put(OrderedKey.REF_EMPLOYEE_NO.getKey(), aCRsx.getReferenceEmployeeNo());
+                            detailMap.put(OrderedKey.JSON.getKey(), aCRsx.getJson());
+                            detailMap.put(OrderedKey.JSON_COMPLETE.getKey(), aCRsx.getJsonComplete());
+                            detailMap.put(OrderedKey.GRAND_TOTAL.getKey(), aCRsx.getGrandtotal());
+                            detailMap.put(OrderedKey.DATETIME.getKey(), aCRsx.getDateTime());
+                            detailMap.put(OrderedKey.STATUS.getKey(), aCRsx.getStatus());
+                            detailMap.put(OrderedKey.REF_RECID.getKey(), aCRsx.getReferenceRecid());
+                            detailsArrayList.add(detailMap);
+
+                            paramsArray.put(String.valueOf(aCRsx.getReferenceRecid()), detailsArrayList);
+                        }
+
+                        uploadString = new JSONObject(paramsArray).toString();
+                        if (!uploadString.trim().equals("")) {
+                            blob = storageinit.create(blobInfo, uploadString.getBytes(UTF_8));
+                        }
+                    }
+                    return "Success: Upload reference = " + blob.getBlobId();
+                } catch (Exception e) {
+//                    DcChecklist.getInstance(getApplicationContext()).updateChecklistIsSent(checklistId, 2);
+                    return "Error: exception = " + e.getLocalizedMessage();
+                }
+            } catch (IOException io) {
+//                DcChecklist.getInstance(getApplicationContext()).updateChecklistIsSent(checklistId, 2);
+                return "Error: io";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d("dsxs gcp",  result);
+        }
+        @Override
+        protected void onPreExecute() {
+            Log.d("dsxs gcpe", "Task Upload Starting");
+        }
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.d("dsxs gcpu", "Running " + + values[0]);
         }
     }
 }

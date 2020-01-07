@@ -3,9 +3,13 @@ package com.fnc.order.android.fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -65,6 +69,14 @@ import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.api.core.NanoClock;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.shehabic.droppy.DroppyClickCallbackInterface;
 import com.shehabic.droppy.DroppyMenuItem;
 import com.shehabic.droppy.DroppyMenuPopup;
@@ -76,6 +88,8 @@ import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.json.JSONTokener;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -92,6 +106,8 @@ import java.util.Map;
 import java.util.Set;
 
 import hari.bounceview.BounceView;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class OrderFragment extends Fragment implements VolleyCallback {
 
@@ -134,9 +150,24 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private MenuList refMenulist;
     private static final int USER_DIALOG_FRAGMENT = 7;
     private static final int OTHER_ITEMS_DIALOG_FRAGMENT = 8;
+    private BroadcastReceiver connStatusReceiver;
 
     public OrderFragment() {
         // Required empty public constructor
+    }
+
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(connStatusReceiver);
     }
 
     @Override
@@ -224,10 +255,26 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             DcOrder.getInstance(ctx).emptyOrderlist();
         }
 
+        connStatusReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("netConnStat")) {
+                    Log.d("bcastx", intent.getStringExtra("isConnected"));
+                    if (intent.getStringExtra("isConnected").equals("false")) {
+                        ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setVisibility(View.VISIBLE);
+                    } else {
+                        ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setVisibility(View.GONE);
+                    }
+                }
+            }
+        };
+        getActivity().registerReceiver(connStatusReceiver, new IntentFilter("netConnStat"));
+
         return rootView;
     }
 
     private void fillItems(View v) {
+//        Boolean hasx = false; if (hasx) {
         if (Helper.isNetworkAvailable(ctx)) {
             final SharedData sp = SharedData.getInstance(ctx);
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
@@ -667,13 +714,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         final ArrayList<HashMap> detailsArrayList = new ArrayList();
         final ArrayList<HashMap> detailsArrayListC = new ArrayList();
         if (curRefArrayList.size() > 0) {
-            Boolean errFlag = false;
+            Boolean errFlag = false, zeroErrFlag = true;
             for (int i = 0; i < curRefArrayList.size(); i++) {
                 Order rowOl = curRefArrayList.get(i);
                 if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
                     LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
                     String rqty = rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity();
                     rqty = rqty.replace(",", "");
+                    if (!rqty.equals("0")) { zeroErrFlag = false; }
                     detailMap.put("quantity", rqty);
                     detailMap.put("item_recid", rowOl.getItemRecid());
                     detailMap.put("remarks", rowOl.getRemarks());
@@ -691,6 +739,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     detailsArrayListC.add(detailMap);
                 }
             }
+
+            if (zeroErrFlag) {
+                Helper.dismissSpinnerDialog(loader);
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                    "Error","Invalid POST! All items has a ZERO quantity.",
+                    "CLOSE", null, false) );
+                isPosted = false;
+                return;
+            }
+
             if(!errFlag) {
                 SharedData sp = SharedData.getInstance(ctx);
 //                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
@@ -754,7 +812,17 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setDateTime(Helper.getPostingDate());
                 ol.setStatus(0);
                 ol.setReferenceRecid(Helper.getReqDate(5, ""));
-                DcOrdered.getInstance(ctx).insertOrderedlist(ol);
+
+                try {
+                    DcOrdered.getInstance(ctx).insertOrderedlist(ol);
+                } catch (Exception e) {
+                    Helper.dismissSpinnerDialog(loader);
+                    BounceView.addAnimTo( Helper.okDialog( ctx,
+                            e.getMessage(),"Error on saving to POST items. Please take an SCREENSHOT and contact IT support.",
+                            "CLOSE", null, false) );
+                    isPosted = false;
+                    return;
+                }
 
                 Helper.dismissSpinnerDialog(loader);
 
@@ -1599,4 +1667,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         });
         viag.getAdminGroupings(ctx, params, strParams.replaceAll(" ", "%20"));
     }
+
+    private Storage storageinit;
+
 }

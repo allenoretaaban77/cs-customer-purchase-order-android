@@ -203,7 +203,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                         loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                                         sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                         sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                        sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                        sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchcode()));
                                         sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
                                         getPreRequisite();
                                     } else {
@@ -552,7 +552,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                             loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                                             sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
                                             sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchid()));
+                                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchcode()));
                                             sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
                                             getPreRequisite();
                                         } else {

@@ -341,9 +341,7 @@ public class Helper {
     }
 
     public static boolean isNetworkAvailable(Context ctx) {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) ctx.getSystemService(
-                ctx.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) ctx.getSystemService(ctx.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
@@ -562,6 +560,23 @@ public class Helper {
                 aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
                 new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx) }
         );
+    }
+
+    public static String getBranchCode(Context ctx) {
+        SharedData sp = SharedData.getInstance(ctx);
+        String branchCode = "";
+        if(!sp.getData(SharedKey.BRANCH_CODE.getKey()).trim().equals("")) {
+            branchCode =  sp.getData(SharedKey.BRANCH_CODE.getKey());
+        } else {
+            branchCode =  "";
+        }
+        Log.d("dsxbc", "BRANCH CODE: " + branchCode);
+        return  branchCode;
+    }
+
+    public static String getDateLongInteger() {
+        Long dtLong = new Date().getTime();
+        return String.valueOf(dtLong);
     }
 
 }
