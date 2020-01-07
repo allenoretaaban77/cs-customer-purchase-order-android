@@ -17,9 +17,7 @@ public class Ordered implements Serializable {
     private int status;
     private String reference_recid;
 
-    public String getCustomerIntegRecid() {
-        return customer_integ_recid;
-    }
+    public String getCustomerIntegRecid() { return customer_integ_recid; }
     public void setCustomerIntegRecid(String customer_integ_recid) { this.customer_integ_recid = customer_integ_recid; }
 
     public String getCustomerRecid() {

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
+    xmlns:tools="http://schemas.android.com/tools"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -50,6 +52,22 @@
                     android:layout_width="wrap_content"
                     android:textSize="12sp"
                     android:text="1.0.1"/>
+                <TextView
+                    android:gravity="center"
+                    android:layout_marginRight="50dp"
+                    android:id="@+id/tv_conn_stat"
+                    android:layout_alignParentRight="true"
+                    android:fontFamily="@font/regular"
+                    android:textColor="@color/white"
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:textSize="14sp"
+                    android:background="@color/red_1"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="NO INTERNET CONNECTION"/>
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rl_back_box"
