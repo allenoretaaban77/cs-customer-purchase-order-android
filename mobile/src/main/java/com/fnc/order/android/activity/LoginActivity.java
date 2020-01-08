@@ -1209,10 +1209,9 @@ public class LoginActivity extends BaseActivity {
         if (Helper.checkBranchProfile(ctx).size() > 0) {
             sp.saveData(SharedKey.BRANCH_CODE.getKey(), Helper.checkBranchProfile(ctx).get(0).getBranchcode());
             if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://192.168.1.200:81/");
-//                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL_IP);
             } else {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://apics.fncnathaniel.com/");
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
             }
         }
 
