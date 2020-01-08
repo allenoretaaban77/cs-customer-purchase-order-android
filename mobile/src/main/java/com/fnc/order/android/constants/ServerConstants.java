@@ -8,6 +8,7 @@ public class ServerConstants {
     public static final boolean IS_HTTPS = false;
     public static final String SERVER_URL = "http://apics.fncnathaniel.com/";
 //    public static final String SERVER_URL = "http://beta.apics.fncnathaniel.com/";
+    public static final String SERVER_URL_IP = "http://192.168.1.200:81/";
     public static final String CN = "backoffice";
 //    public static final String CN = "beta";
     public static final String LOGDB = "clientManagement";
