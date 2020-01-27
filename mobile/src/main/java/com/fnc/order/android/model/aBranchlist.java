@@ -27,7 +27,7 @@ public class aBranchlist implements Serializable {
     }
 
     public Integer getBranchid() { return branchid; }
-    public void setBranchid(Integer integration_recid) { this.branchid = branchid; }
+    public void setBranchid(Integer branchid) { this.branchid = branchid; }
 
     public String getBranchcode() { return branchcode; }
     public void setBranchcode(String branchcode) { this.branchcode = branchcode; }

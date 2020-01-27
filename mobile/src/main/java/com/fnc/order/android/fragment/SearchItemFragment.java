@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
+import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.ItemlistAdapterRv;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcAitemlist;
@@ -258,6 +259,28 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
             }
 
             adapter = new ItemlistAdapterRv(ctx, iRs);
+            adapter.setOnItemClickListener(new ItemlistAdapterRv.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    ArrayList<Itemlist> requestedItems = new ArrayList<Itemlist>(adapter.original_items);
+                    ArrayList<Itemlist> arrayListchecked = new ArrayList<>();
+                    if (requestedItems.size() > 0) {
+                        Itemlist c = requestedItems.get(position);
+                        arrayListchecked.add(c);
+                        if (getActivity() != null) {
+                            Intent i = getActivity().getIntent();
+                            i.putExtra(SharedKey.SEARCHED_ITEMS.getKey(), arrayListchecked);
+                            getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, i);
+                            dismiss();
+                        }
+                    } else {
+                        alertDialog = Helper.okDialog(ctx,
+                                "Error","Please select an item/s", "OK",
+                                null, false);
+                        BounceView.addAnimTo(alertDialog);
+                    }
+                }
+            });
             rvItems.setAdapter(adapter);
             rvItems.setLayoutManager(new LinearLayoutManager(ctx));
             rvItems.setHasFixedSize(true);
@@ -271,6 +294,9 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
     }
 
     private void requestItem(View v) {
+        if (!Helper.isNetworkAvailable(ctx)) {
+            Toast.makeText(ctx, "Fetch items failed. Please check internet connection.", Toast.LENGTH_SHORT).show(); return;
+        }
         tv_no_data.setVisibility(View.VISIBLE); tv_no_data.setText("Searching...");
         rvItems.setVisibility(View.GONE);
 
@@ -333,6 +359,28 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
             }
 
             adapter = new ItemlistAdapterRv(ctx, iRs);
+            adapter.setOnItemClickListener(new ItemlistAdapterRv.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    ArrayList<Itemlist> requestedItems = new ArrayList<Itemlist>(adapter.original_items);
+                    ArrayList<Itemlist> arrayListchecked = new ArrayList<>();
+                    if (requestedItems.size() > 0) {
+                        Itemlist c = requestedItems.get(position);
+                        arrayListchecked.add(c);
+                        if (getActivity() != null) {
+                            Intent i = getActivity().getIntent();
+                            i.putExtra(SharedKey.SEARCHED_ITEMS.getKey(), arrayListchecked);
+                            getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, i);
+                            dismiss();
+                        }
+                    } else {
+                        alertDialog = Helper.okDialog(ctx,
+                                "Error","Please select an item/s", "OK",
+                                null, false);
+                        BounceView.addAnimTo(alertDialog);
+                    }
+                }
+            });
             rvItems.setAdapter(adapter);
             rvItems.setLayoutManager(new LinearLayoutManager(ctx));
             rvItems.setHasFixedSize(true);

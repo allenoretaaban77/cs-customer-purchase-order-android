@@ -32,7 +32,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
     public ArrayList<Itemlist> searched_items = new ArrayList<>();
 
     public interface OnItemClickListener {
-        void onItemClick(View view, Itemlist obj, int position);
+        void onItemClick(View view, int position);
     }
     public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
         this.mOnItemClickListener = mItemClickListener;
@@ -52,6 +52,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
         public TextView tvPrice;
         public CheckBox cb_select;
         public LinearLayout item_box;
+        public LinearLayout checkbox_box;
 
         public ViewHolder(View v) {
             super(v);
@@ -60,6 +61,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
             tvPrice = (TextView) v.findViewById(R.id.tv_itemprice);
             cb_select = (CheckBox) v.findViewById(R.id.cb_select);
             item_box = (LinearLayout) v.findViewById(R.id.item_box);
+            checkbox_box = (LinearLayout) v.findViewById(R.id.checkbox_box);
         }
     }
 
@@ -122,6 +124,14 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
                 holder.item_box.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if(mOnItemClickListener != null){
+                            mOnItemClickListener.onItemClick(view, position);
+                        }
+                    }
+                });
+                holder.checkbox_box.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         List<Integer> positions = new ArrayList<>();
                         positions.add(position);
                         Integer x = 0;
@@ -138,7 +148,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
                             }
                             x++;
                         }
-                        for (int y = 0 ;y<positions.size(); y++)
+                        for (int y = 0; y < positions.size(); y++)
                             notifyItemChanged(positions.get(y));
                     }
                 });

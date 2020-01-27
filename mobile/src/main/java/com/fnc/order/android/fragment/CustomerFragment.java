@@ -270,8 +270,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         TextView tvVersion = (TextView) v.findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
 
-        ll_version_box = (LinearLayout) v.findViewById(R.id.ll_version_box);
-        boxMenu = new DroppyMenuPopup.Builder(ctx, ll_version_box);
+        MaterialRippleLayout btn_menu = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
+        boxMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         boxMenu.setXOffset(85);
         boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "));
         boxMenu.addMenuItem(new DroppyMenuItem("  Reload Items ")).addSeparator();
