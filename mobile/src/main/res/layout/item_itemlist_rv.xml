@@ -67,15 +67,20 @@
                         android:textColor="@color/gray_5"
                         android:textStyle="normal" />
                 </LinearLayout>
-
             </LinearLayout>
-            <CheckBox
-                android:checked="true"
-                android:buttonTint="@color/gold_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/cb_select"
-                android:layout_marginRight="16dp"/>
+            <LinearLayout
+                android:id="@+id/checkbox_box"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:layout_width="70dp"
+                android:layout_height="match_parent">
+                <CheckBox
+                    android:checked="true"
+                    android:buttonTint="@color/gold_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cb_select"/>
+            </LinearLayout>
         </LinearLayout>
 
         <View

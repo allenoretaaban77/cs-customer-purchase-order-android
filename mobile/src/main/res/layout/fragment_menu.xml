@@ -45,21 +45,39 @@
                     android:textSize="20sp"
                     android:text="CUSTOMER LIST"/>
                 <LinearLayout
+                    android:orientation="horizontal"
                     android:id="@+id/ll_version_box"
                     android:layout_alignParentRight="true"
-                    android:layout_width="50dp"
+                    android:layout_width="75dp"
                     android:layout_height="match_parent">
-                    <TextView
-                        android:textAlignment="center"
-                        android:id="@+id/tv_version"
-                        android:layout_alignParentRight="true"
-                        android:textColor="@color/gray_5"
-                        android:layout_gravity="center"
-                        android:layout_height="wrap_content"
-                        android:layout_width="match_parent"
-                        android:fontFamily="@font/regular"
-                        android:textSize="12sp"
-                        android:text="0.0.0"/>
+                    <LinearLayout
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:textAlignment="center"
+                            android:id="@+id/tv_version"
+                            android:layout_alignParentRight="true"
+                            android:textColor="@color/gray_6"
+                            android:layout_gravity="center"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:fontFamily="@font/regular"
+                            android:textSize="12sp"
+                            android:text="0.0.0"/>
+                    </LinearLayout>
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:layout_marginRight="10dp"
+                        android:id="@+id/btn_menu"
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent">
+                        <Button
+                            android:layout_margin="12dp"
+                            android:backgroundTint="@color/gray_5"
+                            android:background="@drawable/baseline_menu_24"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"/>
+                    </com.balysv.materialripple.MaterialRippleLayout>
                 </LinearLayout>
             </RelativeLayout>
 

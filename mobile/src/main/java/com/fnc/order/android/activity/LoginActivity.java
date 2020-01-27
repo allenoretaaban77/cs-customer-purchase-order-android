@@ -135,11 +135,17 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-//        usernameText.setText("12179");
-//        passwordEText.setText("924");
+        // massive
+//        usernameText.setText("office");
+//        passwordEText.setText("Office");
 
+        // commi
 //        usernameText.setText("19130");
 //        passwordEText.setText("nathaniels@1994");
+
+        // jenra kiosk
+//        usernameText.setText("18015");
+//        passwordEText.setText("1629");
     }
 
     private void initListeners(){
