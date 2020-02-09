@@ -1469,7 +1469,7 @@ public class LoginActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             } else {
-                storageinit.delete();
+//                storageinit.delete();
                 Log.d("Ërr", "Error on fetching version");
             }
         }

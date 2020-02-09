@@ -20,6 +20,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
+import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.database.DbConstants;
@@ -94,6 +95,14 @@ public class OrdersService extends Service {
         }
 
         return START_STICKY;
+    }
+
+    @Override
+    public void onStart(Intent intent, int startid)
+    {
+        Intent intents = new Intent(getBaseContext(), LoginActivity.class);
+        intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intents);
     }
 
     @Override
