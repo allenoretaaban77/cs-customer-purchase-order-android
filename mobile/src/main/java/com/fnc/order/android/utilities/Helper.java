@@ -292,7 +292,7 @@ public class Helper {
 
     public static String getVersion(Context context, Activity activity) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(activity.getPackageName(), PackageManager.GET_SIGNATURES);
             return pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -446,7 +446,7 @@ public class Helper {
     @TargetApi(Build.VERSION_CODES.P)
     private static int getVersionCodeNew(Context ctx) {
         try {
-            PackageInfo pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
+            PackageInfo pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), PackageManager.GET_SIGNATURES);
             return Integer.parseInt(String.valueOf(getLongVersionCode(pInfo)));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -455,7 +455,7 @@ public class Helper {
     }
     private static int getVersionCodOld(Context ctx) {
         try {
-            PackageInfo pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
+            PackageInfo pInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), PackageManager.GET_SIGNATURES);
             return pInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
