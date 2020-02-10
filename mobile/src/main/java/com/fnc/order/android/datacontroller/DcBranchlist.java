@@ -8,14 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.fnc.order.android.database.DBHelper;
 import com.fnc.order.android.database.Table;
 import com.fnc.order.android.database.aBranchlistQueryBuilder;
-import com.fnc.order.android.database.aStaffsQueryBuilder;
-import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
-import com.fnc.order.android.enumeration.aItemlistKey;
-import com.fnc.order.android.enumeration.aStaffsKey;
 import com.fnc.order.android.model.aBranchlist;
-import com.fnc.order.android.model.aItemlist;
-import com.fnc.order.android.model.aStaffs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
