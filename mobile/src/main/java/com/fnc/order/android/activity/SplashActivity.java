@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
@@ -31,10 +32,13 @@ import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.R;
+import com.fnc.order.android.database.DbConstants;
 import com.fnc.order.android.datacontroller.DcBranchlist;
+import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
+import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.services.OrdersService;
@@ -46,6 +50,8 @@ import com.gun0912.tedpermission.TedPermission;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,12 +60,27 @@ import java.util.List;
 import java.util.Map;
 import hari.bounceview.BounceView;
 
+import static com.fnc.order.android.database.DBHelper.DBPath;
+
 public class SplashActivity extends BaseActivity implements VolleyCallback {
 
     private Context ctx;
     private SharedData sp;
     private AlertDialog alertDialog;
     private ProgressDialog loader;
+    public static boolean active = false;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        active = false;
+    }
 
 
     @Override
@@ -67,25 +88,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         super.onCreate(savedInstanceState);
         ctx = this;
 
-        String svcname = "OrdersService";
-        Boolean isSvcRunning = false;
-        ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
-            if(service.service.getClassName().indexOf(svcname)>0){
-                isSvcRunning = true;
-            }
-        }
-        if (!isSvcRunning) {
-            startService(new Intent(getBaseContext(), OrdersService.class));
-        }
-
-        if (!isTaskRoot()
-                && getIntent().hasCategory(Intent.CATEGORY_LAUNCHER)
-                && getIntent().getAction() != null
-                && getIntent().getAction().equals(Intent.ACTION_MAIN)) {
-            finish();
-            return;
-        }
         setContentView(R.layout.activity_splash);
 
         sp = SharedData.getInstance(ctx);
@@ -117,10 +119,34 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             @Override
             public void onPermissionGranted() {
                 try {
+                    DcStaffs.getInstance(getApplicationContext()); // create database
+
+                    String svcname = "OrdersService";
+                    Boolean isSvcRunning = false;
+                    ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
+                    for(ActivityManager.RunningServiceInfo service : am.getRunningServices(Integer.MAX_VALUE)){
+                        if(service.service.getClassName().indexOf(svcname)>0){
+                            isSvcRunning = true;
+                        }
+                    }
+                    if (!isSvcRunning) {
+                        startService(new Intent(getBaseContext(), OrdersService.class));
+                    }
+
+                    if (!isTaskRoot()
+                            && getIntent().hasCategory(Intent.CATEGORY_LAUNCHER)
+                            && getIntent().getAction() != null
+                            && getIntent().getAction().equals(Intent.ACTION_MAIN)) {
+                        finish();
+                        return;
+                    }
+
                     String strRefDeviceImei = Helper.getImei(ctx);
                     startProcedure();
                 } catch(SecurityException e) {
                     e.printStackTrace();
+                } finally {
+
                 }
             }
             @Override
@@ -164,7 +190,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 BounceView.addAnimTo(alertDialog);
             } else {
                 alertRequireInternet();
-
             }
         } else {
             String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
@@ -400,11 +425,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     @Override
     protected void onResume(){
         super.onResume();
-    }
-
-    @Override
-    protected void onStop(){
-        super.onStop();
     }
 
     public void onRequestSuccess(final String response, final String type) {

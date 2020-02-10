@@ -22,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
 import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.activity.MainActivity;
+import com.fnc.order.android.activity.SplashActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.database.DbConstants;
 import com.fnc.order.android.datacontroller.DcOrdered;
@@ -100,9 +101,13 @@ public class OrdersService extends Service {
     @Override
     public void onStart(Intent intent, int startid)
     {
-        Intent intents = new Intent(getBaseContext(), LoginActivity.class);
-        intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intents);
+        if (SplashActivity.class == null) {
+            if (SplashActivity.active == false) {
+                Intent intents = new Intent(getBaseContext(), SplashActivity.class);
+                intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intents);
+            }
+        }
     }
 
     @Override
@@ -130,9 +135,9 @@ public class OrdersService extends Service {
 
                 SQLiteDatabase checkDB = null;
                 try {
-                    checkDB = SQLiteDatabase.openDatabase(DBPath + getApplicationContext().getPackageName()
-                            + File.separator + DbConstants.DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
-                    checkDB.close();
+//                    checkDB = SQLiteDatabase.openDatabase(DBPath + getApplicationContext().getPackageName()
+//                            + File.separator + DbConstants.DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+//                    checkDB.close();
 
                     LinkedList<Ordered> od =  DcOrdered.getInstance(getApplicationContext()).getPostedSingle();
                     if(od.size() > 0 ) {

@@ -1225,7 +1225,7 @@ public class LoginActivity extends BaseActivity {
             new getUsersAsync().execute("");
         }
 
-        Helper.updtaeAdministratorPasswor(ctx);
+        Helper.updateAdministratorPassword(ctx);
 
         if (Helper.isNetworkAvailable(ctx)) {
             new checkVersionUpdate().execute("");
