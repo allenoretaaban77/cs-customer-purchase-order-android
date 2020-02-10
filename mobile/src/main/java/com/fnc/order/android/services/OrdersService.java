@@ -98,17 +98,17 @@ public class OrdersService extends Service {
         return START_STICKY;
     }
 
-    @Override
-    public void onStart(Intent intent, int startid)
-    {
-        if (SplashActivity.class == null) {
-            if (SplashActivity.active == false) {
-                Intent intents = new Intent(getBaseContext(), SplashActivity.class);
-                intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intents);
-            }
-        }
-    }
+//    @Override
+//    public void onStart(Intent intent, int startid)
+//    {
+//        if (SplashActivity.class == null) {
+//            if (SplashActivity.active == false) {
+//                Intent intents = new Intent(getBaseContext(), SplashActivity.class);
+//                intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intents);
+//            }
+//        }
+//    }
 
     @Override
     public void onDestroy() {
