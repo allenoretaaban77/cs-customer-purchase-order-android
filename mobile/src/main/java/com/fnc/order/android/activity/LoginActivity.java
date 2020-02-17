@@ -33,15 +33,12 @@ import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
-import com.fnc.order.android.constants.ServerConstants;
-import com.fnc.order.android.database.DataType;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.MenulistKey;
-import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
@@ -1208,10 +1205,11 @@ public class LoginActivity extends BaseActivity {
                 strParams.replaceAll(" ", "%20"));
     }
 
+    private ProgressDialog orloader;
     @Override
     public void onResume(){
         super.onResume();
-        sp = SharedData.getInstance(this);
+        /*sp = SharedData.getInstance(this);
         if (Helper.checkBranchProfile(ctx).size() > 0) {
             sp.saveData(SharedKey.BRANCH_CODE.getKey(), Helper.checkBranchProfile(ctx).get(0).getBranchcode());
             if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
@@ -1219,7 +1217,7 @@ public class LoginActivity extends BaseActivity {
             } else {
                 sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
             }
-        }
+        }*/
 
         if (Helper.isNetworkAvailable(ctx)) {
             new getUsersAsync().execute("");
@@ -1227,12 +1225,21 @@ public class LoginActivity extends BaseActivity {
 
         Helper.updateAdministratorPassword(ctx);
 
-        if (Helper.isNetworkAvailable(ctx)) {
-            new checkVersionUpdate().execute("");
-        }
-
         if (DcBranchlist.getInstance(ctx).getBranchlist().size() < 1) {
             getDeviceProfile("default");
+        }
+
+        if (Helper.isNetworkAvailable(ctx)) {
+            loader = Helper.showSpinnerDialog(ctx, "", "Setting possible update... Please wait..."); loader.show();
+            new checkVersionUpdate().execute("");
+            new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        Helper.dismissSpinnerDialog(loader);
+                    }
+                },
+                2000
+            );
         }
     }
 
@@ -1459,9 +1466,38 @@ public class LoginActivity extends BaseActivity {
                                 }
 
                                 String referenceDate = rowObj.getString("debug_date");
-                                if (!referenceDate.equals("")) {
-                                    new googleCloudUploadProc().execute("");
+                                if (!referenceDate.equals("")) { new googleCloudUploadProc().execute(""); }
+
+                                String referenceCN = rowObj.getString("domain_db");
+                                String referenceCNDefault = rowObj.getString("domain_db_default");
+                                String refCN = Helper.checkBranchProfile(ctx).get(0).getDescription();
+                                JSONArray objArrDB = new JSONArray(referenceCN);
+                                Boolean isSwitchedCN = false;
+                                if (objArrDB.length() > 0) {
+                                    for (int j = 0; j < objArrDB.length(); j++) {
+                                        JSONObject rowObjDB = objArrDB.getJSONObject(j);
+                                        if (rowObjDB.getString("cn").equals(refCN)) {
+                                            isSwitchedCN = true;
+                                            SharedData.getInstance(ctx).saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjDB.getString("domain"));
+                                        }
+                                    }
+                                    if(!isSwitchedCN) {
+                                        SharedData.getInstance(ctx).saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), referenceCNDefault);
+                                    }
                                 }
+
+                                tvVersion.setText(Helper.getVersion(ctx, LoginActivity.this) + " | " +
+                                    SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                );
+                                /*SharedData spx = SharedData.getInstance(ctx);
+                                if (Helper.checkBranchProfile(ctx).size() > 0) {
+                                    spx.saveData(SharedKey.BRANCH_CODE.getKey(), Helper.checkBranchProfile(ctx).get(0).getBranchcode());
+                                    if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
+                                        spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL_IP);
+                                    } else {
+                                        spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
+                                    }
+                                }*/
                             }
                         }
                     }
