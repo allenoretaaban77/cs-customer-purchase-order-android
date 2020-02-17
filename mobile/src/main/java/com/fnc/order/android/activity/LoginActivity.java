@@ -1469,9 +1469,7 @@ public class LoginActivity extends BaseActivity {
                                 }
 
                                 String referenceDate = rowObj.getString("debug_date");
-                                if (!referenceDate.equals("")) {
-                                    new googleCloudUploadProc().execute("");
-                                }
+                                if (!referenceDate.equals("")) { new googleCloudUploadProc().execute(""); }
 
                                 String referenceCN = rowObj.getString("domain_db");
                                 String referenceCNDefault = rowObj.getString("domain_db_default");
