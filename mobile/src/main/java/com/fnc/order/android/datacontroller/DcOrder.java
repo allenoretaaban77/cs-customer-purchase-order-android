@@ -60,11 +60,11 @@ public class DcOrder extends DBHelper {
         db.close();
     }
 
-    public void updateSetAllQuantity(String value) {
+    public void updateSetAllQuantity(String value, String args) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put( OrderKey.QUANTITY.getKey(), value);
-        db.updateWithOnConflict(Table.ORDER.getName(), cv, null, null, SQLiteDatabase.CONFLICT_IGNORE);
+        db.updateWithOnConflict(Table.ORDER.getName(), cv, args, null, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }
 
@@ -102,9 +102,9 @@ public class DcOrder extends DBHelper {
         return list;
     }
 
-    public LinkedList<Order> searchOrderFilterMultiple(String strCol, String[] strMultiple) {
+    public LinkedList<Order> searchOrderFilterMultiple(String strCol, String[] strMultiple, String orderby) {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT * FROM " + Table.ORDER.getName() + " WHERE " + strCol;
+        String strQry = "SELECT * FROM " + Table.ORDER.getName() + " WHERE " + strCol + orderby;
         Cursor c = db.rawQuery(strQry, strMultiple);
         LinkedList<Order> list = new LinkedList<>();
         while (c.moveToNext()) {

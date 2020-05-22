@@ -14,11 +14,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -121,11 +124,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private View rootView;
     private Fragment thisFragment;
     private ProgressDialog loader;
-    private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh, btn_others;
+    private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh,
+            btn_others, btn_setzero, btn_search, btn_closesearch, btn_view;
     private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total;
-    private EditText et_date;
+    private EditText et_date, et_remarks, et_search;
     private CoordinatorLayout rl_content_box;
-    private EditText et_remarks;
     private DroppyMenuPopup.Builder pageMenu;
     private LinearLayout mainTableBox;
     private Integer maintableViewHeight = 0;
@@ -136,7 +139,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private String refPersonIdentityId = "";
     private static AlertDialog alertDialog, alertDialogRemarks;
     private Boolean isBacked = false;
-    private LinearLayout bsCalc;
+    private LinearLayout bsCalc, ll_search, ll_closesearch, llet_search;
     private BottomSheetBehavior bsBh;
     private PopupMenu menuPop;
     private VolleyInteractor vi;
@@ -154,6 +157,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private static final int USER_DIALOG_FRAGMENT = 7;
     private static final int OTHER_ITEMS_DIALOG_FRAGMENT = 8;
     private BroadcastReceiver connStatusReceiver;
+    private Boolean mx_taskrun = false; private Handler mx_handler; private Runnable mx_runnable;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -254,7 +258,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             btn_refresh.setVisibility(View.GONE);
         }
         if (sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1) {
-            DcOrder.getInstance(ctx).updateSetAllQuantity("");
+            DcOrder.getInstance(ctx).updateSetAllQuantity("", null);
             fillItems(rootView);
         } else {
             DcOrder.getInstance(ctx).emptyOrderlist();
@@ -308,40 +312,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             } else {
 //                try {
                     LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
-                    if (llOrderRs.size() > 0) {
-                        for (int i = 0; i < llOrderRs.size(); i++) {
-                            Order ol = llOrderRs.get(i);
-                            if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
-                                curRefArrayList.add(ol);
-                            }
-                        }
-
-                        adapter = new OrderlistAdapter(ctx, curRefArrayList);
-                        adapter.setCurPos(curRefPos);
-                        adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                adapter.setCurPos(position);
-                                adapter.notifyDataSetChanged();
-                                bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
-                                curRefPos = adapter.getCurPos();
-                            }
-                        });
-                        adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                adapter.setCurPos(position);
-                                alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
-                                        "Add Remarks",
-                                        "SAVE", null, "CANCEL", cancelCallback);
-                                BounceView.addAnimTo(alertDialogRemarks);
-                            }
-                        });
-                        list_view.setAdapter(adapter);
-                    } else {
-                        Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
-                    }
+                    showItems(llOrderRs);
 //                } catch (JSONException e) {
 //                    Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
 //                }
@@ -350,7 +321,62 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
     }
 
+    private void showItems(LinkedList<Order> llOrderRs) {
+        curRefArrayList = new LinkedList<Order>();
+        if (llOrderRs.size() > 0) {
+            for (int i = 0; i < llOrderRs.size(); i++) {
+                Order ol = llOrderRs.get(i);
+                if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
+                    curRefArrayList.add(ol);
+                }
+            }
+
+            adapter = new OrderlistAdapter(ctx, curRefArrayList);
+            adapter.setCurPos(curRefPos);
+            adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    adapter.setCurPos(position);
+                    adapter.notifyDataSetChanged();
+                    curRefPos = adapter.getCurPos();
+                    Helper.hideSoftKeyboard(getActivity());
+                    new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                            }
+                        }, 300
+                    );
+                }
+            });
+            adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    adapter.setCurPos(position);
+                    alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
+                            "Add Remarks",
+                            "SAVE", null, "CANCEL", cancelCallback);
+                    BounceView.addAnimTo(alertDialogRemarks);
+                }
+            });
+            list_view.setAdapter(adapter);
+
+            recomputeGrandTotal();
+        } else {
+            Toast.makeText(ctx, "Error fetching items", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void initViews(View v) {
+        btn_view = (MaterialRippleLayout) v.findViewById(R.id.btn_view);
+        llet_search = (LinearLayout) v.findViewById(R.id.llet_search);
+        ll_search = (LinearLayout) v.findViewById(R.id.ll_search);
+        ll_closesearch = (LinearLayout) v.findViewById(R.id.ll_closesearch);
+        btn_closesearch = (MaterialRippleLayout) v.findViewById(R.id.btn_closesearch);
+        btn_search = (MaterialRippleLayout) v.findViewById(R.id.btn_search);
+        btn_setzero = (MaterialRippleLayout) v.findViewById(R.id.btn_setzero);
         btn_refresh = (MaterialRippleLayout) v.findViewById(R.id.btn_refresh);
         btn_others = (MaterialRippleLayout) v.findViewById(R.id.btn_others);
         btn_add_item = (MaterialRippleLayout) v.findViewById(R.id.btn_add_item);
@@ -359,6 +385,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tv_name.setText(refMenulist.getCustomerName());
         rl_content_box = (CoordinatorLayout) v.findViewById(R.id.content_box);
         et_date = (EditText) v.findViewById(R.id.et_date);
+        et_search = (EditText) v.findViewById(R.id.et_search);
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
         tv_header_price = (TextView) v.findViewById(R.id.tv_header_price);
         tv_header_total = (TextView) v.findViewById(R.id.tv_header_total);
@@ -417,6 +444,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        callCloseSearch();
                         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                         showDatePicker();
                     }
@@ -425,6 +453,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         });
         et_remarks.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
+                et_search.setText("");
+                llet_search.setVisibility(View.GONE);
+                ll_search.setVisibility(View.VISIBLE);
+                ll_closesearch.setVisibility(View.GONE);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -462,6 +494,49 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
         });
 
+        btn_view.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+
+                LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
+                    .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
+                        new String[] { "%" }, " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+                ArrayList<HashMap> refArray = new ArrayList();
+                if (llOrderRs.size() > 0) {
+                    Boolean errFlag = false, zeroErrFlag = true;
+                    for (int i = 0; i < llOrderRs.size(); i++) {
+                        Order rowOl = llOrderRs.get(i);
+                        if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
+                            LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
+                            String rqty = rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity();
+                            rqty = rqty.replace(",", "");
+                            if (!rqty.equals("0")) { zeroErrFlag = false; }
+                            detailMap.put("quantity", rqty);
+                            detailMap.put("item_recid", rowOl.getItemRecid());
+                            detailMap.put("remarks", rowOl.getRemarks());
+                            detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
+                            detailMap.put("selling_price", rowOl.getSellingPrice());
+                            String rtotal = rowOl.getTotal().replace(",", "");
+                            detailMap.put("total", rtotal);
+                            detailMap.put("unitName", rowOl.getUnitName());
+                            detailMap.put("itemname", rowOl.getItemName());
+                            detailMap.put("is_checked", false);
+                            detailMap.put("is_error", false);
+                            detailMap.put("is_locked", false);
+                            refArray.add(detailMap);
+                        }
+                    }
+                }
+
+                DialogFragment dialogFrag = TrasactionItemsFragment.searchInstance();
+                Bundle args = new Bundle();
+                args.putString("details", new JSONArray(refArray).toString());
+                dialogFrag.setArguments(args);
+                dialogFrag.setTargetFragment(thisFragment, ITEM_DIALOG_FRAGMENT);
+                dialogFrag.setCancelable(false);
+                dialogFrag.show(getActivity().getSupportFragmentManager(), "dialog_search_item");
+            }
+        });
+
         pageMenu.setOnClick(new DroppyClickCallbackInterface() {
             @Override
             public void call(View v, int id) {
@@ -493,50 +568,201 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         btn_submit.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
-                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
-                        BounceView.addAnimTo( Helper.okDialog(ctx,
-                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                            null, false) );
-                        return;
-                    }
-                } else {
-                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
-                        BounceView.addAnimTo( Helper.okDialog(ctx,
-                                "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                                null, false) );
-                        return;
-                    }
-                }
-
-                if (oldskuerr == true) {
-                    String strSkuMsg = "";
-                    for (int i = 0; i < curRefArrayListErr.size(); i++) {
-                        Order rowRl = curRefArrayListErr.get(i);
-                        String refCnt = String.valueOf(i+1);
-                        strSkuMsg = strSkuMsg + "\n " + refCnt + ". " + rowRl.getItemName();
-                    }
-                    BounceView.addAnimTo( Helper.okDialog(ctx,
-                        "Warning","Some items does not have reference SKU, please contact the developer for assistance.\n" + strSkuMsg, "OK",
-                        null, false) );
-
-                    return;
-                }
-
                 Helper.hideSoftKeyboard(getActivity());
+
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            et_search.setText("");
+                            llet_search.setVisibility(View.GONE);
+                            ll_search.setVisibility(View.VISIBLE);
+                            ll_closesearch.setVisibility(View.GONE);
+
+                            if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                                if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
+                                    BounceView.addAnimTo( Helper.okDialog(ctx,
+                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                            null, false) );
+                                    return;
+                                }
+                            } else {
+                                if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
+                                    BounceView.addAnimTo( Helper.okDialog(ctx,
+                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                            null, false) );
+                                    return;
+                                }
+                            }
+
+                            loader = Helper.showSpinnerDialog(ctx, "", "Please wait..."); loader.show();
+                            LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                            showItems(llOrderRs);
+
+                            new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                        Helper.dismissSpinnerDialog(loader);
+                                        callSubmit();
+                                    }
+                                }, 500
+                            );
+                        }
+                    }, 300
+                );
+
+            }
+        });
+
+        btn_refresh.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                callRefreshItems();
+            }
+        });
+
+        btn_setzero.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                callSetZero();
+            }
+        });
+
+        btn_others.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                DialogFragment dialogFrag = OtherItemFragment.searchInstance();
+                dialogFrag.setTargetFragment(thisFragment, OTHER_ITEMS_DIALOG_FRAGMENT);
+                dialogFrag.setCancelable(false);
+                dialogFrag.show(getActivity().getSupportFragmentManager(), "other_item");
+            }
+        });
+
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                llet_search.setVisibility(View.VISIBLE);
+                ll_search.setVisibility(View.GONE);
+                ll_closesearch.setVisibility(View.VISIBLE);
+                Helper.hideSoftKeyboard(getActivity());
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        }
+                    }, 300
+                );
+            }
+        });
+
+        btn_closesearch.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                callCloseSearch();
+            }
+        });
+
+        et_search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    Log.v("zcv", et_search.getText().toString().trim());
+                    LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
+                            .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
+                                    new String[] { "%" + et_search.getText().toString().trim() + "%" },
+                                    " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+                    showItems(llOrderRs);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        et_search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(final Editable s) {
+                if (mx_taskrun) { mx_handler.removeCallbacks(mx_runnable); }
+
+                mx_handler = new Handler();
+                mx_runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        String searchStr = s.toString().trim().equals("") ? "noitem" : s.toString() ;
+                        Log.d("dsx", searchStr);
+
+                        LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
+                                .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
+                                        new String[] { "%" + et_search.getText().toString().trim() + "%" },
+                                        " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+                        showItems(llOrderRs);
+                        mx_taskrun = false;
+                    }
+                };
+                mx_taskrun = mx_handler.postDelayed(mx_runnable, 700);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        });
+
+        /*et_search.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                    showItems(llOrderRs);
+                }
+            }
+        });*/
+    }
+
+    private void callCloseSearch() {
+        et_search.setText("");
+        llet_search.setVisibility(View.GONE);
+        ll_search.setVisibility(View.VISIBLE);
+        ll_closesearch.setVisibility(View.GONE);
+        Helper.hideSoftKeyboard(getActivity());
+        new android.os.Handler().postDelayed(
+            new Runnable() {
+                @Override
+                public void run() {
+                    LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                    showItems(llOrderRs);
+                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                }
+            }, 300
+        );
+    }
+
+    private void callSubmit() {
+
+        if (oldskuerr == true) {
+            String strSkuMsg = "";
+            for (int i = 0; i < curRefArrayListErr.size(); i++) {
+                Order rowRl = curRefArrayListErr.get(i);
+                String refCnt = String.valueOf(i+1);
+                strSkuMsg = strSkuMsg + "\n " + refCnt + ". " + rowRl.getItemName();
+            }
+            BounceView.addAnimTo( Helper.okDialog(ctx,
+                    "Warning","Some items does not have reference SKU, please contact the developer for assistance.\n" + strSkuMsg, "OK",
+                    null, false) );
+
+            return;
+        }
+
+        Helper.hideSoftKeyboard(getActivity());
 
 //                LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
 //                final ArrayList<HashMap> detailsArrayList = new ArrayList();
-                if(curRefArrayList.size() > 0) {
-                    Boolean errFlag = false;
-                    for (int i = 0; i < curRefArrayList.size(); i++) {
-                        Order rowRl = curRefArrayList.get(i);
-                        if(rowRl.getQuantity().equals("")) {
+        if(curRefArrayList.size() > 0) {
+            Boolean errFlag = false;
+            for (int i = 0; i < curRefArrayList.size(); i++) {
+                Order rowRl = curRefArrayList.get(i);
+                if(rowRl.getQuantity().equals("")) {
 //                            if(rowRl.getRemarks().equals("") || rowRl.getRemarks().equals("null")) {
-                                errFlag = true;
+                    errFlag = true;
 //                            errFlag = false;
-                                curRefArrayList.get(i).setIsError(1);
+                    curRefArrayList.get(i).setIsError(1);
 //                            curRefArrayList.get(i).setIsError(false);
 //                            curRefArrayList.get(i).setQuantity("0");
 
@@ -553,91 +779,103 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //                            TextView tvTotal = (TextView) trx.getChildAt(4);
 //                            tvTotal.setTextColor(getResources().getColor(R.color.red_2));
 //                            }
-                        }else{
-                            curRefArrayList.get(i).setIsError(0);
-                        }
-                    }
-
-                    if (errFlag) {
-                        Helper.dismissSpinnerDialog(loader);
-                        adapter.notifyDataSetChanged();
-//                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
-                        BounceView.addAnimTo( Helper.okDialog(ctx,
-                                "Error","Please set 0 value on EMPTY quantity.", "OK",
-                                null, false) );
-                    } else {
-                        if (refStringDate == null) {
-//                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
-                            BounceView.addAnimTo( Helper.okDialog(ctx,
-                                "Error","Please select delivery date.", "OK",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (alertDialog != null) alertDialog.dismiss();
-                                        Helper.hideSoftKeyboard(getActivity());
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                                showDatePicker();
-                                            }
-                                        }, 300);
-                                    }
-                                }
-                                , false
-                            ) );
-                        } else {
-                            AlertDialog.Builder builder;
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-                            } else {
-                                builder = new AlertDialog.Builder(ctx);
-                            }
-                            builder.setCancelable(false);
-                            BounceView.addAnimTo(
-                                builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if(!isPosted) {
-                                            isPosted = true;
-                                            submitOrders();
-                                        }
-                                    }
-                                })
-                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        isPosted = false;
-                                    }
-                                })
-                                .show()
-                            );
-                        }
-                    }
                 }else{
-//                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
-                    BounceView.addAnimTo( Helper.okDialog(ctx,
-                            "Error","Please add an item.", "CLOSE",
-                            null, false) );
+                    curRefArrayList.get(i).setIsError(0);
                 }
             }
-        });
 
-        btn_refresh.setOnClickListener(new View.OnClickListener() {
-            public final void onClick(final View v) {
-                callRefreshItems();
+            if (errFlag) {
+                Helper.dismissSpinnerDialog(loader);
+                adapter.notifyDataSetChanged();
+//                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
+                BounceView.addAnimTo( Helper.okDialog(ctx,
+                        "Error","Please set 0 value on EMPTY quantity.", "OK",
+                        null, false) );
+            } else {
+                if (refStringDate == null) {
+//                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
+                    BounceView.addAnimTo( Helper.okDialog(ctx,
+                            "Error","Please select delivery date.", "OK",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (alertDialog != null) alertDialog.dismiss();
+                                    Helper.hideSoftKeyboard(getActivity());
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                            showDatePicker();
+                                        }
+                                    }, 300);
+                                }
+                            }
+                            , false
+                    ) );
+                } else {
+                    AlertDialog.Builder builder;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+                    } else {
+                        builder = new AlertDialog.Builder(ctx);
+                    }
+                    builder.setCancelable(false);
+                    BounceView.addAnimTo(
+                            builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if(!isPosted) {
+                                                isPosted = true;
+                                                submitOrders();
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            isPosted = false;
+                                        }
+                                    })
+                                    .show()
+                    );
+                }
             }
-        });
+        }else{
+//                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
+            BounceView.addAnimTo( Helper.okDialog(ctx,
+                    "Error","Please add an item.", "CLOSE",
+                    null, false) );
+        }
+    }
 
-        btn_others.setOnClickListener(new View.OnClickListener() {
-            public final void onClick(final View v) {
-                DialogFragment dialogFrag = OtherItemFragment.searchInstance();
-                dialogFrag.setTargetFragment(thisFragment, OTHER_ITEMS_DIALOG_FRAGMENT);
-                dialogFrag.setCancelable(false);
-                dialogFrag.show(getActivity().getSupportFragmentManager(), "other_item");
-            }
-        });
+    private void callSetZero() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        } else {
+            builder = new AlertDialog.Builder(ctx);
+        }
+        builder.setCancelable(false);
+
+        BounceView.addAnimTo(
+            builder.setTitle("Set Zero Update").setMessage("Are you sure you want all empty quantities turn to ZERO?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DcOrder.getInstance(ctx).updateSetAllQuantity("0", "quantity == ''");
+                        LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                        showItems(llOrderRs);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isPosted = false;
+                    }
+                })
+                .show()
+        );
     }
 
     private void callRefreshItems() {
@@ -650,7 +888,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         builder.setCancelable(false);
 
         BounceView.addAnimTo(
-            builder.setTitle("Update Records").setMessage("Are you sure want to UPDATE PRELOADED list? All ITEMS BELOW will RESET.")
+            builder.setTitle("Update Records").setMessage("Are you sure you want to UPDATE PRELOADED list? All ITEMS BELOW will RESET.")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -967,8 +1205,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         public void onItemClick(View view,  int position) {
                             adapter.setCurPos(position);
                             adapter.notifyDataSetChanged();
-                            bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
                             curRefPos = adapter.getCurPos();
+                            Helper.hideSoftKeyboard(getActivity());
+                            new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                    }
+                                }, 300
+                            );
                         }
                     });
                     adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
@@ -998,7 +1244,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     } */
 
                     if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
-                        LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" });
+                        LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" }, "");
                         if (olRs.size() > 0) {
                             ((LinearLayout) rootView.findViewById(R.id.btn_others_box)).setVisibility(View.VISIBLE);
                             String strSkuMsg = "";
@@ -1092,8 +1338,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         public void onItemClick(View view,  int position) {
                             adapter.setCurPos(position);
                             adapter.notifyDataSetChanged();
-                            bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                            Helper.hideSoftKeyboard(getActivity());
                             curRefPos = adapter.getCurPos();
+                            new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                    }
+                                }, 300
+                            );
                         }
                     });
                     adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
@@ -1430,6 +1684,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         adapter.notifyDataSetChanged();
 
         // recompute grand total
+        recomputeGrandTotal();
+
+
+    }
+
+    private void recomputeGrandTotal() {
         LinkedList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
         if(refOS.size() > 0) {
             double gt = 0.00, ct = 0.00;
@@ -1450,7 +1710,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         } else {
             tv_grandtotal.setText("0.00");
         }
-
     }
 
     private void showMenuPopup(View v) {

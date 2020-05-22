@@ -77,7 +77,7 @@ public class OtherItemFragment extends DialogFragment {
         rv_others = (RecyclerView) v.findViewById(R.id.rv_others);
         tv_no_data = (TextView) v.findViewById(R.id.tv_no_data);
 
-        LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" });
+        LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" }, "");
         if (olRs.size() > 0) {
             rv_others.setVisibility(View.VISIBLE);
             tv_no_data.setVisibility(View.GONE);

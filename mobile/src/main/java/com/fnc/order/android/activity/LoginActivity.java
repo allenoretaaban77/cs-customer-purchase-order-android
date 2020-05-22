@@ -133,8 +133,8 @@ public class LoginActivity extends BaseActivity {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // massive
-//        usernameText.setText("office");
-//        passwordEText.setText("Office");
+        usernameText.setText("12105");
+        passwordEText.setText("746265");
 
         // commi
 //        usernameText.setText("19130");
