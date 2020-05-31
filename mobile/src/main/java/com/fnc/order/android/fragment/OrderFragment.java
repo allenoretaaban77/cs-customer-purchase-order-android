@@ -322,8 +322,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private void showItems(LinkedList<Order> llOrderRs) {
-        curRefArrayList = new LinkedList<Order>();
         if (llOrderRs.size() > 0) {
+            curRefArrayList = new LinkedList<Order>();
             for (int i = 0; i < llOrderRs.size(); i++) {
                 Order ol = llOrderRs.get(i);
                 if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
@@ -1308,12 +1308,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             case ITEM_DIALOG_FRAGMENT:
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle extras = data.getExtras();
-
                     curRefPos = adapter != null ? adapter.getCurPos() : -1 ;
-
                     ArrayList<Itemlist> arrayList = new ArrayList<Itemlist>();
                     arrayList = (ArrayList) extras.get(SharedKey.SEARCHED_ITEMS.getKey());
+                    int errFlag = 0; String refItems = ""; int refItemNo = 0;
+
                     for(Itemlist il : arrayList){
+                        LinkedList<Order> xRs = DcOrder.getInstance(ctx)
+                            .searchOrderFilterMultiple(OrderKey.ITEM_RECID.getKey() + " = ?",
+                                    new String[] { String.valueOf(il.getRecid()) }, "");
+
                         Order ol = new Order();
                         ol.setQuantity("");
                         ol.setItemRecid(String.valueOf(il.getRecid()));
@@ -1327,8 +1331,23 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setIsChecked(0);
                         ol.setIsError(0);
                         ol.setIsLocked(0);
-                        curRefArrayList.add(ol);
-                        DcOrder.getInstance(ctx).insertOrderlist(ol);
+
+                        if (xRs.size() > 0 ) {
+                            errFlag = 1;
+                            refItemNo++;
+                            refItems = refItems + refItemNo + ". " + ol.getItemName() + "\n";
+                        } else {
+                            curRefArrayList.add(ol);
+                            DcOrder.getInstance(ctx).insertOrderlist(ol);
+                        }
+                    }
+
+                    if (errFlag == 1) {
+                        String strMessage = "Some ITEM/s is/are ALREADY EXISTING on the list.\"" +
+                            "\n\nITEM NAME:\n" + refItems + "\n\n NOTE: Please also CHECK CONFLICTED ITEM/s.";
+                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                            "Reminder on some ITEM/s",strMessage, "CLOSE",
+                            null, false) );
                     }
 
                     adapter = new OrderlistAdapter(ctx, curRefArrayList);
