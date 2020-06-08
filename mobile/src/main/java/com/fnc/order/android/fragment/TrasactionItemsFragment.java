@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
@@ -21,6 +22,7 @@ import com.fnc.order.android.model.Order;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -31,6 +33,7 @@ public class TrasactionItemsFragment extends DialogFragment {
     private Button btn_close;
     private ListView list_view;
     private TransactionItemsAdapter adapter;
+    private TextView tv_title;
 
     public static TrasactionItemsFragment searchInstance(){
         TrasactionItemsFragment dialogFragment = new TrasactionItemsFragment();
@@ -65,11 +68,20 @@ public class TrasactionItemsFragment extends DialogFragment {
 
     private void initViews(View v) {
         btn_close = (Button) v.findViewById(R.id.btn_close);
+        tv_title = (TextView) v.findViewById(R.id.tv_title);
 
         list_view = (ListView) v.findViewById(R.id.list_view);
         String strArr = getArguments().getString("details");
+//        String strArrH = getArguments().getString("header");
+
         try {
             JSONArray objArr = new JSONArray(strArr);
+//            JSONArray objArrH = new JSONArray(strArrH);
+
+            // display count of itemsx
+            ((TextView) v.findViewById(R.id.tv_title)).setText("TRANSACTION ITEMS (" + String.valueOf(objArr.length()) + ")");
+//            Toast.makeText(ctx, objArrH.getString("remarks"), Toast.LENGTH_LONG).show();
+
             if(objArr.length() > 0) {
                 ArrayList<Order> arrLst = new ArrayList<>();
                 for (int i = 0; i < objArr.length(); i++) {
