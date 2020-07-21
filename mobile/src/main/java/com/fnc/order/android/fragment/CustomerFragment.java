@@ -274,7 +274,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         boxMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         boxMenu.setXOffset(85);
         boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "));
-        boxMenu.addMenuItem(new DroppyMenuItem("  Reload Items ")).addSeparator();
+        boxMenu.addMenuItem(new DroppyMenuItem("  Re-Sync Customer Lists ")).addSeparator();
         if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") || sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
             boxMenu.addMenuItem(new DroppyMenuItem("  Users ")).addSeparator();
         }

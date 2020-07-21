@@ -10,6 +10,7 @@ public class OrderlistQueryBuilder {
     public static ContentValues prepareOrderlistInsertValues(Order orders, Context context){
         ContentValues values = new ContentValues();
         values.put(OrderKey.QUANTITY.getKey(), orders.getQuantity());
+        values.put(OrderKey.FREE.getKey(), orders.getFree());
         values.put(OrderKey.ITEM_RECID.getKey(), orders.getItemRecid());
         values.put(OrderKey.ITEM_NAME.getKey(), orders.getItemName());
         values.put(OrderKey.UNIT_NAME.getKey(), orders.getUnitName());

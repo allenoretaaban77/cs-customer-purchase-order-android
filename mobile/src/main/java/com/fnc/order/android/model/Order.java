@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class Order implements Serializable {
     private String quantity;
+    private String free;
     private String item_recid;
     private String itemname;
     private String unitName;
@@ -17,6 +18,9 @@ public class Order implements Serializable {
 
     public String getQuantity() { return quantity; }
     public void setQuantity(String quantity) { this.quantity = quantity; }
+
+    public String getFree() { return free; }
+    public void setFree(String free) { this.free = free; }
 
     public String getItemRecid() {
         return item_recid;

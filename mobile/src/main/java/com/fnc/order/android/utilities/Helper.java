@@ -19,6 +19,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
@@ -95,6 +96,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -407,12 +409,22 @@ public class Helper {
         return SharedData.getInstance(ctx).getData(SharedKey.CURRENT_PAGE.getKey());
     }
 
-    public static String getImei(Context ctx) {
-//        return "353800100565635";
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            return getImeiNew(ctx); // + "70";
+    public static String getImei(Context ctx, String strBranchId) {
+        SharedData sp = SharedData.getInstance(ctx);
+        String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey()), resStrImeiId = "";
+        if (strImeiId.equals("")) {
+            if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.P) {
+                sp.saveData("ref_device_id", "CO-" + UUID.randomUUID().toString().toUpperCase());
+                resStrImeiId = sp.getData("ref_device_id");
+            } else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P || android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                resStrImeiId = getImeiNew(ctx).trim();
+            } else {
+                resStrImeiId = getImeiOld(ctx).trim();
+            }
+            sp.saveData(SharedKey.IMEI_ID.getKey(), resStrImeiId);
+            return resStrImeiId;
         } else {
-            return getImeiOld(ctx);
+            return strImeiId;
         }
     }
     @TargetApi(Build.VERSION_CODES.M)
@@ -557,8 +569,8 @@ public class Helper {
 
     public static LinkedList<aBranchlist> checkBranchProfile(Context ctx) {
         return DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx) }
+            aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+            new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx, "") }
         );
     }
 
@@ -577,6 +589,19 @@ public class Helper {
     public static String getDateLongInteger() {
         Long dtLong = new Date().getTime();
         return String.valueOf(dtLong);
+    }
+
+    public static String getProjectPath(Context ctx) {
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.P) {
+            return ctx.getExternalFilesDir(null).toString() + File.separator;
+        } else {
+            return Environment.getExternalStorageDirectory().toString() + File.separator + "Android"
+                + File.separator + "data" + File.separator + ctx.getPackageName() + File.separator;
+        }
+    }
+
+    public static String getFilePath(Context ctx) {
+        return getProjectPath(ctx)  + "gcf" + File.separator;
     }
 
 }

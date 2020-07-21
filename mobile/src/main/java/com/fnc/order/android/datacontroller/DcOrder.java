@@ -55,8 +55,7 @@ public class DcOrder extends DBHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(column.getKey(), value);
-        db.updateWithOnConflict(Table.ORDER.getName(), cv, "item_recid = ?",
-                new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.updateWithOnConflict(Table.ORDER.getName(), cv, "item_recid = ?", new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }
 
@@ -133,6 +132,7 @@ public class DcOrder extends DBHelper {
     private Order setOrderlist(Cursor c) {
         Order order = new Order();
         order.setQuantity(c.getString(c.getColumnIndex(OrderKey.QUANTITY.getKey())));
+        order.setFree(c.getString(c.getColumnIndex(OrderKey.FREE.getKey())));
         order.setItemRecid(c.getString(c.getColumnIndex(OrderKey.ITEM_RECID.getKey())));
         order.setItemName(c.getString(c.getColumnIndex(OrderKey.ITEM_NAME.getKey())));
         order.setUnitName(c.getString(c.getColumnIndex(OrderKey.UNIT_NAME.getKey())));

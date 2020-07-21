@@ -44,6 +44,15 @@ public class DcBranchlist extends DBHelper {
         db.close();
     }
 
+    public void updateBranchlist(String refid, aBranchlistKey key, String value){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(key.getKey(), value);
+        db.updateWithOnConflict(Table.BRANCHLIST.getName(), cv, aBranchlistKey.DEVICEID.getKey() + " = ?",
+                new String[] { refid }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
     public LinkedList<aBranchlist> getBranchlist() {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName();
@@ -60,10 +69,11 @@ public class DcBranchlist extends DBHelper {
     public ArrayList<String> getDescriptions() {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT " + aBranchlistKey.BRANCHCODE.getKey()
-                + "  FROM " + Table.BRANCHLIST.getName()
+                + " FROM " + Table.BRANCHLIST.getName()
+                + " WHERE " + aBranchlistKey.BRANCHID.getKey() + " != ?"
                 + " GROUP BY " + aBranchlistKey.BRANCHID.getKey()
                 + " ORDER BY " + aBranchlistKey.DESCRIPTION.getKey() + " ASC";
-        Cursor c = db.rawQuery(strQry, null);
+        Cursor c = db.rawQuery(strQry, new String[] { "12345" });
         ArrayList<String> stringBranches = new ArrayList<String>();
         while (c.moveToNext()) {
             if (Character.isLetter(c.getString(0).charAt(0))) {

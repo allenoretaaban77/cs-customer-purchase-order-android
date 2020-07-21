@@ -254,7 +254,7 @@ public class VolleyInteractor {
                 requestQueue.add(strRequest);
 
                 VolleyX.init(ctx);
-                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                VolleyX.from(strRequest).subscribeOn(Schedulers.immediate())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<String>() {
                         @Override
@@ -403,7 +403,7 @@ public class VolleyInteractor {
                 requestQueue.getCache().clear();
                 requestQueue.add(strRequest);
                 VolleyX.init(ctx);
-                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                VolleyX.from(strRequest).subscribeOn(Schedulers.immediate())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<String>() {
                         @Override

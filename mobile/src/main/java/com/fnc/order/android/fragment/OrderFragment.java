@@ -24,10 +24,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -93,6 +95,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.json.JSONTokener;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,14 +129,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private ProgressDialog loader;
     private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh,
             btn_others, btn_setzero, btn_search, btn_closesearch, btn_view;
-    private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total;
+    private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total, tv_hdr_freeitem;
+    private Switch sw_report_type;
     private EditText et_date, et_remarks, et_search;
     private CoordinatorLayout rl_content_box;
     private DroppyMenuPopup.Builder pageMenu;
     private LinearLayout mainTableBox;
     private Integer maintableViewHeight = 0;
     private Integer maintableViewWidth = 0;
-    private LinearLayout tblContentBox;
+    private LinearLayout tblContentBox, ref_coordinateor_box, ref_coordinateor_box_padding, ll_report_type;
     private TableLayout tl;
     private Integer calcRefId = 0;
     private String refPersonIdentityId = "";
@@ -321,12 +325,17 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
     }
 
+    private Integer refQtyOrFree = 0;
     private void showItems(LinkedList<Order> llOrderRs) {
         if (llOrderRs.size() > 0) {
             curRefArrayList = new LinkedList<Order>();
             for (int i = 0; i < llOrderRs.size(); i++) {
                 Order ol = llOrderRs.get(i);
-                if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
+                if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                    if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
+                        curRefArrayList.add(ol);
+                    }
+                } else {
                     curRefArrayList.add(ol);
                 }
             }
@@ -335,11 +344,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             adapter.setCurPos(curRefPos);
             adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
                 @Override
-                public void onItemClick(View view, int position) {
+                public void onItemClick(View view, int position, int flag) {
                     adapter.setCurPos(position);
                     adapter.notifyDataSetChanged();
                     curRefPos = adapter.getCurPos();
                     Helper.hideSoftKeyboard(getActivity());
+                    refQtyOrFree = flag;
                     new android.os.Handler().postDelayed(
                         new Runnable() {
                             @Override
@@ -370,6 +380,17 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private void initViews(View v) {
+//        ref_coordinateor_box = (LinearLayout) v.findViewById(R.id.ref_coordinateor_box);
+        ref_coordinateor_box_padding = (LinearLayout) v.findViewById(R.id.ref_coordinateor_box_padding);
+        ll_report_type = (LinearLayout) v.findViewById(R.id.ll_report_type);
+        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+            ll_report_type.setVisibility(View.GONE);
+            ref_coordinateor_box_padding.setVisibility(View.GONE);
+        } else {
+            ll_report_type.setVisibility(View.VISIBLE);
+            ref_coordinateor_box_padding.setVisibility(View.VISIBLE);
+        }
+
         btn_view = (MaterialRippleLayout) v.findViewById(R.id.btn_view);
         llet_search = (LinearLayout) v.findViewById(R.id.llet_search);
         ll_search = (LinearLayout) v.findViewById(R.id.ll_search);
@@ -432,6 +453,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             tv_header_price.setVisibility(View.VISIBLE);
             tv_header_total.setVisibility(View.VISIBLE);
         } */
+
+        tv_hdr_freeitem = (TextView) v.findViewById(R.id.tv_hdr_freeitem);
+        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+            tv_hdr_freeitem.setVisibility(View.GONE);
+        } else {
+            tv_hdr_freeitem.setVisibility(View.VISIBLE);
+        }
+
+        sw_report_type = (Switch) v.findViewById(R.id.sw_report_type);
     }
 
     private void initListeners(View v) {
@@ -582,15 +612,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                                 if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
                                     BounceView.addAnimTo( Helper.okDialog(ctx,
-                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                                            null, false) );
+                                        "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                        null, false) );
                                     return;
                                 }
                             } else {
                                 if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
                                     BounceView.addAnimTo( Helper.okDialog(ctx,
-                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                                            null, false) );
+                                        "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                        null, false) );
                                     return;
                                 }
                             }
@@ -705,15 +735,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
         });
 
-        /*et_search.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        sw_report_type.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
-                    showItems(llOrderRs);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    sw_report_type.setText("SALES INVOICE");
+                } else {
+                    sw_report_type.setText("DELIVERY RECEIPT");
                 }
             }
-        });*/
+        });
     }
 
     private void callCloseSearch() {
@@ -789,28 +820,28 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 adapter.notifyDataSetChanged();
 //                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
                 BounceView.addAnimTo( Helper.okDialog(ctx,
-                        "Error","Please set 0 value on EMPTY quantity.", "OK",
-                        null, false) );
+                    "Error","Please set 0 value on EMPTY quantity.", "OK",
+                    null, false) );
             } else {
                 if (refStringDate == null) {
 //                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
                     BounceView.addAnimTo( Helper.okDialog(ctx,
-                            "Error","Please select delivery date.", "OK",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (alertDialog != null) alertDialog.dismiss();
-                                    Helper.hideSoftKeyboard(getActivity());
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                            showDatePicker();
-                                        }
-                                    }, 300);
-                                }
+                        "Error","Please select delivery date.", "OK",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (alertDialog != null) alertDialog.dismiss();
+                                Helper.hideSoftKeyboard(getActivity());
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                        showDatePicker();
+                                    }
+                                }, 300);
                             }
-                            , false
+                        }
+                        , false
                     ) );
                 } else {
                     AlertDialog.Builder builder;
@@ -821,23 +852,23 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     }
                     builder.setCancelable(false);
                     BounceView.addAnimTo(
-                            builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
-                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            if(!isPosted) {
-                                                isPosted = true;
-                                                submitOrders();
-                                            }
-                                        }
-                                    })
-                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            isPosted = false;
-                                        }
-                                    })
-                                    .show()
+                        builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(!isPosted) {
+                                        isPosted = true;
+                                        submitOrders();
+                                    }
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    isPosted = false;
+                                }
+                            })
+                            .show()
                     );
                 }
             }
@@ -967,6 +998,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     rqty = rqty.replace(",", "");
                     if (!rqty.equals("0")) { zeroErrFlag = false; }
                     detailMap.put("quantity", rqty);
+                    String rfqty = rowOl.getFree().equals("") ? "0" : rowOl.getFree();
+                    rfqty = rfqty.replace(",", "");
+                    detailMap.put("free", rfqty);
                     detailMap.put("item_recid", rowOl.getItemRecid());
                     detailMap.put("remarks", rowOl.getRemarks());
                     detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
@@ -1019,6 +1053,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 } else {
                     headersMap.put("order_type", "2"); // int (customer order: 1 / store order: 2)
                 }
+                headersMap.put("report_type", sw_report_type.isChecked() ? "0" : "1" );
 //                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
@@ -1153,6 +1188,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     for(Itemlist il : iRs) {
                         Order ol = new Order();
                         ol.setQuantity("");
+                        ol.setFree("");
                         ol.setItemRecid(String.valueOf(il.getRecid()));
                         ol.setItemName(String.valueOf(il.getItemName()));
                         ol.setUnitName(String.valueOf(il.getUnitName()));
@@ -1202,11 +1238,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     adapter.setCurPos(curRefPos);
                     adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
                         @Override
-                        public void onItemClick(View view,  int position) {
+                        public void onItemClick(View view,  int position, int flag) {
                             adapter.setCurPos(position);
                             adapter.notifyDataSetChanged();
                             curRefPos = adapter.getCurPos();
                             Helper.hideSoftKeyboard(getActivity());
+                            refQtyOrFree = flag;
                             new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     @Override
@@ -1320,6 +1357,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                         Order ol = new Order();
                         ol.setQuantity("");
+                        ol.setFree("");
                         ol.setItemRecid(String.valueOf(il.getRecid()));
                         ol.setItemName(String.valueOf(il.getItemName()));
                         ol.setUnitName(String.valueOf(il.getUnitName()));
@@ -1354,11 +1392,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     adapter.setCurPos(curRefPos);
                     adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
                         @Override
-                        public void onItemClick(View view,  int position) {
+                        public void onItemClick(View view,  int position, int flag) {
                             adapter.setCurPos(position);
                             adapter.notifyDataSetChanged();
                             Helper.hideSoftKeyboard(getActivity());
                             curRefPos = adapter.getCurPos();
+                            refQtyOrFree = flag;
                             new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     @Override
@@ -1374,8 +1413,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         public void onItemClick(View view,  int position) {
                             adapter.setCurPos(position);
                             alertDialogRemarks =  okCancelInputRemarksDialogBuilder(ctx,
-                                    "Add Remarks",
-                                    "Save", null, "Cancel", cancelCallback );
+                                "Add Remarks",
+                                "Save", null, "Cancel", cancelCallback );
                             BounceView.addAnimTo(alertDialogRemarks);
                         }
                     });
@@ -1608,7 +1647,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 if (refStr.length() > 0) {
                     refStr = refStr.substring(0, refStr.length() - 1);
                 }
-                ol.setQuantity(refStr);
+                if (refQtyOrFree == 0) {
+                    ol.setQuantity(refStr);
+                } else {
+                    ol.setFree(refStr);
+                }
                 adapter.notifyDataSetChanged();
                 recomputeTally("");
             }
@@ -1623,7 +1666,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
     private void recomputeTally(String val) {
         Order ol =  curRefArrayList.get(adapter.getCurPos());
-        String refStr = ol.getQuantity();
+
+        String refStr = "";
+        if (refQtyOrFree == 0) {
+            refStr = ol.getQuantity();
+        } else {
+            refStr = ol.getFree();
+        }
         double u_price = Double.parseDouble(ol.getSellingPrice());
 
         /*TableRow trx = (TableRow) tblContentBox.findViewById(calcRefId);
@@ -1685,49 +1734,60 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //                refStr = strSplit[0] + ".";
 //            }
 //        }
-        ol.setQuantity(refStr);
+        if (refQtyOrFree == 0) {
+            ol.setQuantity(refStr);
+        } else {
+            ol.setFree(refStr);
+        }
 
         refStr = refStr.replace(",", "");
         refStr = refStr.equals("") ? "0" : refStr ;
         double u_quantity = Double.parseDouble(refStr);
         double u_total = u_quantity * u_price;
-        if(u_total == 0.0) {
-            ol.setTotal("0.00");
-        }else{
-            DecimalFormat df2 = new DecimalFormat("#,###,###.00");
-            ol.setTotal(df2.format(u_total));
+        if (refQtyOrFree == 0) {
+            if(u_total == 0.0) {
+                ol.setTotal("0.00");
+            }else{
+                DecimalFormat df2 = new DecimalFormat("#,###,###.00");
+                ol.setTotal(df2.format(u_total));
+            }
         }
-        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.QUANTITY, ol.getQuantity());
-        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.TOTAL, ol.getTotal());
+
+        if (refQtyOrFree == 0) {
+            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.QUANTITY, ol.getQuantity());
+            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.TOTAL, ol.getTotal());
+        } else {
+            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.FREE, ol.getFree());
+        }
 
         adapter.notifyDataSetChanged();
 
         // recompute grand total
         recomputeGrandTotal();
-
-
     }
 
     private void recomputeGrandTotal() {
-        LinkedList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
-        if(refOS.size() > 0) {
-            double gt = 0.00, ct = 0.00;
-            for (int i = 0; i < refOS.size(); i++) {
-                Order olx = refOS.get(i);
-                String refCountTotal = String.valueOf(olx.getQuantity().trim()).replace(",", "");
-                ct = refCountTotal.equals("") || refCountTotal.equals("null") ? ct + 0.0 : ct + Double.parseDouble(refCountTotal) ;
-                String refTotal = String.valueOf(olx.getTotal().trim()).replace(",", "");
-                gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
-            }
-            DecimalFormat df = new DecimalFormat("#,###,###.00");
-            if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
-//            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
-                tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
+        if (refQtyOrFree == 0) {
+            LinkedList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
+            if(refOS.size() > 0) {
+                double gt = 0.00, ct = 0.00;
+                for (int i = 0; i < refOS.size(); i++) {
+                    Order olx = refOS.get(i);
+                    String refCountTotal = String.valueOf(olx.getQuantity().trim()).replace(",", "");
+                    ct = refCountTotal.equals("") || refCountTotal.equals("null") ? ct + 0.0 : ct + Double.parseDouble(refCountTotal) ;
+                    String refTotal = String.valueOf(olx.getTotal().trim()).replace(",", "");
+                    gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
+                }
+                DecimalFormat df = new DecimalFormat("#,###,###.00");
+                if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+    //            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                    tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
+                } else {
+                    tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
+                }
             } else {
-                tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
+                tv_grandtotal.setText("0.00");
             }
-        } else {
-            tv_grandtotal.setText("0.00");
         }
     }
 
@@ -1787,8 +1847,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private AlertDialog okCancelInputRemarksDialogBuilder(final Context activity, String message,
-                                                          String okButtonCaption, View.OnClickListener onClickListener,
-                                                          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+          String okButtonCaption, View.OnClickListener onClickListener,
+          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.custom_ok_input_remarks_dialog, null);
@@ -1886,16 +1946,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
-                                                rowObj.getInt("empId"),
-                                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                                rowObj.getString("empNo"),
-                                                rowObj.getString("Email"),
-                                                rowObj.getString("name"),
-                                                rowObj.getInt("Branch"),
-                                                rowObj.getInt("Jobtitle"),
-                                                rowObj.getString("pass"),
-                                                rowObj.getString("active"),
-                                                rowObj.getString("ismobileadmin")
+                                            rowObj.getInt("empId"),
+                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                            rowObj.getString("empNo"),
+                                            rowObj.getString("Email"),
+                                            rowObj.getString("name"),
+                                            rowObj.getInt("Branch"),
+                                            rowObj.getInt("Jobtitle"),
+                                            rowObj.getString("pass"),
+                                            rowObj.getString("active"),
+                                            rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }

@@ -133,16 +133,16 @@ public class LoginActivity extends BaseActivity {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         // massive
-//        usernameText.setText("12105");
-//        passwordEText.setText("746265");
+//        usernameText.setText("office");
+//        passwordEText.setText("Office");
 
         // commi
 //        usernameText.setText("19130");
 //        passwordEText.setText("nathaniels@1994");
 
-        // jenra kiosk
-//        usernameText.setText("18015");
-//        passwordEText.setText("1629");
+        // og
+//        usernameText.setText("12350");
+//        passwordEText.setText("0114");
     }
 
     private void initListeners(){
@@ -732,7 +732,7 @@ public class LoginActivity extends BaseActivity {
         btnInfo.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Info", "Device ID: " + Helper.getImei(ctx), "CLOSE",
+                    "Info", "Device ID: " + Helper.getImei(ctx, ""), "CLOSE",
                     null, false) );
             }
         });
@@ -1004,7 +1004,7 @@ public class LoginActivity extends BaseActivity {
                                         LinkedList<aBranchlist> abl =
                                             DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
                                                 aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                                                new String[] { refSelectedBranchId, Helper.getImei(ctx) }
+                                                new String[] { refSelectedBranchId, Helper.getImei(ctx, "") }
                                             );
                                         if (abl.size() > 0) {
                                             int flgx = 0;
@@ -1027,7 +1027,7 @@ public class LoginActivity extends BaseActivity {
                                             } else {
                                                 BounceView.addAnimTo( Helper.okDialog( ctx,
                                                     "Device Registration",
-                                                    "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
+                                                    "This device with ID# " + Helper.getImei(ctx, "") + " is NOT YET ACTIVATED. Please contact IT support",
                                                     "OK", new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
@@ -1039,7 +1039,7 @@ public class LoginActivity extends BaseActivity {
                                         } else  {
                                             BounceView.addAnimTo( Helper.okDialog( ctx,
                                                 "Device Registration",
-                                                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
+                                                "This device with ID# " + Helper.getImei(ctx, "") + " is NOT YET REGISTERED. Please contact IT support",
                                                 "OK", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
@@ -1169,7 +1169,7 @@ public class LoginActivity extends BaseActivity {
         HashMap<String, String> params = new HashMap<>();
         params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
         params.put("branchid", refSelectedBranchId);
-        params.put("deviceid", Helper.getImei(ctx));
+        params.put("deviceid", Helper.getImei(ctx, ""));
         Iterator it = params.entrySet().iterator();
         String strParams = "";
         while (it.hasNext()) {

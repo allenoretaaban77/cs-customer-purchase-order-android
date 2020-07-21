@@ -89,12 +89,14 @@ public class TrasactionItemsFragment extends DialogFragment {
                     Order ol = new Order();
 
                     ol.setQuantity(obj.getString("quantity"));
+                    ol.setFree(obj.getString("free"));
                     ol.setOldSku(obj.getString("old_sku"));
                     ol.setRemarks(obj.getString("remarks"));
                     ol.setTotal(obj.getString("total"));
                     ol.setSellingPrice(obj.getString("selling_price"));
                     ol.setItemRecid(obj.getString("item_recid"));
                     ol.setQuantity(obj.getString("quantity"));
+                    ol.setFree(obj.getString("free"));
                     ol.setUnitName(obj.getString("unitName"));
                     ol.setItemName(obj.getString("itemname"));
                     ol.setIsChecked(0);
