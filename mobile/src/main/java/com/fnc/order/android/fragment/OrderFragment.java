@@ -273,9 +273,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("netConnStat")) {
                     Log.d("bcastx", intent.getStringExtra("isConnected"));
+                    ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setText("ALIVE V-" + Helper.getVersion(ctx, getActivity()));
+                    ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setText("DOWN V-" + Helper.getVersion(ctx, getActivity()));
                     if (intent.getStringExtra("isConnected").equals("false")) {
+                        ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setVisibility(View.GONE);
                         ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setVisibility(View.VISIBLE);
                     } else {
+                        ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setVisibility(View.VISIBLE);
                         ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setVisibility(View.GONE);
                     }
                 }

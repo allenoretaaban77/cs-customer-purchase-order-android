@@ -137,8 +137,8 @@ public class LoginActivity extends BaseActivity {
 //        passwordEText.setText("Office");
 
         // commi
-//        usernameText.setText("19130");
-//        passwordEText.setText("nathaniels@1994");
+        usernameText.setText("19130");
+        passwordEText.setText("071393");
 
         // og
 //        usernameText.setText("12350");
