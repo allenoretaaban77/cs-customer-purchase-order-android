@@ -49,6 +49,7 @@ import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
@@ -486,7 +487,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
-            if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+            if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                 params.put("agentid", "");
             } else {
                 params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));

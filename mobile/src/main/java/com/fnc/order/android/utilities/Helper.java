@@ -501,7 +501,7 @@ public class Helper {
 
     private static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(1910454835, "-2", "administrator", "jparallag@fncnathaniel.com",
+        aStaffs cs = new aStaffs(1910454835, "-2", "administrator", "aoaban@nathaniels.com.ph",
             "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
             1912072415, "P@ssw0rd" + Helper.getReqDate(0, ""),
             "true", "true");

@@ -33,6 +33,7 @@ import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
@@ -137,8 +138,8 @@ public class LoginActivity extends BaseActivity {
 //        passwordEText.setText("Office");
 
         // commi
-        usernameText.setText("19130");
-        passwordEText.setText("071393");
+//        usernameText.setText("19130");
+//        passwordEText.setText("071393");
 
         // og
 //        usernameText.setText("12350");
@@ -198,7 +199,7 @@ public class LoginActivity extends BaseActivity {
                     if (slUP.size() > 0 ) {
                         aStaffs slx = slUP.get(0);
                         if (slx.getRefempno().equals("-1")) {
-                            if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                            if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                                 isSubmit = false;
                                 BounceView.addAnimTo( Helper.okDialog( ctx,
                                     "Account Error","Reference employee number not recognized. Please contact IT support to update your account.", "CLOSE",
@@ -263,7 +264,16 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alertDialogSettingsAuth = actionDialog(ctx, "SETTINGS",
+                BounceView.addAnimTo(Helper.okCancelDialog(ctx, "Update App Config", "This will update Are you sure you want to continue?",
+                    "Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finishAndRemoveTask();
+                        }
+                    }, "No", null, false)
+                );
+
+                /*alertDialogSettingsAuth = actionDialog(ctx, "SETTINGS",
                     "Validate settings security account",
                     "Username", "Password",
                     "SUBMIT", new View.OnClickListener() {
@@ -401,7 +411,7 @@ public class LoginActivity extends BaseActivity {
 
                 alertDialogSettingsAuth.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialogSettingsAuth.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                BounceView.addAnimTo(alertDialogSettingsAuth);
+                BounceView.addAnimTo(alertDialogSettingsAuth); */
             }
         });
     }
@@ -1341,7 +1351,7 @@ public class LoginActivity extends BaseActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
-            if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+            if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                 params.put("agentid", "");
             } else {
                 params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
@@ -1487,17 +1497,8 @@ public class LoginActivity extends BaseActivity {
                                 }
 
                                 tvVersion.setText(Helper.getVersion(ctx, LoginActivity.this) + " | " +
-                                    SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                                    SharedData.getInstance(ctx).getData(SharedKey.BRANCH_DESCRIPTION.getKey())
                                 );
-                                /*SharedData spx = SharedData.getInstance(ctx);
-                                if (Helper.checkBranchProfile(ctx).size() > 0) {
-                                    spx.saveData(SharedKey.BRANCH_CODE.getKey(), Helper.checkBranchProfile(ctx).get(0).getBranchcode());
-                                    if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
-                                        spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL_IP);
-                                    } else {
-                                        spx.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-                                    }
-                                }*/
                             }
                         }
                     }

@@ -37,7 +37,7 @@ public class VolleyInteractor {
     public void login(final Context ctx, final HashMap<String, String> params, final String strParams) {
         new Thread( new Runnable(){
             public void run(){
-                String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                String url = SharedData.getInstance(ctx).getData(SharedKey.DEFAULT_DOMAIN_SERVER_URL.getKey())
                     + API.LOGIN.getApi()+ "?" + strParams;
                 Log.d("dsx", url);
                 StringRequest strRequest = new StringRequest( Request.Method.POST, url,
@@ -59,7 +59,7 @@ public class VolleyInteractor {
                 requestQueue.getCache().clear();
                 requestQueue.add(strRequest);
                 VolleyX.init(ctx);
-                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                VolleyX.from(strRequest).subscribeOn(Schedulers.immediate())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<String>() {
                         @Override
