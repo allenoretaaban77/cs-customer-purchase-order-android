@@ -195,9 +195,9 @@ public class SplashActivity extends BaseActivity {
                 alertRequireInternet();
             }
         } else {
-            sp.removeSinglePref(SharedKey.DATABASEID.getKey());
+//            sp.removeSinglePref(SharedKey.DATABASEID.getKey());
             if(sp.getData(SharedKey.DATABASEID.getKey()).equals("")) {
-                loader = Helper.showSpinnerDialog(ctx, "", "Setting possible update... Please wait..."); loader.show();
+                loader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); loader.show();
                 clientSignin(String.valueOf(sp.getData(SharedKey.REF_ADMIN_USER.getKey())), String.valueOf(sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey())));
             } else {
                 LinkedList<aBranchlist> abl = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
@@ -449,29 +449,30 @@ public class SplashActivity extends BaseActivity {
         if (type.equals("login")) {
             try {
                 JSONObject obj = new JSONObject(response);
+                Helper.dismissSpinnerDialog(loader);
                 if (obj.getString("dtcompany").equals("[]")) {
-                    Helper.dismissSpinnerDialog(loader);
                     BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Initialization Error","Invalid credentials",
+                        "CLOSE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }, false)
+                    );
+                } else {
+                    JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
+                    JSONObject objx = new JSONObject(objArr.get(0).toString());
+                    if (objx.getString("DatabaseID").equals("")) {
+                        BounceView.addAnimTo( Helper.okDialog( ctx,
                             "Initialization Error","Invalid credentials",
                             "CLOSE", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                 }
-                            }, false) );
-                } else {
-                    JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
-                    JSONObject objx = new JSONObject(objArr.get(0).toString());
-                    if (objx.getString("DatabaseID").equals("")) {
-                        Helper.dismissSpinnerDialog(loader);
-                        BounceView.addAnimTo( Helper.okDialog( ctx,
-                                "Initialization Error","Invalid credentials",
-                                "CLOSE", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }, false) );
+                            }, false)
+                        );
                     } else {
                         if(alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
                         g_jsonobject = obj;
@@ -946,7 +947,7 @@ public class SplashActivity extends BaseActivity {
                                 proceedNormal();
                             }
 
-                            if (loader == null & loader.isShowing()) loader.dismiss();
+                            Helper.dismissSpinnerDialog(loader);
                             loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                         }
                     } else {
