@@ -105,7 +105,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         });
 
         holder.cell_fqty.setText(iRs.getFree());
-        if (SharedData.getInstance(context).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+        if (SharedData.getInstance(context).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
             holder.cell_fqty.setVisibility(View.GONE);
         } else {
             holder.cell_fqty.setVisibility(View.VISIBLE);

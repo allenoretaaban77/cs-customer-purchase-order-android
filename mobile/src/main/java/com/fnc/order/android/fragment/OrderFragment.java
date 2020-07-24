@@ -254,7 +254,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         initCalc(rootView);
 
         sp = SharedData.getInstance(ctx);
-        if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+        if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
             btn_refresh.setVisibility(View.VISIBLE);
         } else {
@@ -335,7 +335,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             curRefArrayList = new LinkedList<Order>();
             for (int i = 0; i < llOrderRs.size(); i++) {
                 Order ol = llOrderRs.get(i);
-                if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                if (SharedData.getInstance(ctx).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                     if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
                         curRefArrayList.add(ol);
                     }
@@ -387,7 +387,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //        ref_coordinateor_box = (LinearLayout) v.findViewById(R.id.ref_coordinateor_box);
         ref_coordinateor_box_padding = (LinearLayout) v.findViewById(R.id.ref_coordinateor_box_padding);
         ll_report_type = (LinearLayout) v.findViewById(R.id.ll_report_type);
-        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
             ll_report_type.setVisibility(View.GONE);
             ref_coordinateor_box_padding.setVisibility(View.GONE);
         } else {
@@ -459,7 +459,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         } */
 
         tv_hdr_freeitem = (TextView) v.findViewById(R.id.tv_hdr_freeitem);
-        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
             tv_hdr_freeitem.setVisibility(View.GONE);
         } else {
             tv_hdr_freeitem.setVisibility(View.VISIBLE);
@@ -613,7 +613,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             ll_search.setVisibility(View.VISIBLE);
                             ll_closesearch.setVisibility(View.GONE);
 
-                            if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                            if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                                 if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
                                     BounceView.addAnimTo( Helper.okDialog(ctx,
                                         "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
@@ -1044,7 +1044,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 headersMap.put("customer_integ_recid", refMenulist.getCustomerIntegrationId());
                 headersMap.put("deliver_date", refStringDate);
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                     headersMap.put("createdby", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     headersMap.put("createdby", sp.getData(SharedKey.EMP_NO.getKey()));
@@ -1059,7 +1059,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
                 headersMap.put("report_type", sw_report_type.isChecked() ? "0" : "1" );
 //                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.EMP_NO.getKey()));
@@ -1077,14 +1077,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setCustomerName(refMenulist.getCustomerName());
                 ol.setDeliveryDate(refStringDate);
 //                ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                     ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     ol.setCreatedBy(sp.getData(SharedKey.EMP_NO.getKey()));
                 }
                 ol.setRemarks(et_remarks.getText().toString().trim());
 //                ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                     ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     ol.setReferenceEmployeeNo(sp.getData(SharedKey.EMP_NO.getKey()));
@@ -1204,18 +1204,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setIsChecked(0);
                         ol.setIsError(0);
                         ol.setIsLocked(1);
-//                        if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
 
-                        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                             if (!il.getOldSku().equals("null") && !il.getOldSku().equals("0")) {
                                 curRefArrayList.add(ol);
                             }
                         } else {
                             curRefArrayList.add(ol);
                         }
-//                        } else {
-//                            curRefArrayList.add(ol);
-//                        }
                         DcOrder.getInstance(ctx).insertOrderlist(ol);
 
                         // get preloaded
@@ -1284,7 +1280,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             null, false) );
                     } */
 
-                    if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                    if (SharedData.getInstance(ctx).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                         LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" }, "");
                         if (olRs.size() > 0) {
                             ((LinearLayout) rootView.findViewById(R.id.btn_others_box)).setVisibility(View.VISIBLE);

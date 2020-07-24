@@ -40,6 +40,7 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.databinding.ItemUserBinding;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
@@ -722,10 +723,10 @@ public class UserFragment extends DialogFragment {
                 params.put("logdb", sp.getData(SharedKey.DATABASE.getKey()));
                 params.put("empid", String.valueOf(sl.getEmpId()));
                 params.put("password", et_password.getText().toString());
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                     params.put("updatedby", sp.getData(SharedKey.REF_EMP_ID.getKey()));
                 } else {
-                    params.put("updatedby", sp.getData(SharedKey.REF_EMP_ID.getKey()));
+                    params.put("updatedby", sp.getData(SharedKey.EMP_ID.getKey()));
                 }
                 Iterator it = params.entrySet().iterator();
                 String strParams = "";

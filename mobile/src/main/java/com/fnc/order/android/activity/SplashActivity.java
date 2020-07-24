@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
@@ -31,6 +33,7 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.R;
 import com.fnc.order.android.database.DbConstants;
@@ -46,6 +49,12 @@ import com.fnc.order.android.services.OrdersService;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
+import com.google.api.core.NanoClock;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import org.json.JSONArray;
@@ -53,6 +62,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,10 +71,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import hari.bounceview.BounceView;
+import io.opencensus.resource.Resource;
 
 import static com.fnc.order.android.database.DBHelper.DBPath;
 
-public class SplashActivity extends BaseActivity implements VolleyCallback {
+public class SplashActivity extends BaseActivity {
 
     private Context ctx;
     private SharedData sp;
@@ -88,33 +100,22 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ctx = this;
-
         setContentView(R.layout.activity_splash);
 
         sp = SharedData.getInstance(ctx);
-        if(sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-        }
-        if(sp.getData(SharedKey.REF_DATABASE.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
-        }
+        if(sp.getData(SharedKey.DEFAULT_DOMAIN_SERVER_URL.getKey()).trim().equals("")) sp.saveData(SharedKey.DEFAULT_DOMAIN_SERVER_URL.getKey(), ServerConstants.DEFAULT_SERVER_URL);
+        if(sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).trim().equals("")) sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "");
+        if(sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()).trim().equals("")) sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), "");
+        if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASE.getKey(), "");
+        if(sp.getData(SharedKey.DATABASEID.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASEID.getKey(), "");
+        if(sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), "");
+        if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
+        if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
+        if(sp.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), 0);
 
-//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-//        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
-//        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
-//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
-//        sp.saveData(SharedKey.REF_DATABASE.getKey(), "massive");
-//        sp.saveData(SharedKey.DATABASE.getKey(), "massive");
-
-        if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) {
-            sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
-        }
-        if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) {
-            sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
-        }
-        if(sp.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == -1) {
-            sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), 0);
-        }
+        if(sp.getData(SharedKey.SUPPORT_USER.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_USER.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), "");
 
         TedPermission.with(ctx).setPermissionListener(new PermissionListener() {
             @Override
@@ -176,7 +177,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         "Username", "Password", "Branch",
                         "SUBMIT", new View.OnClickListener() {
                             public void onClick(View v) {
-                                clientSignin();
+                                loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
+                                clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
+                                    ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
                             }
                         }, "", null, 0
                 );
@@ -192,20 +195,26 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 alertRequireInternet();
             }
         } else {
-            LinkedList<aBranchlist> abl = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                    aBranchlistKey.DEVICEID.getKey() + " = ? ", new String[] { Helper.getImei(ctx, "") });
-            if (abl.size() > 0 ) {
-                if (abl.get(0).getActive().equals("false")) {
-                    getDeviceProfile("init");
-                } else {
-                    if (abl.get(0).getBranchid() == 12345) {
-                        showBranchDialog("reinit");
-                    } else {
-                        proceedNormal();
-                    }
-                }
+            sp.removeSinglePref(SharedKey.DATABASEID.getKey());
+            if(sp.getData(SharedKey.DATABASEID.getKey()).equals("")) {
+                loader = Helper.showSpinnerDialog(ctx, "", "Setting possible update... Please wait..."); loader.show();
+                clientSignin(String.valueOf(sp.getData(SharedKey.REF_ADMIN_USER.getKey())), String.valueOf(sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey())));
             } else {
-                getDeviceProfile("init");
+                LinkedList<aBranchlist> abl = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                        aBranchlistKey.DEVICEID.getKey() + " = ? ", new String[] { Helper.getImei(ctx, "") });
+                if (abl.size() > 0 ) {
+                    if (abl.get(0).getActive().equals("false")) {
+                        getDeviceProfile("init");
+                    } else {
+                        if (abl.get(0).getBranchid() == 12345) {
+                            showBranchDialog("reinit");
+                        } else {
+                            proceedNormal();
+                        }
+                    }
+                } else {
+                    getDeviceProfile("init");
+                }
             }
         }
     }
@@ -336,12 +345,23 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             it.remove();
         }
         VolleyInteractor vipr = new VolleyInteractor();
-        vipr.registerCallback(this);
+        vipr.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+            @Override
+            public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+        });
         vipr.getPreRequisite(ctx, params,
                 strParams.replaceAll(" ", "%20"));
     }
 
     private void proceedNormal() {
+        if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()))) {
+            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+        } else {
+            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+        }
+
         LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
         if (sl.size() > 0) {
             Helper.dismissSpinnerDialog(loader);
@@ -357,42 +377,56 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
     }
 
-    private void clientSignin() {
-        String strUsername = ((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString();
-        String strPassword = ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString();
+    private void clientSignin(String strUsername, String strPassword) {
 //        strUsername = "admin@backoffice.com"; strPassword = "admin123";
-//        String strBranch = ((EditText) alertDialog.findViewById(R.id.et_edittext3)).getText().toString();
+        if (Helper.isNetworkAvailable(this)) {
+            if(strUsername.matches("")){
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Error","Please enter username.", "CLOSE",
+                        null, false) ); return;
+            }
+            if(strPassword.matches("")){
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Error","Please enter password.", "CLOSE",
+                        null, false) ); return;
+            }
 
-        if(strUsername.matches("")){
-            BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Error","Please enter username.", "CLOSE",
-                    null, false) ); return;
-        }
-        if(strPassword.matches("")){
-            BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Error","Please enter password.", "CLOSE",
-                    null, false) ); return;
-        }
+            HashMap<String, String> params = new HashMap<>();
+            params.put("logdb", ServerConstants.LOGDB);
+            params.put("userid", strUsername);
+            params.put("pass", strPassword);
+            VolleyInteractor vil = new VolleyInteractor();
+            vil.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+                @Override
+                public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+            });
+            vil.login(ctx, params, "");
 
-        loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
-        HashMap<String, String> params = new HashMap<>();
-        params.put("logdb", ServerConstants.LOGDB);
-        params.put("userid", strUsername);
-        params.put("pass", strPassword);
-        VolleyInteractor vil = new VolleyInteractor();
-        vil.registerCallback(this);
-        vil.login(ctx, params, "");
-    }
-
-    private void alertRequireInternet() {
-        BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Initialization Error","This app requires internet to initialize.  Please check your connection.",
-                "CLOSE", new DialogInterface.OnClickListener() {
+        } else {
+            Helper.dismissSpinnerDialog(loader);
+            BounceView.addAnimTo( Helper.okDialog(ctx,
+                "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
+                new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finishAndRemoveTask();
                     }
-                }, false) );
+                }, false)
+            );
+        }
+    }
+
+    private void alertRequireInternet() {
+        BounceView.addAnimTo( Helper.okDialog( ctx,
+            "Initialization Error","This app requires internet to initialize.  Please check your connection.",
+            "CLOSE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAndRemoveTask();
+                }
+            }, false) );
     }
 
     private void showActivity(final Class<?> cls) {
@@ -410,7 +444,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         super.onResume();
     }
 
-    public void onRequestSuccess(final String response, final String type) {
+    private void volleyRequestSuccess(final String response, final String type) {
+//    public void onRequestSuccess(final String response, final String type) {
         if (type.equals("login")) {
             try {
                 JSONObject obj = new JSONObject(response);
@@ -438,8 +473,11 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                     }
                                 }, false) );
                     } else {
-                        alertDialog.dismiss();
-                        String strCN = "";
+                        if(alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
+                        g_jsonobject = obj;
+                        new checkAppConfig().execute(objx.getString("DatabaseID"));
+
+                        /*String strCN = "";
                         if (objx.getString("DatabaseID").equals("BackofficeLive")) {
                             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
                             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
@@ -476,7 +514,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         } else {
                             proceedNormal();
                         }
-                        loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+
+                        loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show(); */
                     }
                 }
             } catch (JSONException e) {
@@ -550,6 +589,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                         sp.saveData(SharedKey.BRANCH_CODE.getKey(), ablRsx.getBranchcode().trim());
                                         sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ablRsx.getDescription().trim());
 
+                                        if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(ablRsx.getDescription().trim())) {
+                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                        } else {
+                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                        }
+
                                         getPreRequisite();
                                     } else {
                                         if (strRef[1].equals("init")) {
@@ -571,6 +616,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                                             sp.saveData(SharedKey.BRANCH_ID.getKey(), rowObj.getString("branchid").trim());
                                             sp.saveData(SharedKey.BRANCH_CODE.getKey(), rowObj.getString("branchcode").trim());
                                             sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), rowObj.getString("description").trim());
+
+                                            if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(rowObj.getString("description").trim())) {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                            } else {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                            }
 
                                             DcBranchlist.getInstance(ctx).updateBranchlist(rowObj.getString("deviceid").trim(), aBranchlistKey.ACTIVE, "true");
 
@@ -636,7 +687,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
     }
 
-    public void onRequestFail(VolleyError response, String type){
+    private void volleyRequestFail(VolleyError response, String type){
+//    public void onRequestFail(VolleyError response, String type){
         alertDataSyncError();
         /*if (type.equals("login")) {
             BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -723,7 +775,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 it.remove();
             }
             VolleyInteractor vidp = new VolleyInteractor();
-            vidp.registerCallback(this);
+            vidp.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+                @Override
+                public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+            });
             vidp.getDeviceProfile(getApplicationContext(), params, strParams
                     .replaceAll(" ", "%20"), type);
         } else {
@@ -750,7 +807,12 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 it.remove();
             }
             VolleyInteractor viri = new VolleyInteractor();
-            viri.registerCallback(this);
+            viri.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+                @Override
+                public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+            });
             viri.postBranchImei(getApplicationContext(), params,
                     strParams.replaceAll(" ", "%20"));
         } else {
@@ -799,5 +861,108 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                     finishAndRemoveTask();
                 }
             }, false) );
+    }
+
+
+    private JSONObject g_jsonobject;
+    private Storage storageinit;
+    private class checkAppConfig extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            String strDbID = params[0];
+            try {
+                InputStream ins = getResources().openRawResource(
+                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
+                storageinit = StorageOptions.newBuilder()
+                    .setCredentials(credentials).setClock(NanoClock.getDefaultClock())
+                    .setProjectId(GlobalConstants.GCP_PROJECTID).build().getService();
+                try {
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_REFERENCE, "config.log");
+                    Blob blob = storageinit.get(blobId);
+                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
+                    return "Success|" + new String(bytes, "UTF-8") + "|" + strDbID;
+                } catch (Exception e) {
+                    return "Error| exception = " + e.getLocalizedMessage();
+                }
+            } catch (IOException io) {
+                return "Error| io";
+            } catch (RuntimeException e) {
+                return "Error| io";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            String[] resMsg = result.split("\\|");
+            if (resMsg[0].equals("Success")) {
+                try {
+                    String strDatabaseId = resMsg[2];
+                    JSONArray objArr = new JSONArray(resMsg[1]);
+                    if (objArr.length() > 0) {
+                        Boolean isSuccess = false;
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            if (rowObj.getString("database_id").equals(strDatabaseId)) {
+                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObj.getString("server_url"));
+                                sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObj.getString("local_url"));
+                                sp.saveData(SharedKey.DATABASE.getKey(), rowObj.getString("cn"));
+                                sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
+                                sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObj.getString("main_branch"));
+                                sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObj.getInt("old_sku_validation"));
+                                sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObj.getInt("preload_items"));
+                                sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObj.getInt("saved_product_items"));
+                                sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
+                                sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
+                                sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
+                                isSuccess = true;
+                            }
+                        }
+                        if (!isSuccess) {
+                            alertDataSyncError();
+                        } else {
+//                            Toast.makeText(ctx, "SUCCESS", Toast.LENGTH_SHORT).show();
+
+                            JSONArray objArrY = new JSONArray(g_jsonobject.getString("dtuser"));
+                            JSONObject objy = new JSONObject(objArrY.get(0).toString());
+                            sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
+                            sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
+                            String strFN = objy.getString("FirstName") + "|" +
+                                    objy.getString("MiddleName") + "|" +
+                                    objy.getString("LastName");
+                            String[] arrFN = strFN.split("\\|");
+                            if (arrFN.length > 0) {
+                                strFN = "";
+                                for (int k = 0; k < arrFN.length; k++) {
+                                    if (!String.valueOf(arrFN[k]).trim().equals(""))
+                                        strFN = strFN + arrFN[k] + " ";
+                                }
+                                sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
+                            }
+
+                            String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
+                            if (strImeiId.equals("")) {
+                                getDeviceProfile("init");
+                            } else {
+                                proceedNormal();
+                            }
+
+                            if (loader == null & loader.isShowing()) loader.dismiss();
+                            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+                        }
+                    } else {
+                        alertDataSyncError();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    alertDataSyncError();
+                }
+            } else {
+                alertDataSyncError();
+            }
+        }
+        @Override
+        protected void onPreExecute() { Log.d("gcpe", "Task Upload Starting"); }
+        @Override
+        protected void onProgressUpdate(Integer... values) { Log.d("gcpu", "Running " + + values[0]); }
     }
 }
