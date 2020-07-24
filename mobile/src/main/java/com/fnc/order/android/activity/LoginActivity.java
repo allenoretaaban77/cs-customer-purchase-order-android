@@ -94,7 +94,7 @@ public class LoginActivity extends BaseActivity {
     private TextView tvVersion;
     private Button loginButton;
     private Button hidePassword, showPassword;
-    private ProgressDialog loader;
+    private ProgressDialog loader, getloader, updateloader;
     private String blockCharacterSet = "~#^|$%&*!()+-$";
     private RelativeLayout relPassword;
     private Context ctx;
@@ -264,11 +264,16 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BounceView.addAnimTo(Helper.okCancelDialog(ctx, "Update App Config", "This will update Are you sure you want to continue?",
+                BounceView.addAnimTo(Helper.okCancelDialog(ctx, "Update App Config",
+                     "Client Name: " + sp.getData(SharedKey.DATABASEID.getKey()) +
+                     "\r\nClient Server: " + sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()) +
+                     "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()) +
+                     "\r\n\r\nThis will update are you sure you want to continue?",
                     "Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            finishAndRemoveTask();
+                            updateloader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); updateloader.show();
+                            clientSignin(String.valueOf(sp.getData(SharedKey.REF_ADMIN_USER.getKey())), String.valueOf(sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey())));
                         }
                     }, "No", null, false)
                 );
@@ -1240,7 +1245,7 @@ public class LoginActivity extends BaseActivity {
         }
 
         if (Helper.isNetworkAvailable(ctx)) {
-            loader = Helper.showSpinnerDialog(ctx, "", "Setting possible update... Please wait..."); loader.show();
+            loader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); loader.show();
             new checkVersionUpdate().execute("");
             new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -1595,6 +1600,201 @@ public class LoginActivity extends BaseActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             Log.d("dsxs gcpu", "Running " + + values[0]);
+        }
+    }
+
+    private JSONObject g_jsonobject;
+    private class checkAppConfig extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            String strDbID = params[0];
+            try {
+                InputStream ins = getResources().openRawResource(
+                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
+                storageinit = StorageOptions.newBuilder()
+                        .setCredentials(credentials).setClock(NanoClock.getDefaultClock())
+                        .setProjectId(GlobalConstants.GCP_PROJECTID).build().getService();
+                try {
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_REFERENCE, "config.log");
+                    Blob blob = storageinit.get(blobId);
+                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
+                    return "Success|" + new String(bytes, "UTF-8") + "|" + strDbID;
+                } catch (Exception e) {
+                    return "Error| exception = " + e.getLocalizedMessage();
+                }
+            } catch (IOException io) {
+                return "Error| io";
+            } catch (RuntimeException e) {
+                return "Error| io";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            String[] resMsg = result.split("\\|");
+            if (resMsg[0].equals("Success")) {
+                try {
+                    String strDatabaseId = resMsg[2];
+                    JSONArray objArr = new JSONArray(resMsg[1]);
+                    if (objArr.length() > 0) {
+                        Boolean isSuccess = false;
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            if (rowObj.getString("database_id").equals(strDatabaseId)) {
+                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObj.getString("server_url"));
+                                sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObj.getString("local_url"));
+                                sp.saveData(SharedKey.DATABASE.getKey(), rowObj.getString("cn"));
+                                sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
+                                sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObj.getString("main_branch"));
+                                sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObj.getInt("old_sku_validation"));
+                                sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObj.getInt("preload_items"));
+                                sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObj.getInt("saved_product_items"));
+                                sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
+                                sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
+                                sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
+                                isSuccess = true;
+                            }
+                        }
+                        if (!isSuccess) {
+                            alertDataSyncError();
+                        } else {
+//                            Toast.makeText(ctx, "SUCCESS", Toast.LENGTH_SHORT).show();
+
+                            JSONArray objArrY = new JSONArray(g_jsonobject.getString("dtuser"));
+                            JSONObject objy = new JSONObject(objArrY.get(0).toString());
+                            sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
+                            sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
+                            String strFN = objy.getString("FirstName") + "|" +
+                                    objy.getString("MiddleName") + "|" +
+                                    objy.getString("LastName");
+                            String[] arrFN = strFN.split("\\|");
+                            if (arrFN.length > 0) {
+                                strFN = "";
+                                for (int k = 0; k < arrFN.length; k++) {
+                                    if (!String.valueOf(arrFN[k]).trim().equals(""))
+                                        strFN = strFN + arrFN[k] + " ";
+                                }
+                                sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
+                            }
+
+                            if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()))) {
+                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                            } else {
+                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                            }
+
+                            if (updateloader == null & updateloader.isShowing()) updateloader.dismiss();
+                            Toast.makeText(ctx, "Update success!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        alertDataSyncError();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    alertDataSyncError();
+                }
+            } else {
+                alertDataSyncError();
+            }
+        }
+        @Override
+        protected void onPreExecute() { Log.d("gcpe", "Task Upload Starting"); }
+        @Override
+        protected void onProgressUpdate(Integer... values) { Log.d("gcpu", "Running " + + values[0]); }
+    }
+
+    private void alertDataSyncError() {
+        Helper.dismissSpinnerDialog(loader);
+        BounceView.addAnimTo( Helper.okDialog( ctx,
+            "Data Sync Error","Data Sync Error, please contact IT support",
+            "CLOSE", null, false)
+        );
+    }
+
+    private void clientSignin(String strUsername, String strPassword) {
+//        strUsername = "admin@backoffice.com"; strPassword = "admin123";
+        if (Helper.isNetworkAvailable(this)) {
+            if(strUsername.matches("")){
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Error","Please enter username.", "CLOSE",
+                        null, false) ); return;
+            }
+            if(strPassword.matches("")){
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Error","Please enter password.", "CLOSE",
+                        null, false) ); return;
+            }
+
+            HashMap<String, String> params = new HashMap<>();
+            params.put("logdb", ServerConstants.LOGDB);
+            params.put("userid", strUsername);
+            params.put("pass", strPassword);
+            VolleyInteractor vil = new VolleyInteractor();
+            vil.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) {
+                    if (type.equals("login")) {
+                        Helper.dismissSpinnerDialog(updateloader);
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            if (obj.getString("dtcompany").equals("[]")) {
+                                BounceView.addAnimTo( Helper.okDialog( ctx,
+                                    "Initialization Error","Invalid credentials",
+                                    "CLOSE", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }, false)
+                                );
+                            } else {
+                                JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
+                                JSONObject objx = new JSONObject(objArr.get(0).toString());
+                                if (objx.getString("DatabaseID").equals("")) {
+                                    BounceView.addAnimTo( Helper.okDialog( ctx,
+                                        "Initialization Error","Invalid credentials",
+                                        "CLOSE", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }, false)
+                                    );
+                                } else {
+                                    g_jsonobject = obj;
+                                    new checkAppConfig().execute(objx.getString("DatabaseID"));
+                                }
+                            }
+                        } catch (JSONException e) {
+                            BounceView.addAnimTo( Helper.okDialog( ctx,
+                                "Initialization Error","Invalid credentials",
+                                "CLOSE", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        alertDialog.show();
+                                    }
+                                }, false)
+                            );
+                        }
+                    }
+                }
+                @Override
+                public void onRequestFail(VolleyError response, String type) { alertDataSyncError(); }
+            });
+            vil.login(ctx, params, "");
+
+        } else {
+            Helper.dismissSpinnerDialog(loader);
+            BounceView.addAnimTo( Helper.okDialog(ctx,
+                    "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finishAndRemoveTask();
+                        }
+                    }, false)
+            );
         }
     }
 }
