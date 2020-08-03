@@ -185,7 +185,7 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@massive.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
 //                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -724,9 +724,9 @@ public class SplashActivity extends BaseActivity {
     }
 
     private AlertDialog actionDialog(final Context activity, String title, String message,
-                                     String strLabel1, String strLabel2, String strLabel3, String okButtonCaption,
-                                     View.OnClickListener onClickListener, String cancelButtonCaption,
-                                     View.OnClickListener cancelClickListener, Integer flagType) {
+             String strLabel1, String strLabel2, String strLabel3, String okButtonCaption,
+             View.OnClickListener onClickListener, String cancelButtonCaption,
+             View.OnClickListener cancelClickListener, Integer flagType) {
 
         SharedData spx = SharedData.getInstance(this);
 

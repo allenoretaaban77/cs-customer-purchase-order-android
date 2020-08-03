@@ -124,7 +124,8 @@ public class MainActivity extends BaseActivity {
 
         if (Helper.checkBranchProfile(ctx).size() > 0) {
             aBranchlist mBl = Helper.checkBranchProfile(ctx).get(0);
-            if(mBl.getDescription().equals("Commissary") || mBl.getDescription().equals("Main")) {
+            if (mBl.getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//            if(mBl.getDescription().equals("Commissary") || mBl.getDescription().equals("Main")) {
                 Helper.changePage(ctx, getSupportFragmentManager(), new CustomerFragment(),
                     "customer_fragment", "main_page");
             } else {
@@ -148,7 +149,8 @@ public class MainActivity extends BaseActivity {
                 .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
                 .addToBackStack(null).commit();
         } else if (refPage.equals("customer_fragment")) {
-            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                 getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, new CustomerFragment(), "customer_fragment")
                     .addToBackStack(null).commit();

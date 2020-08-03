@@ -226,8 +226,8 @@ public class LoginActivity extends BaseActivity {
                         isSubmit = true;
 
                         if (Helper.checkBranchProfile(ctx).size() > 0) {
-                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
-//                                SharedData.getInstance(ctx).saveData(SharedKey.DATABASE.getKey());
+                            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                                 showActivity(MainActivity.class);
                             } else {
                                 LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
@@ -268,7 +268,7 @@ public class LoginActivity extends BaseActivity {
                      "Client Name: " + sp.getData(SharedKey.DATABASEID.getKey()) +
                      "\r\nClient Server: " + sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()) +
                      "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()) +
-                     "\r\n\r\nThis will update are you sure you want to continue?",
+                     "\r\n\r\nThis will update system settings.  Are you sure you want to continue?",
                     "Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
