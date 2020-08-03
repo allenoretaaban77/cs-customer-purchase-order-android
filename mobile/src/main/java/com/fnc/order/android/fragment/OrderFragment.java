@@ -130,14 +130,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh,
             btn_others, btn_setzero, btn_search, btn_closesearch, btn_view;
     private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total, tv_hdr_freeitem;
-    private Switch sw_report_type;
     private EditText et_date, et_remarks, et_search;
     private CoordinatorLayout rl_content_box;
     private DroppyMenuPopup.Builder pageMenu;
     private LinearLayout mainTableBox;
     private Integer maintableViewHeight = 0;
     private Integer maintableViewWidth = 0;
-    private LinearLayout tblContentBox, ref_coordinateor_box, ref_coordinateor_box_padding, ll_report_type;
+    private LinearLayout tblContentBox;
     private TableLayout tl;
     private Integer calcRefId = 0;
     private String refPersonIdentityId = "";
@@ -202,7 +201,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             ).get(0);
         }
 
-        if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//        if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
             strBranchEncoding = "1";
         } else {
             strBranchEncoding = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
@@ -238,7 +238,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+                    if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                    if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                         backItNow(v);
                         return true;
                     } else{
@@ -315,7 +316,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             strParams = strParams.replaceAll(" ", "%20");
             vi.getItemlist(ctx, params, strParams);
         } else {
-            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                 Toast.makeText(ctx, "Please check internet connection....", Toast.LENGTH_SHORT).show();
             } else {
 //                try {
@@ -384,17 +386,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private void initViews(View v) {
-//        ref_coordinateor_box = (LinearLayout) v.findViewById(R.id.ref_coordinateor_box);
-        ref_coordinateor_box_padding = (LinearLayout) v.findViewById(R.id.ref_coordinateor_box_padding);
-        ll_report_type = (LinearLayout) v.findViewById(R.id.ll_report_type);
-        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
-            ll_report_type.setVisibility(View.GONE);
-            ref_coordinateor_box_padding.setVisibility(View.GONE);
-        } else {
-            ll_report_type.setVisibility(View.VISIBLE);
-            ref_coordinateor_box_padding.setVisibility(View.VISIBLE);
-        }
-
         btn_view = (MaterialRippleLayout) v.findViewById(R.id.btn_view);
         llet_search = (LinearLayout) v.findViewById(R.id.llet_search);
         ll_search = (LinearLayout) v.findViewById(R.id.ll_search);
@@ -439,7 +430,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
         tv_grandtotal_lbl = (TextView) v.findViewById(R.id.tv_grandtotal_lbl);
 
-        if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//        if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
             ((RelativeLayout) v.findViewById(R.id.rl_back_box)).setVisibility(View.GONE);
             tv_grandtotal_lbl.setText("Count Total:");
             tv_header_price.setVisibility(View.GONE);
@@ -464,8 +456,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         } else {
             tv_hdr_freeitem.setVisibility(View.VISIBLE);
         }
-
-        sw_report_type = (Switch) v.findViewById(R.id.sw_report_type);
     }
 
     private void initListeners(View v) {
@@ -545,6 +535,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             rqty = rqty.replace(",", "");
                             if (!rqty.equals("0")) { zeroErrFlag = false; }
                             detailMap.put("quantity", rqty);
+                            detailMap.put("free", rowOl.getFree());
                             detailMap.put("item_recid", rowOl.getItemRecid());
                             detailMap.put("remarks", rowOl.getRemarks());
                             detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
@@ -608,41 +599,47 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     new Runnable() {
                         @Override
                         public void run() {
-                            et_search.setText("");
-                            llet_search.setVisibility(View.GONE);
-                            ll_search.setVisibility(View.VISIBLE);
-                            ll_closesearch.setVisibility(View.GONE);
+                            if (!isPosted) {
+                                isPosted = true;
+                                et_search.setText("");
+                                llet_search.setVisibility(View.GONE);
+                                ll_search.setVisibility(View.VISIBLE);
+                                ll_closesearch.setVisibility(View.GONE);
 
-                            if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
-                                if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
-                                    BounceView.addAnimTo( Helper.okDialog(ctx,
-                                        "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                                        null, false) );
-                                    return;
-                                }
-                            } else {
-                                if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
-                                    BounceView.addAnimTo( Helper.okDialog(ctx,
-                                        "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                                        null, false) );
-                                    return;
-                                }
-                            }
-
-                            loader = Helper.showSpinnerDialog(ctx, "", "Please wait..."); loader.show();
-                            LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
-                            showItems(llOrderRs);
-
-                            new android.os.Handler().postDelayed(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                        Helper.dismissSpinnerDialog(loader);
-                                        callSubmit();
+                                if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
+                                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
+                                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                            null, false) );
+                                        isPosted = false;
+                                        return;
                                     }
-                                }, 500
-                            );
+                                } else {
+                                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
+                                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                            null, false) );
+                                        isPosted = false;
+                                        return;
+                                    }
+                                }
+
+                                loader = Helper.showSpinnerDialog(ctx, "", "Please wait..."); loader.show();
+                                LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                                showItems(llOrderRs);
+
+                                new android.os.Handler().postDelayed(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            isPosted = false;
+                                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                            Helper.dismissSpinnerDialog(loader);
+                                            callSubmit();
+                                        }
+                                    }, 500
+                                );
+                            }
                         }
                     }, 300
                 );
@@ -737,17 +734,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
-        });
-
-        sw_report_type.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    sw_report_type.setText("SALES INVOICE");
-                } else {
-                    sw_report_type.setText("DELIVERY RECEIPT");
-                }
-            }
         });
     }
 
@@ -848,39 +834,21 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         , false
                     ) );
                 } else {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-                    } else {
-                        builder = new AlertDialog.Builder(ctx);
+                    if(!isPosted) {
+                        isPosted = true;
+                        if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
+                            submitOrders();
+                        } else {
+                            getReportType();
+                        }
                     }
-                    builder.setCancelable(false);
-                    BounceView.addAnimTo(
-                        builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if(!isPosted) {
-                                        isPosted = true;
-                                        submitOrders();
-                                    }
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    isPosted = false;
-                                }
-                            })
-                            .show()
-                    );
                 }
             }
         }else{
 //                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
             BounceView.addAnimTo( Helper.okDialog(ctx,
-                    "Error","Please add an item.", "CLOSE",
-                    null, false) );
+                "Error","Please add an item.", "CLOSE",
+                null, false) );
         }
     }
 
@@ -980,6 +948,75 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
     };
 
+    private void validateToPost() {
+        isPosted = false;
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        } else {
+            builder = new AlertDialog.Builder(ctx);
+        }
+        builder.setCancelable(false);
+        BounceView.addAnimTo( builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(!isPosted) {
+                        isPosted = true;
+                        submitOrders();
+                    }
+                }
+            })
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    isPosted = false;
+                    Helper.dismissSpinnerDialog(loader);
+                }
+            })
+            .show()
+        );
+        new android.os.Handler().postDelayed( new Runnable() { public void run() { isPosted = false; }}, 500 );
+    }
+
+    private String reportType = "0";
+    private void getReportType() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        } else {
+            builder = new AlertDialog.Builder(ctx);
+        }
+        builder.setCancelable(false);
+        BounceView.addAnimTo(
+            builder.setTitle("Report Type Option").setMessage("Please select REPORT TYPE.")
+            .setPositiveButton("SALES INVOICE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (!isPosted) {
+                        isPosted = true;
+                        reportType = "1";
+                        dialog.dismiss();
+                        validateToPost();
+                    }
+                }
+            })
+            .setNegativeButton("DELIVERY RECEIPT", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (!isPosted) {
+                        isPosted = true;
+                        reportType = "0";
+                        dialog.dismiss();
+                        validateToPost();
+                    }
+                }
+            })
+            .show()
+        );
+        new android.os.Handler().postDelayed( new Runnable() { public void run() { isPosted = false; }}, 500 );
+    }
+
     private Boolean isPosted = false;
     private void submitOrders() {
         VolleyInteractor vi = new VolleyInteractor();
@@ -1052,12 +1089,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
 
-                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                     headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
                 } else {
                     headersMap.put("order_type", "2"); // int (customer order: 1 / store order: 2)
                 }
-                headersMap.put("report_type", sw_report_type.isChecked() ? "0" : "1" );
+                headersMap.put("report_type", reportType );
 //                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
@@ -1109,7 +1147,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                 Helper.dismissSpinnerDialog(loader);
 
-                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                     loader = Helper.showSpinnerDialog(ctx, "Posting Transaction", "Please wait..."); loader.show();
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -1779,7 +1818,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
                 }
                 DecimalFormat df = new DecimalFormat("#,###,###.00");
-                if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
     //            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
                 } else {
