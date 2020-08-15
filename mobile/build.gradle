@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.fnc.order.android.v2"
         minSdkVersion 23
-        targetSdkVersion 28
-        versionCode 54
-        versionName "1.0.54"
+        targetSdkVersion 29
+        versionCode 56
+        versionName "1.0.56"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
