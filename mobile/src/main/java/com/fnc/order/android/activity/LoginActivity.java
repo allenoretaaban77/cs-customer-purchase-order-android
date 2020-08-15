@@ -265,10 +265,11 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 BounceView.addAnimTo(Helper.okCancelDialog(ctx, "Update App Config",
-                     "Client Name: " + sp.getData(SharedKey.DATABASEID.getKey()) +
-                     "\r\nClient Server: " + sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()) +
-                     "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()) +
-                     "\r\n\r\nThis will update system settings.  Are you sure you want to continue?",
+                    "Device ID: " + sp.getData(SharedKey.IMEI_ID.getKey()) +
+                    "\r\nClient Name: " + sp.getData(SharedKey.DATABASEID.getKey()) +
+                    "\r\nClient Server: " + sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()) +
+                    "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()) +
+                    "\r\n\r\nThis will update system settings.  Are you sure you want to continue?",
                     "Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
