@@ -185,7 +185,7 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@massive.com");
 //                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -268,7 +268,7 @@ public class SplashActivity extends BaseActivity {
             ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
             arrBranches = new LinkedList<>();
             if (refAbx.size() > 0) {
-                aBranchlist abr = new aBranchlist(0, "Select branch....",
+                aBranchlist abr = new aBranchlist(0L, "Select branch....",
                         "", "","", "", "", "", "");
                 arrBranches.add(abr);
                 for(int k=0; k<refAbx.size(); k++){
@@ -567,7 +567,7 @@ public class SplashActivity extends BaseActivity {
                                     for (int i = 0; i < objArr.length(); i++) {
                                         JSONObject rowObj = objArr.getJSONObject(i);
                                         aBranchlist br = new aBranchlist(
-                                            rowObj.getInt("branchid"),
+                                            rowObj.getLong("branchid"),
                                             rowObj.getString("branchcode").trim(),
                                             rowObj.getString("deviceid").trim(),
                                             rowObj.getString("description").trim(),
@@ -653,13 +653,13 @@ public class SplashActivity extends BaseActivity {
                         for (int i = 0; i < sArr.length(); i++) {
                             JSONObject rowObj = sArr.getJSONObject(i);
                             aStaffs sl = new aStaffs(
-                                rowObj.getInt("empId"),
+                                rowObj.getLong("empId"),
                                 rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
                                 rowObj.getString("empNo"),
                                 rowObj.getString("Email"),
                                 rowObj.getString("name"),
-                                rowObj.getInt("Branch"),
-                                rowObj.getInt("Jobtitle"),
+                                rowObj.getLong("Branch"),
+                                rowObj.getLong("Jobtitle"),
                                 rowObj.getString("pass"),
                                 rowObj.getString("active"),
                                 rowObj.getString("ismobileadmin")

@@ -1209,7 +1209,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         Itemlist irsx = new Itemlist();
-                        irsx.setRecid(rowObj.getInt(ItemlistKey.RECID.getKey()));
+                        irsx.setRecid(rowObj.getLong(ItemlistKey.RECID.getKey()));
                         irsx.setItemName(rowObj.getString(ItemlistKey.ITEM_NAME_WITH_UNIT.getKey()));
                         irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
                         irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
@@ -1986,13 +1986,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
-                                            rowObj.getInt("empId"),
+                                            rowObj.getLong("empId"),
                                             rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
                                             rowObj.getString("empNo"),
                                             rowObj.getString("Email"),
                                             rowObj.getString("name"),
-                                            rowObj.getInt("Branch"),
-                                            rowObj.getInt("Jobtitle"),
+                                            rowObj.getLong("Branch"),
+                                            rowObj.getLong("Jobtitle"),
                                             rowObj.getString("pass"),
                                             rowObj.getString("active"),
                                             rowObj.getString("ismobileadmin")
@@ -2139,7 +2139,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         aItemlist ail = new aItemlist(
                             String.valueOf(rowObj.getString(aItemlistKey.INTEGRATION_RECID.getKey())),
-                            rowObj.getInt(aItemlistKey.RECID.getKey()),
+                            rowObj.getLong(aItemlistKey.RECID.getKey()),
                             String.valueOf(rowObj.getString(aItemlistKey.OLD_SKU.getKey())),
                             rowObj.getInt(aItemlistKey.BASEUNIT_RECID.getKey()),
                             rowObj.getDouble(aItemlistKey.BASEUNIT_QTY.getKey()),

@@ -138,8 +138,8 @@ public class LoginActivity extends BaseActivity {
 //        passwordEText.setText("Office");
 
         // commi
-//        usernameText.setText("19130");
-//        passwordEText.setText("071393");
+//        usernameText.setText("12105");
+//        passwordEText.setText("746265");
 
         // og
 //        usernameText.setText("12350");
@@ -896,7 +896,7 @@ public class LoginActivity extends BaseActivity {
                     final LinkedList<aAdminGroupings> sl = new LinkedList<>();
                     if(objArr.length() > 0) {
                         aAdminGroupings cjt = new aAdminGroupings();
-                        cjt.setRecid(0);
+                        cjt.setRecid(0L);
                         cjt.setCode("0");
                         cjt.setDescription("Select Job Title:");
                         cjt.setDeleted("false");
@@ -904,7 +904,7 @@ public class LoginActivity extends BaseActivity {
                         for (int ix = 0; ix < objArr.length(); ix++) {
                             JSONObject rowObj = objArr.getJSONObject(ix);
                             cjt = new aAdminGroupings();
-                            cjt.setRecid(rowObj.getInt("recid"));
+                            cjt.setRecid(rowObj.getLong("recid"));
                             cjt.setCode(rowObj.getString("code"));
                             cjt.setDescription(rowObj.getString("Description"));
                             cjt.setDeleted(rowObj.getString("deleted"));
@@ -1000,7 +1000,7 @@ public class LoginActivity extends BaseActivity {
                                         for (int i = 0; i < objArr.length(); i++) {
                                             JSONObject rowObj = objArr.getJSONObject(i);
                                             aBranchlist br = new aBranchlist(
-                                                rowObj.getInt("branchid"),
+                                                rowObj.getLong("branchid"),
                                                 rowObj.getString("branchcode").trim(),
                                                 rowObj.getString("deviceid"),
                                                 rowObj.getString("description").trim(),
@@ -1105,7 +1105,7 @@ public class LoginActivity extends BaseActivity {
         ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
         arrBranches = new LinkedList<>();
         if (refAbx.size() > 0) {
-            aBranchlist abr = new aBranchlist(0, "Select branch....",
+            aBranchlist abr = new aBranchlist(0L, "Select branch....",
                 "", "","", "", "", "", "");
             arrBranches.add(abr);
             for(int k=0; k<refAbx.size(); k++){
@@ -1278,16 +1278,16 @@ public class LoginActivity extends BaseActivity {
                                 for (int i = 0; i < sArr.length(); i++) {
                                     JSONObject rowObj = sArr.getJSONObject(i);
                                     aStaffs sl = new aStaffs(
-                                            rowObj.getInt("empId"),
-                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                            rowObj.getString("empNo"),
-                                            rowObj.getString("Email"),
-                                            rowObj.getString("name"),
-                                            rowObj.getInt("Branch"),
-                                            rowObj.getInt("Jobtitle"),
-                                            rowObj.getString("pass"),
-                                            rowObj.getString("active"),
-                                            rowObj.getString("ismobileadmin")
+                                        rowObj.getLong("empId"),
+                                        rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                        rowObj.getString("empNo"),
+                                        rowObj.getString("Email"),
+                                        rowObj.getString("name"),
+                                        rowObj.getLong("Branch"),
+                                        rowObj.getLong("Jobtitle"),
+                                        rowObj.getString("pass"),
+                                        rowObj.getString("active"),
+                                        rowObj.getString("ismobileadmin")
                                     );
                                     DcStaffs.getInstance(ctx).insertStaffs(sl);
                                 }

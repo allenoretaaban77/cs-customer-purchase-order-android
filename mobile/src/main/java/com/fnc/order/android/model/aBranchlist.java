@@ -3,7 +3,7 @@ package com.fnc.order.android.model;
 import java.io.Serializable;
 
 public class aBranchlist implements Serializable {
-    private Integer branchid;
+    private Long branchid;
     private String branchcode;
     private String deviceid;
     private String description;
@@ -13,7 +13,7 @@ public class aBranchlist implements Serializable {
     private String old_branchid;
     private String old_customerid;
 
-    public aBranchlist (Integer branchid, String branchcode, String deviceid, String description,
+    public aBranchlist (Long branchid, String branchcode, String deviceid, String description,
         String deviceID1, String active, String customerID, String old_branchid, String old_customerid) {
         this.branchid = branchid;
         this.branchcode = branchcode;
@@ -26,8 +26,8 @@ public class aBranchlist implements Serializable {
         this.old_customerid = old_customerid;
     }
 
-    public Integer getBranchid() { return branchid; }
-    public void setBranchid(Integer branchid) { this.branchid = branchid; }
+    public Long getBranchid() { return branchid; }
+    public void setBranchid(Long branchid) { this.branchid = branchid; }
 
     public String getBranchcode() { return branchcode; }
     public void setBranchcode(String branchcode) { this.branchcode = branchcode; }

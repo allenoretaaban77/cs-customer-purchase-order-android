@@ -100,7 +100,7 @@ public class DcBranchlist extends DBHelper {
 
     private aBranchlist setBranchlist(Cursor c) {
         aBranchlist bl = new aBranchlist(
-            c.getInt(c.getColumnIndex(aBranchlistKey.BRANCHID.getKey())),
+            c.getLong(c.getColumnIndex(aBranchlistKey.BRANCHID.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.BRANCHCODE.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.DEVICEID.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.DESCRIPTION.getKey())),
