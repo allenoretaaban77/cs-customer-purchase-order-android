@@ -3,13 +3,13 @@ package com.fnc.order.android.model;
 import java.io.Serializable;
 
 public class aAdminGroupings implements Serializable {
-    Integer recid;
+    Long recid;
     String code;
     String Description;
     String deleted;
 
-    public Integer getRecid() { return recid; }
-    public void setRecid(Integer recid) { this.recid = recid; }
+    public Long getRecid() { return recid; }
+    public void setRecid(Long recid) { this.recid = recid; }
 
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }

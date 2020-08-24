@@ -4,24 +4,24 @@ package com.fnc.order.android.model;
 import java.io.Serializable;
 
 public class CustomerList implements Serializable {
-    private int recid;
-    private int customerID;
+    private Long recid;
+    private Long customerID;
     private String customername;
-    private int group_recid;
+    private Long group_recid;
     private int integration_recid;
     private String dateupdated;
 
-    public Integer getRecId() {
+    public Long getRecId() {
         return recid;
     }
-    public void setRecId(int recid) {
+    public void setRecId(Long recid) {
         this.recid = recid;
     }
 
-    public Integer getCustomerId() {
+    public Long getCustomerId() {
         return customerID;
     }
-    public void setCustomerId(int customerID) {
+    public void setCustomerId(Long customerID) {
         this.customerID = customerID;
     }
 

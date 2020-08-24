@@ -501,23 +501,23 @@ public class Helper {
 
     private static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(1910454835, "-2", "administrator", "aoaban@nathaniels.com.ph",
-            "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
-            1912072415, "P@ssw0rd" + Helper.getReqDate(0, ""),
+        aStaffs cs = new aStaffs(1910454835L, "-2", "administrator", "aoaban@nathaniels.com.ph",
+            "IT Support", Long.parseLong(sp.getData(SharedKey.BRANCH_ID.getKey())),
+            1912072415L, "P@ssw0rd" + Helper.getReqDate(0, ""),
             "true", "true");
         return cs;
     }
 
     private static aStaffs adminStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(-777,
-                "-2",
-                sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
-                sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
-                sp.getData(SharedKey.REF_ADMIN_FULLNAME.getKey()),
-                Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
-                1912072415, sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
-                "true", "true");
+        aStaffs cs = new aStaffs(-777L,
+            "-2",
+            sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
+            sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
+            sp.getData(SharedKey.REF_ADMIN_FULLNAME.getKey()),
+            Long.parseLong(sp.getData(SharedKey.BRANCH_ID.getKey())),
+            1912072415L, sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
+            "true", "true");
         return cs;
     }
 

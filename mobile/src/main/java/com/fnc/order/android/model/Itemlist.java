@@ -3,14 +3,14 @@ package com.fnc.order.android.model;
 import java.io.Serializable;
 
 public class Itemlist implements Serializable {
-    private int recid_old;
-    private int recid;
+    private Long recid_old;
+    private Long recid;
     private String old_sku;
     private String selling_price;
-    private int itemNo;
-    private int itemBarcodeNo;
-    private int parent_baseitem_recid;
-    private int child_group_recid;
+    private Long itemNo;
+    private Long itemBarcodeNo;
+    private Long parent_baseitem_recid;
+    private Long child_group_recid;
     private int itemtype;
     private String itemname;
     private String dept;
@@ -21,13 +21,13 @@ public class Itemlist implements Serializable {
     private String unitName;
     private Boolean is_checked;
 
-    public Integer getRecidOld() {
+    public Long getRecidOld() {
         return recid_old;
     }
-    public void setRecidOld(int recid_old) { this.recid_old = recid_old; }
+    public void setRecidOld(Long recid_old) { this.recid_old = recid_old; }
 
-    public Integer getRecid() { return recid; }
-    public void setRecid(int recid) { this.recid = recid; }
+    public Long getRecid() { return recid; }
+    public void setRecid(Long recid) { this.recid = recid; }
 
     public String getOldSku() { return old_sku; }
     public void setOldSku(String old_sku) { this.old_sku = old_sku; }
@@ -35,23 +35,23 @@ public class Itemlist implements Serializable {
     public String getSellingPrice() { return selling_price; }
     public void setSellingPrice(String selling_price) { this.selling_price = selling_price; }
 
-    public Integer getItemNo() {
+    public Long getItemNo() {
         return itemNo;
     }
-    public void setItemNo(int itemNo) { this.itemNo = itemNo; }
+    public void setItemNo(Long itemNo) { this.itemNo = itemNo; }
 
-    public Integer getItemBarcodeNo() { return itemBarcodeNo; }
-    public void setItemBarcodeNo(int itemBarcodeNo) { this.itemBarcodeNo = itemBarcodeNo; }
+    public Long getItemBarcodeNo() { return itemBarcodeNo; }
+    public void setItemBarcodeNo(Long itemBarcodeNo) { this.itemBarcodeNo = itemBarcodeNo; }
 
-    public Integer getParentBaseitemRecid() {
+    public Long getParentBaseitemRecid() {
         return parent_baseitem_recid;
     }
-    public void setParentBaseitemRecid(int parent_baseitem_recid) { this.parent_baseitem_recid = parent_baseitem_recid; }
+    public void setParentBaseitemRecid(Long parent_baseitem_recid) { this.parent_baseitem_recid = parent_baseitem_recid; }
 
-    public Integer getChildGroupRecid() {
+    public Long getChildGroupRecid() {
         return child_group_recid;
     }
-    public void setChildGroupRecid(int child_group_recid) { this.child_group_recid = child_group_recid; }
+    public void setChildGroupRecid(Long child_group_recid) { this.child_group_recid = child_group_recid; }
 
     public String getItemName() { return itemname; }
     public void setItemName(String itemname) { this.itemname = itemname; }

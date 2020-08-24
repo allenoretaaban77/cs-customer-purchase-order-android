@@ -1,18 +1,18 @@
 package com.fnc.order.android.model;
 
 public class aStaffs {
-    private int empId;
+    private Long empId;
     private String refempno;
     private String empNo;
     private String Email;
     private String name;
-    private int Branch;
-    private int Jobtitle;
+    private Long Branch;
+    private Long Jobtitle;
     private String pass;
     private String active;
     private String ismobileadmin;
 
-    public aStaffs (int empId, String refempno, String empNo, String Email, String name, int Branch, int Jobtitle,
+    public aStaffs (Long empId, String refempno, String empNo, String Email, String name, Long Branch, Long Jobtitle,
                     String pass, String active, String ismobileadmin) {
 
         this.empId = empId;
@@ -27,13 +27,13 @@ public class aStaffs {
         this.ismobileadmin = ismobileadmin;
     }
 
-    public int getEmpId() { return empId; }
+    public Long getEmpId() { return empId; }
     public String getRefempno() { return refempno; }
     public String getEmpNo() { return empNo; }
     public String getEmail() { return Email; }
     public String getName() { return name; }
-    public int getBranch() { return Branch; }
-    public int getJobtitle() { return Jobtitle; }
+    public Long getBranch() { return Branch; }
+    public Long getJobtitle() { return Jobtitle; }
     public String getPass() { return pass; }
     public String getActive() { return active; }
     public String getIsmobileadmin() { return ismobileadmin; }

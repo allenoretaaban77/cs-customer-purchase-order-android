@@ -237,7 +237,7 @@ public class UserFragment extends DialogFragment {
                     llJobtitles = new LinkedList<>();
                     if(objArr.length() > 0) {
                         aAdminGroupings cjt = new aAdminGroupings();
-                        cjt.setRecid(0);
+                        cjt.setRecid(0L);
                         cjt.setCode("0");
                         cjt.setDescription("Select Job Title:");
                         cjt.setDeleted("false");
@@ -245,7 +245,7 @@ public class UserFragment extends DialogFragment {
                         for (int ix = 0; ix < objArr.length(); ix++) {
                             JSONObject rowObj = objArr.getJSONObject(ix);
                             cjt = new aAdminGroupings();
-                            cjt.setRecid(rowObj.getInt("recid"));
+                            cjt.setRecid(rowObj.getLong("recid"));
                             cjt.setCode(rowObj.getString("code"));
                             cjt.setDescription(rowObj.getString("Description"));
                             cjt.setDeleted(rowObj.getString("deleted"));
@@ -324,13 +324,13 @@ public class UserFragment extends DialogFragment {
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
-                                            rowObj.getInt("empId"),
+                                            rowObj.getLong("empId"),
                                             rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
                                             rowObj.getString("empNo"),
                                             rowObj.getString("Email"),
                                             rowObj.getString("name"),
-                                            rowObj.getInt("Branch"),
-                                            rowObj.getInt("Jobtitle"),
+                                            rowObj.getLong("Branch"),
+                                            rowObj.getLong("Jobtitle"),
                                             rowObj.getString("pass"),
                                             rowObj.getString("active"),
                                             rowObj.getString("ismobileadmin")
@@ -379,7 +379,7 @@ public class UserFragment extends DialogFragment {
             llJobtitles = new LinkedList<>();
             if(objArr.length() > 0) {
                 aAdminGroupings cjt = new aAdminGroupings();
-                cjt.setRecid(0);
+                cjt.setRecid(0L);
                 cjt.setCode("0");
                 cjt.setDescription("Select Job Title:");
                 cjt.setDeleted("false");
@@ -387,7 +387,7 @@ public class UserFragment extends DialogFragment {
                 for (int i = 0; i < objArr.length(); i++) {
                     JSONObject rowObj = objArr.getJSONObject(i);
                     cjt = new aAdminGroupings();
-                    cjt.setRecid(rowObj.getInt("recid"));
+                    cjt.setRecid(rowObj.getLong("recid"));
                     cjt.setCode(rowObj.getString("code"));
                     cjt.setDescription(rowObj.getString("Description"));
                     cjt.setDeleted(rowObj.getString("deleted"));
