@@ -43,6 +43,17 @@ public class DcStaffs extends DBHelper {
         db.close();
     }
 
+    public void updateStaff(aStaffsKey rKey, String rVal, aStaffsKey kArr[], String vArr[]){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        for (int i = 0; i < kArr.length; i++) {
+            aStaffsKey key = kArr[i];
+            cv.put(key.getKey(), vArr[i]);
+        }
+        db.updateWithOnConflict(Table.STAFFS.getName(), cv, rKey.getKey() + " = ?", new String[] { rVal }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
     public void setInActive(aStaffs sl) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues value = aStaffsQueryBuilder.prepareStaffsInsertValues(sl, context);

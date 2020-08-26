@@ -1225,35 +1225,16 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onResume(){
         super.onResume();
-        /*sp = SharedData.getInstance(this);
-        if (Helper.checkBranchProfile(ctx).size() > 0) {
-            sp.saveData(SharedKey.BRANCH_CODE.getKey(), Helper.checkBranchProfile(ctx).get(0).getBranchcode());
-            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary")) {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL_IP);
-            } else {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-            }
-        }*/
-
-        if (Helper.isNetworkAvailable(ctx)) {
-            new getUsersAsync().execute("");
-        }
-
-        Helper.updateAdministratorPassword(ctx);
-
-        if (DcBranchlist.getInstance(ctx).getBranchlist().size() < 1) {
-            getDeviceProfile("default");
-        }
 
         if (Helper.isNetworkAvailable(ctx)) {
             loader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); loader.show();
+            if (DcBranchlist.getInstance(ctx).getBranchlist().size() < 1) {
+                getDeviceProfile("default");
+            }
+            new getUsersAsync().execute("");
             new checkVersionUpdate().execute("");
             new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        Helper.dismissSpinnerDialog(loader);
-                    }
-                },
+                new Runnable() { public void run() { Helper.dismissSpinnerDialog(loader); } },
                 2000
             );
         }
@@ -1272,7 +1253,6 @@ public class LoginActivity extends BaseActivity {
                         JSONObject obj = new JSONObject(response);
                         if (obj.length() > 0) {
                             DcStaffs.getInstance(ctx).emptyStaffslist();
-                            Helper.insertDefaultStaffs(ctx);
                             JSONArray sArr = obj.getJSONArray("staff");
                             if (sArr.length() > 0) {
                                 for (int i = 0; i < sArr.length(); i++) {
@@ -1291,6 +1271,7 @@ public class LoginActivity extends BaseActivity {
                                     );
                                     DcStaffs.getInstance(ctx).insertStaffs(sl);
                                 }
+                                Helper.insertDefaultStaffs(ctx);
                             }
                         } else {
                             Log.d("dsxe getuser", response);
@@ -1653,7 +1634,9 @@ public class LoginActivity extends BaseActivity {
                                 sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
                                 sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
                                 sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
+                                sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
                                 isSuccess = true;
+                                Helper.insertDefaultStaffs(ctx);
                             }
                         }
                         if (!isSuccess) {

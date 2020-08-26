@@ -16,6 +16,7 @@ public enum SharedKey {
     SUPPORT_USER("support_user"),
     SUPPORT_PASSWORD("support_password"),
     SUPPORT_EMP_ID("support_employee_id"),
+    SUPPORT_REF_EMP_ID("support_ref_employee_id"),
 
     DATABASE_OLD("ref_old_database"),
     SKU_VALIDATION("old_sku_validation"),

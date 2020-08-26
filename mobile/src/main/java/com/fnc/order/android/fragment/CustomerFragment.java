@@ -670,7 +670,6 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     JSONObject obj = new JSONObject(response);
                     if (obj.length() > 0) {
                         DcStaffs.getInstance(ctx).emptyStaffslist();
-                        Helper.insertDefaultStaffs(ctx);
                         JSONArray sArr = obj.getJSONArray("staff");
                         if (sArr.length() > 0) {
                             for (int i = 0; i < sArr.length(); i++) {
@@ -689,6 +688,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                 );
                                 DcStaffs.getInstance(ctx).insertStaffs(sl);
                             }
+                            Helper.insertDefaultStaffs(ctx);
                         }
                         Helper.dismissSpinnerDialog(loader);
                         Toast.makeText(ctx, "Request success...", Toast.LENGTH_SHORT).show();
@@ -928,7 +928,6 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
                                 DcStaffs.getInstance(ctx).emptyStaffslist();
-                                Helper.insertDefaultStaffs(ctx);
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
                                     for (int i = 0; i < sArr.length(); i++) {
@@ -947,6 +946,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
+                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 loadAdminJobTitles();
                             } else {

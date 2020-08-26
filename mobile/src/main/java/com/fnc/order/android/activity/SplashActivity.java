@@ -116,6 +116,7 @@ public class SplashActivity extends BaseActivity {
         if(sp.getData(SharedKey.SUPPORT_USER.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_USER.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), "");
 
         TedPermission.with(ctx).setPermissionListener(new PermissionListener() {
             @Override
@@ -647,7 +648,6 @@ public class SplashActivity extends BaseActivity {
                 JSONObject obj = new JSONObject(response);
                 if (obj.length() > 0) {
                     DcStaffs.getInstance(ctx).emptyStaffslist();
-                    Helper.insertDefaultStaffs(ctx);
                     JSONArray sArr = obj.getJSONArray("staff");
                     if (sArr.length() > 0) {
                         for (int i = 0; i < sArr.length(); i++) {
@@ -915,6 +915,7 @@ public class SplashActivity extends BaseActivity {
                                 sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
                                 sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
                                 sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
+                                sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
                                 isSuccess = true;
                             }
                         }

@@ -55,6 +55,7 @@ import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
+import com.fnc.order.android.enumeration.aStaffsKey;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
@@ -490,13 +491,18 @@ public class Helper {
     }
 
     public static void insertDefaultStaffs(Context ctx) {
-        DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add dev
+        DcStaffs.getInstance(ctx).deleteStaffsViaId(SharedKey.SUPPORT_EMP_ID.getKey());
         DcStaffs.getInstance(ctx).insertStaffs(Helper.adminStaff(ctx)); // add admin
     }
 
     public static void updateAdministratorPassword(Context ctx) {
-        DcStaffs.getInstance(ctx).deleteStaffsViaId("1910454835");
-        DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add dev
+        /*SharedData sp = SharedData.getInstance(ctx);
+        aStaffsKey kArr[] = { aStaffsKey.EMPNO , aStaffsKey.PASS};
+        String[] vArr =  {  "", "" };
+        DcStaffs.getInstance(ctx).updateStaff(
+            aStaffsKey.EMPID.getKey(), sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
+
+        );*/
     }
 
     private static aStaffs defaultStaff(Context ctx) {
@@ -510,13 +516,14 @@ public class Helper {
 
     private static aStaffs adminStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(-777L,
-            "-2",
-            sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
+        aStaffs cs = new aStaffs(
+            Long.parseLong(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey())),
+            sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()),
+            sp.getData(SharedKey.SUPPORT_USER.getKey()),
             sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
             sp.getData(SharedKey.REF_ADMIN_FULLNAME.getKey()),
             Long.parseLong(sp.getData(SharedKey.BRANCH_ID.getKey())),
-            1912072415L, sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
+            1912072415L, sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()),
             "true", "true");
         return cs;
     }
