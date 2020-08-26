@@ -318,7 +318,6 @@ public class UserFragment extends DialogFragment {
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
                                 DcStaffs.getInstance(ctx).emptyStaffslist();
-                                Helper.insertDefaultStaffs(ctx);
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
                                     for (int i = 0; i < sArr.length(); i++) {
@@ -337,6 +336,7 @@ public class UserFragment extends DialogFragment {
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
+                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 displayUsers("%");
                                 loadAdminJobTitles();

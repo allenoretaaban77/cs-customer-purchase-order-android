@@ -430,7 +430,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
         tv_grandtotal_lbl = (TextView) v.findViewById(R.id.tv_grandtotal_lbl);
 
-        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+        if (!Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
 //        if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
             ((RelativeLayout) v.findViewById(R.id.rl_back_box)).setVisibility(View.GONE);
             tv_grandtotal_lbl.setText("Count Total:");
@@ -1818,7 +1818,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
                 }
                 DecimalFormat df = new DecimalFormat("#,###,###.00");
-                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                if (!Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
 //                if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
     //            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
                     tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
@@ -1979,8 +1979,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         try {
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
-                                DcStaffs.getInstance(ctx).emptyStaffslist();
-                                Helper.insertDefaultStaffs(ctx);
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
                                     for (int i = 0; i < sArr.length(); i++) {
@@ -1999,6 +1997,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
+                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 loadAdminJobTitles();
                             } else {
