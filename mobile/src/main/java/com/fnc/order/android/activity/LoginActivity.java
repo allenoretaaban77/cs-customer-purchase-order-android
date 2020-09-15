@@ -199,7 +199,8 @@ public class LoginActivity extends BaseActivity {
                     if (slUP.size() > 0 ) {
                         aStaffs slx = slUP.get(0);
                         if (slx.getRefempno().equals("-1")) {
-                            if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
+                            if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
+                            //if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
                                 isSubmit = false;
                                 BounceView.addAnimTo( Helper.okDialog( ctx,
                                     "Account Error","Reference employee number not recognized. Please contact IT support to update your account.", "CLOSE",
@@ -1338,7 +1339,7 @@ public class LoginActivity extends BaseActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
-            if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
+            if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
                 params.put("agentid", "");
             } else {
                 params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
@@ -1629,12 +1630,14 @@ public class LoginActivity extends BaseActivity {
                                 sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
                                 sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObj.getString("main_branch"));
                                 sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObj.getInt("old_sku_validation"));
+                                sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObj.getInt("reference_employee_validation"));
                                 sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObj.getInt("preload_items"));
                                 sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObj.getInt("saved_product_items"));
                                 sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
                                 sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
                                 sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
                                 sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
+                                sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), rowObj.getString("support_setup"));
                                 isSuccess = true;
                                 Helper.insertDefaultStaffs(ctx);
                             }

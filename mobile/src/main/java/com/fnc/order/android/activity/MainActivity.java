@@ -124,7 +124,8 @@ public class MainActivity extends BaseActivity {
 
         if (Helper.checkBranchProfile(ctx).size() > 0) {
             aBranchlist mBl = Helper.checkBranchProfile(ctx).get(0);
-            if (mBl.getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+            String strRef = SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey());
+            if (mBl.getDescription().equals(strRef)) {
 //            if(mBl.getDescription().equals("Commissary") || mBl.getDescription().equals("Main")) {
                 Helper.changePage(ctx, getSupportFragmentManager(), new CustomerFragment(),
                     "customer_fragment", "main_page");

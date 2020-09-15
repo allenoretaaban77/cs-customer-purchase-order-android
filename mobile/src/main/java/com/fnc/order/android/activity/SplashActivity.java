@@ -110,6 +110,7 @@ public class SplashActivity extends BaseActivity {
         if(sp.getData(SharedKey.DATABASEID.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASEID.getKey(), "");
         if(sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), "");
         if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
+        if(sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), 1);
         if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
         if(sp.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), 0);
 
@@ -117,6 +118,7 @@ public class SplashActivity extends BaseActivity {
         if(sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), "");
 
         TedPermission.with(ctx).setPermissionListener(new PermissionListener() {
             @Override
@@ -186,8 +188,8 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@massive.com");
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
+                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@philbest.com");
+                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -563,11 +565,11 @@ public class SplashActivity extends BaseActivity {
                         try {
                             JSONArray objArr = new JSONArray(response);
                             if (objArr.length() > 0) {
-                                if (strRef[1].equals("init") || strRef[1].equals("proceed")) {
-                                    DcBranchlist.getInstance(ctx).emptyBranchlist();
-                                    for (int i = 0; i < objArr.length(); i++) {
-                                        JSONObject rowObj = objArr.getJSONObject(i);
-                                        aBranchlist br = new aBranchlist(
+
+                                DcBranchlist.getInstance(ctx).emptyBranchlist();
+                                for (int i = 0; i < objArr.length(); i++) {
+                                    JSONObject rowObj = objArr.getJSONObject(i);
+                                    aBranchlist br = new aBranchlist(
                                             rowObj.getLong("branchid"),
                                             rowObj.getString("branchcode").trim(),
                                             rowObj.getString("deviceid").trim(),
@@ -577,9 +579,11 @@ public class SplashActivity extends BaseActivity {
                                             rowObj.getString("customerID").trim(),
                                             rowObj.getString("old_branchid").trim(),
                                             rowObj.getString("old_customerid").trim()
-                                        );
-                                        DcBranchlist.getInstance(ctx).insertBranches(br);
-                                    }
+                                    );
+                                    DcBranchlist.getInstance(ctx).insertBranches(br);
+                                }
+
+                                if (strRef[1].equals("init") || strRef[1].equals("proceed")) {
 
                                     LinkedList<aBranchlist> ablRs = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(aBranchlistKey.DEVICEID.getKey()
                                                     + " = ? AND " + aBranchlistKey.ACTIVE.getKey() + " = ?",
@@ -667,20 +671,23 @@ public class SplashActivity extends BaseActivity {
                             DcStaffs.getInstance(ctx).insertStaffs(sl);
                         }
                     }
-                    Helper.dismissSpinnerDialog(loader);
-                    if (alertdialogBL != null) alertdialogBL.dismiss();
-                    BounceView.addAnimTo( Helper.okDialog( ctx,
-                            "Initialization Success","You can now login using your registered account.",
-                            "OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    startActivity(new Intent(ctx, LoginActivity.class));
-                                    finish();
-                                }
-                            }, false) );
                 } else {
-                    alertDataSyncError();
+                    Helper.insertDefaultStaffs(ctx);
+//                    alertDataSyncError();
                 }
+
+                Helper.dismissSpinnerDialog(loader);
+                if (alertdialogBL != null) alertdialogBL.dismiss();
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                    "Initialization Success","You can now login using your registered account.",
+                    "OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(ctx, LoginActivity.class));
+                            finish();
+                        }
+                    }, false)
+                );
             } catch (JSONException e) {
                 alertDataSyncError();
                 e.printStackTrace();
@@ -844,7 +851,9 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
-                    if (strRef[1].equals("postbranch")) {
+                    if (strRef[0].equals("getdeviceprofile")) {
+                        showBranchDialog("reinit");
+                    } else {
                         postBranchImei();
                     }
                 }
@@ -910,12 +919,14 @@ public class SplashActivity extends BaseActivity {
                                 sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
                                 sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObj.getString("main_branch"));
                                 sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObj.getInt("old_sku_validation"));
+                                sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObj.getInt("reference_employee_validation"));
                                 sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObj.getInt("preload_items"));
                                 sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObj.getInt("saved_product_items"));
                                 sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
                                 sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
                                 sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
                                 sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
+                                sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), rowObj.getString("support_setup"));
                                 isSuccess = true;
                             }
                         }
