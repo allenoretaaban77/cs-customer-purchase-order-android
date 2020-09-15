@@ -188,8 +188,8 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@philbest.com");
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@philbest.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
