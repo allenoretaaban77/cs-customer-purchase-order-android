@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.daimajia.swipe.SwipeLayout;
 import com.fnc.order.android.R;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.enumeration.SharedKey;
@@ -105,7 +106,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         });
 
         holder.cell_fqty.setText(iRs.getFree());
-        if (SharedData.getInstance(context).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
+        if (SharedData.getInstance(context).getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
             holder.cell_fqty.setVisibility(View.GONE);
         } else {
             holder.cell_fqty.setVisibility(View.VISIBLE);

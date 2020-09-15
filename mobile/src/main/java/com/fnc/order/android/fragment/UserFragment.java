@@ -723,7 +723,7 @@ public class UserFragment extends DialogFragment {
                 params.put("logdb", sp.getData(SharedKey.DATABASE.getKey()));
                 params.put("empid", String.valueOf(sl.getEmpId()));
                 params.put("password", et_password.getText().toString());
-                if (sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
+                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
                     params.put("updatedby", sp.getData(SharedKey.REF_EMP_ID.getKey()));
                 } else {
                     params.put("updatedby", sp.getData(SharedKey.EMP_ID.getKey()));

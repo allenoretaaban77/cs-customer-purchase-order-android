@@ -37,4 +37,6 @@ public class GlobalConstants {
     public static String GCP_PROJECTID = "optical-sight-281108";
     public static String GCP_CREDENTIAL = "credentials";
     public static String GCP_REFERENCE = "cs_reference";
+
+    public static String SUPPORT_SETUP = "default";
 }
