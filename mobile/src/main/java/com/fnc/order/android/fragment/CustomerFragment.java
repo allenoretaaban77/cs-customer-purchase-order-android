@@ -128,7 +128,21 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         initViews(v);
         initListeners(v);
 
-        if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
+        String eiOld = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID_OLD.getKey());
+        String inNew = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey());
+        if (inNew.equals(eiOld)) {
+            LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
+            if (llr.size() < 1) {
+                requestCustomers("");
+            } else {
+                loadSavedItems();
+            }
+        } else {
+            SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), inNew);
+            requestCustomers("");
+        }
+
+        /*if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
                 .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
             SharedData.getInstance(ctx).saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             requestCustomers("");
@@ -146,7 +160,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), inNew);
                 requestCustomers("");
             }
-        }
+        }*/
 
         return v;
     }
@@ -188,7 +202,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 
     private void loadSavedItems(){
         // load alpha grid view
-        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
+        /*if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
                 .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
             ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
             if (refStringAlpha.size() > 0) {
@@ -198,7 +212,15 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             }
         } else {
             stringAlpha = new ArrayList<String>();
+        } */
+
+        ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
+        if (refStringAlpha.size() > 0) {
+            stringAlpha = refStringAlpha;
+        } else {
+            stringAlpha = new ArrayList<String>();
         }
+
         adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
         adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
             @Override

@@ -120,6 +120,8 @@ public class SplashActivity extends BaseActivity {
         if(sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), "");
 
+        Log.d("asasa", android.os.Build.MODEL);
+
         TedPermission.with(ctx).setPermissionListener(new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -188,7 +190,7 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@philbest.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
 //                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -570,24 +572,57 @@ public class SplashActivity extends BaseActivity {
                                 for (int i = 0; i < objArr.length(); i++) {
                                     JSONObject rowObj = objArr.getJSONObject(i);
                                     aBranchlist br = new aBranchlist(
-                                            rowObj.getLong("branchid"),
-                                            rowObj.getString("branchcode").trim(),
-                                            rowObj.getString("deviceid").trim(),
-                                            rowObj.getString("description").trim(),
-                                            rowObj.getString("deviceID1").trim(),
-                                            rowObj.getString("active").trim(),
-                                            rowObj.getString("customerID").trim(),
-                                            rowObj.getString("old_branchid").trim(),
-                                            rowObj.getString("old_customerid").trim()
+                                        rowObj.getLong("branchid"),
+                                        rowObj.getString("branchcode").trim(),
+                                        rowObj.getString("deviceid").trim(),
+                                        rowObj.getString("description").trim(),
+                                        rowObj.getString("deviceID1").trim(),
+                                        rowObj.getString("active").trim(),
+                                        rowObj.getString("customerID").trim(),
+                                        rowObj.getString("old_branchid").trim(),
+                                        rowObj.getString("old_customerid").trim()
                                     );
                                     DcBranchlist.getInstance(ctx).insertBranches(br);
                                 }
 
-                                if (strRef[1].equals("init") || strRef[1].equals("proceed")) {
+                                if (strRef[1].equals("init")) {
+                                    showBranchDialog("reinit");
+                                } else {
+                                    LinkedList<aBranchlist> ablRs = DcBranchlist.getInstance(ctx)
+                                        .searchBranchFilterMultiple(aBranchlistKey.DEVICEID.getKey()
+                                        + " = ?", new String[] { Helper.getImei(ctx, refSelectedBranchId) } );
+                                    if (ablRs.size() > 0) {
+                                        aBranchlist ablRsx = ablRs.get(0);
+                                        if (ablRsx.getActive().equals("false")) {
+                                            alertDeviceNotAddedToServer(new String[]{"", "postbranch"});
+                                        } else {
+                                            sp.saveData(SharedKey.IMEI_ID.getKey(), ablRsx.getDeviceID1().trim());
+                                            sp.saveData(SharedKey.BRANCH_ID.getKey(), ablRsx.getBranchid().toString().trim());
+                                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), ablRsx.getBranchcode().trim());
+                                            sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ablRsx.getDescription().trim());
 
-                                    LinkedList<aBranchlist> ablRs = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(aBranchlistKey.DEVICEID.getKey()
-                                                    + " = ? AND " + aBranchlistKey.ACTIVE.getKey() + " = ?",
-                                            new String[] { Helper.getImei(ctx, refSelectedBranchId), "true" } );
+                                            if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(ablRsx.getDescription().trim())) {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                            } else {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                            }
+
+                                            getPreRequisite();
+                                        }
+                                    } else {
+                                        if (strRef[1].equals("init")) {
+                                            postBranchImei();
+                                        } else {
+                                            getPreRequisite();
+                                        }
+                                    }
+                                }
+
+                                /*if (strRef[1].equals("init") || strRef[1].equals("proceed")) {
+                                    LinkedList<aBranchlist> ablRs = DcBranchlist.getInstance(ctx)
+                                        .searchBranchFilterMultiple(aBranchlistKey.DEVICEID.getKey()
+                                        + " = ? AND " + aBranchlistKey.ACTIVE.getKey() + " = ?",
+                                        new String[] { Helper.getImei(ctx, refSelectedBranchId), "true" } );
                                     if (ablRs.size() > 0) {
                                         aBranchlist ablRsx = ablRs.get(0);
                                         sp.saveData(SharedKey.IMEI_ID.getKey(), ablRsx.getDeviceID1().trim());
@@ -612,12 +647,13 @@ public class SplashActivity extends BaseActivity {
                                 } else {
                                     JSONObject rowObj = objArr.getJSONObject(0);
                                     if (rowObj.getString("active").trim().equals("false")) {
-                                        alertDeviceNotAddedToServer(new String[] {"","postbranch"});
+                                        alertDeviceNotAddedToServer(new String[]{"", "postbranch"});
                                     } else {
                                         if (rowObj.getString("branchid").equals("12345")) { // TEST(1234) is not valid so select a valid branch
                                             showBranchDialog("reinit");
                                         } else {
-                                            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+                                            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait...");
+                                            loader.show();
                                             sp.saveData(SharedKey.IMEI_ID.getKey(), rowObj.getString("deviceid").trim());
                                             sp.saveData(SharedKey.BRANCH_ID.getKey(), rowObj.getString("branchid").trim());
                                             sp.saveData(SharedKey.BRANCH_CODE.getKey(), rowObj.getString("branchcode").trim());
@@ -634,7 +670,7 @@ public class SplashActivity extends BaseActivity {
                                             getDeviceProfile("proceed");
                                         }
                                     }
-                                }
+                                }*/
                             } else {
                                 Log.v("dsxtae", "4");
                                 alertReferenceBranchesNotFound();
@@ -774,7 +810,8 @@ public class SplashActivity extends BaseActivity {
         if (Helper.isNetworkAvailable(this)) {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
-            params.put("deviceid", type.equals("init") || type.equals("proceed") ? "n/a" : Helper.getImei(ctx, ""));
+//            params.put("deviceid", type.equals("init") || type.equals("proceed") ? "n/a" : Helper.getImei(ctx, ""));
+            params.put("deviceid", "n/a");
             Iterator it = params.entrySet().iterator();
             String strParams = "";
             while (it.hasNext()) {
@@ -785,9 +822,13 @@ public class SplashActivity extends BaseActivity {
             VolleyInteractor vidp = new VolleyInteractor();
             vidp.registerCallback(new VolleyCallback() {
                 @Override
-                public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+                public void onRequestSuccess(final String response, String type) {
+                    volleyRequestSuccess(response, type);
+                }
                 @Override
-                public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+                public void onRequestFail(VolleyError response, String type) {
+                    volleyRequestFail(response, type);
+                }
             });
             vidp.getDeviceProfile(getApplicationContext(), params, strParams
                     .replaceAll(" ", "%20"), type);

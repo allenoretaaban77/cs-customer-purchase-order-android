@@ -415,6 +415,7 @@ public class Helper {
         String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey()), resStrImeiId = "";
         if (strImeiId.equals("")) {
             if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.P) {
+//                sp.saveData("ref_device_id", "CO-82EC1E7D-79EC-4D70-BCBC-E5AE06EE3C66");
                 sp.saveData("ref_device_id", "CO-" + UUID.randomUUID().toString().toUpperCase());
                 resStrImeiId = sp.getData("ref_device_id");
             } else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P || android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
