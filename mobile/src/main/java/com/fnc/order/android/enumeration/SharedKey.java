@@ -19,7 +19,7 @@ public enum SharedKey {
     SUPPORT_REF_EMP_ID("support_ref_employee_id"),
     SUPPORT_SETUP("support_setup"),
 
-    DATABASE_OLD("ref_old_database"),
+//    DATABASE_OLD("ref_old_database"),
     SKU_VALIDATION("old_sku_validation"),
     REF_EMP_VALIDATION("reference_employee_validation"),
     PRELOAD_ITEMS("preload_items"),
