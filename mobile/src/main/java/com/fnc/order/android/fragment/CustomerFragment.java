@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.CornerPathEffect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -272,6 +273,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         containerbdl = (BackdropLayout) v.findViewById(R.id.containerbdl);
 
         LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) ll_content_box_main.getLayoutParams();
+        int iMrgnTP =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 200 ;
+        int iMrgnLR =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 100 ;
+        params.setMargins(iMrgnLR, iMrgnTP, iMrgnLR, iMrgnTP);
+        ll_content_box_main.setLayoutParams(params);
         ll_content_box_main.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

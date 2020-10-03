@@ -1,5 +1,6 @@
 package com.fnc.order.android.fragment;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -9,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +21,7 @@ import androidx.fragment.app.DialogFragment;
 import com.fnc.order.android.R;
 import com.fnc.order.android.adapters.TransactionItemsAdapter;
 import com.fnc.order.android.model.Order;
+import com.fnc.order.android.utilities.Helper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,11 +45,20 @@ public class TrasactionItemsFragment extends DialogFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rv = inflater.inflate(R.layout.dialog_trasactionitems, container, false);
         ctx = rv.getContext();
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         rv.setFocusableInTouchMode(true);
         rv.requestFocus();
@@ -114,6 +127,13 @@ public class TrasactionItemsFragment extends DialogFragment {
             Toast.makeText(ctx, "Error on process.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
+
+        LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ll_content_box_main.getLayoutParams();
+        int iMrgnTP =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 200 ;
+        int iMrgnLR =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 100 ;
+        params.setMargins(iMrgnLR, iMrgnTP, iMrgnLR, iMrgnTP);
+        ll_content_box_main.setLayoutParams(params);
     }
 
     private void initListeners(View v) {

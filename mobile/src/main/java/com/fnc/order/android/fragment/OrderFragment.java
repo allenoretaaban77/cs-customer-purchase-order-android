@@ -271,6 +271,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 if (intent.getAction().equals("netConnStat")) {
                     Log.d("bcastx", intent.getStringExtra("isConnected"));
                     ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setText("ALIVE V-" + Helper.getVersion(ctx, getActivity()));
+                    if (Helper.getScrRatio(ctx) < 0.6) {
+                        ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setText("ALIVE");
+                    }
                     ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setText("DOWN V-" + Helper.getVersion(ctx, getActivity()));
                     if (intent.getStringExtra("isConnected").equals("false")) {
                         ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setVisibility(View.GONE);
@@ -424,9 +427,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
         tv_grandtotal_lbl = (TextView) v.findViewById(R.id.tv_grandtotal_lbl);
 
-        tv_grandtotal_lbl.setText("Grand Total:");
+        tv_grandtotal_lbl.setText("Total:");
         if (SharedData.getInstance(ctx).getInt(SharedKey.COMPUTE_QTY_ONLY.getKey()) == 1) {
-            tv_grandtotal_lbl.setText("Count Total:");
+            tv_grandtotal_lbl.setText("Total:");
         }
 
         tv_header_price = (TextView) v.findViewById(R.id.tv_header_price);
@@ -1691,7 +1694,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         if (!refStr.equals("")) {
             DecimalFormat df = new DecimalFormat("#,###,###");
             if (!refStr.contains(".")) {
-                int u_qty = Integer.parseInt(refStr);
+                double u_qty = Double.parseDouble(refStr);
                 refStr = String.valueOf(df.format(u_qty));
             } else {
                 String[] strSplit = refStr.split("\\.");
