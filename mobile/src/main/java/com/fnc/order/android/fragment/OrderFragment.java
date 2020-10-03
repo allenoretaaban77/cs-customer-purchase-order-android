@@ -162,17 +162,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private BroadcastReceiver connStatusReceiver;
     private Boolean mx_taskrun = false; private Handler mx_handler; private Runnable mx_runnable;
 
-    public OrderFragment() {
-        // Required empty public constructor
-    }
-
-
+    public OrderFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
 
     @Override
     public void onDestroy() {
@@ -202,7 +197,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
 
         if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-//        if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
             strBranchEncoding = "1";
         } else {
             strBranchEncoding = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
@@ -405,8 +399,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         et_date = (EditText) v.findViewById(R.id.et_date);
         et_search = (EditText) v.findViewById(R.id.et_search);
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
-        tv_header_price = (TextView) v.findViewById(R.id.tv_header_price);
-        tv_header_total = (TextView) v.findViewById(R.id.tv_header_total);
 
         pageMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         pageMenu.setXOffset(8).setYOffset(0);
@@ -432,30 +424,26 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
         tv_grandtotal_lbl = (TextView) v.findViewById(R.id.tv_grandtotal_lbl);
 
-        if (!Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-//        if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
-            ((RelativeLayout) v.findViewById(R.id.rl_back_box)).setVisibility(View.GONE);
+        tv_grandtotal_lbl.setText("Grand Total:");
+        if (SharedData.getInstance(ctx).getInt(SharedKey.COMPUTE_QTY_ONLY.getKey()) == 1) {
             tv_grandtotal_lbl.setText("Count Total:");
-            tv_header_price.setVisibility(View.GONE);
-            tv_header_total.setVisibility(View.GONE);
-        } else {
-            tv_grandtotal_lbl.setText("Grand Total:");
+        }
+
+        tv_header_price = (TextView) v.findViewById(R.id.tv_header_price);
+        tv_header_price.setVisibility(View.GONE);
+        if (SharedData.getInstance(ctx).getInt(SharedKey.SHOW_PRICE_COL.getKey()) == 1) {
             tv_header_price.setVisibility(View.VISIBLE);
+        }
+
+        tv_header_total = (TextView) v.findViewById(R.id.tv_header_total);
+        tv_header_total.setVisibility(View.GONE);
+        if (SharedData.getInstance(ctx).getInt(SharedKey.SHOW_TOTAL_COL.getKey()) == 1) {
             tv_header_total.setVisibility(View.VISIBLE);
         }
 
-        /* if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(
-                SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
-        } else {
-            tv_grandtotal_lbl.setText("Grand Total:");
-            tv_header_price.setVisibility(View.VISIBLE);
-            tv_header_total.setVisibility(View.VISIBLE);
-        } */
-
         tv_hdr_freeitem = (TextView) v.findViewById(R.id.tv_hdr_freeitem);
-        if (SharedData.getInstance(ctx).getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
-            tv_hdr_freeitem.setVisibility(View.GONE);
-        } else {
+        tv_hdr_freeitem.setVisibility(View.GONE);
+        if (SharedData.getInstance(ctx).getInt(SharedKey.SHOW_FREE_COL.getKey()) == 1) {
             tv_hdr_freeitem.setVisibility(View.VISIBLE);
         }
     }
@@ -838,8 +826,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 } else {
                     if(!isPosted) {
                         isPosted = true;
-                        if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
-                            submitOrders();
+                        if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == 0) {
+                            validateToPost();
                         } else {
                             getReportType();
                         }
@@ -847,7 +835,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
             }
         }else{
-//                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
             BounceView.addAnimTo( Helper.okDialog(ctx,
                 "Error","Please add an item.", "CLOSE",
                 null, false) );
@@ -1135,6 +1122,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setDateTime(Helper.getPostingDate());
                 ol.setStatus(0);
                 ol.setReferenceRecid(Helper.getReqDate(5, ""));
+                ol.setDeliver_date_default(Helper.getReqDate(7, refStringDate));
 
                 try {
                     DcOrdered.getInstance(ctx).insertOrderedlist(ol);
@@ -1562,51 +1550,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
     }
 
-    private void onTableItemClick(final View v) {
-        new android.os.Handler().postDelayed(
-            new Runnable() {
-                @Override
-                public void run() {
-                    calcRefId = v.getId();
-                    try {
-                        LinkedList<Order> refOS = DcOrder.getInstance(ctx).getOrderlistAsc();
-                        for (int i = 0; i < refOS.size(); i++) {
-                            Order olx = refOS.get(i);
-                            TableRow trx = (TableRow) tblContentBox.findViewById(Integer.parseInt(olx.getItemRecid()));
-                            if (trx != null) {
-                                TextView tvQty = (TextView) trx.getChildAt(0);
-                                tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-            //                    tvQty.setHighlightColor(getResources().getColor(R.color.transparent));
-                                tvQty.setTextColor(getResources().getColor(R.color.black));
-                                TextView tvUnit = (TextView) trx.getChildAt(1);
-                                tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-                                LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-                                tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-                                TextView tvPrice = (TextView) trx.getChildAt(3);
-                                tvPrice.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-                                TextView tvTotal = (TextView) trx.getChildAt(4);
-                                tvTotal.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background));
-                            }
-                        }
-                    } finally {
-                        TableRow trx = (TableRow) v;
-                        TextView tvQty = (TextView) trx.getChildAt(0);
-                        tvQty.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-                        tvQty.setTextColor(getResources().getColor(R.color.green_5));
-                        TextView tvUnit = (TextView) trx.getChildAt(1);
-                        tvUnit.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-                        LinearLayout tvDescBox = (LinearLayout) trx.getChildAt(2);
-                        tvDescBox.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-                        TextView tvPrice = (TextView) trx.getChildAt(3);
-                        tvPrice.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-                        TextView tvTotal = (TextView) trx.getChildAt(4);
-                        tvTotal.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cell_background_selected));
-                    }
-                }
-            }, 300
-        );
-    }
-
     private void backItNow(final View v) {
         Helper.dismissSpinnerDialog(loader);
         Helper.hideSoftKeyboard(getActivity());
@@ -1820,12 +1763,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
                 }
                 DecimalFormat df = new DecimalFormat("#,###,###.00");
-                if (!Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-//                if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
-    //            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+
+                tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
+                if (SharedData.getInstance(ctx).getInt(SharedKey.COMPUTE_QTY_ONLY.getKey()) == 1) {
                     tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
-                } else {
-                    tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
                 }
             } else {
                 tv_grandtotal.setText("0.00");

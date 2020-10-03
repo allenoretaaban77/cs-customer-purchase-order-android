@@ -22,6 +22,7 @@ public class OrderedlistQueryBuilder {
         values.put(OrderedKey.DATETIME.getKey(), ordered.getDateTime());
         values.put(OrderedKey.STATUS.getKey(), ordered.getStatus());
         values.put(OrderedKey.REF_RECID.getKey(), ordered.getReferenceRecid());
+        values.put(OrderedKey.DELIVERY_DATE_DEFAULT.getKey(), ordered.getDeliver_date_default());
         return values;
     }
 }

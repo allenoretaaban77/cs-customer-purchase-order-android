@@ -12,6 +12,7 @@ import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.enumeration.aStaffsKey;
+import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.Helper;
 
 import java.io.File;
@@ -170,15 +171,9 @@ public class DBHelper extends SQLiteOpenHelper {
         int version = oldVersion + 1;
         switch (version){
             case 2:
-                db.execSQL(createTables(Table.ORDER, setOrderFields()));
-                db.execSQL(createTables(Table.ORDERED, setOrderedFields()));
-                db.execSQL(createTables(Table.MENULIST, setMenulistFields()));
-                db.execSQL(createTables(Table.USERSLIST, setUserlistFields()));
-                db.execSQL(createTables(Table.A_ITEMLIST, setaItemlistFields()));
-                db.execSQL(createTables(Table.STAFFS, setStaffsFields()));
-                db.execSQL(createTables(Table.STAFFS_INACTIVE, setStaffsFields()));
-                db.execSQL(createTables(Table.BRANCHLIST, setBranchlistFields()));
-//                db.execSQL("ALTER TABLE " + Table.ORDER.getName() + " ADD COLUMN " + OrderKey.TOTAL.getKey() + " TEXT SET DEFAULT ''");
+                db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
+                db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
+                break;
         }
     }
 }

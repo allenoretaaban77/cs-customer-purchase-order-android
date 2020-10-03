@@ -11,6 +11,7 @@ import com.fnc.order.android.database.Table;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.model.Ordered;
+import com.fnc.order.android.model.aBranchlist;
 
 import java.util.LinkedList;
 
@@ -69,20 +70,33 @@ public class DcOrdered extends DBHelper {
         db.close();
     }
 
-    public void updateRefRecIdViaRecId(String recid, Integer intx){
+    public void updateRefDateViaRecId(String recid, String val){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(OrderedKey.STATUS.getKey(), intx);
-        db.updateWithOnConflict(Table.ORDERED.getName(), cv,
-                OrderedKey.CUSTOMER_RECID.getKey()+ " = ?",
-                new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
+        cv.put(OrderedKey.DELIVERY_DATE_DEFAULT.getKey(), val);
+        db.updateWithOnConflict(Table.ORDERED.getName(), cv, OrderedKey.REF_RECID.getKey()+ " = ?",
+            new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }
 
     public LinkedList<Ordered> getOrderedlist() {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT * FROM " + Table.ORDERED.getName() + " ORDER BY datetime DESC";
+        String strQry = "SELECT * FROM " + Table.ORDERED.getName() + " ORDER BY "
+            + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " DESC, " + OrderedKey.CUSTOMER_NAME.getKey() + " ASC" ;
         Cursor c = db.rawQuery(strQry, null);
+        LinkedList<Ordered> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setOrderedlist(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
+    public LinkedList<Ordered> searchFilterMultiple(String strCol, String[] strMultiple) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.ORDERED.getName() + " WHERE " + strCol;
+        Cursor c = db.rawQuery(strQry, strMultiple);
         LinkedList<Ordered> list = new LinkedList<>();
         while (c.moveToNext()) {
             list.add(setOrderedlist(c));
@@ -121,6 +135,7 @@ public class DcOrdered extends DBHelper {
         od.setDateTime(c.getString(c.getColumnIndex(OrderedKey.DATETIME.getKey())));
         od.setStatus(c.getInt(c.getColumnIndex(OrderedKey.STATUS.getKey())));
         od.setReferenceRecid(c.getString(c.getColumnIndex(OrderedKey.REF_RECID.getKey())));
+        od.setDeliver_date_default(c.getString(c.getColumnIndex(OrderedKey.DELIVERY_DATE_DEFAULT.getKey())));
         return od;
     }
 }

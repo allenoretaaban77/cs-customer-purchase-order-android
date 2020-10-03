@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +25,7 @@ import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.adapters.TransactionsAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcOrdered;
+import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.Helper;
@@ -79,51 +82,35 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
         btn_back = (ImageButton) refV.findViewById(R.id.btn_back);
         list_view = (ListView) refV.findViewById(R.id.list_view);
 
-        final LinkedList<Ordered> odll = DcOrdered.getInstance(ctx).getOrderedlist();
-//        final LinkedList<Ordered> odll = new LinkedList<>();
-//        for(int z=0; z<1000; z++) {
-//            int refVal = 1000 + z;
-//            Ordered ox = new Ordered();
-//            ox.setCustomerIntegRecid("7");
-//            ox.setCustomerRecid("7");
-//            ox.setCustomerName("Sample Customer " + String.valueOf(z));
-//            ox.setDeliveryDate(Helper.getPostingDate());
-//            ox.setCreatedBy("Developer");
-//            ox.setRemarks("Sample Remarks");
-//            ox.setReferenceEmployeeNo("7");
-//            ox.setJson("JSON Ref");
-//            ox.setJsonComplete("JSON Complete Ref");
-//            ox.setGrandtotal(String.valueOf(refVal)+".77");
-//            ox.setDateTime(Helper.getPostingDate());
-//            ox.setStatus(0);
-//            ox.setReferenceRecid("7777777");
-//            odll.add(ox);
-//        }
-
-//        ArrayList<Ordered> arrayList = new ArrayList<Ordered>();
-        if(odll.size() > 0) {
-            adapter = new TransactionsAdapter(ctx, odll);
-            adapter.setOnItemClickListener(new TransactionsAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view,  int pos) {
-                    Ordered rso = odll.get(pos);
-//                    try {
-//                        String strRs = new JSONObject(rso.getJsonComplete()).getString("details");
-//                        String strArr = new JSONArray(strRs).get(0).toString();
-                        DialogFragment dialogFrag = TrasactionItemsFragment.searchInstance();
-                        Bundle args = new Bundle();
-                        args.putString("details", rso.getJsonComplete());
-                        dialogFrag.setArguments(args);
-                        dialogFrag.setTargetFragment(thisFragment, ITEM_DIALOG_FRAGMENT);
-                        dialogFrag.setCancelable(false);
-                        dialogFrag.show(getActivity().getSupportFragmentManager(), "dialog_search_item");
-//                    } catch (JSONException e) {
-//                        Toast.makeText(ctx, "Error on process.", Toast.LENGTH_SHORT).show();
-//                        e.printStackTrace();
-//                    }
+        LinkedList<Ordered> refRs = DcOrdered.getInstance(ctx).searchFilterMultiple(
+            OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + "=?", new String[] { "0" });
+        if (refRs.size() > 0) {
+            loader = Helper.showSpinnerDialog(ctx, "Updating Records", "Please wait..."); loader.show();
+            try {
+                for (int i = 0; i < refRs.size(); i++) {
+                    Ordered odRs = refRs.get(i);
+                    if (odRs.getDeliver_date_default().equals("0")) {
+                        DcOrdered.getInstance(ctx).updateRefDateViaRecId(
+                            odRs.getReferenceRecid(), Helper.getReqDate(7, odRs.getDeliveryDate())
+                        );
+                    }
                 }
-            });
-            list_view.setAdapter(adapter);
+            } catch (Exception e) {
+                Toast.makeText(ctx, "Display Records ERROR! Please contact IT support!", Toast.LENGTH_SHORT).show();
+            } finally {
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            fillItems();
+                            loader.dismiss();
+                        }
+                    },
+                    2000
+                );
+            }
+            Log.d("asas", "have");
+        } else {
+            fillItems();
         }
     }
 
@@ -133,6 +120,27 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
                 backItNow(v);
             }
         });
+    }
+
+    private void fillItems() {
+        final LinkedList<Ordered> odll = DcOrdered.getInstance(ctx).getOrderedlist();
+        if(odll.size() > 0) {
+            adapter = new TransactionsAdapter(ctx, odll);
+            adapter.setOnItemClickListener(new TransactionsAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view,  int pos) {
+                    Ordered rso = odll.get(pos);
+                    DialogFragment dialogFrag = TrasactionItemsFragment.searchInstance();
+                    Bundle args = new Bundle();
+                    args.putString("details", rso.getJsonComplete());
+                    dialogFrag.setArguments(args);
+                    dialogFrag.setTargetFragment(thisFragment, ITEM_DIALOG_FRAGMENT);
+                    dialogFrag.setCancelable(false);
+                    dialogFrag.show(getActivity().getSupportFragmentManager(), "dialog_search_item");
+                }
+            });
+            list_view.setAdapter(adapter);
+        }
     }
 
     public void onRequestSuccess(String response, String type) { }

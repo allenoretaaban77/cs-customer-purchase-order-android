@@ -16,6 +16,7 @@ public class Ordered implements Serializable {
     private String datetime;
     private int status;
     private String reference_recid;
+    private String deliver_date_default;
 
     public String getCustomerIntegRecid() { return customer_integ_recid; }
     public void setCustomerIntegRecid(String customer_integ_recid) { this.customer_integ_recid = customer_integ_recid; }
@@ -79,5 +80,10 @@ public class Ordered implements Serializable {
         return reference_recid;
     }
     public void setReferenceRecid(String reference_recid) { this.reference_recid = reference_recid; }
+
+    public String getDeliver_date_default() {
+        return deliver_date_default;
+    }
+    public void setDeliver_date_default(String deliver_date_default) { this.deliver_date_default = deliver_date_default; }
 
 }

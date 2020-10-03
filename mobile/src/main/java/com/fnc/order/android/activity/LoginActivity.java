@@ -265,19 +265,20 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BounceView.addAnimTo(Helper.okCancelDialog(ctx, "Update App Config",
+                BounceView.addAnimTo(Helper.okDialog(ctx, "Update App Config",
                     "Device ID: " + sp.getData(SharedKey.IMEI_ID.getKey()) +
                     "\r\nClient Name: " + sp.getData(SharedKey.DATABASEID.getKey()) +
                     "\r\nClient Server: " + sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()) +
-                    "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()) +
-                    "\r\n\r\nThis will update system settings.  Are you sure you want to continue?",
-                    "Yes", new DialogInterface.OnClickListener() {
+                    "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()),
+//                    "\r\n\r\nThis will update system settings.  Are you sure you want to continue?",
+                    /*"Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             updateloader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); updateloader.show();
                             clientSignin(String.valueOf(sp.getData(SharedKey.REF_ADMIN_USER.getKey())), String.valueOf(sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey())));
                         }
-                    }, "No", null, false)
+                    }, */
+                    "Close", null, false)
                 );
 
                 /*alertDialogSettingsAuth = actionDialog(ctx, "SETTINGS",
@@ -1339,7 +1340,7 @@ public class LoginActivity extends BaseActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
-            if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
+            if(sp.getInt(SharedKey.PER_AGENT_SETUP.getKey()) == 0) {
                 params.put("agentid", "");
             } else {
                 params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
@@ -1369,13 +1370,14 @@ public class LoginActivity extends BaseActivity {
                     DcMenulist.getInstance(ctx).emptyMenulist();
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject obj = objArr.getJSONObject(i);
-                        MenuList mlList = new MenuList();
-                        mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
-                        mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
+
                         String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
-                        mlList.setCustomerName(strCustomerName);
-                        mlList.setRecordCount(0);
-                        mlList.setRemarks("");
+                        MenuList mlList = new MenuList(
+                            obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
+                            obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
+                            strCustomerName,
+                            "", 0, ""
+                        );
                         if (!strCustomerName.equals("")) {
                             if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
                                 mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
@@ -1384,6 +1386,7 @@ public class LoginActivity extends BaseActivity {
                             }
                             DcMenulist.getInstance(ctx).insertMenulist(mlList);
                         }
+
                     }
                 }
             } catch (JSONException e) {
@@ -1463,24 +1466,33 @@ public class LoginActivity extends BaseActivity {
                                         }, false) );
                                 }
 
-                                String referenceDate = rowObj.getString("debug_date");
-                                if (!referenceDate.equals("")) { new googleCloudUploadProc().execute(""); }
-
-                                String referenceCN = rowObj.getString("domain_db");
-                                String referenceCNDefault = rowObj.getString("domain_db_default");
-                                String refCN = Helper.checkBranchProfile(ctx).get(0).getDescription();
-                                JSONArray objArrDB = new JSONArray(referenceCN);
-                                Boolean isSwitchedCN = false;
-                                if (objArrDB.length() > 0) {
-                                    for (int j = 0; j < objArrDB.length(); j++) {
-                                        JSONObject rowObjDB = objArrDB.getJSONObject(j);
-                                        if (rowObjDB.getString("cn").equals(refCN)) {
-                                            isSwitchedCN = true;
-                                            SharedData.getInstance(ctx).saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjDB.getString("domain"));
-                                        }
-                                    }
-                                    if(!isSwitchedCN) {
-                                        SharedData.getInstance(ctx).saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), referenceCNDefault);
+                                String strConf = rowObj.getString("config");
+                                JSONArray objArrConf = new JSONArray(strConf);
+                                String strDatabaseId = sp.getData(SharedKey.DATABASEID.getKey());
+                                for (int j = 0; j < objArrConf.length(); j++) {
+                                    JSONObject rowObjConf = objArrConf.getJSONObject(j);
+                                    if (rowObjConf.getString("database_id").equals(strDatabaseId)) {
+                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
+                                        sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
+                                        sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
+                                        sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
+                                        sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObjConf.getString("main_branch"));
+                                        sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObjConf.getInt("old_sku_validation"));
+                                        sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObjConf.getInt("reference_employee_validation"));
+                                        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObjConf.getInt("preload_items"));
+                                        sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObjConf.getInt("saved_product_items"));
+                                        sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
+                                        sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
+                                        sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObjConf.getString("support_employee_id"));
+                                        sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObjConf.getString("support_ref_employee_id"));
+                                        sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), rowObjConf.getInt("show_price_column_on_order"));
+                                        sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), rowObjConf.getInt("show_total_column_on_order"));
+                                        sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), rowObjConf.getInt("show_free_column_on_order"));
+                                        sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), rowObjConf.getInt("compute_quantity_only"));
+                                        sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
+                                        sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
+                                        sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
+                                        Helper.insertDefaultStaffs(ctx);
                                     }
                                 }
 
@@ -1552,6 +1564,7 @@ public class LoginActivity extends BaseActivity {
                             detailMap.put(OrderedKey.DATETIME.getKey(), aCRsx.getDateTime());
                             detailMap.put(OrderedKey.STATUS.getKey(), aCRsx.getStatus());
                             detailMap.put(OrderedKey.REF_RECID.getKey(), aCRsx.getReferenceRecid());
+                            detailMap.put(OrderedKey.DELIVERY_DATE_DEFAULT.getKey(), aCRsx.getDeliver_date_default());
                             detailsArrayList.add(detailMap);
 
                             paramsArray.put(String.valueOf(aCRsx.getReferenceRecid()), detailsArrayList);
@@ -1637,7 +1650,13 @@ public class LoginActivity extends BaseActivity {
                                 sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
                                 sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
                                 sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
-                                sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), rowObj.getString("support_setup"));
+                                sp.saveData(SharedKey.SHOW_PRICE_COL.getKey(), rowObj.getString("show_price_column_on_order"));
+                                sp.saveData(SharedKey.SHOW_TOTAL_COL.getKey(), rowObj.getString("show_total_column_on_order"));
+                                sp.saveData(SharedKey.SHOW_FREE_COL.getKey(), rowObj.getString("show_free_column_on_order"));
+                                sp.saveData(SharedKey.COMPUTE_QTY_ONLY.getKey(), rowObj.getString("compute_quantity_only"));
+                                sp.saveData(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObj.getString("show_price_on_search"));
+                                sp.saveData(SharedKey.PER_AGENT_SETUP.getKey(), rowObj.getString("per_agent_setup"));
+                                sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObj.getInt("enable_report_type"));
                                 isSuccess = true;
                                 Helper.insertDefaultStaffs(ctx);
                             }
@@ -1749,7 +1768,7 @@ public class LoginActivity extends BaseActivity {
                                     );
                                 } else {
                                     g_jsonobject = obj;
-                                    new checkAppConfig().execute(objx.getString("DatabaseID"));
+                                    // new checkAppConfig().execute(objx.getString("DatabaseID"));
                                 }
                             }
                         } catch (JSONException e) {
