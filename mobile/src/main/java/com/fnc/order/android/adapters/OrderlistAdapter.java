@@ -80,6 +80,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+        SharedData sp = SharedData.getInstance(context);
         OrderlistAdapter.ViewHolder holder;
 
         LayoutInflater inflater = (LayoutInflater) context
@@ -106,9 +107,8 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         });
 
         holder.cell_fqty.setText(iRs.getFree());
-        if (SharedData.getInstance(context).getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
-            holder.cell_fqty.setVisibility(View.GONE);
-        } else {
+        holder.cell_fqty.setVisibility(View.GONE);
+        if (sp.getInt(SharedKey.SHOW_FREE_COL.getKey()) == 1) {
             holder.cell_fqty.setVisibility(View.VISIBLE);
             holder.cell_fqty.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -227,6 +227,16 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         } else {
             holder.cell_price.setVisibility(View.GONE);
             holder.cell_total.setVisibility(View.GONE);
+        }
+
+        holder.cell_price.setVisibility(View.GONE);
+        if (sp.getInt(SharedKey.SHOW_PRICE_COL.getKey()) == 1) {
+            holder.cell_price.setVisibility(View.VISIBLE);
+        }
+
+        holder.cell_total.setVisibility(View.GONE);
+        if (sp.getInt(SharedKey.SHOW_TOTAL_COL.getKey()) == 1) {
+            holder.cell_total.setVisibility(View.VISIBLE);
         }
 
         return convertView;

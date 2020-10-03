@@ -35,7 +35,7 @@
             <TextView
                 android:fontFamily="@font/medium"
                 android:layout_marginBottom="10dp"
-                android:textSize="33sp"
+                android:textSize="@dimen/login_title_text_size"
                 android:textColor="@color/green_1"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.andreabaccega.widget.FormEditText
-                    android:textSize="20sp"
+                    android:textSize="@dimen/header_text_size"
                     android:fontFamily="@font/medium"
                     android:id="@+id/username"
                     android:textColorHint="@color/gray_4"
@@ -88,7 +88,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <com.andreabaccega.widget.FormEditText
-                        android:textSize="17sp"
+                        android:textSize="@dimen/header_text_size"
                         android:fontFamily="@font/regular"
                         android:id="@+id/password"
                         android:textColorHint="@color/gray_4"
@@ -132,7 +132,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <Button
-                        android:textSize="20sp"
+                        android:textSize="@dimen/header_text_size"
                         android:fontFamily="@font/medium"
                         android:background="@android:color/transparent"
                         android:id="@+id/login_button"

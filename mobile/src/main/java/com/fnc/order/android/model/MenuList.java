@@ -10,6 +10,15 @@ public class MenuList implements Serializable {
     private Integer recordcount;
     private String alphachar;
 
+    public MenuList (String customerid, String integration_recid, String customername, String remarks, Integer recordcount, String alphachar) {
+        this.customerid = customerid;
+        this.integration_recid = integration_recid;
+        this.customername = customername;
+        this.remarks = remarks;
+        this.recordcount = recordcount;
+        this.alphachar = alphachar;
+    }
+
     public String getCustomerID() { return customerid; }
     public void setCustomerID(String customerid) { this.customerid = customerid; }
 

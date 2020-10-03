@@ -63,7 +63,7 @@ public class MenuStoresAdapter extends ArrayAdapter<MenuList> {
         TextView tvChecklistCount = (TextView) rowView.findViewById(R.id.dr_record_count);
         tvChecklistCount.setText(String.valueOf(mlRS.getRecordCount()));
 
-        if(mlRS.getCustomerName().equals("No Record Found")) {
+        if(mlRS.getCustomerName().equals("No Record Found") || mlRS.getCustomerName().equals("")) {
             tvRemarks.setVisibility(View.GONE);
             tvEmpty.setVisibility(View.VISIBLE);
             tvEmpty.setText(mlRS.getCustomerName());

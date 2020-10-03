@@ -17,9 +17,15 @@ public enum SharedKey {
     SUPPORT_PASSWORD("support_password"),
     SUPPORT_EMP_ID("support_employee_id"),
     SUPPORT_REF_EMP_ID("support_ref_employee_id"),
-    SUPPORT_SETUP("support_setup"),
 
-//    DATABASE_OLD("ref_old_database"),
+    SHOW_PRICE_COL("show_price_column_on_order"),
+    SHOW_TOTAL_COL("show_total_column_on_order"),
+    SHOW_FREE_COL("show_free_column_on_order"),
+    COMPUTE_QTY_ONLY("compute_quantity_only"),
+    SHOW_SEARCH_PRICE("show_price_on_search"),
+    PER_AGENT_SETUP("per_agent_setup"),
+    ENABLE_REPORT_TYPE("enable_report_type"),
+
     SKU_VALIDATION("old_sku_validation"),
     REF_EMP_VALIDATION("reference_employee_validation"),
     PRELOAD_ITEMS("preload_items"),

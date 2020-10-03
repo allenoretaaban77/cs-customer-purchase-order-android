@@ -31,7 +31,7 @@
                     android:layout_height="44dp">
                         <TextView
                             android:fontFamily="@font/medium"
-                            android:textSize="31sp"
+                            android:textSize="@dimen/title_text_size"
                             android:textColor="@color/green_1"
                             android:layout_gravity="center"
                             android:layout_width="wrap_content"
