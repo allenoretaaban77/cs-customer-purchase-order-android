@@ -374,6 +374,12 @@ public class Helper {
         return monthNumber + day;
     }
 
+    public static double getScrRatio(Context ctx) { // if >= to 0.6 the tab
+        double refMult = Double.parseDouble(String.valueOf(Helper.getScreenDimension(ctx, "w"))) /
+                Double.parseDouble(String.valueOf(Helper.getScreenDimension(ctx, "h")));
+        return refMult;
+    }
+
     public static int getScreenDimension(Context ctx, String strSide) {
         WindowManager wm = (WindowManager) ctx.getSystemService(WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();

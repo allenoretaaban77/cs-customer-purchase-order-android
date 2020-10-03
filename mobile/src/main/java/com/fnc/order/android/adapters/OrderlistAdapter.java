@@ -220,15 +220,6 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             }
         }
 
-//        if(Helper.checkBranchProfile(getContext()).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(getContext()).get(0).getDescription().equals("Main")) {
-        if (SharedData.getInstance(getContext()).getData(SharedKey.BRANCH_DESCRIPTION.getKey()).equals("Commissary") || SharedData.getInstance(getContext()).getData(SharedKey.BRANCH_DESCRIPTION.getKey()).equals("Main")) {
-            holder.cell_price.setVisibility(View.VISIBLE);
-            holder.cell_total.setVisibility(View.VISIBLE);
-        } else {
-            holder.cell_price.setVisibility(View.GONE);
-            holder.cell_total.setVisibility(View.GONE);
-        }
-
         holder.cell_price.setVisibility(View.GONE);
         if (sp.getInt(SharedKey.SHOW_PRICE_COL.getKey()) == 1) {
             holder.cell_price.setVisibility(View.VISIBLE);

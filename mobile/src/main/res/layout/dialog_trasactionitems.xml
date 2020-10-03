@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@drawable/background_round_border_inner_transparent"
-    android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/transparent"
+    android:layout_gravity="center"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <RelativeLayout
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:id="@+id/ll_content_box_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center">
 
         <LinearLayout
             android:layout_height="wrap_content"
-            style="@style/layoutStyleMenu"
-            android:layout_width="750dp"
+            android:layout_width="match_parent"
             android:orientation="horizontal"
             android:background="@drawable/background_round_border">
             <TextView
@@ -51,9 +53,9 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_marginTop="50dp"
-            style="@style/layoutStyleMenu"
-            android:layout_width="750dp"
+            android:layout_marginTop="5dp"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:background="@drawable/background_round_border"
             android:padding="5dp">
 
@@ -93,6 +95,8 @@
             </RelativeLayout>
 
             <LinearLayout
+                android:paddingRight="1dp"
+                android:paddingLeft="1dp"
                 android:layout_marginTop="2dp"
                 android:id="@+id/alphagridview_box"
                 android:background="@drawable/background_green_3_border"
@@ -109,6 +113,6 @@
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-</ScrollView>
+</RelativeLayout>

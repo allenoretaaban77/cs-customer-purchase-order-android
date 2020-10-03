@@ -177,15 +177,15 @@ public class SplashActivity extends BaseActivity {
         if(strCN.equals("")) {
             if (Helper.isNetworkAvailable(this)) {
                 alertDialog = actionDialog( ctx, "APP START-UP",
-                        "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
-                        "Username", "Password", "Branch",
-                        "SUBMIT", new View.OnClickListener() {
-                            public void onClick(View v) {
-                                loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
-                                clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
-                                    ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
-                            }
-                        }, "", null, 0
+                    "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
+                    "Username", "Password", "Branch",
+                    "SUBMIT", new View.OnClickListener() {
+                        public void onClick(View v) {
+                            loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
+                            clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
+                                ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
+                        }
+                    }, "", null, 0
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
@@ -360,8 +360,12 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void proceedNormal() {
-        if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()))) {
-            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+            if (Helper.getScrRatio(ctx) > 0.6) {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+            } else {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+            }
         } else {
             sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
         }
@@ -601,7 +605,11 @@ public class SplashActivity extends BaseActivity {
                                             sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ablRsx.getDescription().trim());
 
                                             if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(ablRsx.getDescription().trim())) {
-                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                                if (Helper.getScrRatio(ctx) > 0.6) {
+                                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                                } else {
+                                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                                }
                                             } else {
                                                 sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
                                             }
@@ -951,6 +959,13 @@ public class SplashActivity extends BaseActivity {
                                 sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
                                 sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
                                 sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
+
+                                if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
+                                    sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
+                                    sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
+                                    sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
+                                }
+
                                 isSuccess = true;
                             }
                         }

@@ -14,7 +14,9 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fnc.order.android.R;
+import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Itemlist;
+import com.fnc.order.android.utilities.SharedData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +95,7 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        SharedData sp = SharedData.getInstance(ctx);
         final Itemlist f = filtered_items.get(position);
 
         if(!f.getItemName().equals("none")) {
@@ -115,6 +118,11 @@ public class ItemlistAdapterRv extends RecyclerView.Adapter<ItemlistAdapterRv.Vi
                     holder.cb_select.setChecked(false);
                 }
                 holder.tvUnit.setText(f.getUnitName());
+
+                holder.tvPrice.setVisibility(View.GONE);
+                if (sp.getInt(SharedKey.SHOW_SEARCH_PRICE.getKey()) == 1) {
+                    holder.tvPrice.setVisibility(View.VISIBLE);
+                }
                 if(f.getSellingPrice().trim().equals("null") || f.getSellingPrice().trim().equals("null")) {
                     holder.tvPrice.setText("(0.00)");
                 }else{
