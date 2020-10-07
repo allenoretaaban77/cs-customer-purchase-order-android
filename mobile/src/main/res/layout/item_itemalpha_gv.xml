@@ -16,7 +16,6 @@
                 android:layout_marginTop="5dp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/medium"
-                android:textSize="90sp"
                 android:gravity="center"
                 android:id="@+id/tv_alpha"
                 android:layout_width="match_parent"

@@ -398,8 +398,8 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                         }
                     } else {
                         alertDialog = Helper.okDialog(ctx,
-                                "Error","Please select an item/s", "OK",
-                                null, false);
+                            "Error","Please select an item/s", "OK",
+                            null, false);
                         BounceView.addAnimTo(alertDialog);
                     }
                 }

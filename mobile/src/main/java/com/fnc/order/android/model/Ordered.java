@@ -13,6 +13,7 @@ public class Ordered implements Serializable {
     private String json;
     private String json_complete;
     private String grandtotal;
+    private String grandtotalcount;
     private String datetime;
     private int status;
     private String reference_recid;
@@ -61,10 +62,11 @@ public class Ordered implements Serializable {
     }
     public void setJsonComplete(String json_complete) { this.json_complete = json_complete; }
 
-    public String getGrandtotal() {
-        return grandtotal;
-    }
+    public String getGrandtotal() { return grandtotal; }
     public void setGrandtotal(String grandtotal) { this.grandtotal = grandtotal; }
+
+    public String getGrandtotalcount() { return grandtotalcount; }
+    public void setGrandtotalcount(String grandtotalcount) { this.grandtotalcount = grandtotalcount; }
 
     public String getDateTime() {
         return datetime;

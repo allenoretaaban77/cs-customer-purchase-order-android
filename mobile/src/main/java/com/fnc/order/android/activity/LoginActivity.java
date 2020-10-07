@@ -136,14 +136,9 @@ public class LoginActivity extends BaseActivity {
         // massive
 //        usernameText.setText("office");
 //        passwordEText.setText("Office");
-
         // commi
 //        usernameText.setText("12105");
 //        passwordEText.setText("746265");
-
-        // og
-//        usernameText.setText("12350");
-//        passwordEText.setText("0114");
     }
 
     private void initListeners(){
@@ -1497,6 +1492,16 @@ public class LoginActivity extends BaseActivity {
                                             sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
                                             sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
                                             sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
+                                        }
+
+                                        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                                            if (Helper.getScrRatio(ctx) > 0.6) {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                            } else {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                            }
+                                        } else {
+                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
                                         }
 
                                         Helper.insertDefaultStaffs(ctx);

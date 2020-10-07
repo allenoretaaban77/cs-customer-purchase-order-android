@@ -5,13 +5,13 @@
 
     <LinearLayout
         android:id="@+id/bottom_wrapper"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
         <com.balysv.materialripple.MaterialRippleLayout
             android:id="@+id/btn_remarks"
-            android:layout_width="0dp"
+            android:layout_width="50dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#66ddff00">
@@ -25,7 +25,7 @@
 
         <com.balysv.materialripple.MaterialRippleLayout
             android:id="@+id/btn_delete"
-            android:layout_width="0dp"
+            android:layout_width="50dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="#66FF3300">
@@ -98,7 +98,7 @@
                     style="@style/tblCellTextView"
                     android:textColor="@color/brown_4"
                     android:fontFamily="@font/medium"
-                    android:lineHeight="15sp"
+                    android:lineHeight="12sp"
                     android:textSize="15sp"
                     android:gravity="center_vertical"
                     android:id="@+id/cell_description"
