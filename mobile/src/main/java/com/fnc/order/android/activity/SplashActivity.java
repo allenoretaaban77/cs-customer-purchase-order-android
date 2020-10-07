@@ -147,7 +147,6 @@ public class SplashActivity extends BaseActivity {
 
                     startProcedure();
 //                    Helper.isTablet(ctx);
-//                    Log.d("axax", String.valueOf(Helper.isTablet(ctx)));
                 } catch(SecurityException e) {
                     e.printStackTrace();
                 } finally {

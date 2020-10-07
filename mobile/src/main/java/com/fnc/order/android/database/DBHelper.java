@@ -76,9 +76,11 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(OrderedKey.JSON);
         fields.add(OrderedKey.JSON_COMPLETE);
         fields.add(OrderedKey.GRAND_TOTAL);
+        fields.add(OrderedKey.GRAND_TOTAL_CNT);
         fields.add(OrderedKey.DATETIME);
         fields.add(OrderedKey.STATUS);
         fields.add(OrderedKey.REF_RECID);
+        fields.add(OrderedKey.DELIVERY_DATE_DEFAULT);
         return fields;
     }
 
@@ -173,6 +175,14 @@ public class DBHelper extends SQLiteOpenHelper {
             case 2:
                 db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
                 db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
+                break;
+            case 3:
+                try {
+                    db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
+                    db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
+                    db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " TEXT ");
+                    db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " = '0'");
+                } catch (Exception e) { }
                 break;
         }
     }

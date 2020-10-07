@@ -1499,6 +1499,16 @@ public class LoginActivity extends BaseActivity {
                                             sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
                                         }
 
+                                        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                                            if (Helper.getScrRatio(ctx) > 0.6) {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                            } else {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                            }
+                                        } else {
+                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                        }
+
                                         Helper.insertDefaultStaffs(ctx);
                                     }
                                 }

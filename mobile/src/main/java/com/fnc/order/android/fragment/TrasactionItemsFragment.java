@@ -1,7 +1,9 @@
 package com.fnc.order.android.fragment;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -20,6 +22,10 @@ import androidx.fragment.app.DialogFragment;
 
 import com.fnc.order.android.R;
 import com.fnc.order.android.adapters.TransactionItemsAdapter;
+import com.fnc.order.android.datacontroller.DcOrder;
+import com.fnc.order.android.datacontroller.DcOrdered;
+import com.fnc.order.android.enumeration.OrderKey;
+import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.utilities.Helper;
 
@@ -28,16 +34,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class TrasactionItemsFragment extends DialogFragment {
 
     public Context ctx;
     private View rv;
-    private Button btn_close;
+    private Button btn_close, btn_cancel, btn_post;
     private ListView list_view;
     private TransactionItemsAdapter adapter;
-    private TextView tv_title;
+    private TextView tv_title, tv_cell_grand_total, tv_cell_grand_total_count;
+    private LinearLayout ll_cmdbox;
 
     public static TrasactionItemsFragment searchInstance(){
         TrasactionItemsFragment dialogFragment = new TrasactionItemsFragment();
@@ -81,22 +89,27 @@ public class TrasactionItemsFragment extends DialogFragment {
 
     private void initViews(View v) {
         btn_close = (Button) v.findViewById(R.id.btn_close);
+        btn_cancel = (Button) v.findViewById(R.id.btn_cancel);
+        btn_post = (Button) v.findViewById(R.id.btn_post);
         tv_title = (TextView) v.findViewById(R.id.tv_title);
+        tv_cell_grand_total = (TextView) v.findViewById(R.id.tv_cell_grand_total);
+        tv_cell_grand_total_count = (TextView) v.findViewById(R.id.tv_cell_grand_total_count);
+        ll_cmdbox = (LinearLayout) v.findViewById(R.id.ll_cmdbox);
 
         list_view = (ListView) v.findViewById(R.id.list_view);
         String strArr = getArguments().getString("details");
-//        String strArrH = getArguments().getString("header");
+        String strIsPosting = getArguments().getString("is_posting");
+        if (strIsPosting.equals("false")) { ll_cmdbox.setVisibility(View.GONE); }
+        if (strIsPosting.equals("true")) { ll_cmdbox.setVisibility(View.VISIBLE); }
 
         try {
             JSONArray objArr = new JSONArray(strArr);
-//            JSONArray objArrH = new JSONArray(strArrH);
-
             // display count of itemsx
-            ((TextView) v.findViewById(R.id.tv_title)).setText("TRANSACTION ITEMS (" + String.valueOf(objArr.length()) + ")");
-//            Toast.makeText(ctx, objArrH.getString("remarks"), Toast.LENGTH_LONG).show();
+            ((TextView) v.findViewById(R.id.tv_title)).setText("TRANSACTION SUMMARY (" + String.valueOf(objArr.length()) + ")");
 
             if(objArr.length() > 0) {
                 ArrayList<Order> arrLst = new ArrayList<>();
+                Double dGT = 0.00, dGTc = 0.00;
                 for (int i = 0; i < objArr.length(); i++) {
                     JSONObject obj = objArr.getJSONObject(i);
                     Order ol = new Order();
@@ -116,11 +129,18 @@ public class TrasactionItemsFragment extends DialogFragment {
                     ol.setIsError(0);
                     ol.setIsLocked(0);
                     arrLst.add(ol);
+
+                    dGTc = dGTc + Double.parseDouble(obj.getString("quantity"));
+                    dGT = dGT + Double.parseDouble(obj.getString("total"));
                 }
 
                 adapter = new TransactionItemsAdapter(ctx, arrLst);
                 adapter.setCurPos(0);
                 list_view.setAdapter(adapter);
+
+                DecimalFormat df = new DecimalFormat("#,###,###.00");
+                tv_cell_grand_total.setText(df.format(dGT).equals(".00") ? "0.00" : df.format(dGT));
+                tv_cell_grand_total_count.setText(df.format(dGTc).equals(".00") ? "0.00" : df.format(dGTc));
             }
 
         } catch(JSONException e) {
@@ -140,6 +160,21 @@ public class TrasactionItemsFragment extends DialogFragment {
         btn_close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dismiss();
+            }
+        });
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+            }
+        });
+        btn_post.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = getActivity().getIntent();
+                i.putExtra("is_posting", "true");
+                getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, i);
                 dismiss();
             }
         });

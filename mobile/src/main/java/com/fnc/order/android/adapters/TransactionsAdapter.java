@@ -66,7 +66,8 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
             holder = (TransactionsAdapter.ViewHolder) convertView.getTag();
         }
 
-        holder.tv_date.setText(od.getDeliveryDate().replace(" 00:00:00", ""));
+        String[] dtArr = od.getDeliveryDate().replace(" 00:00:00", "").split("/");
+        holder.tv_date.setText(dtArr[0] + "/" + dtArr[1] + "/" + dtArr[2].substring(2,4));
         holder.tv_name.setText(od.getCustomerName());
         holder.tv_grandtotal.setText(String.valueOf(new DecimalFormat("#,###,###.00")
                 .format(Double.parseDouble(od.getGrandtotal()))));

@@ -60,6 +60,15 @@ public class DcOrdered extends DBHelper {
         return list;
     }
 
+    public void updateOrderedlist(String recid, OrderKey column, String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(column.getKey(), value);
+        db.updateWithOnConflict(Table.ORDERED.getName(), cv, OrderedKey.REF_RECID.getKey() +
+            " = ?", new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
     public void updateStatusViaRecId(String recid, Integer intx){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -132,6 +141,7 @@ public class DcOrdered extends DBHelper {
         od.setJson(c.getString(c.getColumnIndex(OrderedKey.JSON.getKey())));
         od.setJsonComplete(c.getString(c.getColumnIndex(OrderedKey.JSON_COMPLETE.getKey())));
         od.setGrandtotal(c.getString(c.getColumnIndex(OrderedKey.GRAND_TOTAL.getKey())));
+        od.setGrandtotalcount(c.getString(c.getColumnIndex(OrderedKey.GRAND_TOTAL_CNT.getKey())));
         od.setDateTime(c.getString(c.getColumnIndex(OrderedKey.DATETIME.getKey())));
         od.setStatus(c.getInt(c.getColumnIndex(OrderedKey.STATUS.getKey())));
         od.setReferenceRecid(c.getString(c.getColumnIndex(OrderedKey.REF_RECID.getKey())));

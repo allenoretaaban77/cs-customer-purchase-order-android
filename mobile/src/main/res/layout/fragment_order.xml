@@ -610,6 +610,21 @@
                                             android:text="Total:" />
 
                                         <TextView
+                                            android:visibility="gone"
+                                            android:id="@+id/tv_grandtotal_count"
+                                            android:fontFamily="@font/medium"
+                                            android:textSize="23sp"
+                                            android:paddingLeft="10dp"
+                                            android:gravity="center|left"
+                                            android:layout_height="match_parent"
+                                            style="@style/tblCellTextViewHeaderWhite"
+                                            android:layout_width="150dp"
+                                            android:layout_column="1"
+                                            android:layout_weight="1"
+                                            android:text="0.00" />
+
+                                        <TextView
+                                            android:visibility="gone"
                                             android:id="@+id/tv_grandtotal"
                                             android:fontFamily="@font/medium"
                                             android:textSize="23sp"

@@ -133,6 +133,7 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
                     DialogFragment dialogFrag = TrasactionItemsFragment.searchInstance();
                     Bundle args = new Bundle();
                     args.putString("details", rso.getJsonComplete());
+                    args.putString("is_posting", "false");
                     dialogFrag.setArguments(args);
                     dialogFrag.setTargetFragment(thisFragment, ITEM_DIALOG_FRAGMENT);
                     dialogFrag.setCancelable(false);

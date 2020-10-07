@@ -58,6 +58,7 @@ import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
+import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
@@ -79,6 +80,7 @@ import com.balysv.materialripple.MaterialRippleLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.api.core.NanoClock;
+import com.google.api.services.storage.model.Objects;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
@@ -122,6 +124,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
     private static final int PERSON_DIALOG_FRAGMENT = 7;
     private static final int ITEM_DIALOG_FRAGMENT = 8;
+    private static final int SUMMARY_DIALOG_FRAGMENT = 9;
+    private static final int USER_DIALOG_FRAGMENT = 5;
+    private static final int OTHER_ITEMS_DIALOG_FRAGMENT = 6;
 
     public Context ctx;
     private View rootView;
@@ -129,7 +134,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private ProgressDialog loader;
     private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh,
             btn_others, btn_setzero, btn_search, btn_closesearch, btn_view;
-    private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total, tv_hdr_freeitem;
+    private TextView tv_name, tv_grandtotal, tv_grandtotal_count, tv_grandtotal_lbl, tv_header_price, tv_header_total, tv_hdr_freeitem;
     private EditText et_date, et_remarks, et_search;
     private CoordinatorLayout rl_content_box;
     private DroppyMenuPopup.Builder pageMenu;
@@ -146,7 +151,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private BottomSheetBehavior bsBh;
     private PopupMenu menuPop;
     private VolleyInteractor vi;
-    private Boolean isItemClicked = false;
+    private Boolean isItemClicked = false, isSummary;
     private String refDate, refStringDate, strBranchEncoding;
     private ListView list_view;
     private OrderlistAdapter adapter;
@@ -157,8 +162,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private LinkedList<Order> curRefArrayListErr;
     private SharedData sp;
     private MenuList refMenulist;
-    private static final int USER_DIALOG_FRAGMENT = 7;
-    private static final int OTHER_ITEMS_DIALOG_FRAGMENT = 8;
     private BroadcastReceiver connStatusReceiver;
     private Boolean mx_taskrun = false; private Handler mx_handler; private Runnable mx_runnable;
 
@@ -181,6 +184,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         rootView = inflater.inflate(R.layout.fragment_order, container, false);
         ctx = rootView.getContext();
         thisFragment = this;
+        sp = SharedData.getInstance(ctx);
         Helper.setPreviousPage(ctx, "customer_fragment");
 
         curRefArrayList = new LinkedList<Order>();
@@ -188,11 +192,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         LinkedList<MenuList> mlRs = DcMenulist.getInstance(ctx).searchMenuFilterMultiple(
                 MenulistKey.CUSTOMER_ID.getKey() + " = ?",
-                new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) } );
+                new String[] { sp.getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) } );
         if (mlRs.size() > 0 ) {
             refMenulist = DcMenulist.getInstance(ctx).searchMenuFilterMultiple(
                 MenulistKey.CUSTOMER_ID.getKey() + " = ?",
-                new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) }
+                new String[] { sp.getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) }
             ).get(0);
         }
 
@@ -248,7 +252,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         initListeners(rootView);
         initCalc(rootView);
 
-        sp = SharedData.getInstance(ctx);
         /* if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
             btn_refresh.setVisibility(View.VISIBLE);
@@ -294,8 +297,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //        Boolean hasx = false; if (hasx) {
         if (Helper.isNetworkAvailable(ctx)) {
             final SharedData sp = SharedData.getInstance(ctx);
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
             loader = Helper.showSpinnerDialog(ctx, "", "Updating PRELOADED LIST... Please wait..."); loader.show();
 
@@ -371,8 +373,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                     adapter.setCurPos(position);
                     alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
-                            "Add Remarks",
-                            "SAVE", null, "CANCEL", cancelCallback);
+                        "Add Remarks",
+                        "SAVE", null, "CANCEL", cancelCallback);
                     BounceView.addAnimTo(alertDialogRemarks);
                 }
             });
@@ -425,6 +427,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         list_view = (ListView) v.findViewById(R.id.list_view);
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
+        tv_grandtotal_count = (TextView) v.findViewById(R.id.tv_grandtotal_count);
+
+        if (SharedData.getInstance(ctx).getInt(SharedKey.COMPUTE_QTY_ONLY.getKey()) == 1) {
+            tv_grandtotal_count.setVisibility(View.VISIBLE);
+        } else {
+            tv_grandtotal.setVisibility(View.VISIBLE);
+        }
+
         tv_grandtotal_lbl = (TextView) v.findViewById(R.id.tv_grandtotal_lbl);
 
         tv_grandtotal_lbl.setText("Total:");
@@ -513,74 +523,33 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         btn_view.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-
-                LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
-                    .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
-                        new String[] { "%" }, " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
-                ArrayList<HashMap> refArray = new ArrayList();
-                if (llOrderRs.size() > 0) {
-                    Boolean errFlag = false, zeroErrFlag = true;
-                    for (int i = 0; i < llOrderRs.size(); i++) {
-                        Order rowOl = llOrderRs.get(i);
-                        if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
-                            LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
-                            String rqty = rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity();
-                            rqty = rqty.replace(",", "");
-                            if (!rqty.equals("0")) { zeroErrFlag = false; }
-                            detailMap.put("quantity", rqty);
-                            detailMap.put("free", rowOl.getFree());
-                            detailMap.put("item_recid", rowOl.getItemRecid());
-                            detailMap.put("remarks", rowOl.getRemarks());
-                            detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
-                            detailMap.put("selling_price", rowOl.getSellingPrice());
-                            String rtotal = rowOl.getTotal().replace(",", "");
-                            detailMap.put("total", rtotal);
-                            detailMap.put("unitName", rowOl.getUnitName());
-                            detailMap.put("itemname", rowOl.getItemName());
-                            detailMap.put("is_checked", false);
-                            detailMap.put("is_error", false);
-                            detailMap.put("is_locked", false);
-                            refArray.add(detailMap);
-                        }
-                    }
-                }
-
-                DialogFragment dialogFrag = TrasactionItemsFragment.searchInstance();
-                Bundle args = new Bundle();
-                args.putString("details", new JSONArray(refArray).toString());
-                dialogFrag.setArguments(args);
-                dialogFrag.setTargetFragment(thisFragment, ITEM_DIALOG_FRAGMENT);
-                dialogFrag.setCancelable(false);
-                dialogFrag.show(getActivity().getSupportFragmentManager(), "dialog_search_item");
+                showSummary("false");
             }
         });
 
-        pageMenu.setOnClick(new DroppyClickCallbackInterface() {
-            @Override
-            public void call(View v, int id) {
-                switch(id){
-                    case 1:
-                        Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
-                            new TransactionFragment(), "transaction_fragment", "order_fragment");
-                        break;
-                    case 2:
-                        requestProductItems();
-                        break;
-                    case 3:
-                        loadUsers();
-                        break;
-                    case 0:
-                        BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-                            "Log Out", "Are you sure you want to log-out?",
-                            "Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    getActivity().finish();
-                                    startActivity(new Intent(ctx, LoginActivity.class));
-                                }
-                            }, "Cancel", null, false) );
-                        break;
-                }
+        pageMenu.setOnClick((v1, id) -> {
+            switch(id){
+                case 1:
+                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
+                        new TransactionFragment(), "transaction_fragment", "order_fragment");
+                    break;
+                case 2:
+                    requestProductItems();
+                    break;
+                case 3:
+                    loadUsers();
+                    break;
+                case 0:
+                    BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                        "Log Out", "Are you sure you want to log-out?",
+                        "Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                getActivity().finish();
+                                startActivity(new Intent(ctx, LoginActivity.class));
+                            }
+                        }, "Cancel", null, false) );
+                    break;
             }
         }).build();
 
@@ -829,11 +798,20 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 } else {
                     if(!isPosted) {
                         isPosted = true;
-                        if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == 0) {
+
+                        // filter for kiosk of comissary fnc
+                        if (Helper.checkBranchProfile(ctx).get(0).getDescription()
+                            .equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                            showSummary("true");
+                        } else {
+                            validateToPost();
+                        }
+
+                        /*if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == 0) {
                             validateToPost();
                         } else {
                             getReportType();
-                        }
+                        } */
                     }
                 }
             }
@@ -841,6 +819,59 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             BounceView.addAnimTo( Helper.okDialog(ctx,
                 "Error","Please add an item.", "CLOSE",
                 null, false) );
+        }
+    }
+
+    private void showSummary(String is_posting) {
+        if (Helper.isNetworkAvailable(ctx)) {
+            LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
+                .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ? AND ("
+                + OrderKey.QUANTITY.getKey() + " != '' AND " + OrderKey.QUANTITY.getKey() + " != '0')",
+                new String[] { "%" }, " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+            if (llOrderRs.size() > 0) {
+                loader = Helper.showSpinnerDialog(ctx, "", "Requesting updated values. Please wait..."); loader.show();
+                ArrayList<HashMap> dArrLst = new ArrayList();
+                for (int i = 0; i < llOrderRs.size(); i++) {
+                    Order rowOl = llOrderRs.get(i);
+                    if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
+                        LinkedHashMap<String, Object> dMap = new LinkedHashMap();
+                        dMap.put("recid", rowOl.getItemRecid());
+                        dArrLst.add(dMap);
+                    }
+                }
+                HashMap<String, Object> hmParams = new HashMap();
+                hmParams.put("itemrecids", dArrLst);
+
+                HashMap<String, String> prmx = new HashMap<>();
+                prmx.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+                prmx.put("customerid", sp.getData(SharedKey.ORDER_CUSTOMER_ID.getKey()));
+                Iterator it = prmx.entrySet().iterator();
+                String strParams = "";
+                while (it.hasNext()) {
+                    Map.Entry pair = (Map.Entry) it.next(); strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&"; it.remove();
+                }
+                VolleyInteractor vgis = new VolleyInteractor();
+                vgis.registerCallback(new VolleyCallback() {
+                    @Override
+                    public void onRequestSuccess(String response, String type) {
+                        isPosted = false;
+                        new getItemsSrp().execute(response, is_posting);
+                    }
+                    @Override
+                    public void onRequestFail(VolleyError response, String type) {
+                        isPosted = false;
+                        loader.dismiss();
+                        Toast.makeText(ctx, "Request Item SRP Error, please contact IT support.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                vgis.getItemlistSrp(ctx, prmx, strParams, new JSONObject(hmParams).toString());
+            } else {
+                isPosted = false;
+                Toast.makeText(ctx, "No summary to display. Please input quantity on item/s", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            isPosted = false;
+            Toast.makeText(ctx, "Request failed. Please check internet connection", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -920,6 +951,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         fillItems(rootView);
 
                         tv_grandtotal.setText("0.00");
+                        tv_grandtotal_count.setText("0.00");
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1022,6 +1054,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         final ArrayList<HashMap> detailsArrayList = new ArrayList();
         final ArrayList<HashMap> detailsArrayListC = new ArrayList();
         if (curRefArrayList.size() > 0) {
+            Double dGT = 0.00, dGTc = 0.00;
             Boolean errFlag = false, zeroErrFlag = true;
             for (int i = 0; i < curRefArrayList.size(); i++) {
                 Order rowOl = curRefArrayList.get(i);
@@ -1048,6 +1081,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     detailMap.put("is_error", false);
                     detailMap.put("is_locked", false);
                     detailsArrayListC.add(detailMap);
+
+                    dGT = dGT + Double.parseDouble(rtotal);
+                    dGTc = dGTc + Double.parseDouble(rqty);
                 }
             }
 
@@ -1096,7 +1132,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
                 headersMap.put("branch_encoding", strBranchEncoding);
                 String gt = tv_grandtotal.getText().toString().trim().replace(",", "");
-                headersMap.put("grand_total", gt);
+                String gtc = tv_grandtotal_count.getText().toString().trim().replace(",", "");
+                headersMap.put("grand_total", sp.getInt(SharedKey.COMPUTE_QTY_ONLY.getKey()) == 1 ? gtc : gtc);
                 paramsArray.put("header", headersMap);
 
                 String paramsArrayStr = new JSONObject(paramsArray).toString();
@@ -1121,7 +1158,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
                 ol.setJson(paramsArrayStr);
                 ol.setJsonComplete(new JSONArray(detailsArrayListC).toString());
-                ol.setGrandtotal(gt);
+                ol.setGrandtotal(String.valueOf(dGT));
+                ol.setGrandtotalcount(String.valueOf(dGTc));
                 ol.setDateTime(Helper.getPostingDate());
                 ol.setStatus(0);
                 ol.setReferenceRecid(Helper.getReqDate(5, ""));
@@ -1550,6 +1588,16 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 }
                 if (resultCode == Activity.RESULT_CANCELED){ }
                 break;
+            case SUMMARY_DIALOG_FRAGMENT:
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle extras = data.getExtras();
+                    if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == 0) {
+                        validateToPost();
+                    } else {
+                        getReportType();
+                    }
+                }
+                break;
         }
     }
 
@@ -1740,12 +1788,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
         }
 
-        if (refQtyOrFree == 0) {
-            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.QUANTITY, ol.getQuantity());
-            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.TOTAL, ol.getTotal());
-        } else {
+        if (refQtyOrFree == 1) {
             DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.FREE, ol.getFree());
         }
+        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.QUANTITY, ol.getQuantity());
+        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.TOTAL, ol.getTotal());
 
         adapter.notifyDataSetChanged();
 
@@ -1768,11 +1815,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 DecimalFormat df = new DecimalFormat("#,###,###.00");
 
                 tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
-                if (SharedData.getInstance(ctx).getInt(SharedKey.COMPUTE_QTY_ONLY.getKey()) == 1) {
-                    tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
-                }
+                tv_grandtotal_count.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
             } else {
                 tv_grandtotal.setText("0.00");
+                tv_grandtotal_count.setText("0.00");
             }
         }
     }
@@ -2134,6 +2180,85 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         protected void onProgressUpdate(Integer... values) {
             Log.d("adsx", "task fetch items running " + + values[0]);
         }
+    }
+
+    private class getItemsSrp extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                String response = params[0].replace("\r\n", "");
+                String is_posting = params[1];
+                JSONArray objArr = new JSONArray(response);
+                if(objArr.length() > 0) {
+                    for (int i = 0; i < objArr.length(); i++) {
+                        JSONObject rowObj = objArr.getJSONObject(i);
+                        String strSRP = rowObj.getString(aItemlistKey.SELLING_PRICE.getKey());
+                        String irecid = String.valueOf(rowObj.getLong(aItemlistKey.RECID.getKey()));
+
+                        LinkedList<Order> xRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.ITEM_RECID.getKey() + " = ?",
+                            new String[] { irecid }, "");
+                        if (xRs.size() > 0) {
+                            Order oRs = xRs.get(0);
+                            DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.SELLING_PRICE, strSRP);
+                            double u_total = Double.parseDouble(oRs.getQuantity()) * Double.parseDouble(strSRP);
+                            DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.TOTAL, String.valueOf(u_total));
+                        }
+                    }
+                }
+                return "Task Done|" + is_posting;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return "Task Error";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            String[] resArr = result.split("\\|");
+            if (resArr[1] != null)
+            loader.dismiss();
+            LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
+                new String[] { "%" }, " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+            ArrayList<HashMap> refArray = new ArrayList();
+            if (llOrderRs.size() > 0) {
+                Boolean errFlag = false, zeroErrFlag = true;
+                for (int i = 0; i < llOrderRs.size(); i++) {
+                    Order rowOl = llOrderRs.get(i);
+                    if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
+                        LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
+                        String rqty = rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity();
+                        rqty = rqty.replace(",", "");
+                        if (!rqty.equals("0")) { zeroErrFlag = false; }
+                        detailMap.put("quantity", rqty);
+                        detailMap.put("free", rowOl.getFree());
+                        detailMap.put("item_recid", rowOl.getItemRecid());
+                        detailMap.put("remarks", rowOl.getRemarks());
+                        detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
+                        detailMap.put("selling_price", rowOl.getSellingPrice());
+                        String rtotal = rowOl.getTotal().replace(",", "");
+                        detailMap.put("total", rtotal);
+                        detailMap.put("unitName", rowOl.getUnitName());
+                        detailMap.put("itemname", rowOl.getItemName());
+                        detailMap.put("is_checked", false);
+                        detailMap.put("is_error", false);
+                        detailMap.put("is_locked", false);
+                        refArray.add(detailMap);
+                    }
+                }
+            }
+
+            DialogFragment dialogFrag = TrasactionItemsFragment.searchInstance();
+            Bundle args = new Bundle();
+            args.putString("details", new JSONArray(refArray).toString());
+            args.putString("is_posting", resArr[1] != null ? resArr[1] : "");
+            dialogFrag.setArguments(args);
+            dialogFrag.setTargetFragment(thisFragment, SUMMARY_DIALOG_FRAGMENT);
+            dialogFrag.setCancelable(false);
+            dialogFrag.show(getActivity().getSupportFragmentManager(), "dialog_search_item");
+        }
+        @Override
+        protected void onPreExecute() { }
+        @Override
+        protected void onProgressUpdate(Integer... values) { }
     }
 
 }
