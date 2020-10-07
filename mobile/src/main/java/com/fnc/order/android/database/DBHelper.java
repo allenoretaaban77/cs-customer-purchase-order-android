@@ -171,17 +171,15 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         int version = oldVersion + 1;
-        switch (version){
+        switch (version) {
             case 2:
-                db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
-                db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
-                break;
             case 3:
+            case 4:
                 try {
-                    db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
-                    db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
                     db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " TEXT ");
                     db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " = '0'");
+                    db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
+                    db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
                 } catch (Exception e) { }
                 break;
         }
