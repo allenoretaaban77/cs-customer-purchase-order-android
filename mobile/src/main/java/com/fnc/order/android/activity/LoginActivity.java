@@ -140,10 +140,6 @@ public class LoginActivity extends BaseActivity {
         // commi
 //        usernameText.setText("12105");
 //        passwordEText.setText("746265");
-
-        // og
-//        usernameText.setText("12350");
-//        passwordEText.setText("0114");
     }
 
     private void initListeners(){
