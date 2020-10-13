@@ -2193,6 +2193,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         String strSRP = rowObj.getString(aItemlistKey.SELLING_PRICE.getKey());
+                        strSRP = strSRP.replace(",", "");
                         String irecid = String.valueOf(rowObj.getLong(aItemlistKey.RECID.getKey()));
 
                         LinkedList<Order> xRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.ITEM_RECID.getKey() + " = ?",
@@ -2200,7 +2201,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         if (xRs.size() > 0) {
                             Order oRs = xRs.get(0);
                             DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.SELLING_PRICE, strSRP);
-                            double u_total = Double.parseDouble(oRs.getQuantity()) * Double.parseDouble(strSRP);
+                            String strQty = oRs.getQuantity(); strQty = strQty.replace(",", "");
+                            double u_total = Double.parseDouble(strQty) * Double.parseDouble(strSRP);
                             DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.TOTAL, String.valueOf(u_total));
                         }
                     }
