@@ -802,16 +802,22 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         // filter for kiosk of comissary fnc
                         if (Helper.checkBranchProfile(ctx).get(0).getDescription()
                             .equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-                            showSummary("true");
+                            if (SharedData.getInstance(ctx).getInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey()) == 1) {
+                                showSummary("true");
+                            } else {
+                                if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == 0) {
+                                    validateToPost();
+                                } else {
+                                    getReportType();
+                                }
+                            }
                         } else {
-                            validateToPost();
+                            if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == 0) {
+                                validateToPost();
+                            } else {
+                                getReportType();
+                            }
                         }
-
-                        /*if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == 0) {
-                            validateToPost();
-                        } else {
-                            getReportType();
-                        } */
                     }
                 }
             }

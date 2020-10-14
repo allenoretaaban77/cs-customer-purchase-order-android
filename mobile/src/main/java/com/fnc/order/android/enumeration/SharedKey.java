@@ -25,6 +25,7 @@ public enum SharedKey {
     SHOW_SEARCH_PRICE("show_price_on_search"),
     PER_AGENT_SETUP("per_agent_setup"),
     ENABLE_REPORT_TYPE("enable_report_type"),
+    SHOW_SUMMARY_ON_POST("show_summary_on_post"),
 
     SKU_VALIDATION("old_sku_validation"),
     REF_EMP_VALIDATION("reference_employee_validation"),

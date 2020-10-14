@@ -1487,6 +1487,7 @@ public class LoginActivity extends BaseActivity {
                                         sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
                                         sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
                                         sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
+                                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), rowObjConf.getInt("show_summary_on_post"));
 
                                         if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
                                             sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
