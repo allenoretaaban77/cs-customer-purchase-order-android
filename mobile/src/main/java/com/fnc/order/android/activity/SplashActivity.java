@@ -189,7 +189,7 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@massive.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
 //                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -1008,7 +1008,7 @@ public class SplashActivity extends BaseActivity {
                                     loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                                 }
                             } else {
-                                alertDataSyncError("App Config Error L2.");
+                                // no else because will loop through others
                             }
                         }
                     } else {
