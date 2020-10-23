@@ -85,7 +85,6 @@ public class SplashActivity extends BaseActivity {
         active = false;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +116,8 @@ public class SplashActivity extends BaseActivity {
         if(sp.getInt(SharedKey.PER_AGENT_SETUP.getKey()) == -1) sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), 0);
         if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == -1) sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), 0);
         if(sp.getInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey()) == -1) sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), 0);
+
+        if(sp.getData(SharedKey.LAST_SUCC_CUSTSYNC.getKey()).trim().equals("")) sp.saveData(SharedKey.LAST_SUCC_CUSTSYNC.getKey(), "");
 
         Log.d("asasa", android.os.Build.MODEL);
 
@@ -189,7 +190,7 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@philbest.com");
 //                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);

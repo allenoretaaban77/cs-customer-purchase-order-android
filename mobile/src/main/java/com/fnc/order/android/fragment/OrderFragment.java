@@ -353,10 +353,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 @Override
                 public void onItemClick(View view, int position, int flag) {
                     adapter.setCurPos(position);
-                    adapter.notifyDataSetChanged();
                     curRefPos = adapter.getCurPos();
                     Helper.hideSoftKeyboard(getActivity());
                     refQtyOrFree = flag;
+                    adapter.setIsFreeClicked(flag);
+                    adapter.notifyDataSetChanged();
                     new android.os.Handler().postDelayed(
                         new Runnable() {
                             @Override
@@ -1176,8 +1177,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 } catch (Exception e) {
                     Helper.dismissSpinnerDialog(loader);
                     BounceView.addAnimTo( Helper.okDialog( ctx,
-                            e.getMessage(),"Error on saving to POST items. Please take an SCREENSHOT and contact IT support.",
-                            "CLOSE", null, false) );
+                        e.getMessage(),"Error on saving to POST items. Please take an SCREENSHOT and contact IT support.",
+                        "CLOSE", null, false) );
                     isPosted = false;
                     return;
                 }
@@ -1316,10 +1317,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         @Override
                         public void onItemClick(View view,  int position, int flag) {
                             adapter.setCurPos(position);
-                            adapter.notifyDataSetChanged();
                             curRefPos = adapter.getCurPos();
                             Helper.hideSoftKeyboard(getActivity());
                             refQtyOrFree = flag;
+                            adapter.setIsFreeClicked(flag);
+                            adapter.notifyDataSetChanged();
                             new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     @Override
@@ -1470,10 +1472,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         @Override
                         public void onItemClick(View view,  int position, int flag) {
                             adapter.setCurPos(position);
-                            adapter.notifyDataSetChanged();
                             Helper.hideSoftKeyboard(getActivity());
                             curRefPos = adapter.getCurPos();
                             refQtyOrFree = flag;
+                            adapter.setIsFreeClicked(flag);
+                            adapter.notifyDataSetChanged();
                             new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     @Override
@@ -2208,6 +2211,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             Order oRs = xRs.get(0);
                             DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.SELLING_PRICE, strSRP);
                             String strQty = oRs.getQuantity(); strQty = strQty.replace(",", "");
+                            if (strSRP.equals("null")) { strSRP = "0"; }
                             double u_total = Double.parseDouble(strQty) * Double.parseDouble(strSRP);
                             DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.TOTAL, String.valueOf(u_total));
                         }

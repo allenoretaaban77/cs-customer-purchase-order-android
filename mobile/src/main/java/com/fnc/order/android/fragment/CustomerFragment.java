@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.CornerPathEffect;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -75,6 +77,10 @@ import com.roacult.backdrop.BackdropLayout;
 import com.shehabic.droppy.DroppyClickCallbackInterface;
 import com.shehabic.droppy.DroppyMenuItem;
 import com.shehabic.droppy.DroppyMenuPopup;
+import com.skydoves.powermenu.MenuAnimation;
+import com.skydoves.powermenu.OnMenuItemClickListener;
+import com.skydoves.powermenu.PowerMenu;
+import com.skydoves.powermenu.PowerMenuItem;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
@@ -117,6 +123,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
     private Fragment thisFragment;
     private static final int USER_DIALOG_FRAGMENT = 7;
     private SpringView springView;
+    private PowerMenu pmMenu;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -128,6 +135,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 
         initViews(v);
         initListeners(v);
+
+//        DcMenulist.getInstance(ctx).emptyMenulist();
 
         String eiOld = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID_OLD.getKey());
         String inNew = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey());
@@ -303,14 +312,29 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         tvVersion.setText(Helper.getVersion(ctx, getActivity()));
 
         MaterialRippleLayout btn_menu = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
-        boxMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
-        boxMenu.setXOffset(85);
-        boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "));
-        boxMenu.addMenuItem(new DroppyMenuItem("  Re-Sync Customer Lists ")).addSeparator();
-        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") || sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
-            boxMenu.addMenuItem(new DroppyMenuItem("  Users ")).addSeparator();
-        }
-        boxMenu.addMenuItem(new DroppyMenuItem("  Log-out "));
+        setupMenu();
+        btn_menu.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View vx) { pmMenu.showAsAnchorRightTop(containerbdl, -iMrgnLR, -14); }
+        });
+    }
+
+    private void setupMenu() {
+        String dtLastSync = (sp.getData(SharedKey.LAST_SUCC_CUSTSYNC.getKey()).equals("")) ? "" :
+            sp.getData(SharedKey.LAST_SUCC_CUSTSYNC.getKey());
+        pmMenu = new PowerMenu.Builder(ctx)
+            .addItem(new PowerMenuItem(" View Transactions ", false))
+            .setDivider(new ColorDrawable(ContextCompat.getColor(ctx, R.color.white_1))).setDividerHeight(1)
+            .addItem(new PowerMenuItem(" Re-Sync Customer Lists" + dtLastSync, false))
+            .addItem(new PowerMenuItem(" Users ", false))
+            .addItem(new PowerMenuItem(" Log-Out ", false))
+            .setAnimation(MenuAnimation.ELASTIC_TOP_RIGHT)
+            .setMenuRadius(10f).setBackgroundAlpha(0.4f).setWidth(400)
+            .setMenuColor(ContextCompat.getColor(ctx, R.color.orange_2))
+            .setTextColor(ContextCompat.getColor(ctx, R.color.white_1)).setTextGravity(Gravity.LEFT).setTextSize(14)
+            .setTextTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL))
+            .setOnMenuItemClickListener(onMenuItemClickListener)
+            .setIsClipping(true)
+            .build();
     }
 
     private static final int SWIPTE_MAX_DISTANCE = 120;
@@ -429,87 +453,51 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 requestCustomers("");
             }
         });
-
-        boxMenu.setOnClick(new DroppyClickCallbackInterface() {
-            @Override
-            public void call(View v, int id) {
-                if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
-                switch(id){
-                    case 0:
-                        Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
-                            new TransactionFragment(), "transaction_fragment", "customer_fragment");
-                        break;
-                    case 1:
-                        BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-                            "Update Customers", "Are you sure you want to re-fetch customer list?",
-                            "Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    storelistview_box.setVisibility(View.GONE);
-                                    alphagridview_box.setVisibility(View.VISIBLE);
-                                    requestCustomers("");
-                                }
-                            }, "Cancel", null, false) );
-                        break;
-                    case 2:
-                        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
-                                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
-//                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-//                                "Update Users", "Are you sure you want to update user records?",
-//                                "Ok", new DialogInterface.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(DialogInterface dialog, int which) {
-//                                        updateUsers();
-//                                    }
-//                                }, "Cancel", null, false) );
-                            loadUsers();
-                        } else {
-                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-                                "Log Out", "Are you sure you want to log-out?",
-                                "Ok", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        getActivity().finishAndRemoveTask();
-                                        startActivity(new Intent(ctx, LoginActivity.class));
-                                    }
-                                }, "Cancel", null, false) );
-                        }
-                        break;
-//                    case 3:
-//                        if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") ||
-//                                sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
-//                            addUser();
-//                        } else {
-//                            BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-//                                "Add User", "Access Denied!",
-//                                "Ok", new DialogInterface.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(DialogInterface dialog, int which) {
-//                                        dialog.dismiss();
-//                                    }
-//                                }, "Cancel", null, false) );
-//                        }
-//                        break;
-                    case 3:
-                        BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-                                "Log Out", "Are you sure you want to log-out?",
-                                "Ok", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        getActivity().finishAndRemoveTask();
-                                        startActivity(new Intent(ctx, LoginActivity.class));
-                                    }
-                                }, "Cancel", null, false) );
-                        break;
-                }
-            }
-        });
-        boxMenu.build();
     }
+
+    private OnMenuItemClickListener<PowerMenuItem> onMenuItemClickListener = new OnMenuItemClickListener<PowerMenuItem>() {
+        @Override
+        public void onItemClick(int id, PowerMenuItem item) {
+            pmMenu.dismiss();
+            if (isUpdateCustomer) { Toast.makeText(ctx, updateCustomerMessage,  Toast.LENGTH_SHORT).show(); return; }
+            switch(id){
+                case 0:
+                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(),
+                        new TransactionFragment(), "transaction_fragment", "customer_fragment");
+                    break;
+                case 1:
+                    BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                        "Update Customers", "Are you sure you want to re-fetch customer list?",
+                        "Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                storelistview_box.setVisibility(View.GONE);
+                                alphagridview_box.setVisibility(View.VISIBLE);
+                                requestCustomers("");
+                            }
+                        }, "Cancel", null, false) );
+                    break;
+                case 2:
+                    loadUsers();
+                    break;
+                case 3:
+                    BounceView.addAnimTo( Helper.okCancelDialog(ctx,
+                        "Log Out", "Are you sure you want to log-out?",
+                        "Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                getActivity().finishAndRemoveTask();
+                                startActivity(new Intent(ctx, LoginActivity.class));
+                            }
+                        }, "Cancel", null, false) );
+                    break;
+            }
+        }
+    };
 
     private void requestCustomers(String stringSearch) {
         if (Helper.isNetworkAvailable(ctx)) {
-            floader = Helper.showSpinnerDialog(ctx, "Fetching Customers", updateCustomerMessage); floader.show();
+            floader = Helper.showSpinnerDialog(ctx, "Requesting CUSTOMER RECORDS...", "Pleasee wait."); floader.show();
 //            showSpinnerDialog();
 //            Toast.makeText(ctx, updateCustomerMessage, Toast.LENGTH_SHORT).show();
 
@@ -605,91 +593,91 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         protected String doInBackground(String... params) {
             isUpdateCustomer = true;
             try {
-//                if (!params[0].toString().equals("[]")) {
-                    String response = params[0].replace("\r\n", "");
-                    JSONArray objArr = new JSONArray(response);
-                    DcMenulist.getInstance(ctx).emptyMenulist();
-                    if(objArr.length() > 0) {
-                        for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject obj = objArr.getJSONObject(i);
+                String response = params[0].replace("\r\n", "");
+                JSONArray objArr = new JSONArray(response);
+                DcMenulist.getInstance(ctx).emptyMenulist();
+                if(objArr.length() > 0) {
+                    PRTotal = objArr.length();
+                    xProgressDialog.setMax(PRTotal);
+                    for (int i = 0; i < objArr.length(); i++) {
+                        JSONObject obj = objArr.getJSONObject(i);
 
-                            String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
-                            MenuList mlList = new MenuList(
-                                obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
-                                obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
-                                strCustomerName,
-                                "",
-                                0,
-                                ""
-                            );
-                            if (!strCustomerName.equals("")) {
-                                if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
-                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
-                                } else {
-                                    mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)).toUpperCase());
-                                }
-                                DcMenulist.getInstance(ctx).insertMenulist(mlList);
+                        String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                        MenuList mlList = new MenuList(
+                            obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
+                            obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
+                            strCustomerName,
+                            "",
+                            0,
+                            ""
+                        );
+                        if (!strCustomerName.equals("")) {
+                            if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
+                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
+                            } else {
+                                mlList.setAlphachar(String.valueOf(strCustomerName.charAt(0)).toUpperCase());
                             }
-                            publishProgress(i+1);
-
+                            DcMenulist.getInstance(ctx).insertMenulist(mlList);
                         }
+                        publishProgress(i+1);
                     }
                     return "Task Completed.";
-//                } else {
-//                    isUpdateCustomer = false;
-//                    return "Task Error";
-//                }
+                } else {
+                    return "Task No Customer Found.";
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
                 isUpdateCustomer = false;
                 return "Task Error";
             }
-            /*for (; count <= params[0]; count++) {
-                try {
-                    Thread.sleep(1000);
-                    publishProgress(count);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }*/
         }
         @Override
         protected void onPostExecute(String result) {
-            Log.d("dsxcf", "searchcustomer saved");
             progressBarx.setVisibility(View.GONE);
             loadSavedItems();
             isUpdateCustomer = false;
+            xProgressDialog.dismiss();
 
-            new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        Helper.dismissSpinnerDialog(floader);
+            if (result.equals("Task No Customer Found.")) {
+                Helper.dismissSpinnerDialog(floader);
+                Toast.makeText(ctx, "No customer found!", Toast.LENGTH_SHORT).show();
+            } else {
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            Helper.dismissSpinnerDialog(floader);
 
-                        if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
-                            LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
-                            // if (ailRs.size() < 1) {
-                                loader = Helper.showSpinnerDialog(ctx,"Syncing Product Items", "Please wait..."); loader.show();
+                            SharedData.getInstance(ctx).saveData(SharedKey.LAST_SUCC_CUSTSYNC.getKey(), "\r\n ["+ Helper.getReqDate(4, "") + "]");
+                            setupMenu();
+
+                            if (SharedData.getInstance(ctx).getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == 1) {
+                                LinkedList<aItemlist> ailRs = DcAitemlist.getInstance(ctx).getaItemlist();
+                                loader = Helper.showSpinnerDialog(ctx,"Requesting PRODUCT ITEMS...", "Please wait."); loader.show();
                                 requestProductItems();
-                            /*} else {
+                            } else {
                                 Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
-                            } */
-                        } else {
-                            Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                },
-                500
-            );
+                    },
+                    500
+                );
+            }
         }
         @Override
         protected void onPreExecute() {
-            progressBarx.setVisibility(View.VISIBLE);
-            Log.d("asynctask", "Task Starting");
+            super.onPreExecute();
+            xProgressDialog = new ProgressDialog(ctx, R.style.ProgressSpinnerTheme);
+            xProgressDialog.setMessage("Updating CUSTOMER RECORDS... Please wait.");
+            xProgressDialog.setIndeterminate(false);
+            xProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            xProgressDialog.setCancelable(false);
+            xProgressDialog.setCanceledOnTouchOutside(false);
+            xProgressDialog.show();
         }
         @Override
         protected void onProgressUpdate(Integer... values) {
-            Log.d("asynctask", "Running " + + values[0]);
-            progressBarx.setProgress(values[0]);
+            super.onProgressUpdate(values);
+            xProgressDialog.setProgress(values[0]);
         }
     }
 
@@ -748,19 +736,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     );
                 }
             } else if (type.equals("searchcustomer")) {
-                Log.d("dsxcf", "searchcustomer");
                 JSONArray objArr = new JSONArray(response);
-//                if(objArr.length() > 0) {
-//                    dismissSpinnerDialog();
-                    progressBarx = (ProgressBar) v.findViewById(R.id.progressBar);
-                    progressBarx.setMax(objArr.length());
-                    new customerAT().execute(response);
-                    Log.d("dsxcf", "searchcustomer saved");
-//                } else {
-//                    Helper.dismissSpinnerDialog(loader);
-//                    Helper.dismissSpinnerDialog(floader);
-//                    Toast.makeText(ctx, "Customer record empty, please contact developer", Toast.LENGTH_SHORT).show();
-//                }
+                progressBarx = (ProgressBar) v.findViewById(R.id.progressBar);
+                progressBarx.setMax(objArr.length());
+                Helper.dismissSpinnerDialog(floader);
+                new customerAT().execute(response);
             } else {
                 JSONArray objArr = new JSONArray(response);
                 if(objArr.length() > 0) {
@@ -817,6 +797,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         vi.registerCallback(new VolleyCallback() {
             @Override
             public void onRequestSuccess(String response, String type) {
+                Helper.dismissSpinnerDialog(loader);
                 new requestProductItemsAsync().execute(response);
             }
 
@@ -842,13 +823,18 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         vi.getItemlist(ctx, params, strParams);
     }
 
+    private Integer PRTotal = 0;
+    ProgressDialog  xProgressDialog;
     private class requestProductItemsAsync extends AsyncTask<String, Integer, String> {
+
         @Override
         protected String doInBackground(String... params) {
             try {
                 String response = params[0].replace("\r\n ", "");
                 JSONArray objArr = new JSONArray(response);
                 if(objArr.length() > 0) {
+                    PRTotal = objArr.length();
+                    xProgressDialog.setMax(PRTotal);
                     DcAitemlist.getInstance(ctx).emptyaItemlist();
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject rowObj = objArr.getJSONObject(i);
@@ -882,6 +868,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                             rowObj.getString(aItemlistKey.BARCODENO1.getKey())
                         );
                         DcAitemlist.getInstance(ctx).insertaItemlist(ail);
+                        publishProgress(i+1);
                     }
                 }
                 return "fetch items success";
@@ -892,17 +879,25 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         }
         @Override
         protected void onPostExecute(String result) {
+            xProgressDialog.dismiss();
             Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
-            dismissSpinnerDialog();
-            Log.d("adsx",  result);
         }
         @Override
         protected void onPreExecute() {
-            Log.d("adsx", "task fetch items starting");
+            super.onPreExecute();
+            xProgressDialog = new ProgressDialog(ctx, R.style.ProgressSpinnerTheme);
+            xProgressDialog.setMessage("Updating PRODUCT ITEMS... Please wait.");
+            xProgressDialog.setIndeterminate(false);
+            xProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            xProgressDialog.setCancelable(false);
+            xProgressDialog.setCanceledOnTouchOutside(false);
+            xProgressDialog.setProgress(0);
+            xProgressDialog.show();
         }
         @Override
         protected void onProgressUpdate(Integer... values) {
-            Log.d("adsx", "task fetch items running " + + values[0]);
+            super.onProgressUpdate(values);
+            xProgressDialog.setProgress(values[0]);
         }
     }
 

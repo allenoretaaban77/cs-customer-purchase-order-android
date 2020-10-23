@@ -55,6 +55,14 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         this.onRemarksClickListener = onRemarksClickListener;
     }
 
+    private OrderlistAdapter.OnFreeClickListener onFreeClickListener;
+    public interface OnFreeClickListener {
+        void onItemClick(View view, int actionId);
+    }
+    public void setOnFreeClickListener(final OrderlistAdapter.OnFreeClickListener onFreeClickListener) {
+        this.onFreeClickListener = onFreeClickListener;
+    }
+
     private class ViewHolder {
         private TextView cell_qty, cell_fqty, cell_description, cell_price, cell_total, cell_unit;
         private SwipeLayout swipeLayout;
@@ -185,8 +193,13 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             holder.cell_total.setTextColor(context.getResources().getColor(R.color.red_2));
             if (this.curPos == position) {
                 holder.cell_qty.setTextColor(context.getResources().getColor(R.color.green_5));
-                holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
-                holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
+                if (this.isFreeClicked == 1) {
+                    holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
+                    holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
+                } else {
+                    holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
+                    holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
+                }
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
@@ -202,8 +215,13 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         } else {
             if (this.curPos == position) {
                 holder.cell_qty.setTextColor(context.getResources().getColor(R.color.green_5));
-                holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
-                holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
+                if (this.isFreeClicked == 1) {
+                    holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
+                    holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
+                } else {
+                    holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
+                    holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
+                }
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
@@ -249,4 +267,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
     private Integer curPos = -1;
     public Integer getCurPos() { return this.curPos; }
     public void setCurPos(Integer position) { this.curPos = position; }
+
+    private Integer isFreeClicked = 0;
+    public void setIsFreeClicked(Integer isFreeClicked) { this.isFreeClicked = isFreeClicked; }
 }
