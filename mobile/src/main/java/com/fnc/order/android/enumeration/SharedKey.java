@@ -68,7 +68,9 @@ public enum SharedKey {
     EMP_NAME("employee_name"),
     EMP_POSITION("employee_position"),
     REF_JOBTITLES("ref_jobtitles"),
-    EMP_ISMOBILEADMIN("employee_ismobileadmin");
+    EMP_ISMOBILEADMIN("employee_ismobileadmin"),
+
+    LAST_SUCC_CUSTSYNC("last_success_customer_sync");
 
     private String key;
     SharedKey(String key) { this.key = key; }

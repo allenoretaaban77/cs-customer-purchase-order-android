@@ -157,13 +157,13 @@ public class MainActivity extends BaseActivity {
                     .addToBackStack(null).commit();
             } else {
                 BounceView.addAnimTo( Helper.okCancelDialog(ctx,
-                        "Closing Application", "Are you sure you want to close this app?",
-                        "Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finishAndRemoveTask();
-                            }
-                        }, "Cancel", null, false
+                    "Closing Application", "Are you sure you want to close this app?",
+                    "Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finishAndRemoveTask();
+                        }
+                    }, "Cancel", null, false
                 ) );
             }
         } else if (refPage.equals("order_fragment")) {
