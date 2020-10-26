@@ -1688,6 +1688,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public final void onClick(final View v) {
                 Order ol =  curRefArrayList.get(adapter.getCurPos());
                 String refStr = ol.getQuantity();
+                if (refQtyOrFree == 1) {
+                    refStr = ol.getFree();
+                }
                 if (refStr.length() > 0) {
                     refStr = refStr.substring(0, refStr.length() - 1);
                 }

@@ -24,6 +24,8 @@ public class GlobalConstants {
     public static String DATE_FORMAT_GCP = "yyMMddHHmmssSS";
     public static String DATE_FORMAT = "MMMM d, yyyy";
     public static String DATE_REF_FORMAT = "yyyy-MM-dd";
+    public static String TIME_REF_FORMAT = "HH:mm:ss";
+    public static String DATE_REF_FORMAT_S = "yyyy-MM-dd HH:mm:ss";
     public static String DATE_FORMAT_POST = "M/dd/yyyy HH:mm:ss";
     public static String DATE_FORMAT_TZ = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 

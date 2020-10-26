@@ -125,7 +125,7 @@ public class LoginActivity extends BaseActivity {
 
         // philbest
 //        usernameText.setText("1");
-//        passwordEText.setText("admin123");
+//        passwordEText.setText("clovis");
         // massive
 //        usernameText.setText("office");
 //        passwordEText.setText("Office");

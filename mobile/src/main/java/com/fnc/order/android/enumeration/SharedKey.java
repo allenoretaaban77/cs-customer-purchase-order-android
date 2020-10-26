@@ -9,6 +9,7 @@ public enum SharedKey {
     DATABASE("ref_database_01"),
     DATABASEID("database_id"),
     REF_MAIN_BRANCH("ref_main_branch"),
+    REF_MAIN_BRANCH_ID("ref_main_branch_id"),
     REF_ADMIN_USER("ref_admin_user"),
     REF_ADMIN_PASSWORD("ref_admin_password"),
     REF_ADMIN_FULLNAME("ref_admin_fullname"),

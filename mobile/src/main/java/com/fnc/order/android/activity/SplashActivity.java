@@ -98,6 +98,7 @@ public class SplashActivity extends BaseActivity {
         if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASE.getKey(), "");
         if(sp.getData(SharedKey.DATABASEID.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASEID.getKey(), "");
         if(sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), "");
+        if(sp.getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), "");
         if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 0);
         if(sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), 0);
         if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
@@ -190,7 +191,7 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@philbest.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
 //                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -233,6 +234,15 @@ public class SplashActivity extends BaseActivity {
                     "SUBMIT", new View.OnClickListener() {
                         public void onClick(View v) {
                             if (!refSelectedBranchId.equals("")) {
+                                if (sp.getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()).trim().equals(refSelectedBranchId)) {
+                                    if (Helper.getScrRatio(ctx) > 0.6) {
+                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                    } else {
+                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                    }
+                                } else {
+                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                }
                                 postBranchImei();
                             } else {
                                 Toast.makeText(ctx, "Please select a branch.", Toast.LENGTH_SHORT).show();
@@ -951,6 +961,7 @@ public class SplashActivity extends BaseActivity {
                                         sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
                                         sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
                                         sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObjConf.getString("main_branch"));
+                                        sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), rowObjConf.getString("main_branch_id"));
                                         sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObjConf.getInt("old_sku_validation"));
                                         sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObjConf.getInt("reference_employee_validation"));
                                         sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObjConf.getInt("preload_items"));
