@@ -314,7 +314,13 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         MaterialRippleLayout btn_menu = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
         setupMenu();
         btn_menu.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View vx) { pmMenu.showAsAnchorRightTop(containerbdl, -iMrgnLR, -14); }
+            @Override public void onClick(View vx) {
+                if (Helper.getScreenDimension(ctx, "w") >= 1200) {
+                    pmMenu.showAsAnchorRightTop(containerbdl, -iMrgnLR, -14);
+                } else {
+                    pmMenu.showAtCenter(containerbdl);
+                }
+            }
         });
     }
 

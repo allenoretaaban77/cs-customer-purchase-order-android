@@ -1,6 +1,7 @@
 package com.fnc.order.android.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +69,8 @@ public class TransactionsAdapter extends ArrayAdapter<Ordered> {
 
         String[] dtArr = od.getDeliveryDate().replace(" 00:00:00", "").split("/");
         String[] dtArr2 = od.getDeliver_date_default().split(" ");
-        holder.tv_date.setText(dtArr[0] + "/" + dtArr[1] + "/" + dtArr[2].substring(2,4) + "\r\n" + dtArr2[1]);
+        String sTime = dtArr2.length > 1 ? dtArr2[1] : "00:00:00" ;
+        holder.tv_date.setText(dtArr[0] + "/" + dtArr[1] + "/" + dtArr[2].substring(2,4) + "\r\n" + sTime);
         holder.tv_name.setText(od.getCustomerName());
         holder.tv_grandtotal.setText(String.valueOf(new DecimalFormat("#,###,###.00")
                 .format(Double.parseDouble(od.getGrandtotal()))));
