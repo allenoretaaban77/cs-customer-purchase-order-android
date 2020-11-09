@@ -27,6 +27,7 @@ public enum SharedKey {
     PER_AGENT_SETUP("per_agent_setup"),
     ENABLE_REPORT_TYPE("enable_report_type"),
     SHOW_SUMMARY_ON_POST("show_summary_on_post"),
+    REF_PO_NO("reference_po_number"),
 
     SKU_VALIDATION("old_sku_validation"),
     REF_EMP_VALIDATION("reference_employee_validation"),
