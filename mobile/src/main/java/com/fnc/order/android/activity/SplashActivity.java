@@ -117,6 +117,7 @@ public class SplashActivity extends BaseActivity {
         if(sp.getInt(SharedKey.PER_AGENT_SETUP.getKey()) == -1) sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), 0);
         if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == -1) sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), 0);
         if(sp.getInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey()) == -1) sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), 0);
+        if(sp.getInt(SharedKey.REF_PO_NO.getKey()) == -1) sp.saveInt(SharedKey.REF_PO_NO.getKey(), 0);
 
         if(sp.getData(SharedKey.LAST_SUCC_CUSTSYNC.getKey()).trim().equals("")) sp.saveData(SharedKey.LAST_SUCC_CUSTSYNC.getKey(), "");
 
@@ -978,6 +979,7 @@ public class SplashActivity extends BaseActivity {
                                         sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
                                         sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
                                         sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), rowObjConf.getInt("show_summary_on_post"));
+                                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), rowObjConf.getInt("reference_po_number"));
 
                                         if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
                                             sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);

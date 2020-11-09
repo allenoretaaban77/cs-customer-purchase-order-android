@@ -615,7 +615,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                             strCustomerName,
                             "",
                             0,
-                            ""
+                            "",
+                            obj.getString(MenulistKey.INVOICE.getKey())
                         );
                         if (!strCustomerName.equals("")) {
                             if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
