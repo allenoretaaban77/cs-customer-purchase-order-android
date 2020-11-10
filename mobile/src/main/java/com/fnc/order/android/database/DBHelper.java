@@ -179,6 +179,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 try {
                     db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " TEXT ");
                     db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " = '0'");
+                } catch (Exception e) { }
+                try {
                     db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
                     db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
                 } catch (Exception e) { }

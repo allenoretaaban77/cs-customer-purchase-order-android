@@ -7,8 +7,8 @@ android {
         applicationId "com.fnc.order.android.v2"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 85
-        versionName "1.0.85"
+        versionCode 86
+        versionName "1.0.86"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

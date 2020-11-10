@@ -975,7 +975,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         public void onClick(View v) {
             Helper.hideSoftKeyboard(getActivity());
             Helper.dismissSpinnerDialog(loader);
-            alertDialogRemarks.dismiss();
+            if (alertDialogRemarks != null ) alertDialogRemarks.dismiss();
+            if (alertDialogPONumber != null ) alertDialogPONumber.dismiss();
         }
     };
 
