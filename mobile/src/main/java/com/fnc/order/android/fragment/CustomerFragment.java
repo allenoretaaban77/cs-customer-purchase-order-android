@@ -550,11 +550,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         showSpinnerDialog();
         final LinkedList<MenuList> mlRSx = DcMenulist.getInstance(ctx).getAllMenulist(isAlpha, stringSearch);
         if (mlRSx.size() == 0) {
-            mlRSx.add(new MenuList("0000000", "0000000", "No Record Found", "", 0, ""));
+            mlRSx.add(new MenuList("0000000", "0000000", "No Record Found", "", 0, "", "false"));
         }
 
         // add bottom filler
-        mlRSx.add(new MenuList("0000000", "0000000", "", "", 0, ""));
+        mlRSx.add(new MenuList("0000000", "0000000", "", "", 0, "", "false"));
 
         adapter = new MenuStoresAdapter(ctx, mlRSx);
         listview.setAdapter(adapter);
@@ -609,6 +609,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         JSONObject obj = objArr.getJSONObject(i);
 
                         String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                        String strInvoice = ""; try { strInvoice = obj.getString(MenulistKey.INVOICE.getKey());
+                        } catch (Exception e) { strInvoice = "false"; }
                         MenuList mlList = new MenuList(
                             obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
                             obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
@@ -616,7 +618,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                             "",
                             0,
                             "",
-                            obj.getString(MenulistKey.INVOICE.getKey())
+                            strInvoice
                         );
                         if (!strCustomerName.equals("")) {
                             if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
@@ -754,11 +756,15 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     for (int i = 0; i < objArr.length(); i++) {
                         try {
                             JSONObject obj = objArr.getJSONObject(i);
+                            String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                            String strInvoice = ""; try { strInvoice = obj.getString(MenulistKey.INVOICE.getKey());
+                            } catch (Exception e) { strInvoice = "false"; }
                             MenuList mlList = new MenuList(
                                 obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
                                 obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
-                                obj.getString(MenulistKey.CUSTOMER_NAME.getKey()),
-                                "", 0, ""
+                                strCustomerName,
+                                "", 0, "",
+                                strInvoice
                             );
                             mlRS.add(mlList);
                         } catch (JSONException e) {
@@ -767,7 +773,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         }
                     }
                 }else{
-                    mlRS.add(new MenuList("0000000", "0000000", "No Record Found", "", 0, ""));
+                    mlRS.add(new MenuList("0000000", "0000000", "No Record Found", "", 0, "", "false"));
                 }
             }
         } catch (JSONException e) {
