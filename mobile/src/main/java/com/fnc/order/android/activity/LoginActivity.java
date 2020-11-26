@@ -1359,11 +1359,14 @@ public class LoginActivity extends BaseActivity {
                         JSONObject obj = objArr.getJSONObject(i);
 
                         String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                        String strInvoice = ""; try { strInvoice = obj.getString(MenulistKey.INVOICE.getKey());
+                        } catch (Exception e) { strInvoice = "false"; }
                         MenuList mlList = new MenuList(
                             obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
                             obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
                             strCustomerName,
-                            "", 0, "", obj.getString(MenulistKey.INVOICE.getKey())
+                            "", 0, "",
+                            strInvoice
                         );
                         if (!strCustomerName.equals("")) {
                             if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
