@@ -12,6 +12,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -563,8 +564,23 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 @Override
                 public void onItemClick(View view,  int aid) {
                     MenuList mlRS = mlRSx.get(aid);
-                    SharedData.getInstance(ctx).saveData( SharedKey.ORDER_CUSTOMER_ID.getKey(), String.valueOf(mlRS.getCustomerID()) );
-                    Helper.changePage(ctx, getActivity().getSupportFragmentManager(), new OrderFragment(), "order_fragment", "customer_fragment");
+                    String strCIID = String.valueOf(mlRS.getCustomerIntegrationId());
+                    if (SharedData.getInstance(ctx).getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
+                        if (strCIID.equals("null") || strCIID.equals("0")) {
+                            BounceView.addAnimTo(Helper.okDialog(ctx, "Customer Data Error",
+                                "Customer Integration Record ID not found! Please contact IT support.",
+                                "CLOSE", null,true));
+                        } else {
+                            SharedData.getInstance(ctx).saveData(SharedKey.ORDER_CUSTOMER_ID.getKey(), String.valueOf(mlRS.getCustomerID()));
+                            Helper.changePage(ctx, getActivity().getSupportFragmentManager(), new OrderFragment(),
+                            "order_fragment", "customer_fragment");
+                        }
+                    } else {
+                        SharedData.getInstance(ctx).saveData(SharedKey.ORDER_CUSTOMER_ID.getKey(), String.valueOf(mlRS.getCustomerID()));
+                        Helper.changePage(ctx, getActivity().getSupportFragmentManager(), new OrderFragment(),
+                        "order_fragment", "customer_fragment");
+
+                    }
                 }
             });
         }
