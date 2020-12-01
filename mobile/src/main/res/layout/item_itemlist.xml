@@ -10,6 +10,20 @@
         android:orientation="horizontal">
 
         <com.balysv.materialripple.MaterialRippleLayout
+            android:id="@+id/btn_srb"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/red_1">
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="27dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/baseline_playlist_add_check_white_24" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <com.balysv.materialripple.MaterialRippleLayout
             android:id="@+id/btn_remarks"
             android:layout_width="50dp"
             android:layout_height="match_parent"

@@ -47,6 +47,14 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         this.onListenerClickListener = onListenerClickListener;
     }
 
+    private OrderlistAdapter.OnSrbClickListener onSrbClickListener;
+    public interface OnSrbClickListener {
+        void onItemClick(View view, int actionId);
+    }
+    public void setOnSrbClickListener(final OrderlistAdapter.OnSrbClickListener onSrbClickListener) {
+        this.onSrbClickListener = onSrbClickListener;
+    }
+
     private OrderlistAdapter.OnRemarksClickListener onRemarksClickListener;
     public interface OnRemarksClickListener {
         void onItemClick(View view, int actionId);
@@ -66,7 +74,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
     private class ViewHolder {
         private TextView cell_qty, cell_fqty, cell_description, cell_price, cell_total, cell_unit;
         private SwipeLayout swipeLayout;
-        private MaterialRippleLayout btn_delete, btn_remarks;
+        private MaterialRippleLayout btn_delete, btn_remarks, btn_srb;
         private LinearLayout item_box;
 
         public ViewHolder(View v) {
@@ -80,6 +88,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             cell_unit = (TextView) v.findViewById(R.id.cell_unit);
             btn_delete = (MaterialRippleLayout) v.findViewById(R.id.btn_delete);
             btn_remarks = (MaterialRippleLayout) v.findViewById(R.id.btn_remarks);
+            btn_srb = (MaterialRippleLayout) v.findViewById(R.id.btn_srb);
             item_box = (LinearLayout) v.findViewById(R.id.item_box);
 
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
@@ -145,6 +154,14 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             holder.cell_total.setText("0.00");
         }
 
+        holder.btn_srb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (onSrbClickListener != null) {
+                    onSrbClickListener.onItemClick(v, position);
+                }
+            }
+        });
         holder.btn_remarks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -153,6 +170,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
                 }
             }
         });
+
         if (iRs.getIsLocked() == 1) {
 //            Toast.makeText(context, "Item cannot be deleted", Toast.LENGTH_LONG).show();
             holder.btn_delete.setVisibility(View.GONE);
