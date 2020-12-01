@@ -101,6 +101,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -268,7 +269,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("netConnStat")) {
-                    Log.d("bcastx", intent.getStringExtra("isConnected"));
                     ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setText("ALIVE V-" + Helper.getVersion(ctx, getActivity()));
                     if (Helper.getScrRatio(ctx) < 0.6) {
                         ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setText("ALIVE");
@@ -364,6 +364,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     );
                 }
             });
+            adapter.setOnSrbClickListener(new OrderlistAdapter.OnSrbClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    getSrb(position);
+                }
+            });
             adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
@@ -381,6 +387,59 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         } else {
             Toast.makeText(ctx, "Error fetching items", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void getSrb(Integer pos) {
+        loader = Helper.showSpinnerDialog(ctx, "Fetching RUNNING BALANCE.", "Please wait..."); loader.show();
+        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+        adapter.setCurPos(pos);
+        Order ol =  curRefArrayList.get(adapter.getCurPos());
+
+        VolleyInteractor vsrb = new VolleyInteractor();
+        HashMap<String, String> params = new HashMap<>();
+        params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
+        params.put("item_recid", ol.getItemRecid());
+        Iterator it = params.entrySet().iterator();
+        String strParams = "";
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            strParams = strParams + pair.getKey()+"="+pair.getValue()+"&";
+            it.remove();
+        }
+        strParams = strParams.replaceAll(" ", "%20");
+        vsrb.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(String response, String type) {
+                loader.dismiss();
+                try {
+                    response = response.replace("\r\n ", "");
+                    if (!response.equals("[]")) {
+                        JSONArray objArr = new JSONArray(response);
+                        String strInfo = "";
+                        for (int j = 0; j < objArr.length(); j++) {
+                            JSONObject obj = objArr.getJSONObject(j);
+                            String strCode = String.valueOf(obj.getString("code"));
+                            String strCnt = String.valueOf(obj.getString("SRB")).equals("null") ? "---" :
+                                String.valueOf(obj.getString("SRB"));
+                            strInfo = strInfo + strCode.toLowerCase().toUpperCase() + ": " + strCnt + "\n";
+                        }
+                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                            "Stock Running Balance", "\n" + ol.getItemName() + "\n\n" + strInfo
+                            , "CLOSE",null, false) );
+                    } else {
+                        Toast.makeText(ctx, "SRB info not found.", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(ctx, "Request SRB Error, please contact IT support.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onRequestFail(VolleyError response, String type) {
+                loader.dismiss();
+                Toast.makeText(ctx, "Request SRB Error, please contact IT support.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        vsrb.getSrb(ctx, params, strParams);
     }
 
     private void initViews(View v) {
@@ -675,7 +734,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     @Override
                     public void run() {
                         String searchStr = s.toString().trim().equals("") ? "noitem" : s.toString() ;
-                        Log.d("dsx", searchStr);
 
                         LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
                                 .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
@@ -1348,6 +1406,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             );
                         }
                     });
+                    adapter.setOnSrbClickListener(new OrderlistAdapter.OnSrbClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            getSrb(position);
+                        }
+                    });
                     adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
                         @Override
                         public void onItemClick(View view,  int position) {
@@ -1502,6 +1566,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                     }
                                 }, 300
                             );
+                        }
+                    });
+                    adapter.setOnSrbClickListener(new OrderlistAdapter.OnSrbClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            getSrb(position);
                         }
                     });
                     adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
@@ -2036,7 +2106,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 vipr.registerCallback(new VolleyCallback() {
                     @Override
                     public void onRequestSuccess(final String response, String type) {
-                        Log.d("dsxs getuser", response);
                         try {
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
@@ -2062,18 +2131,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                 }
                                 loadAdminJobTitles();
                             } else {
-                                Log.d("dsxe getuser", response);
 //                                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
-                            Log.d("dsxe getuser", response);
 //                            Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                         }
                     }
                     @Override
                     public void onRequestFail(VolleyError response, String type) {
                         Helper.dismissSpinnerDialog(loader);
-                        Log.d("dsxe getuser", String.valueOf(response));
 //                        Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -2109,8 +2175,6 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public void onRequestSuccess(String response, String type) {
                 Helper.dismissSpinnerDialog(loader);
                 response = response.replace("\r\n ", "");
-                Log.d("DSX post response: ", response);
-
                 SharedData.getInstance(ctx).saveData(SharedKey.REF_JOBTITLES.getKey(), response);
 
                 DialogFragment dialogFrag = UserFragment.searchInstance();
@@ -2239,15 +2303,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         protected void onPostExecute(String result) {
             Helper.dismissSpinnerDialog(loader);
             Toast.makeText(ctx, "Records updated successfully.", Toast.LENGTH_SHORT).show();
-            Log.d("adsx",  result);
         }
         @Override
         protected void onPreExecute() {
-            Log.d("adsx", "task fetch items starting");
         }
         @Override
         protected void onProgressUpdate(Integer... values) {
-            Log.d("adsx", "task fetch items running " + + values[0]);
         }
     }
 

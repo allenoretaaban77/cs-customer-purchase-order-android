@@ -52,7 +52,6 @@ public class TransactionItemsAdapter extends ArrayAdapter<Order> {
         private TextView cell_description;
         private TextView cell_price;
         private TextView cell_total;
-        private TextView cell_srb;
         private TextView cell_unit;
         private LinearLayout item_box;
 
@@ -61,7 +60,6 @@ public class TransactionItemsAdapter extends ArrayAdapter<Order> {
             cell_description = (TextView) v.findViewById(R.id.cell_description);
             cell_price = (TextView) v.findViewById(R.id.cell_price);
             cell_total = (TextView) v.findViewById(R.id.cell_total);
-            cell_srb = (TextView) v.findViewById(R.id.cell_srb);
             item_box = (LinearLayout) v.findViewById(R.id.item_box);
         }
     }
@@ -100,8 +98,6 @@ public class TransactionItemsAdapter extends ArrayAdapter<Order> {
         } else {
             holder.cell_total.setText("0.00");
         }
-
-        holder.cell_srb.setText(iRs.getSrb());
 
         /*if (iRs.getOldSku().equals("null")) {
             holder.cell_qty.setTextColor(context.getResources().getColor(R.color.orange_2));
