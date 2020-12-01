@@ -120,6 +120,7 @@ public class TrasactionItemsFragment extends DialogFragment {
                     ol.setRemarks(obj.getString("remarks"));
                     ol.setTotal(obj.getString("total"));
                     ol.setSellingPrice(obj.getString("selling_price"));
+                    ol.setSrb(obj.getString("SRB"));
                     ol.setItemRecid(obj.getString("item_recid"));
                     ol.setQuantity(obj.getString("quantity"));
                     ol.setFree(obj.getString("free"));
@@ -151,7 +152,7 @@ public class TrasactionItemsFragment extends DialogFragment {
         LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ll_content_box_main.getLayoutParams();
         int iMrgnTP =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 200 ;
-        int iMrgnLR =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 100 ;
+        int iMrgnLR =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 70 ;
         params.setMargins(iMrgnLR, iMrgnTP, iMrgnLR, iMrgnTP);
         ll_content_box_main.setLayoutParams(params);
     }

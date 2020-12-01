@@ -852,6 +852,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 HashMap<String, String> prmx = new HashMap<>();
                 prmx.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
                 prmx.put("customerid", sp.getData(SharedKey.ORDER_CUSTOMER_ID.getKey()));
+//                prmx.put("area_recid", "10006");
                 Iterator it = prmx.entrySet().iterator();
                 String strParams = "";
                 while (it.hasNext()) {
@@ -1291,6 +1292,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setOldSku(String.valueOf(il.getOldSku()));
                         String strSP = String.valueOf(il.getSellingPrice()).equals("null") ? "0" : String.valueOf(il.getSellingPrice());
                         ol.setSellingPrice(strSP);
+                        ol.setSrb("");
                         ol.setTotal("null");
                         ol.setIsChecked(0);
                         ol.setIsError(0);
@@ -1457,6 +1459,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setOldSku(String.valueOf(il.getOldSku()));
                         String strSP = String.valueOf(il.getSellingPrice()).equals("null") ? "0" : String.valueOf(il.getSellingPrice()) ;
                         ol.setSellingPrice(strSP);
+                        ol.setSrb("-");
                         ol.setTotal("null");
                         ol.setIsChecked(0);
                         ol.setIsError(0);
@@ -2261,6 +2264,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         String strSRP = rowObj.getString(aItemlistKey.SELLING_PRICE.getKey());
                         strSRP = strSRP.replace(",", "");
                         String irecid = String.valueOf(rowObj.getLong(aItemlistKey.RECID.getKey()));
+                        String strSRB = String.valueOf(rowObj.getString(OrderKey.SRB.getKey()));
 
                         LinkedList<Order> xRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.ITEM_RECID.getKey() + " = ?",
                             new String[] { irecid }, "");
@@ -2271,6 +2275,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             if (strSRP.equals("null")) { strSRP = "0"; }
                             double u_total = Double.parseDouble(strQty) * Double.parseDouble(strSRP);
                             DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.TOTAL, String.valueOf(u_total));
+                            DcOrder.getInstance(ctx).updateOrderlist(irecid, OrderKey.SRB, strSRB);
                         }
                     }
                 }
@@ -2303,6 +2308,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         detailMap.put("remarks", rowOl.getRemarks());
                         detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
                         detailMap.put("selling_price", rowOl.getSellingPrice());
+                        detailMap.put("SRB", rowOl.getSrb());
                         String rtotal = rowOl.getTotal().replace(",", "");
                         detailMap.put("total", rtotal);
                         detailMap.put("unitName", rowOl.getUnitName());

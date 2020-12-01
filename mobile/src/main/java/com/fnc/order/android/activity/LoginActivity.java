@@ -108,6 +108,18 @@ public class LoginActivity extends BaseActivity {
         initListeners();
 
 //        addUser();
+
+        // philbest
+//        usernameText.setText("1");
+//        passwordEText.setText("clovis");
+        // massive
+//        usernameText.setText("office");
+//        passwordEText.setText("Office");
+        // commi
+        usernameText.setText("12105");
+        passwordEText.setText("746265");
+
+        loginButton.callOnClick();
     }
 
     private void initViews() {
@@ -122,16 +134,6 @@ public class LoginActivity extends BaseActivity {
         tvVersion = (TextView) findViewById(R.id.tv_version);
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-        // philbest
-//        usernameText.setText("1");
-//        passwordEText.setText("clovis");
-        // massive
-//        usernameText.setText("office");
-//        passwordEText.setText("Office");
-        // commi
-//        usernameText.setText("12105");
-//        passwordEText.setText("746265");
     }
 
     private void initListeners(){

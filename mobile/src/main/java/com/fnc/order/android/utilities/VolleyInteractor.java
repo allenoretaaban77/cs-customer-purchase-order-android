@@ -183,9 +183,9 @@ public class VolleyInteractor {
     public void getItemlistSrp(final Context ctx, final HashMap<String, String> params, final String strParams, final String strBodyParams) {
         new Thread(new Runnable(){
             public void run(){
-                StringRequest strRequest = new StringRequest( Request.Method.POST,
-                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
-                        + API.GET_ITEMLIST_SRP.getApi()+ "?" + strParams, null, null) {
+                String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                    + API.GET_ITEMLIST_SRP.getApi()+ "?" + strParams;
+                StringRequest strRequest = new StringRequest( Request.Method.POST, url, null, null) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError { return ServerConstants.getHeaderOrder(); }
                     @Override
