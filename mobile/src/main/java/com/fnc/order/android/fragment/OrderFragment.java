@@ -176,8 +176,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_order, container, false);
         ctx = rootView.getContext();
         thisFragment = this;

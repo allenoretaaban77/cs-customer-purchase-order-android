@@ -192,8 +192,8 @@ public class SplashActivity extends BaseActivity {
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
+                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
+                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
 
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -920,7 +920,7 @@ public class SplashActivity extends BaseActivity {
             String strDbID = params[0];
             try {
                 InputStream ins = getResources().openRawResource(
-                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                    getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
                 GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
                 storageinit = StorageOptions.newBuilder()
                     .setCredentials(credentials).setClock(NanoClock.getDefaultClock())

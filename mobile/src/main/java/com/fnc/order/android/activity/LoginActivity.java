@@ -116,8 +116,8 @@ public class LoginActivity extends BaseActivity {
 //        usernameText.setText("office");
 //        passwordEText.setText("Office");
         // commi
-//        usernameText.setText("12105");
-//        passwordEText.setText("746265");
+        usernameText.setText("12105");
+        passwordEText.setText("746265");
 
 //        loginButton.callOnClick();
     }
