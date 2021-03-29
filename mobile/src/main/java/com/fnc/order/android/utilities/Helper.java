@@ -404,7 +404,7 @@ public class Helper {
         if (Helper.getScreenDimension(ctx, "w") >= 1200) {
             tWidth = Helper.getScreenDimension(ctx, "w") * 0.7;
         } else {
-            tWidth = Helper.getScreenDimension(ctx, "w") * 0.90;
+            tWidth = Helper.getScreenDimension(ctx, "w") * 0.80;
         }
         return (int)Math.round(tWidth);
     }
