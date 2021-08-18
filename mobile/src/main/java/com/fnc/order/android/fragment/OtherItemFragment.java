@@ -9,18 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.databinding.ItemItemlistOthersBinding;
-import com.fnc.order.android.databinding.ItemItemlistOthersBindingImpl;
-import com.fnc.order.android.databinding.ItemOthersBinding;
-import com.fnc.order.android.databinding.ItemUserBinding;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.enumeration.OrderKey;
 import com.fnc.order.android.model.Order;

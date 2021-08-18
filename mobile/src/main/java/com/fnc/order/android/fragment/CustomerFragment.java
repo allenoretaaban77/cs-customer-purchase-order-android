@@ -22,30 +22,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-
-import com.andreabaccega.widget.FormEditText;
 import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
@@ -53,41 +43,30 @@ import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
-import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
-import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.model.MainViewModel;
 import com.fnc.order.android.model.MenuList;
-import com.fnc.order.android.model.aAdminGroupings;
-import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
-import com.google.android.material.snackbar.Snackbar;
 import com.liaoinstan.springview.widget.SpringView;
 import com.roacult.backdrop.BackdropLayout;
-import com.shehabic.droppy.DroppyClickCallbackInterface;
-import com.shehabic.droppy.DroppyMenuItem;
 import com.shehabic.droppy.DroppyMenuPopup;
 import com.skydoves.powermenu.MenuAnimation;
 import com.skydoves.powermenu.OnMenuItemClickListener;
 import com.skydoves.powermenu.PowerMenu;
 import com.skydoves.powermenu.PowerMenuItem;
-
-import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -727,13 +706,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                     rowObj.getString("name"),
                                     rowObj.getLong("Branch"),
                                     rowObj.getLong("Jobtitle"),
-                                    rowObj.getString("pass"),
+                                    Helper.encryptMsg(rowObj.getString("pass"), Helper.generateKey()),
                                     rowObj.getString("active"),
                                     rowObj.getString("ismobileadmin")
                                 );
                                 DcStaffs.getInstance(ctx).insertStaffs(sl);
                             }
-                            Helper.insertDefaultStaffs(ctx);
                         }
                         Helper.dismissSpinnerDialog(loader);
                         Toast.makeText(ctx, "Request success...", Toast.LENGTH_SHORT).show();
@@ -990,13 +968,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                             rowObj.getString("name"),
                                             rowObj.getLong("Branch"),
                                             rowObj.getLong("Jobtitle"),
-                                            rowObj.getString("pass"),
+                                            Helper.encryptMsg(rowObj.getString("pass"), Helper.generateKey()),
                                             rowObj.getString("active"),
                                             rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
-                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 loadAdminJobTitles();
                             } else {

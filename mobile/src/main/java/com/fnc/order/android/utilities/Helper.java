@@ -81,9 +81,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -102,6 +104,12 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
@@ -234,7 +242,7 @@ public class Helper {
         }
         builder.setCancelable(isCancelable);
         builder.setTitle(title).setMessage(message)
-                .setPositiveButton(okButtonCaption, okClickListener);
+        .setPositiveButton(okButtonCaption, okClickListener);
         builder.create();
         return builder.show();
     }
@@ -421,21 +429,23 @@ public class Helper {
         return SharedData.getInstance(ctx).getData(SharedKey.CURRENT_PAGE.getKey());
     }
 
-    public static String getImei(Context ctx, String strBranchId) {
+    public static String getImei(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey()), resStrImeiId = "";
+        String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
         if (strImeiId.equals("")) {
+            String refStrImeiId = "";
             if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.P) {
-//                sp.saveData("ref_device_id", "CO-82EC1E7D-79EC-4D70-BCBC-E5AE06EE3C66");
-                sp.saveData("ref_device_id", "CO-" + UUID.randomUUID().toString().toUpperCase());
-                resStrImeiId = sp.getData("ref_device_id");
+                refStrImeiId = sp.getData("ref_device_id");
+                if (refStrImeiId.equals("")) {
+                    sp.saveData("ref_device_id", "CO-" + UUID.randomUUID().toString().toUpperCase());
+                    refStrImeiId = sp.getData("ref_device_id");
+                }
             } else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P || android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                resStrImeiId = getImeiNew(ctx).trim();
+                refStrImeiId = getImeiNew(ctx).trim();
             } else {
-                resStrImeiId = getImeiOld(ctx).trim();
+                refStrImeiId = getImeiOld(ctx).trim();
             }
-            sp.saveData(SharedKey.IMEI_ID.getKey(), resStrImeiId);
-            return resStrImeiId;
+            return refStrImeiId;
         } else {
             return strImeiId;
         }
@@ -502,44 +512,6 @@ public class Helper {
         }
     }
 
-    public static void insertDefaultStaffs(Context ctx) {
-        DcStaffs.getInstance(ctx).deleteStaffsViaId(SharedKey.SUPPORT_EMP_ID.getKey());
-        DcStaffs.getInstance(ctx).insertStaffs(Helper.adminStaff(ctx)); // add admin
-    }
-
-    public static void updateAdministratorPassword(Context ctx) {
-        /*SharedData sp = SharedData.getInstance(ctx);
-        aStaffsKey kArr[] = { aStaffsKey.EMPNO , aStaffsKey.PASS};
-        String[] vArr =  {  "", "" };
-        DcStaffs.getInstance(ctx).updateStaff(
-            aStaffsKey.EMPID.getKey(), sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
-
-        );*/
-    }
-
-    private static aStaffs defaultStaff(Context ctx) {
-        SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(1910454835L, "-2", "administrator", "aoaban@nathaniels.com.ph",
-            "IT Support", Long.parseLong(sp.getData(SharedKey.BRANCH_ID.getKey())),
-            1912072415L, "P@ssw0rd" + Helper.getReqDate(0, ""),
-            "true", "true");
-        return cs;
-    }
-
-    private static aStaffs adminStaff(Context ctx) {
-        SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(
-            Long.parseLong(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey())),
-            sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()),
-            sp.getData(SharedKey.SUPPORT_USER.getKey()),
-            sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
-            sp.getData(SharedKey.REF_ADMIN_FULLNAME.getKey()),
-            Long.parseLong(sp.getData(SharedKey.BRANCH_ID.getKey())),
-            1912072415L, sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()),
-            "true", "true");
-        return cs;
-    }
-
     public static String getReqDate(Integer type, String dateSample) {
         Date date = Calendar.getInstance().getTime();
         String dayOfTheWeek = (String) DateFormat.format("EEEE", date); // Sunday
@@ -594,9 +566,9 @@ public class Helper {
     }
 
     public static LinkedList<aBranchlist> checkBranchProfile(Context ctx) {
-        return DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+        return DcBranchlist.getInstance(ctx).filterMultiple( false,
             aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-            new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx, "") }
+            new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx) }, ""
         );
     }
 
@@ -636,4 +608,36 @@ public class Helper {
         return (xlarge || large);
     }
 
+    public static SecretKey generateKey()  {
+        String strDefaultKey = "cdevfr@7890$2021";
+        return new SecretKeySpec(strDefaultKey.getBytes(), "AES");
+    }
+
+    public static byte[] encryptMsg(String message, SecretKey secret) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            byte[] cipherText = cipher.doFinal(message.getBytes("UTF-8"));
+            return cipherText; }
+        catch (NoSuchAlgorithmException e) { return null; }
+        catch (NoSuchPaddingException e) { return null; }
+        catch (InvalidKeyException e) { return null; }
+        catch (IllegalBlockSizeException e) { return null; }
+        catch (BadPaddingException e) { return null; }
+        catch (UnsupportedEncodingException e) { return null; }
+    }
+
+    public static String decryptMsg(byte[] cipherText, SecretKey secret)  {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secret);
+            String decryptString = new String(cipher.doFinal(cipherText), "UTF-8");
+            return decryptString; }
+        catch (NoSuchAlgorithmException e) { return null; }
+        catch (NoSuchPaddingException e) { return null; }
+        catch (InvalidKeyException e) { return null; }
+        catch (IllegalBlockSizeException e) { return null; }
+        catch (BadPaddingException e) { return null; }
+        catch (UnsupportedEncodingException e) { return null; }
+    }
 }

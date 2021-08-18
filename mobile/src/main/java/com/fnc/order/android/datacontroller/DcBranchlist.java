@@ -31,13 +31,13 @@ public class DcBranchlist extends DBHelper {
         this.context = context;
     }
 
-    public void emptyBranchlist() {
+    public void emptyList() {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(Table.BRANCHLIST.getName(), null, null);
         db.close();
     }
 
-    public void insertBranches(aBranchlist bl) {
+    public void insertItems(aBranchlist bl) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues value = aBranchlistQueryBuilder.prepareaBranchlistInsertValues(bl, context);
         db.insertWithOnConflict(Table.BRANCHLIST.getName(), null, value, SQLiteDatabase.CONFLICT_IGNORE);
@@ -59,7 +59,7 @@ public class DcBranchlist extends DBHelper {
         Cursor c = db.rawQuery(strQry, null);
         LinkedList<aBranchlist> list = new LinkedList<>();
         while (c.moveToNext()) {
-            list.add(setBranchlist(c));
+            list.add(setList(c));
         }
         c.close();
         db.close();
@@ -76,7 +76,7 @@ public class DcBranchlist extends DBHelper {
         Cursor c = db.rawQuery(strQry, new String[] { "12345" });
         ArrayList<String> stringBranches = new ArrayList<String>();
         while (c.moveToNext()) {
-            if (Character.isLetter(c.getString(0).charAt(0))) {
+            if(!c.getString(0).trim().equals("")) {
                 stringBranches.add(c.getString(0));
             }
         }
@@ -85,20 +85,25 @@ public class DcBranchlist extends DBHelper {
         return stringBranches;
     }
 
-    public LinkedList<aBranchlist> searchBranchFilterMultiple(String strCol, String[] strMultiple) {
+    public LinkedList<aBranchlist> filterMultiple(Boolean distinct, String strCol, String[] strMultiple, String orderby) {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT * FROM " + Table.BRANCHLIST.getName() + " WHERE " + strCol;
+        String strQry = "";
+        if(!distinct) {
+            strQry = "SELECT * FROM " + Table.BRANCHLIST.getName() + " WHERE " + strCol + orderby;
+        } else {
+            strQry = "SELECT distinct(recid), description FROM " + Table.BRANCHLIST.getName() + " WHERE " + strCol + orderby;
+        }
         Cursor c = db.rawQuery(strQry, strMultiple);
         LinkedList<aBranchlist> list = new LinkedList<>();
         while (c.moveToNext()) {
-            list.add(setBranchlist(c));
+            list.add(setList(c));
         }
         c.close();
         db.close();
         return list;
     }
 
-    private aBranchlist setBranchlist(Cursor c) {
+    private aBranchlist setList(Cursor c) {
         aBranchlist bl = new aBranchlist(
             c.getLong(c.getColumnIndex(aBranchlistKey.BRANCHID.getKey())),
             c.getString(c.getColumnIndex(aBranchlistKey.BRANCHCODE.getKey())),

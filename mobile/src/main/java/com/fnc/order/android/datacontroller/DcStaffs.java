@@ -116,6 +116,20 @@ public class DcStaffs extends DBHelper {
         return list;
     }
 
+    public LinkedList<aStaffs> checkStaff(String strUn) {
+        SQLiteDatabase db = getReadableDatabase();
+        String strQry = "SELECT * FROM " + Table.STAFFS.getName()
+                + " WHERE " + aStaffsKey.EMPNO.getKey() + " = ?";
+        Cursor c = db.rawQuery(strQry, new String[] { strUn });
+        LinkedList<aStaffs> list = new LinkedList<>();
+        while (c.moveToNext()) {
+            list.add(setStaffs(c));
+        }
+        c.close();
+        db.close();
+        return list;
+    }
+
     public LinkedList<aStaffs> checkStaff(String strUn, String strPw) {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.STAFFS.getName()
@@ -140,7 +154,7 @@ public class DcStaffs extends DBHelper {
             c.getString(c.getColumnIndex(aStaffsKey.NAME.getKey())),
             c.getLong(c.getColumnIndex(aStaffsKey.BRANCH.getKey())),
             c.getLong(c.getColumnIndex(aStaffsKey.JOBTITLE.getKey())),
-            c.getString(c.getColumnIndex(aStaffsKey.PASS.getKey())),
+            c.getBlob(c.getColumnIndex(aStaffsKey.PASS.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.ACTIVE.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.ISMOBILEADMIN.getKey()))
         );

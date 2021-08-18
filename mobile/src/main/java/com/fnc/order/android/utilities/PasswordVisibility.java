@@ -6,15 +6,14 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import com.andreabaccega.widget.FormEditText;
+import android.widget.EditText;
 
 public class PasswordVisibility {
 
     public static boolean shownNew = false;
     public static boolean shownConfirm = false;
 
-    public static void visibility(final Button hidePassword, final Button showPassword, final FormEditText etPassword){
+    public static void visibility(final Button hidePassword, final Button showPassword, final EditText etPassword){
         Log.d("test1", "error");
         showPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,7 +35,7 @@ public class PasswordVisibility {
             }
         });
     }
-    public static void visibilityInValidationNew(final FormEditText etPassword, final Button showPassword, final Button hidePassword){
+    public static void visibilityInValidationNew(final EditText etPassword, final Button showPassword, final Button hidePassword){
         Log.d("test2", "error");
         if(etPassword.getText().length() == 0) {
             showPassword.setVisibility(View.GONE);
@@ -81,7 +80,7 @@ public class PasswordVisibility {
         });
     }
 
-    public static void visibilityInValidationConfirm(final FormEditText etPassword, final Button showPassword, final Button hidePassword){
+    public static void visibilityInValidationConfirm(final EditText etPassword, final Button showPassword, final Button hidePassword){
         if(etPassword.getText().length() == 0) {
             showPassword.setVisibility(View.GONE);
             hidePassword.setVisibility(View.GONE);

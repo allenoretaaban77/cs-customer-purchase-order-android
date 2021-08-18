@@ -9,35 +9,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
-import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.activity.MainActivity;
-import com.fnc.order.android.activity.SplashActivity;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.database.DbConstants;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.VolleyInteractor;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
 import java.util.LinkedList;
-
-import static com.fnc.order.android.database.DBHelper.DBPath;
 
 public class OrdersService extends Service {
 

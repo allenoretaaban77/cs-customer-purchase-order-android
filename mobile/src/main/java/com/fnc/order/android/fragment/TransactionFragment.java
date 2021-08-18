@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,26 +12,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-
 import com.android.volley.VolleyError;
 import com.fnc.order.android.R;
-import com.fnc.order.android.activity.MainActivity;
 import com.fnc.order.android.adapters.TransactionsAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.enumeration.OrderedKey;
-import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.utilities.Helper;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class TransactionFragment extends Fragment implements VolleyCallback {
 
@@ -45,8 +37,7 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
     private Fragment thisFragment;
     private static final int ITEM_DIALOG_FRAGMENT = 8;
 
-    public TransactionFragment() {
-    }
+    public TransactionFragment() { }
 
     @Nullable
     @Override

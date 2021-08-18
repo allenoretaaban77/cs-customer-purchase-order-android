@@ -1,87 +1,39 @@
 package com.fnc.order.android.activity;
 
 import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.GridView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import androidx.fragment.app.FragmentTransaction;
-
-import com.android.volley.VolleyError;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.R;
-import com.fnc.order.android.adapters.AlphaGridAdapter;
-import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
-import com.fnc.order.android.datacontroller.DcAitemlist;
-import com.fnc.order.android.datacontroller.DcBranchlist;
-import com.fnc.order.android.datacontroller.DcMenulist;
-import com.fnc.order.android.datacontroller.DcOrdered;
-import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.SharedKey;
-import com.fnc.order.android.enumeration.aBranchlistKey;
-import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.fragment.OrderFragment;
-import com.fnc.order.android.fragment.SearchItemFragment;
 import com.fnc.order.android.fragment.TransactionFragment;
-import com.fnc.order.android.model.Itemlist;
-import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.aBranchlist;
-import com.fnc.order.android.model.aItemlist;
-import com.fnc.order.android.services.OrdersService;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
-import com.fnc.order.android.utilities.VolleyInteractor;
 import com.google.api.core.NanoClock;
-import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import hari.bounceview.BounceView;
 
-import static android.content.Context.ACTIVITY_SERVICE;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 public class MainActivity extends BaseActivity {
-
     Context ctx;
-    private AlertDialog alertDialog;
-    private ProgressDialog loader;
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -124,9 +76,8 @@ public class MainActivity extends BaseActivity {
 
         if (Helper.checkBranchProfile(ctx).size() > 0) {
             aBranchlist mBl = Helper.checkBranchProfile(ctx).get(0);
-            String strRef = SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey());
-            if (mBl.getDescription().equals(strRef)) {
-//            if(mBl.getDescription().equals("Commissary") || mBl.getDescription().equals("Main")) {
+            String strRef = SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey());
+            if (mBl.getBranchid().toString().equals(strRef)) {
                 Helper.changePage(ctx, getSupportFragmentManager(), new CustomerFragment(),
                     "customer_fragment", "main_page");
             } else {
@@ -150,8 +101,7 @@ public class MainActivity extends BaseActivity {
                 .replace(R.id.container, new TransactionFragment(), "transaction_fragment")
                 .addToBackStack(null).commit();
         } else if (refPage.equals("customer_fragment")) {
-            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-//            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+            if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
                 getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, new CustomerFragment(), "customer_fragment")
                     .addToBackStack(null).commit();
@@ -268,74 +218,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        new checkVersionUpdate().execute("");
-    }
-    private Storage storageinit;
-    private class checkVersionUpdate extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                InputStream ins = getResources().openRawResource(
-                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
-                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
-                storageinit = StorageOptions.newBuilder()
-                        .setCredentials(credentials)
-                        .setClock(NanoClock.getDefaultClock())
-                        .setProjectId(GlobalConstants.GCP_PROJECTID)
-                        .build()
-                        .getService();
-                try {
-                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION, "version.log");
-                    Blob blob = storageinit.get(blobId);
-                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
-                    return "Success|" + new String(bytes, "UTF-8");
-                } catch (Exception e) {
-                    return "Error| exception = " + e.getLocalizedMessage();
-                }
-            } catch (IOException io) {
-                return "Error| io";
-            }
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            String[] resMsg = result.split("\\|");
-            if (resMsg[0].equals("Success")) {
-                try {
-                    Log.d("gcp",  resMsg[1]);
-                    JSONArray objArr = new JSONArray(resMsg[1]);
-                    if (objArr.length() > 0) {
-                        for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject rowObj = objArr.getJSONObject(i);
-                            if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
-                                String strVersionName = rowObj.getString("version_name");
-                                if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
-                                    BounceView.addAnimTo( Helper.okDialog( ctx,
-                                        "App Update",
-                                        "A new version of this app is now available.",
-                                        "UPDATE", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
-                                            }
-                                        }, false) );
-                                }
-                            }
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        @Override
-        protected void onPreExecute() {
-            Log.d("gcpe", "Task Upload Starting");
-        }
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            Log.d("gcpu", "Running " + + values[0]);
-        }
     }
 
     private static boolean active = false;
