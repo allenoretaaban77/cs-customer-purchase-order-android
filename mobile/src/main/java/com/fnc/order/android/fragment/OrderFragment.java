@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,23 +23,17 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-
 import com.android.volley.VolleyError;
 import com.daimajia.swipe.SwipeLayout;
 import com.fnc.order.android.R;
@@ -48,7 +41,6 @@ import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.OrderlistAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
-import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
@@ -58,7 +50,6 @@ import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.ItemlistKey;
 import com.fnc.order.android.enumeration.MenulistKey;
 import com.fnc.order.android.enumeration.OrderKey;
-import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.PersonsKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
@@ -68,7 +59,6 @@ import com.fnc.order.android.model.Itemlist;
 import com.fnc.order.android.model.MenuList;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.model.Ordered;
-import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aItemlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.utilities.DatePickerDialogFragment;
@@ -78,30 +68,12 @@ import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.api.core.NanoClock;
-import com.google.api.services.storage.model.Objects;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import com.shehabic.droppy.DroppyClickCallbackInterface;
 import com.shehabic.droppy.DroppyMenuItem;
 import com.shehabic.droppy.DroppyMenuPopup;
 import com.fnc.order.android.utilities.RelativePopupWindow;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
-import org.json.JSONTokener;
-import org.w3c.dom.Text;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -109,20 +81,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import hari.bounceview.BounceView;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 public class OrderFragment extends Fragment implements VolleyCallback {
-
     private static final int PERSON_DIALOG_FRAGMENT = 7;
     private static final int ITEM_DIALOG_FRAGMENT = 8;
     private static final int SUMMARY_DIALOG_FRAGMENT = 9;
@@ -187,8 +153,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         curRefArrayListErr = new LinkedList<Order>();
 
         LinkedList<MenuList> mlRs = DcMenulist.getInstance(ctx).searchMenuFilterMultiple(
-                MenulistKey.CUSTOMER_ID.getKey() + " = ?",
-                new String[] { sp.getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) } );
+            MenulistKey.CUSTOMER_ID.getKey() + " = ?",
+            new String[] { sp.getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) } );
         if (mlRs.size() > 0 ) {
             refMenulist = DcMenulist.getInstance(ctx).searchMenuFilterMultiple(
                 MenulistKey.CUSTOMER_ID.getKey() + " = ?",
@@ -196,12 +162,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             ).get(0);
         }
 
-        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+        if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
             strBranchEncoding = "1";
         } else {
-            strBranchEncoding = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                    aBranchlistKey.CUSTOMERID.getKey() + " = ?",
-                    new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) }
+            strBranchEncoding = DcBranchlist.getInstance(ctx).filterMultiple( false, aBranchlistKey.CUSTOMERID.getKey() + " = ?",
+            new String[] { SharedData.getInstance(ctx).getData(SharedKey.ORDER_CUSTOMER_ID.getKey()) }, ""
             ).get(0).getOld_branchid();
         }
 
@@ -232,7 +197,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                    if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
 //                    if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                         backItNow(v);
                         return true;
@@ -312,8 +277,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             strParams = strParams.replaceAll(" ", "%20");
             vi.getItemlist(ctx, params, strParams);
         } else {
-            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-//            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+            if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
                 Toast.makeText(ctx, "Please check internet connection....", Toast.LENGTH_SHORT).show();
             } else {
 //                try {
@@ -854,8 +818,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         isPosted = true;
 
                         // filter for kiosk of comissary fnc
-                        if (Helper.checkBranchProfile(ctx).get(0).getDescription()
-                            .equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                        if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString()
+                            .equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
                             if (SharedData.getInstance(ctx).getInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey()) == 1) {
                                 showSummary("true");
                             } else {
@@ -1195,9 +1159,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
 
-                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-//                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
-                    headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
+                if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
+//                    headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
+                    headersMap.put("order_type", refMenulist.getInvoice().trim().equals("true")?"1":"2");
                 } else {
                     headersMap.put("order_type", "2"); // int (customer order: 1 / store order: 2)
                 }
@@ -1257,7 +1221,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                 Helper.dismissSpinnerDialog(loader);
 
-                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
 //                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                     loader = Helper.showSpinnerDialog(ctx, "Posting Transaction", "Please wait..."); loader.show();
                     new Handler().postDelayed(new Runnable() {
@@ -2120,13 +2084,12 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                                             rowObj.getString("name"),
                                             rowObj.getLong("Branch"),
                                             rowObj.getLong("Jobtitle"),
-                                            rowObj.getString("pass"),
+                                            Helper.encryptMsg(rowObj.getString("pass"), Helper.generateKey()),
                                             rowObj.getString("active"),
                                             rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
-                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 loadAdminJobTitles();
                             } else {

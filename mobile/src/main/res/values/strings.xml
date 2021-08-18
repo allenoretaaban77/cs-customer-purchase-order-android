@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CS Customer Order</string>
     <string name="app_name_massive">CS Customer Order</string>
+    <string name="button_login">LOG-IN</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

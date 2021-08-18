@@ -8,12 +8,12 @@ public class aStaffs {
     private String name;
     private Long Branch;
     private Long Jobtitle;
-    private String pass;
+    private byte[] pass;
     private String active;
     private String ismobileadmin;
 
     public aStaffs (Long empId, String refempno, String empNo, String Email, String name, Long Branch, Long Jobtitle,
-                    String pass, String active, String ismobileadmin) {
+        byte[] pass, String active, String ismobileadmin) {
 
         this.empId = empId;
         this.refempno = refempno;
@@ -34,7 +34,7 @@ public class aStaffs {
     public String getName() { return name; }
     public Long getBranch() { return Branch; }
     public Long getJobtitle() { return Jobtitle; }
-    public String getPass() { return pass; }
+    public byte[] getPass() { return pass; }
     public String getActive() { return active; }
     public String getIsmobileadmin() { return ismobileadmin; }
 }

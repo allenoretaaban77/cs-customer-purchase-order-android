@@ -12,6 +12,7 @@
     android:orientation="vertical">
 
     <ImageView
+        android:contentDescription="@string/app_name"
         android:layout_gravity="center"
         android:alpha=".1"
         android:backgroundTintMode="src_over"
@@ -20,10 +21,11 @@
         android:layout_centerInParent="true"
         android:src="@drawable/po1" />
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="300dp"
+    <ScrollView
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:background="@color/transparent"
         android:visibility="visible" >
 
         <LinearLayout
@@ -32,38 +34,37 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:fontFamily="@font/medium"
-                android:layout_marginBottom="10dp"
-                android:textSize="@dimen/login_title_text_size"
-                android:textColor="@color/green_1"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CUSTOMER ORDER"/>
-
-            <!--com.github.florent37.materialtextfield.MaterialTextField
+            <LinearLayout
+                android:gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                app:mtf_openKeyboardOnFocus="true"
-                app:mtf_cardCollapsedHeight="4dp"
-                app:mtf_labelColor="@color/gray_6"
-                app:mtf_image="@drawable/baseline_account_box_24">
-                <EditText
-                    android:background="@color/red_2"
-                    android:id="@+id/username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Username"
-                    android:textColor="@color/gray_6"
-                    android:textSize="17sp" />
-            </com.github.florent37.materialtextfield.MaterialTextField-->
+                android:layout_height="58dp">
+                    <ImageView
+                        android:layout_marginEnd="10dp"
+                        android:background="@mipmap/ic_launcher"
+                        android:layout_width="58dp"
+                        android:contentDescription="@string/app_name"
+                        android:layout_height="match_parent"/>
+                    <LinearLayout
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:fontFamily="@font/medium"
+                            android:textSize="@dimen/login_title_text_size"
+                            android:textColor="@color/black"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_name"/>
+                    </LinearLayout>
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:fontFamily="@font/regular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <com.andreabaccega.widget.FormEditText
+                <EditText
+                    android:autofillHints="Please enter user name"
                     android:textSize="@dimen/header_text_size"
                     android:fontFamily="@font/medium"
                     android:id="@+id/username"
@@ -87,9 +88,10 @@
                     android:fontFamily="@font/regular"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <com.andreabaccega.widget.FormEditText
+                    <EditText
+                        android:autofillHints="Please enter pass word"
                         android:textSize="@dimen/header_text_size"
-                        android:fontFamily="@font/regular"
+                        android:fontFamily="@font/medium"
                         android:id="@+id/password"
                         android:textColorHint="@color/gray_4"
                         android:textColor="@color/gray_6"
@@ -106,7 +108,7 @@
                     android:id="@+id/relPassword"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
+                    android:layout_gravity="end|center_vertical"
                     android:visibility="gone">
                     <Button
                         android:id="@+id/hide_password"
@@ -138,7 +140,7 @@
                         android:id="@+id/login_button"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="LOG-IN"
+                        android:text="@string/button_login"
                         android:textColor="@color/white"
                         android:textAllCaps="false"/>
                 </com.balysv.materialripple.MaterialRippleLayout>
@@ -159,7 +161,6 @@
             android:fontFamily="@font/regular"
             android:textColor="@color/red_1"
             android:textSize="19sp"
-            android:text="0.0.0"
             android:textAlignment="textEnd"
             android:id="@+id/tv_version"
             android:layout_width="match_parent"

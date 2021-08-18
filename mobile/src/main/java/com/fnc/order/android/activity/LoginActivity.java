@@ -15,7 +15,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,14 +24,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-
-import com.andreabaccega.widget.FormEditText;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.constants.GlobalConstants;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
 import com.fnc.order.android.datacontroller.DcStaffs;
@@ -48,39 +45,26 @@ import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.PasswordVisibility;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.R;
-import com.google.api.core.NanoClock;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-
 import hari.bounceview.BounceView;
 
 public class LoginActivity extends BaseActivity {
 
     PasswordVisibility passwordVisibility;
-    private FormEditText usernameText;
-    private FormEditText passwordEText;
+    private EditText usernameText, passwordEText;
     private TextView tvVersion;
     private Button loginButton;
     private Button hidePassword, showPassword;
@@ -113,20 +97,20 @@ public class LoginActivity extends BaseActivity {
 //        usernameText.setText("1");
 //        passwordEText.setText("clovis");
         // massive
-//        usernameText.setText("office");
-//        passwordEText.setText("Office");
+//        usernameText.setText("gabby");
+//        passwordEText.setText("gBuensuceso");
         // commi
-        usernameText.setText("12105");
-        passwordEText.setText("746265");
+//        usernameText.setText("12105");
+//        passwordEText.setText("7777");
 
 //        loginButton.callOnClick();
     }
 
     private void initViews() {
         relPassword = (RelativeLayout) findViewById(R.id.relPassword);
-        usernameText = (FormEditText) findViewById(R.id.username);
+        usernameText = (EditText) findViewById(R.id.username);
         usernameText.setFilters(new InputFilter[] { filter });
-        passwordEText = (FormEditText) findViewById(R.id.password);
+        passwordEText = (EditText) findViewById(R.id.password);
         passwordEText.setText("");
         hidePassword = (Button) findViewById(R.id.hide_password);
         showPassword = (Button) findViewById(R.id.show_password);
@@ -185,69 +169,70 @@ public class LoginActivity extends BaseActivity {
 
                 LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
                 if (sl.size() > 0) {
-                    LinkedList<aStaffs> slUP = DcStaffs.getInstance(ctx).checkStaff(usernameStr, passwordString);
+                    LinkedList<aStaffs> slUP = DcStaffs.getInstance(ctx).checkStaff(usernameStr);
                     if (slUP.size() > 0 ) {
                         aStaffs slx = slUP.get(0);
-                        if (slx.getRefempno().equals("-1")) {
-                            if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
-                            //if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
-                                isSubmit = false;
-                                BounceView.addAnimTo( Helper.okDialog( ctx,
-                                    "Account Error","Reference employee number not recognized. Please contact IT support to update your account.", "CLOSE",
-                                    null, false) );
-                                return;
-                            }
-                        }
 
-                        String refEmpIDOld = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey());
-                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), refEmpIDOld);
-                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID.getKey(), String.valueOf(slx.getEmpId()));
-
-                        SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), String.valueOf(slx.getRefempno()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpId()));
-                        /* if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
-                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpId()));
-                        } else {
-                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
-                        } */
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
-                        SharedData.getInstance(ctx).saveData(SharedKey.EMP_ISMOBILEADMIN.getKey(), String.valueOf(slx.getIsmobileadmin()));
-                        isSubmit = true;
-
-                        if (Helper.checkBranchProfile(ctx).size() > 0) {
-                            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-//                            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
-                                showActivity(MainActivity.class);
-                            } else {
-                                LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
-                                if (llr.size() > 0) {
-                                    showActivity(MainActivity.class);
-                                    Toast.makeText(ctx, "Welcome " + slx.getName() + "!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    requestCustomers("");
+                        if (Helper.decryptMsg(slx.getPass(), Helper.generateKey()).trim().equals(passwordString)) {
+                            if (slx.getRefempno().equals("-1")) {
+                                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
+                                    if(sp.getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.DEFAULT_CN)) {
+                                        BounceView.addAnimTo( Helper.okDialog( ctx,
+                                        "Account Error","Reference employee number not recognized. Please contact IT support to update your account.", "CLOSE",
+                                        null, false) );
+                                        return;
+                                    }
                                 }
+                            }
+
+                            String refEmpIDOld = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey());
+                            SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), refEmpIDOld);
+                            SharedData.getInstance(ctx).saveData(SharedKey.IDENTITY_ID.getKey(), String.valueOf(slx.getRefempno()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_NO.getKey(), String.valueOf(slx.getRefempno()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID.getKey(), String.valueOf(slx.getEmpId()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NO.getKey(), String.valueOf(slx.getEmpNo()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_NAME.getKey(), String.valueOf(slx.getName()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_POSITION.getKey(), String.valueOf(slx.getJobtitle()));
+                            SharedData.getInstance(ctx).saveData(SharedKey.EMP_ISMOBILEADMIN.getKey(), String.valueOf(slx.getIsmobileadmin()));
+
+                            if (Helper.checkBranchProfile(ctx).size() > 0) {
+                                if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString()
+                                .equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
+                                    showActivity(MainActivity.class);
+                                } else {
+                                    LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
+                                    if (llr.size() > 0) {
+                                        showActivity(MainActivity.class);
+                                        Toast.makeText(ctx, "Welcome " + slx.getName() + "!", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        requestCustomers("");
+                                    }
+                                }
+                            } else {
+                                isSubmit = false;
+                                Toast.makeText(ctx, "Login Error, please contact IT support.", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             isSubmit = false;
-                            Toast.makeText(ctx, "Login Error, please contact IT support.", Toast.LENGTH_SHORT).show();
+                            alertDialog = Helper.okDialog(ctx,
+                            "Error","Invalid username or password", "CLOSE", null, false);
+                            BounceView.addAnimTo(alertDialog);
                         }
                     } else {
                         isSubmit = false;
                         BounceView.addAnimTo( Helper.okDialog( ctx,
-                            "Error","Invalid username or password", "CLOSE",
-                            null, false) );
+                        "Error","Invalid username or password", "CLOSE",
+                        null, false) );
                     }
                 } else {
                     BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Data Sync Required","This app needs to be restarted.",
-                        "CLOSE", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            finishAndRemoveTask();
-                            }
-                        }, false) );
+                    "Data Sync Required","Users data empty. This app needs to be restarted.",
+                    "CLOSE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        finishAndRemoveTask();
+                        }
+                    }, false) );
                 }
             }
         });
@@ -740,7 +725,7 @@ public class LoginActivity extends BaseActivity {
         btnInfo.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Info", "Device ID: " + Helper.getImei(ctx, ""), "CLOSE",
+                    "Info", "Device ID: " + Helper.getImei(ctx), "CLOSE",
                     null, false) );
             }
         });
@@ -772,12 +757,11 @@ public class LoginActivity extends BaseActivity {
     }
 
     private Spinner btnAddJobTitle;
-    private FormEditText et_jobtitle;
-    private EditText et_jobtitle_id;
+    private EditText et_jobtitle, et_jobtitle_id;
     private ArrayAdapter<aAdminGroupings> spinneradapter;
     private void addUser() {
         alertDialogUser = addUserDialog(ctx);
-        et_jobtitle = (FormEditText) alertDialogUser.findViewById(R.id.et_jobtitle);
+        et_jobtitle = (EditText) alertDialogUser.findViewById(R.id.et_jobtitle);
         et_jobtitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -791,12 +775,12 @@ public class LoginActivity extends BaseActivity {
         btnSubmit.setOnClickListener (new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FormEditText et_employeeno = (FormEditText) alertDialogUser.findViewById(R.id.et_employeeno);
-                FormEditText et_firstname = (FormEditText) alertDialogUser.findViewById(R.id.et_firstname);
-                FormEditText et_middlename = (FormEditText) alertDialogUser.findViewById(R.id.et_middlename);
-                FormEditText et_lastname = (FormEditText) alertDialogUser.findViewById(R.id.et_lastname);
-                FormEditText et_password = (FormEditText) alertDialogUser.findViewById(R.id.et_password);
-                FormEditText et_repeatpassword = (FormEditText) alertDialogUser.findViewById(R.id.et_repeatpassword);
+                EditText et_employeeno = (EditText) alertDialogUser.findViewById(R.id.et_employeeno);
+                EditText et_firstname = (EditText) alertDialogUser.findViewById(R.id.et_firstname);
+                EditText et_middlename = (EditText) alertDialogUser.findViewById(R.id.et_middlename);
+                EditText et_lastname = (EditText) alertDialogUser.findViewById(R.id.et_lastname);
+                EditText et_password = (EditText) alertDialogUser.findViewById(R.id.et_password);
+                EditText et_repeatpassword = (EditText) alertDialogUser.findViewById(R.id.et_repeatpassword);
 
                 if (et_employeeno.getText().toString().trim().equals("")) {
                     Toast.makeText(ctx, "Invalid employee number.", Toast.LENGTH_SHORT).show(); return;
@@ -988,7 +972,7 @@ public class LoginActivity extends BaseActivity {
                                 try {
                                     JSONArray objArr = new JSONArray(response);
                                     if (objArr.length() > 0) {
-                                        DcBranchlist.getInstance(ctx).emptyBranchlist();
+                                        DcBranchlist.getInstance(ctx).emptyList();
                                         for (int i = 0; i < objArr.length(); i++) {
                                             JSONObject rowObj = objArr.getJSONObject(i);
                                             aBranchlist br = new aBranchlist(
@@ -1002,7 +986,7 @@ public class LoginActivity extends BaseActivity {
                                                 rowObj.getString("old_branchid").trim(),
                                                 rowObj.getString("old_customerid").trim()
                                             );
-                                            DcBranchlist.getInstance(ctx).insertBranches(br);
+                                            DcBranchlist.getInstance(ctx).insertItems(br);
                                         }
                                     }
 
@@ -1010,9 +994,9 @@ public class LoginActivity extends BaseActivity {
                                     if (strRef[1].equals("reinit")) {
 //                                        Toast.makeText(ctx, "Validate", Toast.LENGTH_SHORT).show();
                                         LinkedList<aBranchlist> abl =
-                                            DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                                            DcBranchlist.getInstance(ctx).filterMultiple( false,
                                                 aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                                                new String[] { refSelectedBranchId, Helper.getImei(ctx, "") }
+                                                new String[] { refSelectedBranchId, Helper.getImei(ctx) }, ""
                                             );
                                         if (abl.size() > 0) {
                                             int flgx = 0;
@@ -1035,7 +1019,7 @@ public class LoginActivity extends BaseActivity {
                                             } else {
                                                 BounceView.addAnimTo( Helper.okDialog( ctx,
                                                     "Device Registration",
-                                                    "This device with ID# " + Helper.getImei(ctx, "") + " is NOT YET ACTIVATED. Please contact IT support",
+                                                    "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
                                                     "OK", new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
@@ -1046,15 +1030,13 @@ public class LoginActivity extends BaseActivity {
                                             }
                                         } else  {
                                             BounceView.addAnimTo( Helper.okDialog( ctx,
-                                                "Device Registration",
-                                                "This device with ID# " + Helper.getImei(ctx, "") + " is NOT YET REGISTERED. Please contact IT support",
-                                                "OK", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                        loadSpinnerBranches();
-                                                    }
-                                                }, false) );
+                                            "Device Registration",
+                                            "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
+                                            "OK", new DialogInterface.OnClickListener() {
+                                                @Override public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss(); loadSpinnerBranches();
+                                                }
+                                            }, false) );
                                         }
                                     } else if (strRef[1].equals("reload")) {
                                         loadSpinnerBranches();
@@ -1101,12 +1083,11 @@ public class LoginActivity extends BaseActivity {
                 "", "","", "", "", "", "");
             arrBranches.add(abr);
             for(int k=0; k<refAbx.size(); k++){
-                if (DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                    aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }
+                if (DcBranchlist.getInstance(ctx).filterMultiple( false,
+                    aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }, ""
                 ).size() > 0) {
-                    abr = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                            aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }
-                    ).get(0);
+                    abr = DcBranchlist.getInstance(ctx).filterMultiple( false,
+                    aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }, "").get(0);
                     arrBranches.add(abr);
                 }
             }
@@ -1153,64 +1134,16 @@ public class LoginActivity extends BaseActivity {
         msBranches.setAdapter(sadapter);
 
         if(!sp.getData(SharedKey.BRANCH_ID.getKey()).equals("")) {
-            if ( DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                    aBranchlistKey.BRANCHID.getKey() + " = ? ", new String[] { sp.getData(SharedKey.BRANCH_ID.getKey()) }
+            if ( DcBranchlist.getInstance(ctx).filterMultiple( false,
+            aBranchlistKey.BRANCHID.getKey() + " = ? ", new String[] { sp.getData(SharedKey.BRANCH_ID.getKey()) }, ""
             ).size() > 0) {
-                aBranchlist rsBl = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                        aBranchlistKey.BRANCHID.getKey() + " = ? ", new String[] { sp.getData(SharedKey.BRANCH_ID.getKey()) }
+                aBranchlist rsBl = DcBranchlist.getInstance(ctx).filterMultiple( false,
+                aBranchlistKey.BRANCHID.getKey() + " = ? ", new String[] { sp.getData(SharedKey.BRANCH_ID.getKey()) }, ""
                 ).get(0);
                 tvBranchdescription.setText(rsBl.getBranchcode() + " (" + rsBl.getDescription() + ")");
                 refSelectedBranchId = String.valueOf(rsBl.getBranchid());
             }
         }
-    }
-
-    private void postBranchImei() {
-        if (!Helper.isNetworkAvailable(this)) {
-            Toast.makeText(ctx, "This app requires internet to initialize.  Please check your connection.",
-                Toast.LENGTH_SHORT).show(); return;
-        }
-
-        if (loader != null) Helper.dismissSpinnerDialog(loader);
-        loader = Helper.showSpinnerDialog(ctx, "Processing Registration", "Please wait..."); loader.show();
-
-        HashMap<String, String> params = new HashMap<>();
-        params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
-        params.put("branchid", refSelectedBranchId);
-        params.put("deviceid", Helper.getImei(ctx, ""));
-        Iterator it = params.entrySet().iterator();
-        String strParams = "";
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
-            it.remove();
-        }
-        VolleyInteractor viri = new VolleyInteractor();
-        viri.registerCallback(new VolleyCallback() {
-            @Override
-            public void onRequestSuccess(final String response, String type) {
-                Helper.dismissSpinnerDialog(loader);
-                if (response.toLowerCase().equals("true")) {
-                    getDeviceProfile("reinit");
-                } else {
-                    BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Device Registration","Registration failed. Please contact IT support.",
-                        "CLOSE", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            }
-                        }, false) );
-                }
-            }
-            @Override
-            public void onRequestFail(VolleyError response, String type) {
-                Helper.dismissSpinnerDialog(loader);
-                Toast.makeText(ctx, "Request Error", Toast.LENGTH_SHORT).show();
-            }
-        });
-        viri.postBranchImei(getApplicationContext(), params,
-                strParams.replaceAll(" ", "%20"));
     }
 
     private ProgressDialog orloader;
@@ -1224,12 +1157,12 @@ public class LoginActivity extends BaseActivity {
                 getDeviceProfile("default");
             }
             new getUsersAsync().execute("");
-            new checkVersionUpdate().execute("");
+            new getSettings().execute("");
             new android.os.Handler().postDelayed(
                 new Runnable() { public void run() { Helper.dismissSpinnerDialog(loader); } },
                 2000
             );
-        }
+        } // else not needed here, will hinder transaction
     }
 
     private class getUsersAsync extends AsyncTask<String, Integer, String> {
@@ -1257,7 +1190,7 @@ public class LoginActivity extends BaseActivity {
                                         rowObj.getString("name"),
                                         rowObj.getLong("Branch"),
                                         rowObj.getLong("Jobtitle"),
-                                        rowObj.getString("pass"),
+                                        Helper.encryptMsg(rowObj.getString("pass"), Helper.generateKey()),
                                         rowObj.getString("active"),
                                         rowObj.getString("ismobileadmin")
                                     );
@@ -1402,141 +1335,113 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    private Storage storageinit;
-    private class checkVersionUpdate extends AsyncTask<String, Integer, String> {
+    private class getSettings extends AsyncTask<String, Integer, String> {
         @Override
         protected String doInBackground(String... params) {
-            try {
-                InputStream ins = getResources().openRawResource(
-                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
-                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
-                storageinit = StorageOptions.newBuilder()
-                        .setCredentials(credentials)
-                        .setClock(NanoClock.getDefaultClock())
-                        .setProjectId(GlobalConstants.GCP_PROJECTID)
-                        .build()
-                        .getService();
-                try {
-                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION, "version.log");
-                    Blob blob = storageinit.get(blobId);
-                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
-                    return "Success|" + new String(bytes, "UTF-8");
-                } catch (Exception e) {
-                    return "Error| exception = " + e.getLocalizedMessage();
-                }
-            } catch (IOException io) {
-                return "Error| io";
-            }
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            String[] resMsg = result.split("\\|");
-            if (resMsg[0].equals("Success")) {
-                try {
-                    Log.d("gcp",  resMsg[1]);
-                    JSONArray objArr = new JSONArray(resMsg[1]);
-                    if (objArr.length() > 0) {
-                        for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject rowObj = objArr.getJSONObject(i);
-                            if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
-                                String strVersionName = rowObj.getString("version_name");
-                                if (Integer.parseInt(rowObj.getString("version_code")) > Helper.getVersionCode(ctx)) {
-                                    BounceView.addAnimTo( Helper.okDialog( ctx,
-                                        "App Update",
-                                        "App Update\n\nA new version of this app is now available.\n\n*** It is REQUIRED TO UPDATE your app before you start any transactions.",
-                                        "PROCEED UPDATE", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
-                                            }
-//                                            }, "CANCEL", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialog, int which) {
-//                                                    dialog.dismiss();
-//                                                }
-                                        }, false) );
-                                }
+            String strClienntId = sp.getData(SharedKey.CLIENT_ID.getKey());
+            VolleyInteractor vi = new VolleyInteractor();
+            vi.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) {
+                    if(alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
+                    if (loader != null) Helper.dismissSpinnerDialog(loader);
 
-                                String strConf = rowObj.getString("config");
-                                JSONArray objArrConf = new JSONArray(strConf);
-                                String strDatabaseId = sp.getData(SharedKey.DATABASEID.getKey());
-                                for (int j = 0; j < objArrConf.length(); j++) {
-                                    JSONObject rowObjConf = objArrConf.getJSONObject(j);
-                                    if (rowObjConf.getString("database_id").equals(strDatabaseId)) {
-                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
-                                        sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
-                                        sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
-                                        sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
-                                        sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObjConf.getString("main_branch"));
-                                        sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObjConf.getInt("old_sku_validation"));
-                                        sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObjConf.getInt("reference_employee_validation"));
-                                        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObjConf.getInt("preload_items"));
-                                        sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObjConf.getInt("saved_product_items"));
-                                        sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
-                                        sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
-                                        sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObjConf.getString("support_employee_id"));
-                                        sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObjConf.getString("support_ref_employee_id"));
-                                        sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), rowObjConf.getInt("show_price_column_on_order"));
-                                        sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), rowObjConf.getInt("show_total_column_on_order"));
-                                        sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), rowObjConf.getInt("show_free_column_on_order"));
-                                        sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), rowObjConf.getInt("compute_quantity_only"));
-                                        sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
-                                        sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
-                                        sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
-                                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), rowObjConf.getInt("show_summary_on_post"));
-                                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), rowObjConf.getInt("reference_po_number"));
+                    String res = response.replace("\r\n","");
+                    try {
+                        JSONObject sObj = new JSONObject(res);
+                        if (sObj.getString("err").equals("false")) {
+                            JSONObject rowObjConf = sObj.getJSONObject("res");
 
-                                        if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
-                                            sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
-                                            sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
-                                            sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
-                                        }
-
-                                        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
-                                            if (Helper.getScrRatio(ctx) > 0.6) {
-                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
-                                            } else {
-                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
-                                            }
-                                        } else {
-                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
-                                        }
-
-                                        Helper.insertDefaultStaffs(ctx);
+                            if (Integer.parseInt(rowObjConf.getString("ver_po")) > Helper.getVersionCode(ctx)) {
+                                BounceView.addAnimTo( Helper.okDialog( ctx,
+                                "App Update",
+                                "App Update\n\nA new version of this app is now available.\n\n*** It is REQUIRED TO UPDATE your app before you start any transactions.",
+                                "PROCEED UPDATE", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + ctx.getPackageName())));
                                     }
-                                }
-
-                                tvVersion.setText(Helper.getVersion(ctx, LoginActivity.this) + " | " +
-                                    SharedData.getInstance(ctx).getData(SharedKey.BRANCH_DESCRIPTION.getKey())
-                                );
+                                }, false) );
                             }
+
+                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
+                            sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
+                            sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
+                            sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), rowObjConf.getString("main_branch_id"));
+                            sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
+                            sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
+
+                            String resconf = rowObjConf.getString("conf_po").replace("\r\n","");
+                            JSONObject objConfPO = new JSONObject(resconf);
+                            sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), objConfPO.getString("support_employee_id"));
+                            sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), objConfPO.getString("support_ref_employee_id"));
+                            sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), objConfPO.getInt("reference_employee_validation"));
+                            sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), objConfPO.getInt("old_sku_validation"));
+                            sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), objConfPO.getInt("preload_items"));
+                            sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), objConfPO.getInt("saved_product_items"));
+                            sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), objConfPO.getInt("show_price_column_on_order"));
+                            sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), objConfPO.getInt("show_total_column_on_order"));
+                            sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), objConfPO.getInt("show_free_column_on_order"));
+                            sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), objConfPO.getInt("compute_quantity_only"));
+                            sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), objConfPO.getInt("show_price_on_search"));
+                            sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), objConfPO.getInt("per_agent_setup"));
+                            sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), objConfPO.getInt("enable_report_type"));
+                            sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), objConfPO.getInt("show_summary_on_post"));
+                            sp.saveInt(SharedKey.REF_PO_NO.getKey(), objConfPO.getInt("reference_po_number"));
+
+                            if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
+                                sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
+                                sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
+                                sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
+                            }
+
+                            tvVersion.setText(Helper.getVersion(ctx, LoginActivity.this) + " | " +
+                                SharedData.getInstance(ctx).getData(SharedKey.BRANCH_DESCRIPTION.getKey())
+                            );
+                        } else {
+                            alertDataSyncError(sObj.getString("msg"));
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        alertDataSyncError("App Config Error L1.");
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-            } else {
-//                storageinit.delete();
-                Log.d("Ërr", "Error on fetching version");
+                @Override
+                public void onRequestFail(VolleyError response, String type) {
+                    if(alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
+                }
+            });
+            HashMap<String, String> vparams = new HashMap<>();
+            vparams.put("id", strClienntId);
+            String strParams = ""; Iterator it = vparams.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                strParams = strParams + pair.getKey() + "=" + pair.getValue() + "&";
+                it.remove();
             }
+            vi.getSettings(ctx, vparams, strParams, "");
+
+            return "";
         }
         @Override
-        protected void onPreExecute() {
-            Log.d("gcpe", "Task Upload Starting");
-        }
+        protected void onPostExecute(String result) { }
         @Override
-        protected void onProgressUpdate(Integer... values) {
-            Log.d("gcpu", "Running " + + values[0]);
-        }
+        protected void onPreExecute() { }
+        @Override
+        protected void onProgressUpdate(Integer... values) { }
     }
 
-    private void alertDataSyncError() {
+    private void alertDataSyncError(String strMsg) {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
-            "Data Sync Error","Data Sync Error, please contact IT support",
-            "CLOSE", null, false)
-        );
+        "Data Sync Error", strMsg + " Please contact IT support.",
+        "CLOSE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finishAndRemoveTask();
+            }
+        }, false) );
     }
 }
 

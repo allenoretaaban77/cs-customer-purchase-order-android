@@ -4,10 +4,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -23,24 +21,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.andreabaccega.widget.FormEditText;
 import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
-import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.databinding.ItemUserBinding;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
@@ -50,16 +43,13 @@ import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
 import com.roacult.backdrop.BackdropLayout;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-
 import easyadapter.dc.com.library.EasyAdapter;
 import hari.bounceview.BounceView;
 
@@ -84,8 +74,7 @@ public class UserFragment extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.dialog_users, container, false);
         ctx = v.getContext();
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -330,13 +319,12 @@ public class UserFragment extends DialogFragment {
                                             rowObj.getString("name"),
                                             rowObj.getLong("Branch"),
                                             rowObj.getLong("Jobtitle"),
-                                            rowObj.getString("pass"),
+                                            Helper.encryptMsg(rowObj.getString("pass"), Helper.generateKey()),
                                             rowObj.getString("active"),
                                             rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
-                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 displayUsers("%");
                                 loadAdminJobTitles();
@@ -474,8 +462,8 @@ public class UserFragment extends DialogFragment {
         btnSubmit.setOnClickListener (new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FormEditText et_jobtitle_code = (FormEditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_code);
-                FormEditText et_jobtitle_description = (FormEditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_description);
+                EditText et_jobtitle_code = (EditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_code);
+                EditText et_jobtitle_description = (EditText) alertDialogJobTitle.findViewById(R.id.et_jobtitle_description);
 
                 if (et_jobtitle_code.getText().toString().trim().equals("")) {
                     Toast.makeText(ctx, "Invalid job title code.", Toast.LENGTH_SHORT).show(); return;
@@ -548,12 +536,12 @@ public class UserFragment extends DialogFragment {
     }
 
     private Spinner btnAddJobTitle;
-    private FormEditText et_jobtitle;
+    private EditText et_jobtitle;
     private EditText et_jobtitle_id;
     private ArrayAdapter<aAdminGroupings> spinneradapter;
     private void addUser() {
         alertDialogUser = addUserDialog(ctx);
-        et_jobtitle = (FormEditText) alertDialogUser.findViewById(R.id.et_jobtitle);
+        et_jobtitle = (EditText) alertDialogUser.findViewById(R.id.et_jobtitle);
         et_jobtitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -580,12 +568,12 @@ public class UserFragment extends DialogFragment {
                             Toast.LENGTH_SHORT).show(); return;
                 }
 
-                FormEditText et_employeeno = (FormEditText) alertDialogUser.findViewById(R.id.et_employeeno);
-                FormEditText et_firstname = (FormEditText) alertDialogUser.findViewById(R.id.et_firstname);
-                FormEditText et_middlename = (FormEditText) alertDialogUser.findViewById(R.id.et_middlename);
-                FormEditText et_lastname = (FormEditText) alertDialogUser.findViewById(R.id.et_lastname);
-                FormEditText et_password = (FormEditText) alertDialogUser.findViewById(R.id.et_password);
-                FormEditText et_repeatpassword = (FormEditText) alertDialogUser.findViewById(R.id.et_repeatpassword);
+                EditText et_employeeno = (EditText) alertDialogUser.findViewById(R.id.et_employeeno);
+                EditText et_firstname = (EditText) alertDialogUser.findViewById(R.id.et_firstname);
+                EditText et_middlename = (EditText) alertDialogUser.findViewById(R.id.et_middlename);
+                EditText et_lastname = (EditText) alertDialogUser.findViewById(R.id.et_lastname);
+                EditText et_password = (EditText) alertDialogUser.findViewById(R.id.et_password);
+                EditText et_repeatpassword = (EditText) alertDialogUser.findViewById(R.id.et_repeatpassword);
 
                 if (et_employeeno.getText().toString().trim().equals("")) {
                     Toast.makeText(ctx, "Invalid employee number.", Toast.LENGTH_SHORT).show(); return;
@@ -697,9 +685,9 @@ public class UserFragment extends DialogFragment {
         btnSubmit.setOnClickListener (new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FormEditText et_old_password = (FormEditText) alertDialogUpdatePassword.findViewById(R.id.et_old_password);
-                FormEditText et_password = (FormEditText) alertDialogUpdatePassword.findViewById(R.id.et_password);
-                FormEditText et_repeatpassword = (FormEditText) alertDialogUpdatePassword.findViewById(R.id.et_repeatpassword);
+                EditText et_old_password = (EditText) alertDialogUpdatePassword.findViewById(R.id.et_old_password);
+                EditText et_password = (EditText) alertDialogUpdatePassword.findViewById(R.id.et_password);
+                EditText et_repeatpassword = (EditText) alertDialogUpdatePassword.findViewById(R.id.et_repeatpassword);
 
                 if (et_old_password.getText().toString().trim().equals("")) {
                     Toast.makeText(ctx, "Invalid old password.", Toast.LENGTH_SHORT).show(); return;

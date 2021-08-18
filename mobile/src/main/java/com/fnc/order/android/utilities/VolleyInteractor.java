@@ -34,6 +34,46 @@ public class VolleyInteractor {
         this.callback = callback;
     }
 
+    public void getSettings(final Context ctx, final HashMap<String, String> params, final String strParams, final String type) {
+        new Thread( new Runnable(){
+            public void run(){
+//                String url = "http://192.247.75.175/config.php?" + strParams;
+                String url = "http://nathaniels.com.ph/mobapp/config.php?" + strParams;
+                StringRequest strRequest = new StringRequest( Request.Method.GET, url,
+                        null, null) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        return ServerConstants.getHeaderConfig();
+                    }
+                    public Map<String, String> getParams(){
+                        return params;
+                    }
+                };
+                requestQueue = Volley.newRequestQueue(ctx);
+                RetryPolicy policy = new DefaultRetryPolicy(5000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                strRequest.setRetryPolicy(policy); strRequest.setShouldCache(false);
+                requestQueue.getCache().clear(); //requestQueue.add(strRequest);
+                VolleyX.init(ctx);
+                VolleyX.from(strRequest).subscribeOn(Schedulers.immediate())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onCompleted() { }
+                    @Override
+                    public void onError(Throwable e) {
+                        VolleyError ve = new VolleyError();
+                        callback.onRequestFail(ve, "settings");
+                    }
+                    @Override
+                    public void onNext(String response) {
+                        callback.onRequestSuccess(response, "settings|"+type);
+                    }
+                });
+                VolleyX.setRequestQueue(requestQueue);
+            }
+        }).start();
+    }
+
     public void login(final Context ctx, final HashMap<String, String> params, final String strParams) {
         new Thread( new Runnable(){
             public void run(){
@@ -327,8 +367,7 @@ public class VolleyInteractor {
         }).start();
     }
 
-    public void getDeviceProfile(final Context ctx, final HashMap<String, String> params,
-                                 final String strParams, final String type) {
+    public void getDeviceProfile(final Context ctx, final HashMap<String, String> params, final String strParams, final String type) {
         new Thread(new Runnable(){
             public void run(){
                 String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
@@ -369,7 +408,7 @@ public class VolleyInteractor {
                         @Override
                         public void onNext(String response) {
                             Log.d("dsx", response);
-                            callback.onRequestSuccess(response, "getdeviceprofile|" + type);
+                            callback.onRequestSuccess(response, "getdeviceprofile|"+type);
                         }
                     });
                 VolleyX.setRequestQueue(requestQueue);

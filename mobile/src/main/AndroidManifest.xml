@@ -26,13 +26,13 @@
         android:hardwareAccelerated="false"
         tools:replace="android:allowBackup"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher_order"
-        android:roundIcon="@mipmap/ic_launcher_order"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activity.SplashActivity">
+        <activity android:name=".activity.SplashActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!--<category android:name="android.intent.category.HOME" />-->

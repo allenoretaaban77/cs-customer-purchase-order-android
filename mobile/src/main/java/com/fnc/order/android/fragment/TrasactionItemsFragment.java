@@ -17,28 +17,18 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.fragment.app.DialogFragment;
-
 import com.fnc.order.android.R;
 import com.fnc.order.android.adapters.TransactionItemsAdapter;
-import com.fnc.order.android.datacontroller.DcOrder;
-import com.fnc.order.android.datacontroller.DcOrdered;
-import com.fnc.order.android.enumeration.OrderKey;
-import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Order;
 import com.fnc.order.android.utilities.Helper;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class TrasactionItemsFragment extends DialogFragment {
-
     public Context ctx;
     private View rv;
     private Button btn_close, btn_cancel, btn_post;
@@ -114,18 +104,17 @@ public class TrasactionItemsFragment extends DialogFragment {
                     JSONObject obj = objArr.getJSONObject(i);
                     Order ol = new Order();
 
-                    ol.setQuantity(obj.getString("quantity"));
-                    ol.setFree(obj.getString("free"));
-                    ol.setOldSku(obj.getString("old_sku"));
-                    ol.setRemarks(obj.getString("remarks"));
-                    ol.setTotal(obj.getString("total"));
-                    ol.setSellingPrice(obj.getString("selling_price"));
-                    ol.setSrb(obj.getString("SRB"));
-                    ol.setItemRecid(obj.getString("item_recid"));
-                    ol.setQuantity(obj.getString("quantity"));
-                    ol.setFree(obj.getString("free"));
-                    ol.setUnitName(obj.getString("unitName"));
-                    ol.setItemName(obj.getString("itemname"));
+                    ol.setQuantity(obj.isNull("quantity")?"-":obj.getString("quantity"));
+                    ol.setFree(obj.isNull("free")?"-":obj.getString("free"));
+                    ol.setOldSku(obj.isNull("old_sku")?"-":obj.getString("old_sku"));
+                    ol.setRemarks(obj.isNull("remarks")?"0.00":obj.getString("remarks"));
+                    ol.setTotal(obj.isNull("total")?"-":obj.getString("total"));
+                    ol.setSellingPrice(obj.isNull("selling_price")?"-":obj.getString("selling_price"));
+                    ol.setSrb(obj.isNull("SRB")?"0.00":obj.getString("SRB"));
+                    ol.setItemRecid(obj.isNull("item_recid")?"-":obj.getString("item_recid"));
+                    ol.setQuantity(obj.isNull("quantity")?"-":obj.getString("quantity"));
+                    ol.setUnitName(obj.isNull("unitName")?"-":obj.getString("unitName"));
+                    ol.setItemName(obj.isNull("itemname")?"-":obj.getString("itemname"));
                     ol.setIsChecked(0);
                     ol.setIsError(0);
                     ol.setIsLocked(0);
