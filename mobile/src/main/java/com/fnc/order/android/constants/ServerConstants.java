@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 public class ServerConstants {
 
-//    public static final String DEFAULT_SERVER_URL = "http://apics.fncnathaniel.com/";
-    public static final String DEFAULT_SERVER_URL = "http://192.168.242.187:85/";
+    public static final String DEFAULT_SERVER_URL = "http://apics.fncnathaniel.com/";
 //    public static final String DEFAULT_SERVER_URL = "http://192.168.1.200:81/";
     public static final String DEFAULT_CN = "backoffice";
     public static final String DEFAULT_DBID = "BackofficeLive";

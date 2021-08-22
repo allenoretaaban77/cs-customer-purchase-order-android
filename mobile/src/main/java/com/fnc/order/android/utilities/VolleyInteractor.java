@@ -37,7 +37,6 @@ public class VolleyInteractor {
     public void getSettings(final Context ctx, final HashMap<String, String> params, final String strParams, final String type) {
         new Thread( new Runnable(){
             public void run(){
-//                String url = "http://192.247.75.175/config.php?" + strParams;
                 String url = "http://nathaniels.com.ph/mobapp/config.php?" + strParams;
                 StringRequest strRequest = new StringRequest( Request.Method.GET, url,
                         null, null) {
