@@ -179,8 +179,8 @@ public class SplashActivity extends BaseActivity {
                         }
                     }, "", null, 0
                 );
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@demo.com");
-                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@demo.com");
+//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 BounceView.addAnimTo(alertDialog);
@@ -196,16 +196,37 @@ public class SplashActivity extends BaseActivity {
                     refSelectedBranchId = sp.getData(SharedKey.BRANCH_ID.getKey());
                     alertDeviceNotAddedToServer();
                 } else {
-                    if (bRsImId.get(0).getBranchid() == 12345) {
-                        showBranchDialog();
-                    } else {
-                        showActivity(LoginActivity.class);
-                    }
+                    proceedNormal();
                 }
             } else {
                 getDeviceProfile("validate");
             }
         }
+    }
+
+    private void proceedNormal() {
+        if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
+            if (Helper.getScrRatio(ctx) > 0.6) {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+            } else {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+            }
+        } else {
+            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+        }
+        showActivity(LoginActivity.class);
+
+        /*LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
+        if (sl.size() > 0) {
+            Helper.dismissSpinnerDialog(loader);
+            showActivity(LoginActivity.class);
+        } else {
+            if (Helper.isNetworkAvailable(this)) {
+                showActivity(LoginActivity.class);
+            } else {
+                alertRequireInternet();
+            }
+        }*/
     }
 
     private AlertDialog alertdialogBL;
@@ -250,7 +271,7 @@ public class SplashActivity extends BaseActivity {
         refSelectedBranchId = "";
 
         if(alertdialogBL != null) {
-            ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
+            ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions(); // to check if not 12345
             arrBranches = new LinkedList<>();
             if (refAbx.size() > 0) {
                 aBranchlist abr = new aBranchlist(0L, "Select branch....",
@@ -311,30 +332,6 @@ public class SplashActivity extends BaseActivity {
                 public void onNothingSelected(AdapterView<?> parent) { }
             });
             msBranches.setAdapter(sadapter);
-        }
-    }
-
-    private void proceedNormal() {
-        if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
-            if (Helper.getScrRatio(ctx) > 0.6) {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
-            } else {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
-            }
-        } else {
-            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
-        }
-
-        LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
-        if (sl.size() > 0) {
-            Helper.dismissSpinnerDialog(loader);
-            showActivity(LoginActivity.class);
-        } else {
-            if (Helper.isNetworkAvailable(this)) {
-                showActivity(LoginActivity.class);
-            } else {
-                alertRequireInternet();
-            }
         }
     }
 
@@ -534,7 +531,7 @@ public class SplashActivity extends BaseActivity {
                                                             "INITIALIZATION SUCCESS","You can now LOGIN using YOUR REGISTERED ACCOUNT.",
                                                             "OK", new DialogInterface.OnClickListener() {
                                                             @Override public void onClick(DialogInterface dialog, int which) {
-                                                            showActivity(LoginActivity.class); }}, false));
+                                                            /*showActivity(LoginActivity.class);*/ proceedNormal(); }}, false));
                                                         } else {
                                                             postBranchImei();
                                                         }
