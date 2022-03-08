@@ -179,8 +179,8 @@ public class SplashActivity extends BaseActivity {
                         }
                     }, "", null, 0
                 );
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@demo.com");
-//                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
+                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
+                ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 BounceView.addAnimTo(alertDialog);
@@ -364,14 +364,11 @@ public class SplashActivity extends BaseActivity {
         } else {
             Helper.dismissSpinnerDialog(loader);
             BounceView.addAnimTo( Helper.okDialog(ctx,
-                "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
-                    }
-                }, false)
-            );
+            "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) { finishAndRemoveTask(); }
+            }, false));
         }
     }
 

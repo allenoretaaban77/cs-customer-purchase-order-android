@@ -7,8 +7,8 @@ android {
         applicationId "com.fnc.order.android.v2"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 93
-        versionName "1.0.93"
+        versionCode 95
+        versionName "1.0.95"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -42,7 +42,6 @@ dependencies {
     implementation 'com.shehabic.droppy:Droppy:0.6.0@aar'
     implementation 'com.github.florent37:materialtextfield:1.0.7'
     implementation 'io.reactivex:rxandroid:1.2.1'
-//    implementation 'io.reactivex:rxjava:1.1.6'
     implementation 'com.github.yangweigbh:volleyx:1.1.0'
     implementation 'com.daimajia.swipelayout:library:1.2.0@aar'
     implementation 'hari.bounceview:bounceview:0.1.0'
@@ -59,5 +58,4 @@ dependencies {
     implementation 'com.github.roiacult:BackdropLayout:1.0'
     implementation 'com.github.skydoves:powermenu:2.1.4'
     implementation 'com.balysv:material-ripple:1.0.2' // material ripple
-//    implementation 'com.andreabaccega:android-form-edittext:1.2.1@aar'
 }

@@ -699,6 +699,17 @@ public class LoginActivity extends BaseActivity {
                             tvVersion.setText(Helper.getVersion(ctx, LoginActivity.this) + " | " +
                                 SharedData.getInstance(ctx).getData(SharedKey.BRANCH_DESCRIPTION.getKey())
                             );
+
+                            if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx)
+                                .getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
+                                if (Helper.getScrRatio(ctx) > 0.6) {
+                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                } else {
+                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                }
+                            } else {
+                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                            }
                         } else {
                             alertDataSyncError(sObj.getString("msg"));
                         }

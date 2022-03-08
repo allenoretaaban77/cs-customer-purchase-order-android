@@ -321,8 +321,9 @@ public class VolleyInteractor {
     public void postOrders(final Context ctx, final String param) {
         new Thread(new Runnable(){
             public void run(){
+//                String urlStr = "http://192.168.1.199:85/"
                 String urlStr = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
-                        + API.POST_ORDER.getApi();
+                    + API.POST_ORDER.getApi();
                 Log.i("dsxo", urlStr + " | " + param);
                 StringRequest strRequest = new StringRequest( Request.Method.POST, urlStr,
                         new Response.Listener<String>() {

@@ -69,6 +69,16 @@ public class DcOrdered extends DBHelper {
         db.close();
     }
 
+    public void updateStatusAll(Integer intx){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(OrderedKey.STATUS.getKey(), intx);
+        db.updateWithOnConflict(Table.ORDERED.getName(), cv,
+            OrderedKey.CUSTOMER_NAME.getKey()+ " LIKE ?",
+            new String[] { "%" }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
     public void updateStatusViaRecId(String recid, Integer intx){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
