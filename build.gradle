@@ -3,6 +3,7 @@
 buildscript {
     repositories {
         google()
+        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -13,6 +14,7 @@ buildscript {
 allprojects {
     repositories {
         google()
+        jcenter()
         maven { url 'https://jitpack.io' }
         maven {
             url 'https://maven.google.com/'
@@ -21,7 +23,6 @@ allprojects {
         maven{
             url "https://dl.bintray.com/infideap2/Drawer-Behavior"
         }
-        jcenter()
     }
 }
 

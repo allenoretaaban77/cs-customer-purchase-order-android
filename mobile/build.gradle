@@ -1,6 +1,36 @@
 apply plugin: 'com.android.application'
 
 android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
+    defaultConfig {
+        applicationId "com.fnc.checklist.android"
+        minSdkVersion 23
+        targetSdkVersion 30
+        versionCode 39
+        versionName "1.0.39"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets { main { resources.srcDirs = ['src/main/resources', 'src/main/resources/'] } }
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/DEPENDENCIES'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+
+android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
