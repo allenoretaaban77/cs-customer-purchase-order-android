@@ -456,7 +456,7 @@ public class LoginActivity extends BaseActivity {
 
         if (Helper.isNetworkAvailable(ctx)) {
             loader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); loader.show();
-            new getSettings().execute("");
+//            new getSettings().execute("");
             new getUsersAsync().execute("");
             new android.os.Handler().postDelayed(
                 new Runnable() { public void run() { Helper.dismissSpinnerDialog(loader); } },

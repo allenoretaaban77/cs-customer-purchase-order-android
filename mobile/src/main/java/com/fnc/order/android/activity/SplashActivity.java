@@ -184,6 +184,12 @@ public class SplashActivity extends BaseActivity {
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 BounceView.addAnimTo(alertDialog);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override public void run() {
+                        ((Button) alertDialog.findViewById(R.id.btn_update)).callOnClick();
+                    }
+                }, 300);
             } else {
                 alertRequireInternet();
             }
