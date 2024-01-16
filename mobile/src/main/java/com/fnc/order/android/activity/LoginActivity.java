@@ -667,7 +667,8 @@ public class LoginActivity extends BaseActivity {
 
                             sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
                             sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
-                            sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
+                            sp.saveData(SharedKey.DATABASE.getKey(), "test");
+//                            sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
                             sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), rowObjConf.getString("main_branch_id"));
                             sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
                             sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));

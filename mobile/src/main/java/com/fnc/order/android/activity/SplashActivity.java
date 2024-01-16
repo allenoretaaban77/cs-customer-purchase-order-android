@@ -441,9 +441,10 @@ public class SplashActivity extends BaseActivity {
 
                         JSONArray objArrDtBus = new JSONArray(obj.getString("dtbusiness"));
                         JSONObject objDtBus = new JSONObject(objArrDtBus.get(0).toString());
-                        JSONObject objConfPO = new JSONObject(objDtBus.getString("config_custopo"));
+                        JSONObject objConfPO = new JSONObject(objDtBus.getString("config"));
 
-                        sp.saveData(SharedKey.DATABASE.getKey(), objConfPO.getString("cn"));
+                        sp.saveData(SharedKey.DATABASE.getKey(), "test");
+//                        sp.saveData(SharedKey.DATABASE.getKey(), objConfPO.getString("cn"));
                         sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), objConfPO.getString("server_url"));
                         sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), objConfPO.getString("local_url"));
                         sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), objConfPO.getString("main_branch_id"));
@@ -463,8 +464,10 @@ public class SplashActivity extends BaseActivity {
                         sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), objConfPO.getInt("show_price_on_search"));
                         sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), objConfPO.getInt("per_agent_setup"));
                         sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), objConfPO.getInt("enable_report_type"));
-                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), objConfPO.getInt("show_summary_on_post"));
-                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), objConfPO.getInt("reference_po_number"));
+                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), 1);
+//                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), objConfPO.getInt("show_summary_on_post"));
+                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), 1);
+//                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), objConfPO.getInt("reference_po_number"));
 
                         if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
                             sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
@@ -764,7 +767,8 @@ public class SplashActivity extends BaseActivity {
                             JSONObject rowObjConf = sObj.getJSONObject("res");
                             sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
                             sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
-                            sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
+                            sp.saveData(SharedKey.DATABASE.getKey(), "test");
+//                            sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
                             sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), rowObjConf.getString("main_branch_id"));
                             sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
                             sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
