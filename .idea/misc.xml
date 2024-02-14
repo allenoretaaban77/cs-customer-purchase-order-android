@@ -1,22 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="..\:/Users/Allen/Documents/Projects/CS/customer_po/mobile/src/main/res/layout/dialog_init.xml" value="0.3138586956521739" />
-        <entry key="mobile/src/main/res/layout/activity_main.xml" value="0.37726449275362317" />
-        <entry key="mobile/src/main/res/layout/fragment_order.xml" value="0.37726449275362317" />
-        <entry key="mobile/src/main/res/layout/fragment_transaction.xml" value="0.4401041666666667" />
-        <entry key="mobile/src/main/res/layout/item_itemlist.xml" value="0.37726449275362317" />
-        <entry key="mobile/src/main/res/layout/item_itemlist_rv.xml" value="0.37726449275362317" />
-      </map>
-    </option>
-  </component>
-  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="corretto-1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="corretto-11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

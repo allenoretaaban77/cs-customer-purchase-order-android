@@ -169,70 +169,43 @@ public class SplashActivity extends BaseActivity {
         if(strCN.equals("")) {
             if (Helper.isNetworkAvailable(this)) {
                 alertDialog = actionDialog( ctx, "APP START-UP",
-                        "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
-                        "Username", "Password", "Branch",
-                        "SUBMIT", new View.OnClickListener() {
-                            public void onClick(View v) {
-                                loader = Helper.showSpinnerDialog(ctx, "Client Sign-In", "Posting... Please wait..."); loader.show();
-                                clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
-                                        ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
-                            }
-                        }, "", null, 0
+                    "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
+                    "Username", "Password", "Branch",
+                    "SUBMIT", new View.OnClickListener() {
+                        public void onClick(View v) {
+                            loader = Helper.showSpinnerDialog(ctx, "Client Sign-In", "Posting... Please wait..."); loader.show();
+                            clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
+                                ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
+                        }
+                    }, "", null, 0
                 );
                 ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext1))).setText("admin@backoffice.com");
                 ((EditText) ((EditText) alertDialog.findViewById(R.id.et_edittext2))).setText("admin123");
                 alertDialog.getWindow().setLayout(Helper.getDialogWidth(ctx), RelativeLayout.LayoutParams.WRAP_CONTENT);
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 BounceView.addAnimTo(alertDialog);
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
-                        ((Button) alertDialog.findViewById(R.id.btn_update)).callOnClick();
-                    }
-                }, 300);
             } else {
                 alertRequireInternet();
             }
         } else {
             LinkedList<aBranchlist> bRsImId = DcBranchlist.getInstance(ctx).filterMultiple(false,
-                    aBranchlistKey.DEVICEID.getKey() + "=? AND " + aBranchlistKey.BRANCHID.getKey() + "=?",
-                    new String[] { Helper.getImei(ctx), sp.getData(SharedKey.BRANCH_ID.getKey()) }, "");
+                aBranchlistKey.DEVICEID.getKey() + "=? AND " + aBranchlistKey.BRANCHID.getKey() + "=?",
+                new String[] { Helper.getImei(ctx), sp.getData(SharedKey.BRANCH_ID.getKey()) }, "");
             if (bRsImId.size() > 0 ) {
                 if (bRsImId.get(0).getActive().equals("false")) {
                     refSelectedBranchId = sp.getData(SharedKey.BRANCH_ID.getKey());
                     alertDeviceNotAddedToServer();
                 } else {
-                    proceedNormal();
+                    if (bRsImId.get(0).getBranchid() == 12345) {
+                        showBranchDialog();
+                    } else {
+                        showActivity(LoginActivity.class);
+                    }
                 }
             } else {
                 getDeviceProfile("validate");
             }
         }
-    }
-
-    private void proceedNormal() {
-        if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
-            if (Helper.getScrRatio(ctx) > 0.6) {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
-            } else {
-                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
-            }
-        } else {
-            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
-        }
-        showActivity(LoginActivity.class);
-
-        /*LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
-        if (sl.size() > 0) {
-            Helper.dismissSpinnerDialog(loader);
-            showActivity(LoginActivity.class);
-        } else {
-            if (Helper.isNetworkAvailable(this)) {
-                showActivity(LoginActivity.class);
-            } else {
-                alertRequireInternet();
-            }
-        }*/
     }
 
     private AlertDialog alertdialogBL;
@@ -277,23 +250,23 @@ public class SplashActivity extends BaseActivity {
         refSelectedBranchId = "";
 
         if(alertdialogBL != null) {
-            ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions(); // to check if not 12345
+            ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
             arrBranches = new LinkedList<>();
             if (refAbx.size() > 0) {
                 aBranchlist abr = new aBranchlist(0L, "Select branch....",
-                        "", "","", "", "", "", "");
+                "", "","", "", "", "", "");
                 arrBranches.add(abr);
                 for(int k=0; k<refAbx.size(); k++){
                     if (DcBranchlist.getInstance(ctx).filterMultiple( false,
-                            aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }, "").size() > 0) {
+                    aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }, "").size() > 0) {
                         abr = DcBranchlist.getInstance(ctx).filterMultiple( false,
-                                aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }, "").get(0);
+                        aBranchlistKey.BRANCHCODE.getKey() + " = ? ", new String[] { refAbx.get(k) }, "").get(0);
                         arrBranches.add(abr);
                     }
                 }
             }
             ArrayAdapter<aBranchlist> sadapter = new ArrayAdapter<aBranchlist>(ctx,
-                    android.R.layout.simple_spinner_dropdown_item, arrBranches) {
+            android.R.layout.simple_spinner_dropdown_item, arrBranches) {
                 @Override public boolean isEnabled(int position) {
                     if(position == 0) { return false; }
                     else { return true; }
@@ -341,17 +314,41 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
+    private void proceedNormal() {
+        if (Helper.checkBranchProfile(ctx).get(0).getBranchid().toString().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()))) {
+            if (Helper.getScrRatio(ctx) > 0.6) {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+            } else {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+            }
+        } else {
+            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+        }
+
+        LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
+        if (sl.size() > 0) {
+            Helper.dismissSpinnerDialog(loader);
+            showActivity(LoginActivity.class);
+        } else {
+            if (Helper.isNetworkAvailable(this)) {
+                showActivity(LoginActivity.class);
+            } else {
+                alertRequireInternet();
+            }
+        }
+    }
+
     private void clientSignin(String strUsername, String strPassword) {
         if (Helper.isNetworkAvailable(this)) {
             if(strUsername.matches("")){
                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Error","Please enter username.", "CLOSE",
-                        null, false) ); return;
+                "Error","Please enter username.", "CLOSE",
+                null, false) ); return;
             }
             if(strPassword.matches("")){
                 BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Error","Please enter password.", "CLOSE",
-                        null, false) ); return;
+                "Error","Please enter password.", "CLOSE",
+                null, false) ); return;
             }
 
             HashMap<String, String> params = new HashMap<>();
@@ -370,23 +367,26 @@ public class SplashActivity extends BaseActivity {
         } else {
             Helper.dismissSpinnerDialog(loader);
             BounceView.addAnimTo( Helper.okDialog(ctx,
-                    "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) { finishAndRemoveTask(); }
-                    }, false));
+                "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finishAndRemoveTask();
+                    }
+                }, false)
+            );
         }
     }
 
     private void alertRequireInternet() {
         BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Initialization Error","This app requires internet to initialize.  Please check your connection.",
-                "CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
-                    }
-                }, false) );
+            "Initialization Error","This app requires internet to initialize.  Please check your connection.",
+            "CLOSE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAndRemoveTask();
+                }
+            }, false) );
     }
 
     private void showActivity(final Class<?> cls) {
@@ -411,15 +411,15 @@ public class SplashActivity extends BaseActivity {
                 Helper.dismissSpinnerDialog(loader);
                 if (obj.getString("dtcompany").equals("[]")) {
                     BounceView.addAnimTo( Helper.okDialog( ctx, "Initialization Error","Invalid credentials",
-                            "CLOSE", new DialogInterface.OnClickListener() {
-                                @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
+                    "CLOSE", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
                 } else {
                     JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
                     JSONObject objx = new JSONObject(objArr.get(0).toString());
                     if (objx.getString("DatabaseID").equals("")) {
                         BounceView.addAnimTo( Helper.okDialog( ctx, "Initialization Error","Invalid credentials",
-                                "CLOSE", new DialogInterface.OnClickListener() {
-                                    @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
+                        "CLOSE", new DialogInterface.OnClickListener() {
+                        @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
                     } else {
                         if(alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
 
@@ -429,7 +429,7 @@ public class SplashActivity extends BaseActivity {
                         sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
                         sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
                         String strFN = objy.getString("FirstName") + "|" + objy.getString("MiddleName") + "|" +
-                                objy.getString("LastName");
+                        objy.getString("LastName");
                         String[] arrFN = strFN.split("\\|");
                         if (arrFN.length > 0) {
                             strFN = "";
@@ -439,56 +439,15 @@ public class SplashActivity extends BaseActivity {
                             sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
                         }
 
-                        JSONArray objArrDtBus = new JSONArray(obj.getString("dtbusiness"));
-                        JSONObject objDtBus = new JSONObject(objArrDtBus.get(0).toString());
-                        JSONObject objConfPO = new JSONObject(objDtBus.getString("config"));
-
-                        sp.saveData(SharedKey.DATABASE.getKey(), "test");
-//                        sp.saveData(SharedKey.DATABASE.getKey(), objConfPO.getString("cn"));
-                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), objConfPO.getString("server_url"));
-                        sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), objConfPO.getString("local_url"));
-                        sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), objConfPO.getString("main_branch_id"));
-                        sp.saveData(SharedKey.SUPPORT_USER.getKey(), objConfPO.getString("support_user"));
-                        sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), objConfPO.getString("support_password"));
-
-                        sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), objConfPO.getString("support_employee_id"));
-                        sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), objConfPO.getString("support_ref_employee_id"));
-                        sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), objConfPO.getInt("reference_employee_validation"));
-                        sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), objConfPO.getInt("old_sku_validation"));
-                        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), objConfPO.getInt("preload_items"));
-                        sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), objConfPO.getInt("saved_product_items"));
-                        sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), objConfPO.getInt("show_price_column_on_order"));
-                        sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), objConfPO.getInt("show_total_column_on_order"));
-                        sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), objConfPO.getInt("show_free_column_on_order"));
-                        sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), objConfPO.getInt("compute_quantity_only"));
-                        sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), objConfPO.getInt("show_price_on_search"));
-                        sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), objConfPO.getInt("per_agent_setup"));
-                        sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), objConfPO.getInt("enable_report_type"));
-                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), 1);
-//                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), objConfPO.getInt("show_summary_on_post"));
-                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), 1);
-//                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), objConfPO.getInt("reference_po_number"));
-
-                        if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
-                            sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
-                            sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
-                            sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
-                        }
-
-//                            sp.removeSinglePref(SharedKey.IMEI_ID.getKey());
-                        String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
-                        if (strImeiId.equals("")) {
-                            getDeviceProfile("getbranches");
-                        } else {
-                            proceedNormal();
-                        }
+                        loader = Helper.showSpinnerDialog(ctx, "Fetching Settings", "Please wait..."); loader.show();
+                        new getSettings().execute("");
                     }
                 }
             } catch (JSONException e) {
                 Helper.dismissSpinnerDialog(loader);
                 BounceView.addAnimTo( Helper.okDialog( ctx, "Initialization Error","Invalid credentials",
-                        "CLOSE", new DialogInterface.OnClickListener() {
-                            @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
+                "CLOSE", new DialogInterface.OnClickListener() {
+                @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
             }
         }
         if (type.equals("getpostbranchimei")) {
@@ -497,8 +456,8 @@ public class SplashActivity extends BaseActivity {
                 getDeviceProfile("getbranches");
             } else {
                 BounceView.addAnimTo( Helper.okDialog( ctx, "Device Registration Failed","Please contact IT support.",
-                        "CLOSE", new DialogInterface.OnClickListener() {
-                            @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
+                "CLOSE", new DialogInterface.OnClickListener() {
+                @Override public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }}, false) );
             }
         }
         if (type.contains("getdeviceprofile")) {
@@ -525,28 +484,28 @@ public class SplashActivity extends BaseActivity {
                                         for (int i = 0; i < objArr.length(); i++) {
                                             JSONObject rowObj = objArr.getJSONObject(i);
                                             aBranchlist br = new aBranchlist(
-                                                    rowObj.getLong("branchid"),
-                                                    rowObj.getString("branchcode").trim(),
-                                                    rowObj.getString("deviceid").trim(),
-                                                    rowObj.getString("description").trim(),
-                                                    rowObj.getString("deviceID1").trim(),
-                                                    rowObj.getString("active").trim(),
-                                                    rowObj.getString("customerID").trim(),
-                                                    rowObj.getString("old_branchid").trim(),
-                                                    rowObj.getString("old_customerid").trim()
+                                                rowObj.getLong("branchid"),
+                                                rowObj.getString("branchcode").trim(),
+                                                rowObj.getString("deviceid").trim(),
+                                                rowObj.getString("description").trim(),
+                                                rowObj.getString("deviceID1").trim(),
+                                                rowObj.getString("active").trim(),
+                                                rowObj.getString("customerID").trim(),
+                                                rowObj.getString("old_branchid").trim(),
+                                                rowObj.getString("old_customerid").trim()
                                             );
                                             DcBranchlist.getInstance(ctx).insertItems(br);
                                         }
                                         Helper.dismissSpinnerDialog(loader);
 
                                         LinkedList<aBranchlist> bRs = DcBranchlist.getInstance(ctx).filterMultiple( false,
-                                                aBranchlistKey.DEVICEID.getKey() + " LIKE ? ", new String[] { "%" }, "");
+                                            aBranchlistKey.DEVICEID.getKey() + " LIKE ? ", new String[] { "%" }, "");
                                         if (bRs.size()>0) {
                                             String strDeviceId = Helper.getImei(ctx);
                                             String strBranchId = sp.getData(SharedKey.BRANCH_ID.getKey());
                                             LinkedList<aBranchlist> bRsImId = DcBranchlist.getInstance(ctx).filterMultiple(false,
-                                                    aBranchlistKey.DEVICEID.getKey() + "=? AND " + aBranchlistKey.BRANCHID.getKey() + "=?",
-                                                    new String[] { strDeviceId, strBranchId }, "");
+                                                aBranchlistKey.DEVICEID.getKey() + "=? AND " + aBranchlistKey.BRANCHID.getKey() + "=?",
+                                                new String[] { strDeviceId, strBranchId }, "");
                                             if (bRsImId.size()>0) {
                                                 aBranchlist bRsx = bRsImId.get(0);
                                                 if (bRsx.getActive().trim().equals("true")) {
@@ -572,10 +531,10 @@ public class SplashActivity extends BaseActivity {
                                                             }
 
                                                             BounceView.addAnimTo( Helper.okDialog( ctx,
-                                                                    "INITIALIZATION SUCCESS","You can now LOGIN using YOUR REGISTERED ACCOUNT.",
-                                                                    "OK", new DialogInterface.OnClickListener() {
-                                                                        @Override public void onClick(DialogInterface dialog, int which) {
-                                                                            /*showActivity(LoginActivity.class);*/ proceedNormal(); }}, false));
+                                                            "INITIALIZATION SUCCESS","You can now LOGIN using YOUR REGISTERED ACCOUNT.",
+                                                            "OK", new DialogInterface.OnClickListener() {
+                                                            @Override public void onClick(DialogInterface dialog, int which) {
+                                                            showActivity(LoginActivity.class); }}, false));
                                                         } else {
                                                             postBranchImei();
                                                         }
@@ -619,8 +578,8 @@ public class SplashActivity extends BaseActivity {
     }
 
     private AlertDialog actionDialog(final Context activity, String title, String message, String strLabel1,
-                                     String strLabel2, String strLabel3, String okButtonCaption, View.OnClickListener onClickListener,
-                                     String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer flagType) {
+        String strLabel2, String strLabel3, String okButtonCaption, View.OnClickListener onClickListener,
+        String cancelButtonCaption, View.OnClickListener cancelClickListener, Integer flagType) {
 
         SharedData spx = SharedData.getInstance(this);
 
@@ -715,38 +674,38 @@ public class SplashActivity extends BaseActivity {
     private void alertReferenceBranchesNotFound() {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Initialization Error","Reference branches not found, please contact IT support.",
-                "END APP", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
-                    }
-                }, false) );
+        "Initialization Error","Reference branches not found, please contact IT support.",
+        "END APP", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finishAndRemoveTask();
+            }
+        }, false) );
     }
 
     private void alertDeviceNotAddedToServer() {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
-                "DEVICE REGISTRATION",
-                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
-                "OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        postBranchImei();
-                    }}, false));
+        "DEVICE REGISTRATION",
+        "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
+        "OK", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+            postBranchImei();
+        }}, false));
     }
 
     private void alertDataSyncError(String strMsg) {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Data Sync Error", strMsg + " Please contact IT support.",
-                "CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
-                    }
-                }, false) );
+        "Data Sync Error", strMsg + " Please contact IT support.",
+        "CLOSE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finishAndRemoveTask();
+            }
+        }, false) );
     }
 
     private class getSettings extends AsyncTask<String, Integer, String> {

@@ -1945,8 +1945,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private AlertDialog okCancelInputRemarksDialogBuilder(final Context activity, String message,
-        String okButtonCaption, View.OnClickListener onClickListener,
-        String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+          String okButtonCaption, View.OnClickListener onClickListener,
+          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.custom_ok_input_remarks_dialog, null);

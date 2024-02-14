@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,7 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
     public Context ctx;
     private View refV;
     private ProgressDialog loader;
-    private ImageButton btn_back, btn_resend;
+    private ImageButton btn_back;
     private ListView list_view;
     private TransactionsAdapter adapter;
     private Fragment thisFragment;
@@ -110,16 +109,6 @@ public class TransactionFragment extends Fragment implements VolleyCallback {
         btn_back.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
                 backItNow(v);
-            }
-        });
-
-        btn_resend.setOnClickListener(new View.OnClickListener() {
-            public final void onClick(final View v) {
-                loader = Helper.showSpinnerDialog(ctx, "Resending PO's.", "Please wait..."); loader.show();
-                new Handler().postDelayed(new Runnable() { @Override public void run() {
-                    DcOrdered.getInstance(ctx).updateStatusAll(0);
-                    Helper.dismissSpinnerDialog(loader);
-                }}, 1000);
             }
         });
     }

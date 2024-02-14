@@ -22,15 +22,15 @@
                     android:layout_height="match_parent"
                     android:layout_width="match_parent">
                     <TextView
-                        android:id="@+id/headertitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
                         android:layout_marginTop="5dp"
-                        android:fontFamily="@font/regular"
+                        android:id="@+id/headertitle"
                         android:gravity="center"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
                         android:text="TRANSACTIONS"
-                        android:textColor="@color/gray_6"
-                        android:textSize="20sp" />
+                        android:fontFamily="@font/regular"
+                        android:textSize="20sp"
+                        android:textColor="@color/gray_6" />
                 </RelativeLayout>
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -51,6 +51,7 @@
                     </com.balysv.materialripple.MaterialRippleLayout>
                 </RelativeLayout>
                 <RelativeLayout
+                    android:visibility="gone"
                     android:layout_alignParentRight="true"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -60,14 +61,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent">
                         <ImageButton
-                            android:id="@+id/btn_resend"
+                            android:id="@+id/btn_menu"
                             android:layout_width="55dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="left"
                             android:alpha="1.0"
                             android:backgroundTint="@color/blue_2"
                             android:background="@android:color/transparent"
-                            android:src="@drawable/baseline_restore_24"/>
+                            android:src="@drawable/baseline_menu_24"/>
                     </com.balysv.materialripple.MaterialRippleLayout>
                 </RelativeLayout>
             </RelativeLayout>
