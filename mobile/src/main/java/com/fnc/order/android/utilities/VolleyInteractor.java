@@ -108,24 +108,24 @@ public class VolleyInteractor {
                 requestQueue.add(strRequest);
                 VolleyX.init(ctx);
                 VolleyX.from(strRequest).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<String>() {
-                            @Override
-                            public void onCompleted() {
-                                Log.d("searchcustomer", "onCompleted");
-                            }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+                        @Override
+                        public void onCompleted() {
+                            Log.d("searchcustomer", "onCompleted");
+                        }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                VolleyError ve = new VolleyError();
-                                callback.onRequestFail(ve, "searchcustomer");
-                            }
+                        @Override
+                        public void onError(Throwable e) {
+                            VolleyError ve = new VolleyError();
+                            callback.onRequestFail(ve, "searchcustomer");
+                        }
 
-                            @Override
-                            public void onNext(String response) {
-                                callback.onRequestSuccess(response, "searchcustomer");
-                            }
-                        });
+                        @Override
+                        public void onNext(String response) {
+                            callback.onRequestSuccess(response, "searchcustomer");
+                        }
+                    });
                 VolleyX.setRequestQueue(requestQueue);
             }
         }).start();
@@ -180,12 +180,60 @@ public class VolleyInteractor {
         }).start();
     }
 
+    public void getSrb(final Context ctx, final HashMap<String, String> params, final String strParams) {
+        new Thread(new Runnable(){
+            public void run(){
+                StringRequest strRequest = new StringRequest( Request.Method.GET,
+                    SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                    //"http://beta.apics.fncnathaniel.com/"
+                    + API.GET_ITEMSRB.getApi()+ "?" + strParams, null, null) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        return ServerConstants.getHeaderOrder();
+                    }
+                    public Map<String, String> getParams(){
+                        return params;
+                    }
+
+                };
+                requestQueue = Volley.newRequestQueue(ctx);
+                int socketTimeout = 10000;
+                RetryPolicy policy = new DefaultRetryPolicy(socketTimeout,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                strRequest.setRetryPolicy(policy);
+                requestQueue.getCache().clear();
+                requestQueue.add(strRequest);
+                VolleyX.init(ctx);
+                VolleyX.from(strRequest).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>() {
+                        @Override
+                        public void onCompleted() {
+                            Log.d("getsrb", "onCompleted");
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            VolleyError ve = new VolleyError();
+                            callback.onRequestFail(ve, "getsrb");
+                        }
+
+                        @Override
+                        public void onNext(String response) {
+                            callback.onRequestSuccess(response, "getsrb");
+                        }
+                    });
+                VolleyX.setRequestQueue(requestQueue);
+            }
+        }).start();
+    }
+
     public void getItemlistSrp(final Context ctx, final HashMap<String, String> params, final String strParams, final String strBodyParams) {
         new Thread(new Runnable(){
             public void run(){
-                StringRequest strRequest = new StringRequest( Request.Method.POST,
-                        SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
-                        + API.GET_ITEMLIST_SRP.getApi()+ "?" + strParams, null, null) {
+                String url = SharedData.getInstance(ctx).getData(SharedKey.DOMAIN_SERVER_URL.getKey())
+                    + API.GET_ITEMLIST_SRP.getApi()+ "?" + strParams;
+                StringRequest strRequest = new StringRequest( Request.Method.POST, url, null, null) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError { return ServerConstants.getHeaderOrder(); }
                     @Override

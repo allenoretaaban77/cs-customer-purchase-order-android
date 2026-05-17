@@ -57,6 +57,7 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(OrderKey.REMARKS);
         fields.add(OrderKey.OLD_SKU);
         fields.add(OrderKey.SELLING_PRICE);
+        fields.add(OrderKey.SRB);
         fields.add(OrderKey.TOTAL);
         fields.add(OrderKey.IS_CHECKED);
         fields.add(OrderKey.IS_ERROR);
@@ -188,6 +189,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 try {
                     db.execSQL("ALTER TABLE " + Table.MENULIST.getName() + " ADD COLUMN " + MenulistKey.INVOICE.getKey() + " TEXT ");
                     db.execSQL("UPDATE " + Table.MENULIST.getName() + " SET " + MenulistKey.INVOICE.getKey() + " = ''");
+                } catch (Exception e) { }
+            case 6:
+                try {
+                    db.execSQL("ALTER TABLE " + Table.ORDER.getName() + " ADD COLUMN " + OrderKey.SRB.getKey() + " TEXT ");
+                    db.execSQL("UPDATE " + Table.ORDER.getName() + " SET " + OrderKey.SRB.getKey() + " = ''");
                 } catch (Exception e) { }
                 break;
         }

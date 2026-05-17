@@ -11,6 +11,7 @@ public enum OrderKey {
     REMARKS("remarks", DataType.TEXT),
     OLD_SKU("old_sku", DataType.TEXT),
     SELLING_PRICE("selling_price", DataType.TEXT),
+    SRB("SRB", DataType.TEXT),
     TOTAL("total", DataType.TEXT),
     IS_CHECKED("is_checked", DataType.INTEGER),
     IS_ERROR("is_error", DataType.INTEGER),

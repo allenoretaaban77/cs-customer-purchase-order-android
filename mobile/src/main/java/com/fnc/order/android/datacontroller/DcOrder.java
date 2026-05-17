@@ -139,6 +139,7 @@ public class DcOrder extends DBHelper {
         order.setRemarks(c.getString(c.getColumnIndex(OrderKey.REMARKS.getKey())));
         order.setOldSku(c.getString(c.getColumnIndex(OrderKey.OLD_SKU.getKey())));
         order.setSellingPrice(c.getString(c.getColumnIndex(OrderKey.SELLING_PRICE.getKey())));
+        order.setSrb(c.getString(c.getColumnIndex(OrderKey.SRB.getKey())));
         order.setTotal(c.getString(c.getColumnIndex(OrderKey.TOTAL.getKey())));
         order.setIsChecked(c.getInt(c.getColumnIndex(OrderKey.IS_CHECKED.getKey())));
         order.setIsError(c.getInt(c.getColumnIndex(OrderKey.IS_ERROR.getKey())));

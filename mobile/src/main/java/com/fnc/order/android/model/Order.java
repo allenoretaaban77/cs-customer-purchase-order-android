@@ -11,6 +11,7 @@ public class Order implements Serializable {
     private String remarks;
     private String old_sku;
     private String selling_price;
+    private String srb;
     private String total;
     private Integer is_checked;
     private Integer is_error;
@@ -41,6 +42,9 @@ public class Order implements Serializable {
 
     public String getSellingPrice() { return selling_price; }
     public void setSellingPrice(String selling_price) { this.selling_price = selling_price; }
+
+    public String getSrb() { return srb; }
+    public void setSrb(String srb) { this.srb = srb; }
 
     public String getTotal() { return total; }
     public void setTotal(String total) { this.total = total; }

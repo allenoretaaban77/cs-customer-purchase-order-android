@@ -120,6 +120,7 @@ public class TrasactionItemsFragment extends DialogFragment {
                     ol.setRemarks(obj.getString("remarks"));
                     ol.setTotal(obj.getString("total"));
                     ol.setSellingPrice(obj.getString("selling_price"));
+                    ol.setSrb(obj.getString("SRB"));
                     ol.setItemRecid(obj.getString("item_recid"));
                     ol.setQuantity(obj.getString("quantity"));
                     ol.setFree(obj.getString("free"));

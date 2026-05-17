@@ -407,10 +407,28 @@
                                     <Button
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:background="@drawable/baseline_receipt_24"
+                                        android:background="@drawable/baseline_receipt_white_24"
                                         android:backgroundTint="@color/white" />
                                 </com.balysv.materialripple.MaterialRippleLayout>
                             </LinearLayout>
+                            <!--LinearLayout
+                                android:backgroundTint="@color/brown_5"
+                                android:layout_marginLeft="5dp"
+                                android:layout_width="wrap_content"
+                                android:layout_alignParentRight="true"
+                                style="@style/btnTransparentStyleSmallWrap">
+                                <com.balysv.materialripple.MaterialRippleLayout
+                                    android:id="@+id/btn_view"
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:padding="3dp">
+                                    <Button
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@drawable/baseline_receipt_white_24"
+                                        android:backgroundTint="@color/white" />
+                                </com.balysv.materialripple.MaterialRippleLayout>
+                            </LinearLayout-->
                             <LinearLayout
                                 android:visibility="gone"
                                 android:id="@+id/btn_others_box"
