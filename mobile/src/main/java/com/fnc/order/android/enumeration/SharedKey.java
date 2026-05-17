@@ -9,6 +9,7 @@ public enum SharedKey {
     DATABASE("ref_database_01"),
     DATABASEID("database_id"),
     REF_MAIN_BRANCH("ref_main_branch"),
+    REF_MAIN_BRANCH_ID("ref_main_branch_id"),
     REF_ADMIN_USER("ref_admin_user"),
     REF_ADMIN_PASSWORD("ref_admin_password"),
     REF_ADMIN_FULLNAME("ref_admin_fullname"),
@@ -25,6 +26,8 @@ public enum SharedKey {
     SHOW_SEARCH_PRICE("show_price_on_search"),
     PER_AGENT_SETUP("per_agent_setup"),
     ENABLE_REPORT_TYPE("enable_report_type"),
+    SHOW_SUMMARY_ON_POST("show_summary_on_post"),
+    REF_PO_NO("reference_po_number"),
 
     SKU_VALIDATION("old_sku_validation"),
     REF_EMP_VALIDATION("reference_employee_validation"),
@@ -67,7 +70,9 @@ public enum SharedKey {
     EMP_NAME("employee_name"),
     EMP_POSITION("employee_position"),
     REF_JOBTITLES("ref_jobtitles"),
-    EMP_ISMOBILEADMIN("employee_ismobileadmin");
+    EMP_ISMOBILEADMIN("employee_ismobileadmin"),
+
+    LAST_SUCC_CUSTSYNC("last_success_customer_sync");
 
     private String key;
     SharedKey(String key) { this.key = key; }

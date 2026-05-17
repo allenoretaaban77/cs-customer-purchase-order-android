@@ -56,6 +56,15 @@
                     android:layout_column="3"
                     android:text="Status" />
 
+                <TextView
+                    android:textSize="12sp"
+                    android:id="@+id/tv_refpo"
+                    android:gravity="top|center"
+                    style="@style/tblCellTextView"
+                    android:layout_width="75dp"
+                    android:layout_column="4"
+                    android:text="Status" />
+
             </TableRow>
 
         </LinearLayout>

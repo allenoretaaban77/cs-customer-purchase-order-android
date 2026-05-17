@@ -9,6 +9,17 @@ public class MenuList implements Serializable {
     private String remarks;
     private Integer recordcount;
     private String alphachar;
+    private String invoice;
+
+    public MenuList (String customerid, String integration_recid, String customername, String remarks, Integer recordcount, String alphachar, String invoice) {
+        this.customerid = customerid;
+        this.integration_recid = integration_recid;
+        this.customername = customername;
+        this.remarks = remarks;
+        this.recordcount = recordcount;
+        this.alphachar = alphachar;
+        this.invoice = invoice;
+    }
 
     public MenuList (String customerid, String integration_recid, String customername, String remarks, Integer recordcount, String alphachar) {
         this.customerid = customerid;
@@ -38,4 +49,7 @@ public class MenuList implements Serializable {
 
     public String getAlphachar() { return alphachar; }
     public void setAlphachar(String alphachar) { this.alphachar = alphachar; }
+
+    public String getInvoice() { return invoice; }
+    public void setInvoice(String invoice) { this.invoice = invoice; }
 }

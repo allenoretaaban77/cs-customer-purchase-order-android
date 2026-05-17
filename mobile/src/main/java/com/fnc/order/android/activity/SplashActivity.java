@@ -85,7 +85,6 @@ public class SplashActivity extends BaseActivity {
         active = false;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +98,7 @@ public class SplashActivity extends BaseActivity {
         if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASE.getKey(), "");
         if(sp.getData(SharedKey.DATABASEID.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASEID.getKey(), "");
         if(sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), "");
+        if(sp.getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), "");
         if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 0);
         if(sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), 0);
         if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
@@ -116,6 +116,10 @@ public class SplashActivity extends BaseActivity {
         if(sp.getInt(SharedKey.SHOW_SEARCH_PRICE.getKey()) == -1) sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), 0);
         if(sp.getInt(SharedKey.PER_AGENT_SETUP.getKey()) == -1) sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), 0);
         if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == -1) sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), 0);
+        if(sp.getInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey()) == -1) sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), 0);
+        if(sp.getInt(SharedKey.REF_PO_NO.getKey()) == -1) sp.saveInt(SharedKey.REF_PO_NO.getKey(), 0);
+
+        if(sp.getData(SharedKey.LAST_SUCC_CUSTSYNC.getKey()).trim().equals("")) sp.saveData(SharedKey.LAST_SUCC_CUSTSYNC.getKey(), "");
 
         Log.d("asasa", android.os.Build.MODEL);
 
@@ -231,6 +235,15 @@ public class SplashActivity extends BaseActivity {
                     "SUBMIT", new View.OnClickListener() {
                         public void onClick(View v) {
                             if (!refSelectedBranchId.equals("")) {
+                                if (sp.getData(SharedKey.REF_MAIN_BRANCH_ID.getKey()).trim().equals(refSelectedBranchId)) {
+                                    if (Helper.getScrRatio(ctx) > 0.6) {
+                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                    } else {
+                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                    }
+                                } else {
+                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                }
                                 postBranchImei();
                             } else {
                                 Toast.makeText(ctx, "Please select a branch.", Toast.LENGTH_SHORT).show();
@@ -913,7 +926,7 @@ public class SplashActivity extends BaseActivity {
                     .setCredentials(credentials).setClock(NanoClock.getDefaultClock())
                     .setProjectId(GlobalConstants.GCP_PROJECTID).build().getService();
                 try {
-                    BlobId blobId = BlobId.of(GlobalConstants.GCP_REFERENCE, "config.log");
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION, "version.log");
                     Blob blob = storageinit.get(blobId);
                     byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
                     return "Success|" + new String(bytes, "UTF-8") + "|" + strDbID;
@@ -933,80 +946,94 @@ public class SplashActivity extends BaseActivity {
                 try {
                     String strDatabaseId = resMsg[2];
                     JSONArray objArr = new JSONArray(resMsg[1]);
+
                     if (objArr.length() > 0) {
-                        Boolean isSuccess = false;
                         for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject rowObjConf = objArr.getJSONObject(i);
-                            if (rowObjConf.getString("database_id").equals(strDatabaseId)) {
-                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
-                                sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
-                                sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
-                                sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
-                                sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObjConf.getString("main_branch"));
-                                sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObjConf.getInt("old_sku_validation"));
-                                sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObjConf.getInt("reference_employee_validation"));
-                                sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObjConf.getInt("preload_items"));
-                                sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObjConf.getInt("saved_product_items"));
-                                sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
-                                sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
-                                sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObjConf.getString("support_employee_id"));
-                                sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObjConf.getString("support_ref_employee_id"));
-                                sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), rowObjConf.getInt("show_price_column_on_order"));
-                                sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), rowObjConf.getInt("show_total_column_on_order"));
-                                sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), rowObjConf.getInt("show_free_column_on_order"));
-                                sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), rowObjConf.getInt("compute_quantity_only"));
-                                sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
-                                sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
-                                sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            if (rowObj.getString("app_name").equals("CUSTOMER PO")) {
+                                String strConf = rowObj.getString("config");
+                                JSONArray objArrConf = new JSONArray(strConf);
+                                Boolean isSuccess = false;
+                                for (int j = 0; j < objArrConf.length(); j++) {
+                                    JSONObject rowObjConf = objArrConf.getJSONObject(j);
+                                    if (rowObjConf.getString("database_id").equals(strDatabaseId)) {
+                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
+                                        sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
+                                        sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
+                                        sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
+                                        sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObjConf.getString("main_branch"));
+                                        sp.saveData(SharedKey.REF_MAIN_BRANCH_ID.getKey(), rowObjConf.getString("main_branch_id"));
+                                        sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObjConf.getInt("old_sku_validation"));
+                                        sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObjConf.getInt("reference_employee_validation"));
+                                        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObjConf.getInt("preload_items"));
+                                        sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObjConf.getInt("saved_product_items"));
+                                        sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
+                                        sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
+                                        sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObjConf.getString("support_employee_id"));
+                                        sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObjConf.getString("support_ref_employee_id"));
+                                        sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), rowObjConf.getInt("show_price_column_on_order"));
+                                        sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), rowObjConf.getInt("show_total_column_on_order"));
+                                        sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), rowObjConf.getInt("show_free_column_on_order"));
+                                        sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), rowObjConf.getInt("compute_quantity_only"));
+                                        sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
+                                        sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
+                                        sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
+                                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), rowObjConf.getInt("show_summary_on_post"));
+                                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), rowObjConf.getInt("reference_po_number"));
 
-                                if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
-                                    sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
-                                    sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
-                                    sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
+                                        if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
+                                            sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
+                                            sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
+                                            sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
+                                        }
+
+                                        isSuccess = true;
+                                    }
                                 }
 
-                                isSuccess = true;
-                            }
-                        }
-                        if (!isSuccess) {
-                            alertDataSyncError("App Config Error L1.");
-                        } else {
-                            JSONArray objArrY = new JSONArray(g_jsonobject.getString("dtuser"));
-                            JSONObject objy = new JSONObject(objArrY.get(0).toString());
-                            sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
-                            sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
-                            String strFN = objy.getString("FirstName") + "|" +
-                                    objy.getString("MiddleName") + "|" +
-                                    objy.getString("LastName");
-                            String[] arrFN = strFN.split("\\|");
-                            if (arrFN.length > 0) {
-                                strFN = "";
-                                for (int k = 0; k < arrFN.length; k++) {
-                                    if (!String.valueOf(arrFN[k]).trim().equals(""))
-                                        strFN = strFN + arrFN[k] + " ";
-                                }
-                                sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
-                            }
+                                if (!isSuccess) {
+                                    alertDataSyncError("App Config Error L1.");
+                                } else {
+                                    JSONArray objArrY = new JSONArray(g_jsonobject.getString("dtuser"));
+                                    JSONObject objy = new JSONObject(objArrY.get(0).toString());
+                                    sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
+                                    sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
+                                    String strFN = objy.getString("FirstName") + "|" +
+                                            objy.getString("MiddleName") + "|" +
+                                            objy.getString("LastName");
+                                    String[] arrFN = strFN.split("\\|");
+                                    if (arrFN.length > 0) {
+                                        strFN = "";
+                                        for (int k = 0; k < arrFN.length; k++) {
+                                            if (!String.valueOf(arrFN[k]).trim().equals(""))
+                                                strFN = strFN + arrFN[k] + " ";
+                                        }
+                                        sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
+                                    }
 
-                            String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
-                            if (strImeiId.equals("")) {
-                                getDeviceProfile("init");
+                                    String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
+                                    if (strImeiId.equals("")) {
+                                        getDeviceProfile("init");
+                                    } else {
+                                        proceedNormal();
+                                    }
+
+                                    Helper.dismissSpinnerDialog(loader);
+                                    loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+                                }
                             } else {
-                                proceedNormal();
+                                // no else because will loop through others
                             }
-
-                            Helper.dismissSpinnerDialog(loader);
-                            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                         }
                     } else {
-                        alertDataSyncError("App Config Error L2.");
+                        alertDataSyncError("App Config Error L3.");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    alertDataSyncError("App Config Error L3.");
+                    alertDataSyncError("App Config Error L4.");
                 }
             } else {
-                alertDataSyncError("App Config Error L4.");
+                alertDataSyncError("App Config Error L5.");
             }
         }
         @Override

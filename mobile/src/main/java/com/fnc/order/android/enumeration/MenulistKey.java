@@ -8,7 +8,8 @@ public enum MenulistKey {
     CUSTOMER_NAME("customername", DataType.TEXT),
     REMARKS("remarks", DataType.TEXT),
     RECORD_COUNT("recordcount", DataType.INTEGER),
-    ALPHA_CHAR("alphachar", DataType.TEXT);
+    ALPHA_CHAR("alphachar", DataType.TEXT),
+    INVOICE("invoice", DataType.TEXT);
 
     private String key;
     private String dataType;

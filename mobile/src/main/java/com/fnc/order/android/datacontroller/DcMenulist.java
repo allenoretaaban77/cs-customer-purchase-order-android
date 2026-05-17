@@ -144,7 +144,8 @@ public class DcMenulist extends DBHelper {
             c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_NAME.getKey())),
             c.getString(c.getColumnIndex(MenulistKey.REMARKS.getKey())),
             c.getInt(c.getColumnIndex(MenulistKey.RECORD_COUNT.getKey())),
-            c.getString(c.getColumnIndex(MenulistKey.ALPHA_CHAR.getKey()))
+            c.getString(c.getColumnIndex(MenulistKey.ALPHA_CHAR.getKey())),
+            c.getString(c.getColumnIndex(MenulistKey.INVOICE.getKey()))
         );
         return menulist;
     }

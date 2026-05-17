@@ -157,8 +157,8 @@
         <TextView
             android:layout_margin="20dp"
             android:fontFamily="@font/regular"
-            android:textColor="@color/gray_5"
-            android:textSize="12sp"
+            android:textColor="@color/red_1"
+            android:textSize="19sp"
             android:text="0.0.0"
             android:textAlignment="textEnd"
             android:id="@+id/tv_version"

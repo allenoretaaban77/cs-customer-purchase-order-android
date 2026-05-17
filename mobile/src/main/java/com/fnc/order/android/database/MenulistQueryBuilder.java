@@ -16,6 +16,7 @@ public class MenulistQueryBuilder {
         values.put(MenulistKey.REMARKS.getKey(), menulist.getRemarks());
         values.put(MenulistKey.RECORD_COUNT.getKey(), menulist.getRemarks());
         values.put(MenulistKey.ALPHA_CHAR.getKey(), menulist.getAlphachar());
+        values.put(MenulistKey.INVOICE.getKey(), menulist.getInvoice());
         return values;
     }
 }

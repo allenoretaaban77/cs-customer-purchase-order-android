@@ -553,7 +553,8 @@ public class Helper {
                 String[] dArrx = dArr[0].split("/");
                 String sM = dArrx[0].length() > 1 ? dArrx[0] : "0" + dArrx[0] ;
                 String sD = dArrx[1].length() > 1 ? dArrx[1] : "0" + dArrx[1] ;
-                return dArrx[2] + "-" + sM + "-" + sD;
+                java.text.DateFormat dfyx = new SimpleDateFormat(GlobalConstants.TIME_REF_FORMAT);
+                return dArrx[2] + "-" + sM + "-" + sD + " " + dfyx.format(date);
             case 5:
                 java.text.DateFormat dfy = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_GCP);
                 return dfy.format(date);

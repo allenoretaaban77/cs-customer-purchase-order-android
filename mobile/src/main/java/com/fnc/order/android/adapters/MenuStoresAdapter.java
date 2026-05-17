@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
@@ -49,7 +50,9 @@ public class MenuStoresAdapter extends ArrayAdapter<MenuList> {
         View rowView = inflater.inflate(R.layout.item_store, parent, false);
         final MenuList mlRS = menulist_values.get(position);
 
-        Button btnStoreTitle = (Button) rowView.findViewById(R.id.storetitle);
+        MaterialRippleLayout mrlStoreTitle = (MaterialRippleLayout) rowView.findViewById(R.id.storetitle);
+        Button btnStoreTitle = (Button) rowView.findViewById(R.id.btn_storetitle);
+
 
         LinearLayout btnContainer = (LinearLayout) rowView.findViewById(R.id.btn_container);
         btnContainer.setVisibility(View.GONE);
@@ -77,7 +80,7 @@ public class MenuStoresAdapter extends ArrayAdapter<MenuList> {
 
             btnContainer.setVisibility(View.VISIBLE);
             btnStoreTitle.setText(mlRS.getCustomerName());
-            btnStoreTitle.setOnClickListener(new View.OnClickListener(){
+            mrlStoreTitle.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(final View v){
                     if(onButtonClickListener != null){

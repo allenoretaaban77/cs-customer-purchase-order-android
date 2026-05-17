@@ -33,18 +33,13 @@ import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
-import com.fnc.order.android.constants.ServerConstants;
-import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
-import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.MenulistKey;
-import com.fnc.order.android.enumeration.OrderedKey;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.model.MenuList;
-import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.model.aAdminGroupings;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
@@ -57,7 +52,6 @@ import com.google.api.core.NanoClock;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
@@ -65,7 +59,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,13 +71,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import hari.bounceview.BounceView;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class LoginActivity extends BaseActivity {
 
@@ -133,6 +123,9 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setText(Helper.getVersion(ctx, this));
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        // philbest
+//        usernameText.setText("1");
+//        passwordEText.setText("clovis");
         // massive
 //        usernameText.setText("office");
 //        passwordEText.setText("Office");
@@ -175,15 +168,15 @@ public class LoginActivity extends BaseActivity {
 
                 if(usernameStr.matches("")){
                     alertDialog = Helper.okDialog(ctx,
-                            "Error","Please enter username.", "CLOSE",
-                            null, false);
+                        "Error","Please enter username.", "CLOSE",
+                        null, false);
                     BounceView.addAnimTo(alertDialog);
                     return;
                 }
                 if(passwordString.matches("")){
                     alertDialog = Helper.okDialog(ctx,
-                            "Error","Please enter password.", "CLOSE",
-                            null, false);
+                        "Error","Please enter password.", "CLOSE",
+                        null, false);
                     BounceView.addAnimTo(alertDialog);
                     return;
                 }
@@ -1268,7 +1261,6 @@ public class LoginActivity extends BaseActivity {
                                     );
                                     DcStaffs.getInstance(ctx).insertStaffs(sl);
                                 }
-                                Helper.insertDefaultStaffs(ctx);
                             }
                         } else {
                             Log.d("dsxe getuser", response);
@@ -1367,11 +1359,14 @@ public class LoginActivity extends BaseActivity {
                         JSONObject obj = objArr.getJSONObject(i);
 
                         String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
+                        String strInvoice = ""; try { strInvoice = obj.getString(MenulistKey.INVOICE.getKey());
+                        } catch (Exception e) { strInvoice = "false"; }
                         MenuList mlList = new MenuList(
                             obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
                             obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
                             strCustomerName,
-                            "", 0, ""
+                            "", 0, "",
+                            strInvoice
                         );
                         if (!strCustomerName.equals("")) {
                             if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
@@ -1487,6 +1482,8 @@ public class LoginActivity extends BaseActivity {
                                         sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
                                         sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
                                         sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
+                                        sp.saveInt(SharedKey.SHOW_SUMMARY_ON_POST.getKey(), rowObjConf.getInt("show_summary_on_post"));
+                                        sp.saveInt(SharedKey.REF_PO_NO.getKey(), rowObjConf.getInt("reference_po_number"));
 
                                         if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
                                             sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);

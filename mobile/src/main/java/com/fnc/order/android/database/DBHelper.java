@@ -92,6 +92,7 @@ public class DBHelper extends SQLiteOpenHelper {
         fields.add(MenulistKey.REMARKS);
         fields.add(MenulistKey.RECORD_COUNT);
         fields.add(MenulistKey.ALPHA_CHAR);
+        fields.add(MenulistKey.INVOICE);
         return fields;
     }
 
@@ -178,8 +179,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 try {
                     db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " TEXT ");
                     db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.GRAND_TOTAL_CNT.getKey() + " = '0'");
+                } catch (Exception e) { }
+                try {
                     db.execSQL("ALTER TABLE " + Table.ORDERED.getName() + " ADD COLUMN " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " TEXT ");
                     db.execSQL("UPDATE " + Table.ORDERED.getName() + " SET " + OrderedKey.DELIVERY_DATE_DEFAULT.getKey() + " = '0'");
+                } catch (Exception e) { }
+            case 5:
+                try {
+                    db.execSQL("ALTER TABLE " + Table.MENULIST.getName() + " ADD COLUMN " + MenulistKey.INVOICE.getKey() + " TEXT ");
+                    db.execSQL("UPDATE " + Table.MENULIST.getName() + " SET " + MenulistKey.INVOICE.getKey() + " = ''");
                 } catch (Exception e) { }
                 break;
         }

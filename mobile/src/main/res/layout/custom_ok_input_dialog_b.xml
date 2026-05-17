@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:keepScreenOn="true"
+    android:background="@drawable/background_gradient_round_a"
+    android:padding="10dp">
+
+    <TextView
+        android:text=""
+        android:id="@+id/tvMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:fontFamily="@font/medium"
+        android:textSize="18sp"
+        android:textAlignment="center" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvMessage"
+            android:layout_marginTop="27dp">
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvMessage"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="0px"
+                android:layout_height="0px"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
+
+            <EditText
+                android:layout_marginBottom="5dp"
+                android:id="@+id/et_inputtext"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/background_round_border_inner_transparent"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:imeOptions="actionDone"
+                android:maxLines="10"
+                android:inputType="textMultiLine"
+                android:paddingLeft="7dp"
+                android:paddingRight="5dp"
+                android:paddingTop="7dp"
+                android:paddingBottom="5dp"
+                android:textColor="@color/brown_5"
+                android:textColorHint="@color/gray_4"
+                android:fontFamily="@font/regular"
+                android:textSize="20sp"
+                android:hint="PO number here...."
+                android:lineHeight="16sp" />
+
+            <LinearLayout
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    style="@style/btnTransparentStyle">
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <Button
+                            android:textSize="20sp"
+                            android:fontFamily="@font/medium"
+                            android:background="@android:color/transparent"
+                            android:id="@+id/btnCancel"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:text="Cancel"
+                            android:textColor="@color/white"
+                            android:textAllCaps="false"/>
+                    </com.balysv.materialripple.MaterialRippleLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    style="@style/btnTransparentStyle">
+                    <com.balysv.materialripple.MaterialRippleLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <Button
+                            android:textSize="20sp"
+                            android:fontFamily="@font/medium"
+                            android:background="@android:color/transparent"
+                            android:id="@+id/btnOk"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:text="Ok"
+                            android:textColor="@color/white"
+                            android:textAllCaps="false"/>
+                    </com.balysv.materialripple.MaterialRippleLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
