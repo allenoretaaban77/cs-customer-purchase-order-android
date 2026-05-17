@@ -43,6 +43,17 @@ public class DcStaffs extends DBHelper {
         db.close();
     }
 
+    public void updateStaff(aStaffsKey rKey, String rVal, aStaffsKey kArr[], String vArr[]){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        for (int i = 0; i < kArr.length; i++) {
+            aStaffsKey key = kArr[i];
+            cv.put(key.getKey(), vArr[i]);
+        }
+        db.updateWithOnConflict(Table.STAFFS.getName(), cv, rKey.getKey() + " = ?", new String[] { rVal }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+    }
+
     public void setInActive(aStaffs sl) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues value = aStaffsQueryBuilder.prepareStaffsInsertValues(sl, context);
@@ -56,7 +67,7 @@ public class DcStaffs extends DBHelper {
         db.close();
     }
 
-    public LinkedList<aStaffs> checkIfActive(Integer intEmpId) {
+    public LinkedList<aStaffs> checkIfActive(Long intEmpId) {
         SQLiteDatabase db = getReadableDatabase();
         String strQry = "SELECT * FROM " + Table.STAFFS_INACTIVE.getName() +
             " WHERE " + aStaffsKey.EMPID.getKey() + " = ?";
@@ -122,13 +133,13 @@ public class DcStaffs extends DBHelper {
 
     private aStaffs setStaffs(Cursor c) {
         aStaffs sl = new aStaffs(
-            c.getInt(c.getColumnIndex(aStaffsKey.EMPID.getKey())),
+            c.getLong(c.getColumnIndex(aStaffsKey.EMPID.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.REFEMPNO.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.EMPNO.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.EMAIL.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.NAME.getKey())),
-            c.getInt(c.getColumnIndex(aStaffsKey.BRANCH.getKey())),
-            c.getInt(c.getColumnIndex(aStaffsKey.JOBTITLE.getKey())),
+            c.getLong(c.getColumnIndex(aStaffsKey.BRANCH.getKey())),
+            c.getLong(c.getColumnIndex(aStaffsKey.JOBTITLE.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.PASS.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.ACTIVE.getKey())),
             c.getString(c.getColumnIndex(aStaffsKey.ISMOBILEADMIN.getKey()))

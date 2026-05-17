@@ -49,6 +49,8 @@ import com.fnc.order.android.activity.LoginActivity;
 import com.fnc.order.android.adapters.AlphaGridAdapter;
 import com.fnc.order.android.adapters.MenuStoresAdapter;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcAitemlist;
 import com.fnc.order.android.datacontroller.DcBranchlist;
 import com.fnc.order.android.datacontroller.DcMenulist;
@@ -126,7 +128,21 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         initViews(v);
         initListeners(v);
 
-        if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
+        String eiOld = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID_OLD.getKey());
+        String inNew = SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey());
+        if (inNew.equals(eiOld)) {
+            LinkedList<MenuList> llr = DcMenulist.getInstance(ctx).getAllMenulist(false, "%");
+            if (llr.size() < 1) {
+                requestCustomers("");
+            } else {
+                loadSavedItems();
+            }
+        } else {
+            SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), inNew);
+            requestCustomers("");
+        }
+
+        /*if (!SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
                 .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
             SharedData.getInstance(ctx).saveData(SharedKey.DATABASE_OLD.getKey(), SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             requestCustomers("");
@@ -144,7 +160,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                 SharedData.getInstance(ctx).saveData(SharedKey.REF_EMP_ID_OLD.getKey(), inNew);
                 requestCustomers("");
             }
-        }
+        }*/
 
         return v;
     }
@@ -186,7 +202,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
 
     private void loadSavedItems(){
         // load alpha grid view
-        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
+        /*if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey())
                 .equals(SharedData.getInstance(ctx).getData(SharedKey.DATABASE_OLD.getKey()))) {
             ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
             if (refStringAlpha.size() > 0) {
@@ -196,7 +212,15 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             }
         } else {
             stringAlpha = new ArrayList<String>();
+        } */
+
+        ArrayList<String> refStringAlpha = DcMenulist.getInstance(ctx).getAllMenulistAlpha();
+        if (refStringAlpha.size() > 0) {
+            stringAlpha = refStringAlpha;
+        } else {
+            stringAlpha = new ArrayList<String>();
         }
+
         adapterAlpha = new AlphaGridAdapter(ctx, stringAlpha);
         adapterAlpha.setOnButtonClickListener(new AlphaGridAdapter.OnBoxClickListener() {
             @Override
@@ -274,7 +298,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         boxMenu = new DroppyMenuPopup.Builder(ctx, btn_menu);
         boxMenu.setXOffset(85);
         boxMenu.addMenuItem(new DroppyMenuItem("  View Transactions "));
-        boxMenu.addMenuItem(new DroppyMenuItem("  Reload Items ")).addSeparator();
+        boxMenu.addMenuItem(new DroppyMenuItem("  Re-Sync Customer Lists ")).addSeparator();
         if(sp.getData(SharedKey.EMP_POSITION.getKey()).equals("1912072415") || sp.getData(SharedKey.EMP_ISMOBILEADMIN.getKey()).equals("true")) {
             boxMenu.addMenuItem(new DroppyMenuItem("  Users ")).addSeparator();
         }
@@ -486,7 +510,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
-            if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+            if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
                 params.put("agentid", "");
             } else {
                 params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
@@ -669,25 +693,25 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     JSONObject obj = new JSONObject(response);
                     if (obj.length() > 0) {
                         DcStaffs.getInstance(ctx).emptyStaffslist();
-                        Helper.insertDefaultStaffs(ctx);
                         JSONArray sArr = obj.getJSONArray("staff");
                         if (sArr.length() > 0) {
                             for (int i = 0; i < sArr.length(); i++) {
                                 JSONObject rowObj = sArr.getJSONObject(i);
                                 aStaffs sl = new aStaffs(
-                                        rowObj.getInt("empId"),
-                                        rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                        rowObj.getString("empNo"),
-                                        rowObj.getString("Email"),
-                                        rowObj.getString("name"),
-                                        rowObj.getInt("Branch"),
-                                        rowObj.getInt("Jobtitle"),
-                                        rowObj.getString("pass"),
-                                        rowObj.getString("active"),
-                                        rowObj.getString("ismobileadmin")
+                                    rowObj.getLong("empId"),
+                                    rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                    rowObj.getString("empNo"),
+                                    rowObj.getString("Email"),
+                                    rowObj.getString("name"),
+                                    rowObj.getLong("Branch"),
+                                    rowObj.getLong("Jobtitle"),
+                                    rowObj.getString("pass"),
+                                    rowObj.getString("active"),
+                                    rowObj.getString("ismobileadmin")
                                 );
                                 DcStaffs.getInstance(ctx).insertStaffs(sl);
                             }
+                            Helper.insertDefaultStaffs(ctx);
                         }
                         Helper.dismissSpinnerDialog(loader);
                         Toast.makeText(ctx, "Request success...", Toast.LENGTH_SHORT).show();
@@ -826,33 +850,33 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         aItemlist ail = new aItemlist(
-                                String.valueOf(rowObj.getString(aItemlistKey.INTEGRATION_RECID.getKey())),
-                                rowObj.getInt(aItemlistKey.RECID.getKey()),
-                                String.valueOf(rowObj.getString(aItemlistKey.OLD_SKU.getKey())),
-                                rowObj.getInt(aItemlistKey.BASEUNIT_RECID.getKey()),
-                                rowObj.getDouble(aItemlistKey.BASEUNIT_QTY.getKey()),
-                                rowObj.getString(aItemlistKey.ITEMNO.getKey()),
-                                rowObj.getString(aItemlistKey.ITEMNAME.getKey()),
-                                rowObj.getString(aItemlistKey.ITEMNAME_WUNIT.getKey()),
-                                rowObj.getDouble(aItemlistKey.QUANTITY_INUNIT.getKey()),
-                                rowObj.getString(aItemlistKey.DEPT.getKey()),
-                                rowObj.getString(aItemlistKey.UNIT.getKey()),
-                                rowObj.getInt(aItemlistKey.TBLUNIT_RECID.getKey()),
-                                rowObj.getInt(aItemlistKey.UNIT_TOCONVERT.getKey()),
-                                rowObj.getString(aItemlistKey.BARCODENO.getKey()),
-                                rowObj.getBoolean(aItemlistKey.F_BASE.getKey()) == true ? 1 : 0,
-                                rowObj.getString(aItemlistKey.D_ITEMDEPARTMENT_CODE.getKey()),
-                                String.valueOf(rowObj.getString(aItemlistKey.SELLING_PRICE.getKey())).equals("null")
-                                        ? 0.00 : rowObj.getDouble(aItemlistKey.SELLING_PRICE.getKey()),
-                                String.valueOf(rowObj.getString(aItemlistKey.COST_PRICE.getKey())).equals("null")
-                                        ? 0.00 : rowObj.getDouble(aItemlistKey.COST_PRICE.getKey()),
-                                rowObj.getString(aItemlistKey.TAXCODE.getKey()),
-                                String.valueOf(rowObj.getString(aItemlistKey.EXPENSE_ACCT.getKey())).equals("null")
-                                        ? 0 : rowObj.getInt(aItemlistKey.EXPENSE_ACCT.getKey()),
-                                String.valueOf(rowObj.getString(aItemlistKey.INCOME_ACCT.getKey())).equals("null")
-                                        ? 0 : rowObj.getInt(aItemlistKey.INCOME_ACCT.getKey()),
-                                rowObj.getString(aItemlistKey.DATA_VISIBILITY.getKey()),
-                                rowObj.getString(aItemlistKey.BARCODENO1.getKey())
+                            String.valueOf(rowObj.getString(aItemlistKey.INTEGRATION_RECID.getKey())),
+                            rowObj.getLong(aItemlistKey.RECID.getKey()),
+                            String.valueOf(rowObj.getString(aItemlistKey.OLD_SKU.getKey())),
+                            rowObj.getInt(aItemlistKey.BASEUNIT_RECID.getKey()),
+                            rowObj.getDouble(aItemlistKey.BASEUNIT_QTY.getKey()),
+                            rowObj.getString(aItemlistKey.ITEMNO.getKey()),
+                            rowObj.getString(aItemlistKey.ITEMNAME.getKey()),
+                            rowObj.getString(aItemlistKey.ITEMNAME_WUNIT.getKey()),
+                            rowObj.getDouble(aItemlistKey.QUANTITY_INUNIT.getKey()),
+                            rowObj.getString(aItemlistKey.DEPT.getKey()),
+                            rowObj.getString(aItemlistKey.UNIT.getKey()),
+                            rowObj.getInt(aItemlistKey.TBLUNIT_RECID.getKey()),
+                            rowObj.getInt(aItemlistKey.UNIT_TOCONVERT.getKey()),
+                            rowObj.getString(aItemlistKey.BARCODENO.getKey()),
+                            rowObj.getBoolean(aItemlistKey.F_BASE.getKey()) == true ? 1 : 0,
+                            rowObj.getString(aItemlistKey.D_ITEMDEPARTMENT_CODE.getKey()),
+                            String.valueOf(rowObj.getString(aItemlistKey.SELLING_PRICE.getKey())).equals("null")
+                                    ? 0.00 : rowObj.getDouble(aItemlistKey.SELLING_PRICE.getKey()),
+                            String.valueOf(rowObj.getString(aItemlistKey.COST_PRICE.getKey())).equals("null")
+                                    ? 0.00 : rowObj.getDouble(aItemlistKey.COST_PRICE.getKey()),
+                            rowObj.getString(aItemlistKey.TAXCODE.getKey()),
+                            String.valueOf(rowObj.getString(aItemlistKey.EXPENSE_ACCT.getKey())).equals("null")
+                                    ? 0 : rowObj.getInt(aItemlistKey.EXPENSE_ACCT.getKey()),
+                            String.valueOf(rowObj.getString(aItemlistKey.INCOME_ACCT.getKey())).equals("null")
+                                    ? 0 : rowObj.getInt(aItemlistKey.INCOME_ACCT.getKey()),
+                            rowObj.getString(aItemlistKey.DATA_VISIBILITY.getKey()),
+                            rowObj.getString(aItemlistKey.BARCODENO1.getKey())
                         );
                         DcAitemlist.getInstance(ctx).insertaItemlist(ail);
                     }
@@ -927,25 +951,25 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
                                 DcStaffs.getInstance(ctx).emptyStaffslist();
-                                Helper.insertDefaultStaffs(ctx);
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
-                                                rowObj.getInt("empId"),
-                                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                                rowObj.getString("empNo"),
-                                                rowObj.getString("Email"),
-                                                rowObj.getString("name"),
-                                                rowObj.getInt("Branch"),
-                                                rowObj.getInt("Jobtitle"),
-                                                rowObj.getString("pass"),
-                                                rowObj.getString("active"),
-                                                rowObj.getString("ismobileadmin")
+                                            rowObj.getLong("empId"),
+                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                            rowObj.getString("empNo"),
+                                            rowObj.getString("Email"),
+                                            rowObj.getString("name"),
+                                            rowObj.getLong("Branch"),
+                                            rowObj.getLong("Jobtitle"),
+                                            rowObj.getString("pass"),
+                                            rowObj.getString("active"),
+                                            rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
+                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 loadAdminJobTitles();
                             } else {

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class aItemlist implements Serializable {
     private String integration_recid;
-    private int recid;
+    private Long recid;
     private String old_sku;
     private int baseUnit_recid;
     private double baseUnit_qty;
@@ -27,7 +27,7 @@ public class aItemlist implements Serializable {
     private String data_visibility;
     private String barcodeNo1;
 
-    public aItemlist ( String integration_recid, int recid, String old_sku, int baseUnit_recid,
+    public aItemlist ( String integration_recid, Long recid, String old_sku, int baseUnit_recid,
         double baseUnit_qty, String itemNo, String itemname, String itemName_wUnit, double quantity_inUnit,
         String dept, String unit, int tblUnit_recid, int unit_toconvert, String barcodeNo,
         int f_base, String d_itemdepartment_code, double selling_price, double cost_price,
@@ -63,10 +63,10 @@ public class aItemlist implements Serializable {
     }
     public void setIntegration_recid(String integration_recid) { this.integration_recid = integration_recid; }
 
-    public int getRecid() {
+    public Long getRecid() {
         return recid;
     }
-    public void setRecid(int recid) { this.recid = recid; }
+    public void setRecid(Long recid) { this.recid = recid; }
 
     public String getOld_sku() {
         return old_sku;

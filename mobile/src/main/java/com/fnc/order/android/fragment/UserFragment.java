@@ -40,6 +40,7 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.databinding.ItemUserBinding;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
@@ -236,7 +237,7 @@ public class UserFragment extends DialogFragment {
                     llJobtitles = new LinkedList<>();
                     if(objArr.length() > 0) {
                         aAdminGroupings cjt = new aAdminGroupings();
-                        cjt.setRecid(0);
+                        cjt.setRecid(0L);
                         cjt.setCode("0");
                         cjt.setDescription("Select Job Title:");
                         cjt.setDeleted("false");
@@ -244,7 +245,7 @@ public class UserFragment extends DialogFragment {
                         for (int ix = 0; ix < objArr.length(); ix++) {
                             JSONObject rowObj = objArr.getJSONObject(ix);
                             cjt = new aAdminGroupings();
-                            cjt.setRecid(rowObj.getInt("recid"));
+                            cjt.setRecid(rowObj.getLong("recid"));
                             cjt.setCode(rowObj.getString("code"));
                             cjt.setDescription(rowObj.getString("Description"));
                             cjt.setDeleted(rowObj.getString("deleted"));
@@ -317,25 +318,25 @@ public class UserFragment extends DialogFragment {
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
                                 DcStaffs.getInstance(ctx).emptyStaffslist();
-                                Helper.insertDefaultStaffs(ctx);
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
-                                            rowObj.getInt("empId"),
+                                            rowObj.getLong("empId"),
                                             rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
                                             rowObj.getString("empNo"),
                                             rowObj.getString("Email"),
                                             rowObj.getString("name"),
-                                            rowObj.getInt("Branch"),
-                                            rowObj.getInt("Jobtitle"),
+                                            rowObj.getLong("Branch"),
+                                            rowObj.getLong("Jobtitle"),
                                             rowObj.getString("pass"),
                                             rowObj.getString("active"),
                                             rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
+                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 displayUsers("%");
                                 loadAdminJobTitles();
@@ -378,7 +379,7 @@ public class UserFragment extends DialogFragment {
             llJobtitles = new LinkedList<>();
             if(objArr.length() > 0) {
                 aAdminGroupings cjt = new aAdminGroupings();
-                cjt.setRecid(0);
+                cjt.setRecid(0L);
                 cjt.setCode("0");
                 cjt.setDescription("Select Job Title:");
                 cjt.setDeleted("false");
@@ -386,7 +387,7 @@ public class UserFragment extends DialogFragment {
                 for (int i = 0; i < objArr.length(); i++) {
                     JSONObject rowObj = objArr.getJSONObject(i);
                     cjt = new aAdminGroupings();
-                    cjt.setRecid(rowObj.getInt("recid"));
+                    cjt.setRecid(rowObj.getLong("recid"));
                     cjt.setCode(rowObj.getString("code"));
                     cjt.setDescription(rowObj.getString("Description"));
                     cjt.setDeleted(rowObj.getString("deleted"));
@@ -722,10 +723,10 @@ public class UserFragment extends DialogFragment {
                 params.put("logdb", sp.getData(SharedKey.DATABASE.getKey()));
                 params.put("empid", String.valueOf(sl.getEmpId()));
                 params.put("password", et_password.getText().toString());
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
                     params.put("updatedby", sp.getData(SharedKey.REF_EMP_ID.getKey()));
                 } else {
-                    params.put("updatedby", sp.getData(SharedKey.REF_EMP_ID.getKey()));
+                    params.put("updatedby", sp.getData(SharedKey.EMP_ID.getKey()));
                 }
                 Iterator it = params.entrySet().iterator();
                 String strParams = "";

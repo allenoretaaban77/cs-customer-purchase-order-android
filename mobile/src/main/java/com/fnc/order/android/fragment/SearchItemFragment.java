@@ -337,7 +337,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                 for (int i = 0; i < objArr.length(); i++) {
                     JSONObject rowObj = objArr.getJSONObject(i);
                     Itemlist irsx = new Itemlist();
-                    irsx.setRecid(rowObj.getInt(ItemlistKey.RECID.getKey()));
+                    irsx.setRecid(rowObj.getLong(ItemlistKey.RECID.getKey()));
                     irsx.setItemName(rowObj.getString(ItemlistKey.ITEM_NAME_WITH_UNIT.getKey()));
                     irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
                     irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));

@@ -55,16 +55,15 @@ public class DcOrder extends DBHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(column.getKey(), value);
-        db.updateWithOnConflict(Table.ORDER.getName(), cv, "item_recid = ?",
-                new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
+        db.updateWithOnConflict(Table.ORDER.getName(), cv, "item_recid = ?", new String[] { recid }, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }
 
-    public void updateSetAllQuantity(String value) {
+    public void updateSetAllQuantity(String value, String args) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put( OrderKey.QUANTITY.getKey(), value);
-        db.updateWithOnConflict(Table.ORDER.getName(), cv, null, null, SQLiteDatabase.CONFLICT_IGNORE);
+        db.updateWithOnConflict(Table.ORDER.getName(), cv, args, null, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
     }
 
@@ -102,9 +101,9 @@ public class DcOrder extends DBHelper {
         return list;
     }
 
-    public LinkedList<Order> searchOrderFilterMultiple(String strCol, String[] strMultiple) {
+    public LinkedList<Order> searchOrderFilterMultiple(String strCol, String[] strMultiple, String orderby) {
         SQLiteDatabase db = getReadableDatabase();
-        String strQry = "SELECT * FROM " + Table.ORDER.getName() + " WHERE " + strCol;
+        String strQry = "SELECT * FROM " + Table.ORDER.getName() + " WHERE " + strCol + orderby;
         Cursor c = db.rawQuery(strQry, strMultiple);
         LinkedList<Order> list = new LinkedList<>();
         while (c.moveToNext()) {
@@ -133,6 +132,7 @@ public class DcOrder extends DBHelper {
     private Order setOrderlist(Cursor c) {
         Order order = new Order();
         order.setQuantity(c.getString(c.getColumnIndex(OrderKey.QUANTITY.getKey())));
+        order.setFree(c.getString(c.getColumnIndex(OrderKey.FREE.getKey())));
         order.setItemRecid(c.getString(c.getColumnIndex(OrderKey.ITEM_RECID.getKey())));
         order.setItemName(c.getString(c.getColumnIndex(OrderKey.ITEM_NAME.getKey())));
         order.setUnitName(c.getString(c.getColumnIndex(OrderKey.UNIT_NAME.getKey())));

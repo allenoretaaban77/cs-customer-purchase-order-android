@@ -77,7 +77,7 @@ public class DcAitemlist extends DBHelper {
     private aItemlist setaItemlist(Cursor c) {
         return new aItemlist(
             c.getString(c.getColumnIndex(aItemlistKey.INTEGRATION_RECID.getKey())),
-            c.getInt(c.getColumnIndex(aItemlistKey.RECID.getKey())),
+            c.getLong(c.getColumnIndex(aItemlistKey.RECID.getKey())),
             c.getString(c.getColumnIndex(aItemlistKey.OLD_SKU.getKey())),
             c.getInt(c.getColumnIndex(aItemlistKey.BASEUNIT_RECID.getKey())),
             c.getDouble(c.getColumnIndex(aItemlistKey.BASEUNIT_QTY.getKey())),

@@ -14,17 +14,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -90,6 +95,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.json.JSONTokener;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,11 +127,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private View rootView;
     private Fragment thisFragment;
     private ProgressDialog loader;
-    private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh, btn_others;
-    private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total;
-    private EditText et_date;
+    private MaterialRippleLayout btn_add_item, btn_submit, btn_menu, btn_back, btn_refresh,
+            btn_others, btn_setzero, btn_search, btn_closesearch, btn_view;
+    private TextView tv_name, tv_grandtotal, tv_grandtotal_lbl, tv_header_price, tv_header_total, tv_hdr_freeitem;
+    private EditText et_date, et_remarks, et_search;
     private CoordinatorLayout rl_content_box;
-    private EditText et_remarks;
     private DroppyMenuPopup.Builder pageMenu;
     private LinearLayout mainTableBox;
     private Integer maintableViewHeight = 0;
@@ -136,7 +142,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private String refPersonIdentityId = "";
     private static AlertDialog alertDialog, alertDialogRemarks;
     private Boolean isBacked = false;
-    private LinearLayout bsCalc;
+    private LinearLayout bsCalc, ll_search, ll_closesearch, llet_search;
     private BottomSheetBehavior bsBh;
     private PopupMenu menuPop;
     private VolleyInteractor vi;
@@ -154,6 +160,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     private static final int USER_DIALOG_FRAGMENT = 7;
     private static final int OTHER_ITEMS_DIALOG_FRAGMENT = 8;
     private BroadcastReceiver connStatusReceiver;
+    private Boolean mx_taskrun = false; private Handler mx_handler; private Runnable mx_runnable;
 
     public OrderFragment() {
         // Required empty public constructor
@@ -194,7 +201,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             ).get(0);
         }
 
-        if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//        if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
             strBranchEncoding = "1";
         } else {
             strBranchEncoding = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
@@ -230,7 +238,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             @Override
             public boolean onKey( View v, int keyCode, KeyEvent event ) {
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+                    if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                    if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                         backItNow(v);
                         return true;
                     } else{
@@ -246,17 +255,19 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         initCalc(rootView);
 
         sp = SharedData.getInstance(ctx);
-        if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+        /* if(sp.getData(SharedKey.DATABASEID.getKey()).equals(ServerConstants.DEFAULT_DBID)) {
             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
             btn_refresh.setVisibility(View.VISIBLE);
         } else {
             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
             btn_refresh.setVisibility(View.GONE);
-        }
+        } */
         if (sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == 1) {
-            DcOrder.getInstance(ctx).updateSetAllQuantity("");
+            btn_refresh.setVisibility(View.VISIBLE);
+            DcOrder.getInstance(ctx).updateSetAllQuantity("", null);
             fillItems(rootView);
         } else {
+            btn_refresh.setVisibility(View.GONE);
             DcOrder.getInstance(ctx).emptyOrderlist();
         }
 
@@ -265,9 +276,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals("netConnStat")) {
                     Log.d("bcastx", intent.getStringExtra("isConnected"));
+                    ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setText("ALIVE V-" + Helper.getVersion(ctx, getActivity()));
+                    ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setText("DOWN V-" + Helper.getVersion(ctx, getActivity()));
                     if (intent.getStringExtra("isConnected").equals("false")) {
+                        ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setVisibility(View.GONE);
                         ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setVisibility(View.VISIBLE);
                     } else {
+                        ((TextView) rootView.findViewById(R.id.tv_conn_stat_conn)).setVisibility(View.VISIBLE);
                         ((TextView) rootView.findViewById(R.id.tv_conn_stat)).setVisibility(View.GONE);
                     }
                 }
@@ -303,45 +318,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             strParams = strParams.replaceAll(" ", "%20");
             vi.getItemlist(ctx, params, strParams);
         } else {
-            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+            if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//            if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                 Toast.makeText(ctx, "Please check internet connection....", Toast.LENGTH_SHORT).show();
             } else {
 //                try {
                     LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
-                    if (llOrderRs.size() > 0) {
-                        for (int i = 0; i < llOrderRs.size(); i++) {
-                            Order ol = llOrderRs.get(i);
-                            if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
-                                curRefArrayList.add(ol);
-                            }
-                        }
-
-                        adapter = new OrderlistAdapter(ctx, curRefArrayList);
-                        adapter.setCurPos(curRefPos);
-                        adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                adapter.setCurPos(position);
-                                adapter.notifyDataSetChanged();
-                                bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
-                                curRefPos = adapter.getCurPos();
-                            }
-                        });
-                        adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                adapter.setCurPos(position);
-                                alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
-                                        "Add Remarks",
-                                        "SAVE", null, "CANCEL", cancelCallback);
-                                BounceView.addAnimTo(alertDialogRemarks);
-                            }
-                        });
-                        list_view.setAdapter(adapter);
-                    } else {
-                        Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
-                    }
+                    showItems(llOrderRs);
 //                } catch (JSONException e) {
 //                    Toast.makeText(ctx, "Error fetching offline items", Toast.LENGTH_SHORT).show();
 //                }
@@ -350,7 +333,68 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
     }
 
+    private Integer refQtyOrFree = 0;
+    private void showItems(LinkedList<Order> llOrderRs) {
+        if (llOrderRs.size() > 0) {
+            curRefArrayList = new LinkedList<Order>();
+            for (int i = 0; i < llOrderRs.size(); i++) {
+                Order ol = llOrderRs.get(i);
+                if (SharedData.getInstance(ctx).getInt(SharedKey.SKU_VALIDATION.getKey()) == 1) {
+                    if (!ol.getOldSku().equals("null") && !ol.getOldSku().equals("0")) {
+                        curRefArrayList.add(ol);
+                    }
+                } else {
+                    curRefArrayList.add(ol);
+                }
+            }
+
+            adapter = new OrderlistAdapter(ctx, curRefArrayList);
+            adapter.setCurPos(curRefPos);
+            adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position, int flag) {
+                    adapter.setCurPos(position);
+                    adapter.notifyDataSetChanged();
+                    curRefPos = adapter.getCurPos();
+                    Helper.hideSoftKeyboard(getActivity());
+                    refQtyOrFree = flag;
+                    new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                            }
+                        }, 300
+                    );
+                }
+            });
+            adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    adapter.setCurPos(position);
+                    alertDialogRemarks = okCancelInputRemarksDialogBuilder(ctx,
+                            "Add Remarks",
+                            "SAVE", null, "CANCEL", cancelCallback);
+                    BounceView.addAnimTo(alertDialogRemarks);
+                }
+            });
+            list_view.setAdapter(adapter);
+
+            recomputeGrandTotal();
+        } else {
+            Toast.makeText(ctx, "Error fetching items", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void initViews(View v) {
+        btn_view = (MaterialRippleLayout) v.findViewById(R.id.btn_view);
+        llet_search = (LinearLayout) v.findViewById(R.id.llet_search);
+        ll_search = (LinearLayout) v.findViewById(R.id.ll_search);
+        ll_closesearch = (LinearLayout) v.findViewById(R.id.ll_closesearch);
+        btn_closesearch = (MaterialRippleLayout) v.findViewById(R.id.btn_closesearch);
+        btn_search = (MaterialRippleLayout) v.findViewById(R.id.btn_search);
+        btn_setzero = (MaterialRippleLayout) v.findViewById(R.id.btn_setzero);
         btn_refresh = (MaterialRippleLayout) v.findViewById(R.id.btn_refresh);
         btn_others = (MaterialRippleLayout) v.findViewById(R.id.btn_others);
         btn_add_item = (MaterialRippleLayout) v.findViewById(R.id.btn_add_item);
@@ -359,6 +403,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tv_name.setText(refMenulist.getCustomerName());
         rl_content_box = (CoordinatorLayout) v.findViewById(R.id.content_box);
         et_date = (EditText) v.findViewById(R.id.et_date);
+        et_search = (EditText) v.findViewById(R.id.et_search);
         btn_menu  = (MaterialRippleLayout) v.findViewById(R.id.btn_menu);
         tv_header_price = (TextView) v.findViewById(R.id.tv_header_price);
         tv_header_total = (TextView) v.findViewById(R.id.tv_header_total);
@@ -387,7 +432,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         tv_grandtotal = (TextView) v.findViewById(R.id.tv_grandtotal);
         tv_grandtotal_lbl = (TextView) v.findViewById(R.id.tv_grandtotal_lbl);
 
-        if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+        if (!Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//        if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
             ((RelativeLayout) v.findViewById(R.id.rl_back_box)).setVisibility(View.GONE);
             tv_grandtotal_lbl.setText("Count Total:");
             tv_header_price.setVisibility(View.GONE);
@@ -405,6 +451,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             tv_header_price.setVisibility(View.VISIBLE);
             tv_header_total.setVisibility(View.VISIBLE);
         } */
+
+        tv_hdr_freeitem = (TextView) v.findViewById(R.id.tv_hdr_freeitem);
+        if (SharedData.getInstance(ctx).getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
+            tv_hdr_freeitem.setVisibility(View.GONE);
+        } else {
+            tv_hdr_freeitem.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initListeners(View v) {
@@ -417,6 +470,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        callCloseSearch();
                         bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
                         showDatePicker();
                     }
@@ -425,6 +479,10 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         });
         et_remarks.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
+                et_search.setText("");
+                llet_search.setVisibility(View.GONE);
+                ll_search.setVisibility(View.VISIBLE);
+                ll_closesearch.setVisibility(View.GONE);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -462,6 +520,50 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             }
         });
 
+        btn_view.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+
+                LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
+                    .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
+                        new String[] { "%" }, " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+                ArrayList<HashMap> refArray = new ArrayList();
+                if (llOrderRs.size() > 0) {
+                    Boolean errFlag = false, zeroErrFlag = true;
+                    for (int i = 0; i < llOrderRs.size(); i++) {
+                        Order rowOl = llOrderRs.get(i);
+                        if(!rowOl.getQuantity().equals("") && !rowOl.getQuantity().equals("0")) {
+                            LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
+                            String rqty = rowOl.getQuantity().equals("") ? "0" : rowOl.getQuantity();
+                            rqty = rqty.replace(",", "");
+                            if (!rqty.equals("0")) { zeroErrFlag = false; }
+                            detailMap.put("quantity", rqty);
+                            detailMap.put("free", rowOl.getFree());
+                            detailMap.put("item_recid", rowOl.getItemRecid());
+                            detailMap.put("remarks", rowOl.getRemarks());
+                            detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
+                            detailMap.put("selling_price", rowOl.getSellingPrice());
+                            String rtotal = rowOl.getTotal().replace(",", "");
+                            detailMap.put("total", rtotal);
+                            detailMap.put("unitName", rowOl.getUnitName());
+                            detailMap.put("itemname", rowOl.getItemName());
+                            detailMap.put("is_checked", false);
+                            detailMap.put("is_error", false);
+                            detailMap.put("is_locked", false);
+                            refArray.add(detailMap);
+                        }
+                    }
+                }
+
+                DialogFragment dialogFrag = TrasactionItemsFragment.searchInstance();
+                Bundle args = new Bundle();
+                args.putString("details", new JSONArray(refArray).toString());
+                dialogFrag.setArguments(args);
+                dialogFrag.setTargetFragment(thisFragment, ITEM_DIALOG_FRAGMENT);
+                dialogFrag.setCancelable(false);
+                dialogFrag.show(getActivity().getSupportFragmentManager(), "dialog_search_item");
+            }
+        });
+
         pageMenu.setOnClick(new DroppyClickCallbackInterface() {
             @Override
             public void call(View v, int id) {
@@ -493,50 +595,197 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
         btn_submit.setOnClickListener(new View.OnClickListener() {
             public final void onClick(final View v) {
-
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
-                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
-                        BounceView.addAnimTo( Helper.okDialog(ctx,
-                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                            null, false) );
-                        return;
-                    }
-                } else {
-                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
-                        BounceView.addAnimTo( Helper.okDialog(ctx,
-                                "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
-                                null, false) );
-                        return;
-                    }
-                }
-
-                if (oldskuerr == true) {
-                    String strSkuMsg = "";
-                    for (int i = 0; i < curRefArrayListErr.size(); i++) {
-                        Order rowRl = curRefArrayListErr.get(i);
-                        String refCnt = String.valueOf(i+1);
-                        strSkuMsg = strSkuMsg + "\n " + refCnt + ". " + rowRl.getItemName();
-                    }
-                    BounceView.addAnimTo( Helper.okDialog(ctx,
-                        "Warning","Some items does not have reference SKU, please contact the developer for assistance.\n" + strSkuMsg, "OK",
-                        null, false) );
-
-                    return;
-                }
-
                 Helper.hideSoftKeyboard(getActivity());
+
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isPosted) {
+                                isPosted = true;
+                                et_search.setText("");
+                                llet_search.setVisibility(View.GONE);
+                                ll_search.setVisibility(View.VISIBLE);
+                                ll_closesearch.setVisibility(View.GONE);
+
+                                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
+                                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-1") || sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
+                                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                            null, false) );
+                                        isPosted = false;
+                                        return;
+                                    }
+                                } else {
+                                    if (sp.getData(SharedKey.REF_EMP_NO.getKey()).equals("-2")) {
+                                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                                            "Error","Your account is not valid to process this request. Please contact IT support.", "CLOSE",
+                                            null, false) );
+                                        isPosted = false;
+                                        return;
+                                    }
+                                }
+
+                                loader = Helper.showSpinnerDialog(ctx, "", "Please wait..."); loader.show();
+                                LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                                showItems(llOrderRs);
+
+                                new android.os.Handler().postDelayed(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            isPosted = false;
+                                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                            Helper.dismissSpinnerDialog(loader);
+                                            callSubmit();
+                                        }
+                                    }, 500
+                                );
+                            }
+                        }
+                    }, 300
+                );
+
+            }
+        });
+
+        btn_refresh.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                callRefreshItems();
+            }
+        });
+
+        btn_setzero.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                callSetZero();
+            }
+        });
+
+        btn_others.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                DialogFragment dialogFrag = OtherItemFragment.searchInstance();
+                dialogFrag.setTargetFragment(thisFragment, OTHER_ITEMS_DIALOG_FRAGMENT);
+                dialogFrag.setCancelable(false);
+                dialogFrag.show(getActivity().getSupportFragmentManager(), "other_item");
+            }
+        });
+
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                llet_search.setVisibility(View.VISIBLE);
+                ll_search.setVisibility(View.GONE);
+                ll_closesearch.setVisibility(View.VISIBLE);
+                Helper.hideSoftKeyboard(getActivity());
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        }
+                    }, 300
+                );
+            }
+        });
+
+        btn_closesearch.setOnClickListener(new View.OnClickListener() {
+            public final void onClick(final View v) {
+                callCloseSearch();
+            }
+        });
+
+        et_search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    Log.v("zcv", et_search.getText().toString().trim());
+                    LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
+                            .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
+                                    new String[] { "%" + et_search.getText().toString().trim() + "%" },
+                                    " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+                    showItems(llOrderRs);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        et_search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(final Editable s) {
+                if (mx_taskrun) { mx_handler.removeCallbacks(mx_runnable); }
+
+                mx_handler = new Handler();
+                mx_runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        String searchStr = s.toString().trim().equals("") ? "noitem" : s.toString() ;
+                        Log.d("dsx", searchStr);
+
+                        LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx)
+                                .searchOrderFilterMultiple(OrderKey.ITEM_NAME.getKey() + " LIKE ?",
+                                        new String[] { "%" + et_search.getText().toString().trim() + "%" },
+                                        " ORDER BY " +  OrderKey.ITEM_NAME.getKey() + " ASC" );
+                        showItems(llOrderRs);
+                        mx_taskrun = false;
+                    }
+                };
+                mx_taskrun = mx_handler.postDelayed(mx_runnable, 700);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        });
+    }
+
+    private void callCloseSearch() {
+        et_search.setText("");
+        llet_search.setVisibility(View.GONE);
+        ll_search.setVisibility(View.VISIBLE);
+        ll_closesearch.setVisibility(View.GONE);
+        Helper.hideSoftKeyboard(getActivity());
+        new android.os.Handler().postDelayed(
+            new Runnable() {
+                @Override
+                public void run() {
+                    LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                    showItems(llOrderRs);
+                    bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                }
+            }, 300
+        );
+    }
+
+    private void callSubmit() {
+
+        if (oldskuerr == true) {
+            String strSkuMsg = "";
+            for (int i = 0; i < curRefArrayListErr.size(); i++) {
+                Order rowRl = curRefArrayListErr.get(i);
+                String refCnt = String.valueOf(i+1);
+                strSkuMsg = strSkuMsg + "\n " + refCnt + ". " + rowRl.getItemName();
+            }
+            BounceView.addAnimTo( Helper.okDialog(ctx,
+                    "Warning","Some items does not have reference SKU, please contact the developer for assistance.\n" + strSkuMsg, "OK",
+                    null, false) );
+
+            return;
+        }
+
+        Helper.hideSoftKeyboard(getActivity());
 
 //                LinkedList<Order> ol =  DcOrder.getInstance(ctx).getOrderlistAsc();
 //                final ArrayList<HashMap> detailsArrayList = new ArrayList();
-                if(curRefArrayList.size() > 0) {
-                    Boolean errFlag = false;
-                    for (int i = 0; i < curRefArrayList.size(); i++) {
-                        Order rowRl = curRefArrayList.get(i);
-                        if(rowRl.getQuantity().equals("")) {
+        if(curRefArrayList.size() > 0) {
+            Boolean errFlag = false;
+            for (int i = 0; i < curRefArrayList.size(); i++) {
+                Order rowRl = curRefArrayList.get(i);
+                if(rowRl.getQuantity().equals("")) {
 //                            if(rowRl.getRemarks().equals("") || rowRl.getRemarks().equals("null")) {
-                                errFlag = true;
+                    errFlag = true;
 //                            errFlag = false;
-                                curRefArrayList.get(i).setIsError(1);
+                    curRefArrayList.get(i).setIsError(1);
 //                            curRefArrayList.get(i).setIsError(false);
 //                            curRefArrayList.get(i).setQuantity("0");
 
@@ -553,91 +802,85 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //                            TextView tvTotal = (TextView) trx.getChildAt(4);
 //                            tvTotal.setTextColor(getResources().getColor(R.color.red_2));
 //                            }
-                        }else{
-                            curRefArrayList.get(i).setIsError(0);
-                        }
-                    }
-
-                    if (errFlag) {
-                        Helper.dismissSpinnerDialog(loader);
-                        adapter.notifyDataSetChanged();
-//                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
-                        BounceView.addAnimTo( Helper.okDialog(ctx,
-                                "Error","Please set 0 value on EMPTY quantity.", "OK",
-                                null, false) );
-                    } else {
-                        if (refStringDate == null) {
-//                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
-                            BounceView.addAnimTo( Helper.okDialog(ctx,
-                                "Error","Please select delivery date.", "OK",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (alertDialog != null) alertDialog.dismiss();
-                                        Helper.hideSoftKeyboard(getActivity());
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
-                                                showDatePicker();
-                                            }
-                                        }, 300);
-                                    }
-                                }
-                                , false
-                            ) );
-                        } else {
-                            AlertDialog.Builder builder;
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
-                            } else {
-                                builder = new AlertDialog.Builder(ctx);
-                            }
-                            builder.setCancelable(false);
-                            BounceView.addAnimTo(
-                                builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if(!isPosted) {
-                                            isPosted = true;
-                                            submitOrders();
-                                        }
-                                    }
-                                })
-                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        isPosted = false;
-                                    }
-                                })
-                                .show()
-                            );
-                        }
-                    }
                 }else{
-//                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
-                    BounceView.addAnimTo( Helper.okDialog(ctx,
-                            "Error","Please add an item.", "CLOSE",
-                            null, false) );
+                    curRefArrayList.get(i).setIsError(0);
                 }
             }
-        });
 
-        btn_refresh.setOnClickListener(new View.OnClickListener() {
-            public final void onClick(final View v) {
-                callRefreshItems();
+            if (errFlag) {
+                Helper.dismissSpinnerDialog(loader);
+                adapter.notifyDataSetChanged();
+//                        Toast.makeText(ctx, "Please check 0 or empty quantity.", Toast.LENGTH_LONG).show();
+                BounceView.addAnimTo( Helper.okDialog(ctx,
+                    "Error","Please set 0 value on EMPTY quantity.", "OK",
+                    null, false) );
+            } else {
+                if (refStringDate == null) {
+//                            Toast.makeText(ctx, "Please select delivery date.", Toast.LENGTH_LONG).show();
+                    BounceView.addAnimTo( Helper.okDialog(ctx,
+                        "Error","Please select delivery date.", "OK",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (alertDialog != null) alertDialog.dismiss();
+                                Helper.hideSoftKeyboard(getActivity());
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bsBh.setState(BottomSheetBehavior.STATE_HIDDEN);
+                                        showDatePicker();
+                                    }
+                                }, 300);
+                            }
+                        }
+                        , false
+                    ) );
+                } else {
+                    if(!isPosted) {
+                        isPosted = true;
+                        if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
+                            submitOrders();
+                        } else {
+                            getReportType();
+                        }
+                    }
+                }
             }
-        });
+        }else{
+//                    Toast.makeText(ctx, "Please add an item.", Toast.LENGTH_LONG).show();
+            BounceView.addAnimTo( Helper.okDialog(ctx,
+                "Error","Please add an item.", "CLOSE",
+                null, false) );
+        }
+    }
 
-        btn_others.setOnClickListener(new View.OnClickListener() {
-            public final void onClick(final View v) {
-                DialogFragment dialogFrag = OtherItemFragment.searchInstance();
-                dialogFrag.setTargetFragment(thisFragment, OTHER_ITEMS_DIALOG_FRAGMENT);
-                dialogFrag.setCancelable(false);
-                dialogFrag.show(getActivity().getSupportFragmentManager(), "other_item");
-            }
-        });
+    private void callSetZero() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        } else {
+            builder = new AlertDialog.Builder(ctx);
+        }
+        builder.setCancelable(false);
+
+        BounceView.addAnimTo(
+            builder.setTitle("Set Zero Update").setMessage("Are you sure you want all empty quantities turn to ZERO?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DcOrder.getInstance(ctx).updateSetAllQuantity("0", "quantity == ''");
+                        LinkedList<Order> llOrderRs = DcOrder.getInstance(ctx).getOrderlist();
+                        showItems(llOrderRs);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        isPosted = false;
+                    }
+                })
+                .show()
+        );
     }
 
     private void callRefreshItems() {
@@ -650,7 +893,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         builder.setCancelable(false);
 
         BounceView.addAnimTo(
-            builder.setTitle("Update Records").setMessage("Are you sure want to UPDATE PRELOADED list? All ITEMS BELOW will RESET.")
+            builder.setTitle("Update Records").setMessage("Are you sure you want to UPDATE PRELOADED list? All ITEMS BELOW will RESET.")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -707,6 +950,75 @@ public class OrderFragment extends Fragment implements VolleyCallback {
         }
     };
 
+    private void validateToPost() {
+        isPosted = false;
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        } else {
+            builder = new AlertDialog.Builder(ctx);
+        }
+        builder.setCancelable(false);
+        BounceView.addAnimTo( builder.setTitle("Post Transaction").setMessage("Are you sure want to post this transaction?")
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(!isPosted) {
+                        isPosted = true;
+                        submitOrders();
+                    }
+                }
+            })
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    isPosted = false;
+                    Helper.dismissSpinnerDialog(loader);
+                }
+            })
+            .show()
+        );
+        new android.os.Handler().postDelayed( new Runnable() { public void run() { isPosted = false; }}, 500 );
+    }
+
+    private String reportType = "0";
+    private void getReportType() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ctx, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        } else {
+            builder = new AlertDialog.Builder(ctx);
+        }
+        builder.setCancelable(false);
+        BounceView.addAnimTo(
+            builder.setTitle("Report Type Option").setMessage("Please select REPORT TYPE.")
+            .setPositiveButton("SALES INVOICE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (!isPosted) {
+                        isPosted = true;
+                        reportType = "1";
+                        dialog.dismiss();
+                        validateToPost();
+                    }
+                }
+            })
+            .setNegativeButton("DELIVERY RECEIPT", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (!isPosted) {
+                        isPosted = true;
+                        reportType = "0";
+                        dialog.dismiss();
+                        validateToPost();
+                    }
+                }
+            })
+            .show()
+        );
+        new android.os.Handler().postDelayed( new Runnable() { public void run() { isPosted = false; }}, 500 );
+    }
+
     private Boolean isPosted = false;
     private void submitOrders() {
         VolleyInteractor vi = new VolleyInteractor();
@@ -729,6 +1041,9 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     rqty = rqty.replace(",", "");
                     if (!rqty.equals("0")) { zeroErrFlag = false; }
                     detailMap.put("quantity", rqty);
+                    String rfqty = rowOl.getFree().equals("") ? "0" : rowOl.getFree();
+                    rfqty = rfqty.replace(",", "");
+                    detailMap.put("free", rfqty);
                     detailMap.put("item_recid", rowOl.getItemRecid());
                     detailMap.put("remarks", rowOl.getRemarks());
                     detailMap.put("old_sku", rowOl.getOldSku().equals("null") ? "0" : rowOl.getOldSku());
@@ -768,7 +1083,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 headersMap.put("customer_integ_recid", refMenulist.getCustomerIntegrationId());
                 headersMap.put("deliver_date", refStringDate);
                 headersMap.put("remarks", et_remarks.getText().toString().trim());
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
                     headersMap.put("createdby", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     headersMap.put("createdby", sp.getData(SharedKey.EMP_NO.getKey()));
@@ -776,13 +1091,15 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 String android_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
                 headersMap.put("pcortab_id", android_id);
 
-                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                     headersMap.put("order_type", "1"); // int (customer order: 1 / store order: 2)
                 } else {
                     headersMap.put("order_type", "2"); // int (customer order: 1 / store order: 2)
                 }
+                headersMap.put("report_type", reportType );
 //                headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     headersMap.put("reference_employee_no", sp.getData(SharedKey.EMP_NO.getKey()));
@@ -800,14 +1117,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 ol.setCustomerName(refMenulist.getCustomerName());
                 ol.setDeliveryDate(refStringDate);
 //                ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
                     ol.setCreatedBy(sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     ol.setCreatedBy(sp.getData(SharedKey.EMP_NO.getKey()));
                 }
                 ol.setRemarks(et_remarks.getText().toString().trim());
 //                ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
-                if (sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                if (sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == 1) {
                     ol.setReferenceEmployeeNo(sp.getData(SharedKey.REF_EMP_NO.getKey()));
                 } else {
                     ol.setReferenceEmployeeNo(sp.getData(SharedKey.EMP_NO.getKey()));
@@ -832,7 +1149,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
                 Helper.dismissSpinnerDialog(loader);
 
-                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+                if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                if(Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") || Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
                     loader = Helper.showSpinnerDialog(ctx, "Posting Transaction", "Please wait..."); loader.show();
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -893,7 +1211,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         Itemlist irsx = new Itemlist();
-                        irsx.setRecid(rowObj.getInt(ItemlistKey.RECID.getKey()));
+                        irsx.setRecid(rowObj.getLong(ItemlistKey.RECID.getKey()));
                         irsx.setItemName(rowObj.getString(ItemlistKey.ITEM_NAME_WITH_UNIT.getKey()));
                         irsx.setDept(rowObj.getString(ItemlistKey.DEPT.getKey()));
                         irsx.setUnitName(rowObj.getString(ItemlistKey.UNIT.getKey()));
@@ -915,6 +1233,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     for(Itemlist il : iRs) {
                         Order ol = new Order();
                         ol.setQuantity("");
+                        ol.setFree("");
                         ol.setItemRecid(String.valueOf(il.getRecid()));
                         ol.setItemName(String.valueOf(il.getItemName()));
                         ol.setUnitName(String.valueOf(il.getUnitName()));
@@ -926,18 +1245,14 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setIsChecked(0);
                         ol.setIsError(0);
                         ol.setIsLocked(1);
-//                        if(sp.getData(SharedKey.DATABASE.getKey()).equals(sp.getData(SharedKey.REF_DATABASE.getKey()).trim())) {
 
-                        if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
+                        if (SharedData.getInstance(ctx).getInt(SharedKey.SKU_VALIDATION.getKey()) == 1) {
                             if (!il.getOldSku().equals("null") && !il.getOldSku().equals("0")) {
                                 curRefArrayList.add(ol);
                             }
                         } else {
                             curRefArrayList.add(ol);
                         }
-//                        } else {
-//                            curRefArrayList.add(ol);
-//                        }
                         DcOrder.getInstance(ctx).insertOrderlist(ol);
 
                         // get preloaded
@@ -964,11 +1279,20 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                     adapter.setCurPos(curRefPos);
                     adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
                         @Override
-                        public void onItemClick(View view,  int position) {
+                        public void onItemClick(View view,  int position, int flag) {
                             adapter.setCurPos(position);
                             adapter.notifyDataSetChanged();
-                            bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
                             curRefPos = adapter.getCurPos();
+                            Helper.hideSoftKeyboard(getActivity());
+                            refQtyOrFree = flag;
+                            new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                    }
+                                }, 300
+                            );
                         }
                     });
                     adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
@@ -997,8 +1321,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                             null, false) );
                     } */
 
-                    if (SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()).equals(ServerConstants.CN)) {
-                        LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" });
+                    if (SharedData.getInstance(ctx).getInt(SharedKey.SKU_VALIDATION.getKey()) == 1) {
+                        LinkedList<Order> olRs = DcOrder.getInstance(ctx).searchOrderFilterMultiple(OrderKey.OLD_SKU.getKey() + " = ?", new String[] { "null" }, "");
                         if (olRs.size() > 0) {
                             ((LinearLayout) rootView.findViewById(R.id.btn_others_box)).setVisibility(View.VISIBLE);
                             String strSkuMsg = "";
@@ -1062,14 +1386,19 @@ public class OrderFragment extends Fragment implements VolleyCallback {
             case ITEM_DIALOG_FRAGMENT:
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle extras = data.getExtras();
-
                     curRefPos = adapter != null ? adapter.getCurPos() : -1 ;
-
                     ArrayList<Itemlist> arrayList = new ArrayList<Itemlist>();
                     arrayList = (ArrayList) extras.get(SharedKey.SEARCHED_ITEMS.getKey());
+                    int errFlag = 0; String refItems = ""; int refItemNo = 0;
+
                     for(Itemlist il : arrayList){
+                        LinkedList<Order> xRs = DcOrder.getInstance(ctx)
+                            .searchOrderFilterMultiple(OrderKey.ITEM_RECID.getKey() + " = ?",
+                                    new String[] { String.valueOf(il.getRecid()) }, "");
+
                         Order ol = new Order();
                         ol.setQuantity("");
+                        ol.setFree("");
                         ol.setItemRecid(String.valueOf(il.getRecid()));
                         ol.setItemName(String.valueOf(il.getItemName()));
                         ol.setUnitName(String.valueOf(il.getUnitName()));
@@ -1081,19 +1410,43 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         ol.setIsChecked(0);
                         ol.setIsError(0);
                         ol.setIsLocked(0);
-                        curRefArrayList.add(ol);
-                        DcOrder.getInstance(ctx).insertOrderlist(ol);
+
+                        if (xRs.size() > 0 ) {
+                            errFlag = 1;
+                            refItemNo++;
+                            refItems = refItems + refItemNo + ". " + ol.getItemName() + "\n";
+                        } else {
+                            curRefArrayList.add(ol);
+                            DcOrder.getInstance(ctx).insertOrderlist(ol);
+                        }
+                    }
+
+                    if (errFlag == 1) {
+                        String strMessage = "Some ITEM/s is/are ALREADY EXISTING on the list.\"" +
+                            "\n\nITEM NAME:\n" + refItems + "\n\n NOTE: Please also CHECK CONFLICTED ITEM/s.";
+                        BounceView.addAnimTo( Helper.okDialog(ctx,
+                            "Reminder on some ITEM/s",strMessage, "CLOSE",
+                            null, false) );
                     }
 
                     adapter = new OrderlistAdapter(ctx, curRefArrayList);
                     adapter.setCurPos(curRefPos);
                     adapter.setOnItemClickListener(new OrderlistAdapter.OnItemClickListener() {
                         @Override
-                        public void onItemClick(View view,  int position) {
+                        public void onItemClick(View view,  int position, int flag) {
                             adapter.setCurPos(position);
                             adapter.notifyDataSetChanged();
-                            bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                            Helper.hideSoftKeyboard(getActivity());
                             curRefPos = adapter.getCurPos();
+                            refQtyOrFree = flag;
+                            new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        bsBh.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                    }
+                                }, 300
+                            );
                         }
                     });
                     adapter.setOnRemarksClickListener(new OrderlistAdapter.OnRemarksClickListener() {
@@ -1101,8 +1454,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         public void onItemClick(View view,  int position) {
                             adapter.setCurPos(position);
                             alertDialogRemarks =  okCancelInputRemarksDialogBuilder(ctx,
-                                    "Add Remarks",
-                                    "Save", null, "Cancel", cancelCallback );
+                                "Add Remarks",
+                                "Save", null, "Cancel", cancelCallback );
                             BounceView.addAnimTo(alertDialogRemarks);
                         }
                     });
@@ -1335,7 +1688,11 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                 if (refStr.length() > 0) {
                     refStr = refStr.substring(0, refStr.length() - 1);
                 }
-                ol.setQuantity(refStr);
+                if (refQtyOrFree == 0) {
+                    ol.setQuantity(refStr);
+                } else {
+                    ol.setFree(refStr);
+                }
                 adapter.notifyDataSetChanged();
                 recomputeTally("");
             }
@@ -1350,7 +1707,13 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 
     private void recomputeTally(String val) {
         Order ol =  curRefArrayList.get(adapter.getCurPos());
-        String refStr = ol.getQuantity();
+
+        String refStr = "";
+        if (refQtyOrFree == 0) {
+            refStr = ol.getQuantity();
+        } else {
+            refStr = ol.getFree();
+        }
         double u_price = Double.parseDouble(ol.getSellingPrice());
 
         /*TableRow trx = (TableRow) tblContentBox.findViewById(calcRefId);
@@ -1412,45 +1775,62 @@ public class OrderFragment extends Fragment implements VolleyCallback {
 //                refStr = strSplit[0] + ".";
 //            }
 //        }
-        ol.setQuantity(refStr);
+        if (refQtyOrFree == 0) {
+            ol.setQuantity(refStr);
+        } else {
+            ol.setFree(refStr);
+        }
 
         refStr = refStr.replace(",", "");
         refStr = refStr.equals("") ? "0" : refStr ;
         double u_quantity = Double.parseDouble(refStr);
         double u_total = u_quantity * u_price;
-        if(u_total == 0.0) {
-            ol.setTotal("0.00");
-        }else{
-            DecimalFormat df2 = new DecimalFormat("#,###,###.00");
-            ol.setTotal(df2.format(u_total));
+        if (refQtyOrFree == 0) {
+            if(u_total == 0.0) {
+                ol.setTotal("0.00");
+            }else{
+                DecimalFormat df2 = new DecimalFormat("#,###,###.00");
+                ol.setTotal(df2.format(u_total));
+            }
         }
-        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.QUANTITY, ol.getQuantity());
-        DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.TOTAL, ol.getTotal());
+
+        if (refQtyOrFree == 0) {
+            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.QUANTITY, ol.getQuantity());
+            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.TOTAL, ol.getTotal());
+        } else {
+            DcOrder.getInstance(ctx).updateOrderlist(ol.getItemRecid(), OrderKey.FREE, ol.getFree());
+        }
 
         adapter.notifyDataSetChanged();
 
         // recompute grand total
-        LinkedList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
-        if(refOS.size() > 0) {
-            double gt = 0.00, ct = 0.00;
-            for (int i = 0; i < refOS.size(); i++) {
-                Order olx = refOS.get(i);
-                String refCountTotal = String.valueOf(olx.getQuantity().trim()).replace(",", "");
-                ct = refCountTotal.equals("") || refCountTotal.equals("null") ? ct + 0.0 : ct + Double.parseDouble(refCountTotal) ;
-                String refTotal = String.valueOf(olx.getTotal().trim()).replace(",", "");
-                gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
-            }
-            DecimalFormat df = new DecimalFormat("#,###,###.00");
-            if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
-//            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
-                tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
-            } else {
-                tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
-            }
-        } else {
-            tv_grandtotal.setText("0.00");
-        }
+        recomputeGrandTotal();
+    }
 
+    private void recomputeGrandTotal() {
+        if (refQtyOrFree == 0) {
+            LinkedList<Order> refOS = curRefArrayList; //DcOrder.getInstance(ctx).getOrderlistAsc();
+            if(refOS.size() > 0) {
+                double gt = 0.00, ct = 0.00;
+                for (int i = 0; i < refOS.size(); i++) {
+                    Order olx = refOS.get(i);
+                    String refCountTotal = String.valueOf(olx.getQuantity().trim()).replace(",", "");
+                    ct = refCountTotal.equals("") || refCountTotal.equals("null") ? ct + 0.0 : ct + Double.parseDouble(refCountTotal) ;
+                    String refTotal = String.valueOf(olx.getTotal().trim()).replace(",", "");
+                    gt = refTotal.equals("") || refTotal.equals("null") ? gt + 0.0 : gt + Double.parseDouble(refTotal) ;
+                }
+                DecimalFormat df = new DecimalFormat("#,###,###.00");
+                if (!Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+//                if(!Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Commissary") && !Helper.checkBranchProfile(ctx).get(0).getDescription().equals("Main")) {
+    //            if (SharedData.getInstance(getContext()).getData(SharedKey.DATABASE.getKey()).equals(SharedData.getInstance(getContext()).getData(SharedKey.REF_DATABASE.getKey()).trim())) {
+                    tv_grandtotal.setText(df.format(ct).equals(".00") ? "0.00" : df.format(ct));
+                } else {
+                    tv_grandtotal.setText(df.format(gt).equals(".00") ? "0.00" : df.format(gt));
+                }
+            } else {
+                tv_grandtotal.setText("0.00");
+            }
+        }
     }
 
     private void showMenuPopup(View v) {
@@ -1509,8 +1889,8 @@ public class OrderFragment extends Fragment implements VolleyCallback {
     }
 
     private AlertDialog okCancelInputRemarksDialogBuilder(final Context activity, String message,
-                                                          String okButtonCaption, View.OnClickListener onClickListener,
-                                                          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
+          String okButtonCaption, View.OnClickListener onClickListener,
+          String cancelButtonCaption, View.OnClickListener cancelClickListener) {
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = inflater.inflate(R.layout.custom_ok_input_remarks_dialog, null);
@@ -1601,26 +1981,25 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         try {
                             JSONObject obj = new JSONObject(response);
                             if (obj.length() > 0) {
-                                DcStaffs.getInstance(ctx).emptyStaffslist();
-                                Helper.insertDefaultStaffs(ctx);
                                 JSONArray sArr = obj.getJSONArray("staff");
                                 if (sArr.length() > 0) {
                                     for (int i = 0; i < sArr.length(); i++) {
                                         JSONObject rowObj = sArr.getJSONObject(i);
                                         aStaffs sl = new aStaffs(
-                                                rowObj.getInt("empId"),
-                                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                                rowObj.getString("empNo"),
-                                                rowObj.getString("Email"),
-                                                rowObj.getString("name"),
-                                                rowObj.getInt("Branch"),
-                                                rowObj.getInt("Jobtitle"),
-                                                rowObj.getString("pass"),
-                                                rowObj.getString("active"),
-                                                rowObj.getString("ismobileadmin")
+                                            rowObj.getLong("empId"),
+                                            rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                            rowObj.getString("empNo"),
+                                            rowObj.getString("Email"),
+                                            rowObj.getString("name"),
+                                            rowObj.getLong("Branch"),
+                                            rowObj.getLong("Jobtitle"),
+                                            rowObj.getString("pass"),
+                                            rowObj.getString("active"),
+                                            rowObj.getString("ismobileadmin")
                                         );
                                         DcStaffs.getInstance(ctx).insertStaffs(sl);
                                     }
+                                    Helper.insertDefaultStaffs(ctx);
                                 }
                                 loadAdminJobTitles();
                             } else {
@@ -1761,7 +2140,7 @@ public class OrderFragment extends Fragment implements VolleyCallback {
                         JSONObject rowObj = objArr.getJSONObject(i);
                         aItemlist ail = new aItemlist(
                             String.valueOf(rowObj.getString(aItemlistKey.INTEGRATION_RECID.getKey())),
-                            rowObj.getInt(aItemlistKey.RECID.getKey()),
+                            rowObj.getLong(aItemlistKey.RECID.getKey()),
                             String.valueOf(rowObj.getString(aItemlistKey.OLD_SKU.getKey())),
                             rowObj.getInt(aItemlistKey.BASEUNIT_RECID.getKey()),
                             rowObj.getDouble(aItemlistKey.BASEUNIT_QTY.getKey()),

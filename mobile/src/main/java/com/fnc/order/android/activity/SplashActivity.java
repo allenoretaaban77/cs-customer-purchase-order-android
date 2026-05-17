@@ -10,9 +10,12 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,7 @@ import com.android.volley.VolleyError;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.BaseActivity;
 import com.fnc.order.android.callback.VolleyCallback;
+import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.R;
 import com.fnc.order.android.database.DbConstants;
@@ -45,6 +49,12 @@ import com.fnc.order.android.services.OrdersService;
 import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 import com.fnc.order.android.utilities.VolleyInteractor;
+import com.google.api.core.NanoClock;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import org.json.JSONArray;
@@ -52,6 +62,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -59,10 +71,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import hari.bounceview.BounceView;
+import io.opencensus.resource.Resource;
 
 import static com.fnc.order.android.database.DBHelper.DBPath;
 
-public class SplashActivity extends BaseActivity implements VolleyCallback {
+public class SplashActivity extends BaseActivity {
 
     private Context ctx;
     private SharedData sp;
@@ -87,33 +100,27 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ctx = this;
-
         setContentView(R.layout.activity_splash);
 
         sp = SharedData.getInstance(ctx);
-        if(sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-        }
-        if(sp.getData(SharedKey.REF_DATABASE.getKey()).trim().equals("")) {
-            sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
-        }
+        if(sp.getData(SharedKey.DEFAULT_DOMAIN_SERVER_URL.getKey()).trim().equals("")) sp.saveData(SharedKey.DEFAULT_DOMAIN_SERVER_URL.getKey(), ServerConstants.DEFAULT_SERVER_URL);
+        if(sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()).trim().equals("")) sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "");
+        if(sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()).trim().equals("")) sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), "");
+        if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASE.getKey(), "");
+        if(sp.getData(SharedKey.DATABASEID.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASEID.getKey(), "");
+        if(sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), "");
+        if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
+        if(sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), 1);
+        if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
+        if(sp.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), 0);
 
-//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), ServerConstants.SERVER_URL);
-//        sp.saveData(SharedKey.REF_DATABASE.getKey(), ServerConstants.CN);
-//        sp.saveData(SharedKey.DATABASE.getKey(), ServerConstants.CN);
-//        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), "http://beta.apics.fncnathaniel.com/");
-//        sp.saveData(SharedKey.REF_DATABASE.getKey(), "massive");
-//        sp.saveData(SharedKey.DATABASE.getKey(), "massive");
+        if(sp.getData(SharedKey.SUPPORT_USER.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_USER.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), "");
+        if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), "");
 
-        if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) {
-            sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
-        }
-        if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) {
-            sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
-        }
-        if(sp.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == -1) {
-            sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), 0);
-        }
+        Log.d("asasa", android.os.Build.MODEL);
 
         TedPermission.with(ctx).setPermissionListener(new PermissionListener() {
             @Override
@@ -141,7 +148,6 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         return;
                     }
 
-                    String strRefDeviceImei = Helper.getImei(ctx);
                     startProcedure();
                 } catch(SecurityException e) {
                     e.printStackTrace();
@@ -176,7 +182,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         "Username", "Password", "Branch",
                         "SUBMIT", new View.OnClickListener() {
                             public void onClick(View v) {
-                                clientSignin();
+                                loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
+                                clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
+                                    ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
                             }
                         }, "", null, 0
                 );
@@ -192,11 +200,26 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 alertRequireInternet();
             }
         } else {
-            String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
-            if (strImeiId.equals("")) {
-                getDeviceProfile("init");
+//            sp.removeSinglePref(SharedKey.DATABASEID.getKey());
+            if(sp.getData(SharedKey.DATABASEID.getKey()).equals("")) {
+                loader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); loader.show();
+                clientSignin(String.valueOf(sp.getData(SharedKey.REF_ADMIN_USER.getKey())), String.valueOf(sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey())));
             } else {
-                proceedNormal();
+                LinkedList<aBranchlist> abl = DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
+                        aBranchlistKey.DEVICEID.getKey() + " = ? ", new String[] { Helper.getImei(ctx, "") });
+                if (abl.size() > 0 ) {
+                    if (abl.get(0).getActive().equals("false")) {
+                        getDeviceProfile("init");
+                    } else {
+                        if (abl.get(0).getBranchid() == 12345) {
+                            showBranchDialog("reinit");
+                        } else {
+                            proceedNormal();
+                        }
+                    }
+                } else {
+                    getDeviceProfile("init");
+                }
             }
         }
     }
@@ -204,39 +227,13 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     private AlertDialog alertdialogBL;
     private void showBranchDialog(final String type) {
         if (type.equals("init") || type.equals("reinit")) {
-            alertdialogBL = actionDialog( ctx, "ASSIGN BRANCH",
+            alertdialogBL = actionDialog( ctx, "Assign Branch",
                     getString(R.string.branch_dialog_message),
                     "Username", "Password", "Branch",
                     "SUBMIT", new View.OnClickListener() {
                         public void onClick(View v) {
                             if (!refSelectedBranchId.equals("")) {
-                                LinkedList<aBranchlist> abl =
-                                        DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                                                aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                                                new String[] { refSelectedBranchId, Helper.getImei(ctx) }
-                                        );
-                                if (abl.size() > 0) {
-                                    int flgx = 0;
-                                    aBranchlist ab = null;
-                                    for (int i = 0; i < abl.size(); i++) {
-                                        ab = abl.get(i);
-                                        if(ab.getActive().equals("true")) {
-                                            flgx = 1;
-                                        }
-                                    }
-                                    if (flgx == 1) {
-                                        loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
-                                        sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
-                                        sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                        sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchcode()));
-                                        sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
-                                        getPreRequisite();
-                                    } else {
-                                        postBranchImei();
-                                    }
-                                } else {
-                                    postBranchImei();
-                                }
+                                postBranchImei();
                             } else {
                                 Toast.makeText(ctx, "Please select a branch.", Toast.LENGTH_SHORT).show();
                             }
@@ -267,7 +264,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     private LinkedList<aBranchlist> arrBranches = new LinkedList<>();
     private Spinner msBranches;
     private TextView tvBranchdescription;
-    private String refSelectedBranchId;
+    private String refSelectedBranchId = "";
     private void loadSpinnerBranches() {
         if(tvBranchdescription != null) tvBranchdescription.setText("Select branch....");
         refSelectedBranchId = "";
@@ -276,7 +273,7 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             ArrayList<String> refAbx = DcBranchlist.getInstance(ctx).getDescriptions();
             arrBranches = new LinkedList<>();
             if (refAbx.size() > 0) {
-                aBranchlist abr = new aBranchlist(0, "Select branch....",
+                aBranchlist abr = new aBranchlist(0L, "Select branch....",
                         "", "","", "", "", "", "");
                 arrBranches.add(abr);
                 for(int k=0; k<refAbx.size(); k++){
@@ -353,12 +350,23 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
             it.remove();
         }
         VolleyInteractor vipr = new VolleyInteractor();
-        vipr.registerCallback(this);
+        vipr.registerCallback(new VolleyCallback() {
+            @Override
+            public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+            @Override
+            public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+        });
         vipr.getPreRequisite(ctx, params,
                 strParams.replaceAll(" ", "%20"));
     }
 
     private void proceedNormal() {
+        if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()))) {
+            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+        } else {
+            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+        }
+
         LinkedList<aStaffs> sl = DcStaffs.getInstance(ctx).getStaffs();
         if (sl.size() > 0) {
             Helper.dismissSpinnerDialog(loader);
@@ -374,42 +382,56 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
     }
 
-    private void clientSignin() {
-        String strUsername = ((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString();
-        String strPassword = ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString();
+    private void clientSignin(String strUsername, String strPassword) {
 //        strUsername = "admin@backoffice.com"; strPassword = "admin123";
-//        String strBranch = ((EditText) alertDialog.findViewById(R.id.et_edittext3)).getText().toString();
+        if (Helper.isNetworkAvailable(this)) {
+            if(strUsername.matches("")){
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Error","Please enter username.", "CLOSE",
+                        null, false) ); return;
+            }
+            if(strPassword.matches("")){
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Error","Please enter password.", "CLOSE",
+                        null, false) ); return;
+            }
 
-        if(strUsername.matches("")){
-            BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Error","Please enter username.", "CLOSE",
-                    null, false) ); return;
-        }
-        if(strPassword.matches("")){
-            BounceView.addAnimTo( Helper.okDialog( ctx,
-                    "Error","Please enter password.", "CLOSE",
-                    null, false) ); return;
-        }
+            HashMap<String, String> params = new HashMap<>();
+            params.put("logdb", ServerConstants.LOGDB);
+            params.put("userid", strUsername);
+            params.put("pass", strPassword);
+            VolleyInteractor vil = new VolleyInteractor();
+            vil.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+                @Override
+                public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+            });
+            vil.login(ctx, params, "");
 
-        loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
-        HashMap<String, String> params = new HashMap<>();
-        params.put("logdb", ServerConstants.LOGDB);
-        params.put("userid", strUsername);
-        params.put("pass", strPassword);
-        VolleyInteractor vil = new VolleyInteractor();
-        vil.registerCallback(this);
-        vil.login(ctx, params, "");
-    }
-
-    private void alertRequireInternet() {
-        BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Initialization Error","This app requires internet to initialize.  Please check your connection.",
-                "CLOSE", new DialogInterface.OnClickListener() {
+        } else {
+            Helper.dismissSpinnerDialog(loader);
+            BounceView.addAnimTo( Helper.okDialog(ctx,
+                "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
+                new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finishAndRemoveTask();
                     }
-                }, false) );
+                }, false)
+            );
+        }
+    }
+
+    private void alertRequireInternet() {
+        BounceView.addAnimTo( Helper.okDialog( ctx,
+            "Initialization Error","This app requires internet to initialize.  Please check your connection.",
+            "CLOSE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAndRemoveTask();
+                }
+            }, false) );
     }
 
     private void showActivity(final Class<?> cls) {
@@ -427,50 +449,41 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         super.onResume();
     }
 
-    public void onRequestSuccess(final String response, final String type) {
-        if (type.equals("getpostbranchimei")) {
-            if (response.toLowerCase().equals("true")) {
-                getDeviceProfile("reinit");
-            } else {
-                BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Device Registration","Registration failed. Please contact IT support.",
-                        "CLOSE", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finishAndRemoveTask();
-                            }
-                        }, false) );
-            }
-        }
+    private void volleyRequestSuccess(final String response, final String type) {
+//    public void onRequestSuccess(final String response, final String type) {
         if (type.equals("login")) {
             try {
                 JSONObject obj = new JSONObject(response);
+                Helper.dismissSpinnerDialog(loader);
                 if (obj.getString("dtcompany").equals("[]")) {
-                    Helper.dismissSpinnerDialog(loader);
                     BounceView.addAnimTo( Helper.okDialog( ctx,
+                        "Initialization Error","Invalid credentials",
+                        "CLOSE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }, false)
+                    );
+                } else {
+                    JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
+                    JSONObject objx = new JSONObject(objArr.get(0).toString());
+                    if (objx.getString("DatabaseID").equals("")) {
+                        BounceView.addAnimTo( Helper.okDialog( ctx,
                             "Initialization Error","Invalid credentials",
                             "CLOSE", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                 }
-                            }, false) );
-                } else {
-                    JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
-                    JSONObject objx = new JSONObject(objArr.get(0).toString());
-                    if (objx.getString("DatabaseID").equals("")) {
-                        Helper.dismissSpinnerDialog(loader);
-                        BounceView.addAnimTo( Helper.okDialog( ctx,
-                                "Initialization Error","Invalid credentials",
-                                "CLOSE", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }, false) );
+                            }, false)
+                        );
                     } else {
-                        alertDialog.dismiss();
-                        String strCN = "";
+                        if(alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
+                        g_jsonobject = obj;
+                        new checkAppConfig().execute(objx.getString("DatabaseID"));
+
+                        /*String strCN = "";
                         if (objx.getString("DatabaseID").equals("BackofficeLive")) {
                             sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
                             sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
@@ -507,7 +520,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         } else {
                             proceedNormal();
                         }
-                        loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+
+                        loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show(); */
                     }
                 }
             } catch (JSONException e) {
@@ -523,86 +537,142 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                         }, false) );
             }
         }
+        if (type.equals("getpostbranchimei")) {
+            if (response.toLowerCase().equals("true")) {
+                getDeviceProfile("reinit");
+            } else {
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                    "Device Registration","Registration failed. Please contact IT support.",
+                    "CLOSE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finishAndRemoveTask();
+                        }
+                    }, false) );
+            }
+        }
         if (type.contains("getdeviceprofile|")) {
+            final String[] strRef = type.split("\\|");
             Helper.dismissSpinnerDialog(loader);
             if (response.equals("[]")) {
-                alertReferenceBranchesNotFound();
+                if (strRef[1].equals("init")) {
+                    alertReferenceBranchesNotFound();
+                } else {
+                    alertDeviceNotAddedToServer(new String[] {"getdeviceprofile","postbranch"});
+                }
             } else {
-                final String[] strRef = type.split("\\|");
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             JSONArray objArr = new JSONArray(response);
                             if (objArr.length() > 0) {
+
                                 DcBranchlist.getInstance(ctx).emptyBranchlist();
                                 for (int i = 0; i < objArr.length(); i++) {
                                     JSONObject rowObj = objArr.getJSONObject(i);
                                     aBranchlist br = new aBranchlist(
-                                            rowObj.getInt("branchid"),
-                                            rowObj.getString("branchcode").trim(),
-                                            rowObj.getString("deviceid"),
-                                            rowObj.getString("description").trim(),
-                                            rowObj.getString("deviceID1").trim(),
-                                            rowObj.getString("active").trim(),
-                                            rowObj.getString("customerID").trim(),
-                                            rowObj.getString("old_branchid").trim(),
-                                            rowObj.getString("old_customerid").trim()
+                                        rowObj.getLong("branchid"),
+                                        rowObj.getString("branchcode").trim(),
+                                        rowObj.getString("deviceid").trim(),
+                                        rowObj.getString("description").trim(),
+                                        rowObj.getString("deviceID1").trim(),
+                                        rowObj.getString("active").trim(),
+                                        rowObj.getString("customerID").trim(),
+                                        rowObj.getString("old_branchid").trim(),
+                                        rowObj.getString("old_customerid").trim()
                                     );
                                     DcBranchlist.getInstance(ctx).insertBranches(br);
                                 }
 
-                                if (strRef[1].equals("reinit")) {
-                                    LinkedList<aBranchlist> abl =
-//                                        DcBranchlist.getInstance(ctx).searchBranch(refSelectedBranchId, Helper.getImei(ctx));
-                                            DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                                                    aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                                                    new String[] { refSelectedBranchId, Helper.getImei(ctx) }
-                                            );
-                                    if (abl.size() > 0) {
-                                        int flgx = 0;
-                                        aBranchlist ab = null;
-                                        for (int i = 0; i < abl.size(); i++) {
-                                            ab = abl.get(i);
-                                            if(ab.getActive().equals("true")) {
-                                                flgx = 1;
-                                            }
-                                        }
-                                        if (flgx == 1) {
-                                            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
-                                            sp.saveData(SharedKey.IMEI_ID.getKey(), ab.getDeviceid());
-                                            sp.saveData(SharedKey.BRANCH_ID.getKey(), String.valueOf(ab.getBranchid()));
-                                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), String.valueOf(ab.getBranchcode()));
-                                            sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), String.valueOf(ab.getDescription()));
-                                            getPreRequisite();
+                                if (strRef[1].equals("init")) {
+                                    showBranchDialog("reinit");
+                                } else {
+                                    LinkedList<aBranchlist> ablRs = DcBranchlist.getInstance(ctx)
+                                        .searchBranchFilterMultiple(aBranchlistKey.DEVICEID.getKey()
+                                        + " = ?", new String[] { Helper.getImei(ctx, refSelectedBranchId) } );
+                                    if (ablRs.size() > 0) {
+                                        aBranchlist ablRsx = ablRs.get(0);
+                                        if (ablRsx.getActive().equals("false")) {
+                                            alertDeviceNotAddedToServer(new String[]{"", "postbranch"});
                                         } else {
-                                            BounceView.addAnimTo( Helper.okDialog( ctx,
-                                                    "Device Registration",
-                                                    "This device with ID# " + Helper.getImei(ctx) + " is NOT YET ACTIVATED. Please contact IT support",
-                                                    "OK", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            dialog.dismiss();
-                                                            showBranchDialog(strRef[1]);
-                                                        }
-                                                    }, false) );
+                                            sp.saveData(SharedKey.IMEI_ID.getKey(), ablRsx.getDeviceID1().trim());
+                                            sp.saveData(SharedKey.BRANCH_ID.getKey(), ablRsx.getBranchid().toString().trim());
+                                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), ablRsx.getBranchcode().trim());
+                                            sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ablRsx.getDescription().trim());
+
+                                            if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(ablRsx.getDescription().trim())) {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                            } else {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                            }
+
+                                            getPreRequisite();
                                         }
                                     } else {
-                                        BounceView.addAnimTo( Helper.okDialog( ctx,
-                                                "Device Registration",
-                                                "This device with ID# " + Helper.getImei(ctx) + " is NOT YET REGISTERED. Please contact IT support",
-                                                "OK", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                        showBranchDialog(strRef[1]);
-                                                    }
-                                                }, false) );
+                                        if (strRef[1].equals("init")) {
+                                            postBranchImei();
+                                        } else {
+                                            getPreRequisite();
+                                        }
+                                    }
+                                }
+
+                                /*if (strRef[1].equals("init") || strRef[1].equals("proceed")) {
+                                    LinkedList<aBranchlist> ablRs = DcBranchlist.getInstance(ctx)
+                                        .searchBranchFilterMultiple(aBranchlistKey.DEVICEID.getKey()
+                                        + " = ? AND " + aBranchlistKey.ACTIVE.getKey() + " = ?",
+                                        new String[] { Helper.getImei(ctx, refSelectedBranchId), "true" } );
+                                    if (ablRs.size() > 0) {
+                                        aBranchlist ablRsx = ablRs.get(0);
+                                        sp.saveData(SharedKey.IMEI_ID.getKey(), ablRsx.getDeviceID1().trim());
+                                        sp.saveData(SharedKey.BRANCH_ID.getKey(), ablRsx.getBranchid().toString().trim());
+                                        sp.saveData(SharedKey.BRANCH_CODE.getKey(), ablRsx.getBranchcode().trim());
+                                        sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ablRsx.getDescription().trim());
+
+                                        if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(ablRsx.getDescription().trim())) {
+                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                        } else {
+                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                        }
+
+                                        getPreRequisite();
+                                    } else {
+                                        if (strRef[1].equals("init")) {
+                                            postBranchImei();
+                                        } else {
+                                            getPreRequisite();
+                                        }
                                     }
                                 } else {
-                                    showBranchDialog(strRef[1]);
-                                }
+                                    JSONObject rowObj = objArr.getJSONObject(0);
+                                    if (rowObj.getString("active").trim().equals("false")) {
+                                        alertDeviceNotAddedToServer(new String[]{"", "postbranch"});
+                                    } else {
+                                        if (rowObj.getString("branchid").equals("12345")) { // TEST(1234) is not valid so select a valid branch
+                                            showBranchDialog("reinit");
+                                        } else {
+                                            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait...");
+                                            loader.show();
+                                            sp.saveData(SharedKey.IMEI_ID.getKey(), rowObj.getString("deviceid").trim());
+                                            sp.saveData(SharedKey.BRANCH_ID.getKey(), rowObj.getString("branchid").trim());
+                                            sp.saveData(SharedKey.BRANCH_CODE.getKey(), rowObj.getString("branchcode").trim());
+                                            sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), rowObj.getString("description").trim());
+
+                                            if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(rowObj.getString("description").trim())) {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                            } else {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                            }
+
+                                            DcBranchlist.getInstance(ctx).updateBranchlist(rowObj.getString("deviceid").trim(), aBranchlistKey.ACTIVE, "true");
+
+                                            getDeviceProfile("proceed");
+                                        }
+                                    }
+                                }*/
                             } else {
+                                Log.v("dsxtae", "4");
                                 alertReferenceBranchesNotFound();
                             }
                         } catch (JSONException e) {
@@ -618,40 +688,42 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 JSONObject obj = new JSONObject(response);
                 if (obj.length() > 0) {
                     DcStaffs.getInstance(ctx).emptyStaffslist();
-                    Helper.insertDefaultStaffs(ctx);
                     JSONArray sArr = obj.getJSONArray("staff");
                     if (sArr.length() > 0) {
                         for (int i = 0; i < sArr.length(); i++) {
                             JSONObject rowObj = sArr.getJSONObject(i);
                             aStaffs sl = new aStaffs(
-                                    rowObj.getInt("empId"),
-                                    rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
-                                    rowObj.getString("empNo"),
-                                    rowObj.getString("Email"),
-                                    rowObj.getString("name"),
-                                    rowObj.getInt("Branch"),
-                                    rowObj.getInt("Jobtitle"),
-                                    rowObj.getString("pass"),
-                                    rowObj.getString("active"),
-                                    rowObj.getString("ismobileadmin")
+                                rowObj.getLong("empId"),
+                                rowObj.getString("refempno").equals("null") ? "-1" : rowObj.getString("refempno"),
+                                rowObj.getString("empNo"),
+                                rowObj.getString("Email"),
+                                rowObj.getString("name"),
+                                rowObj.getLong("Branch"),
+                                rowObj.getLong("Jobtitle"),
+                                rowObj.getString("pass"),
+                                rowObj.getString("active"),
+                                rowObj.getString("ismobileadmin")
                             );
                             DcStaffs.getInstance(ctx).insertStaffs(sl);
                         }
                     }
-                    Helper.dismissSpinnerDialog(loader);
-                    if (alertdialogBL != null) alertdialogBL.dismiss();
-                    BounceView.addAnimTo( Helper.okDialog( ctx,
-                            "Initialization Success","You can now login using your registered account.",
-                            "OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    startActivity(new Intent(ctx, LoginActivity.class));
-                                    finish();
-                                }
-                            }, false) );
                 } else {
-                    alertDataSyncError();
+                    Helper.insertDefaultStaffs(ctx);
+//                    alertDataSyncError();
                 }
+
+                Helper.dismissSpinnerDialog(loader);
+                if (alertdialogBL != null) alertdialogBL.dismiss();
+                BounceView.addAnimTo( Helper.okDialog( ctx,
+                    "Initialization Success","You can now login using your registered account.",
+                    "OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(ctx, LoginActivity.class));
+                            finish();
+                        }
+                    }, false)
+                );
             } catch (JSONException e) {
                 alertDataSyncError();
                 e.printStackTrace();
@@ -659,7 +731,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         }
     }
 
-    public void onRequestFail(VolleyError response, String type){
+    private void volleyRequestFail(VolleyError response, String type){
+//    public void onRequestFail(VolleyError response, String type){
         alertDataSyncError();
         /*if (type.equals("login")) {
             BounceView.addAnimTo( Helper.okDialog( ctx,
@@ -694,9 +767,9 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     }
 
     private AlertDialog actionDialog(final Context activity, String title, String message,
-                                     String strLabel1, String strLabel2, String strLabel3, String okButtonCaption,
-                                     View.OnClickListener onClickListener, String cancelButtonCaption,
-                                     View.OnClickListener cancelClickListener, Integer flagType) {
+             String strLabel1, String strLabel2, String strLabel3, String okButtonCaption,
+             View.OnClickListener onClickListener, String cancelButtonCaption,
+             View.OnClickListener cancelClickListener, Integer flagType) {
 
         SharedData spx = SharedData.getInstance(this);
 
@@ -737,9 +810,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
         if (Helper.isNetworkAvailable(this)) {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
+//            params.put("deviceid", type.equals("init") || type.equals("proceed") ? "n/a" : Helper.getImei(ctx, ""));
             params.put("deviceid", "n/a");
-//            params.put("deviceid", Helper.getImei(ctx));
-//            params.put("deviceid", "353800100112222"); // timog
             Iterator it = params.entrySet().iterator();
             String strParams = "";
             while (it.hasNext()) {
@@ -748,8 +820,17 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 it.remove();
             }
             VolleyInteractor vidp = new VolleyInteractor();
-            vidp.registerCallback(this);
-            vidp.getDeviceProfile(ctx, params, strParams
+            vidp.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) {
+                    volleyRequestSuccess(response, type);
+                }
+                @Override
+                public void onRequestFail(VolleyError response, String type) {
+                    volleyRequestFail(response, type);
+                }
+            });
+            vidp.getDeviceProfile(getApplicationContext(), params, strParams
                     .replaceAll(" ", "%20"), type);
         } else {
             alertRequireInternet();
@@ -765,8 +846,8 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
 
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", sp.getData(SharedKey.DATABASE.getKey()));
-            params.put("branchid", refSelectedBranchId);
-            params.put("deviceid", Helper.getImei(ctx));
+            params.put("branchid", refSelectedBranchId.equals("") ? "12345" /*mother account*/ : refSelectedBranchId );
+            params.put("deviceid", Helper.getImei(ctx, refSelectedBranchId).trim());
             Iterator it = params.entrySet().iterator();
             String strParams = "";
             while (it.hasNext()) {
@@ -775,8 +856,13 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
                 it.remove();
             }
             VolleyInteractor viri = new VolleyInteractor();
-            viri.registerCallback(this);
-            viri.postBranchImei(ctx, params,
+            viri.registerCallback(new VolleyCallback() {
+                @Override
+                public void onRequestSuccess(final String response, String type) { volleyRequestSuccess(response, type); }
+                @Override
+                public void onRequestFail(VolleyError response, String type) { volleyRequestFail(response, type); }
+            });
+            viri.postBranchImei(getApplicationContext(), params,
                     strParams.replaceAll(" ", "%20"));
         } else {
             alertRequireInternet();
@@ -788,24 +874,149 @@ public class SplashActivity extends BaseActivity implements VolleyCallback {
     private void alertReferenceBranchesNotFound() {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Initialization Error","Reference branches not found, please contact IT support.",
-                "END APP", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
+            "Initialization Error","Reference branches not found, please contact IT support.",
+            "END APP", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAndRemoveTask();
+                }
+            }, false) );
+    }
+
+    private void alertDeviceNotAddedToServer(final String[] strRef) {
+        Log.d("dsximei", "alertDeviceNotAddedToServer");
+        BounceView.addAnimTo( Helper.okDialog( ctx,
+            "Device Registration",
+            "This device with ID# " + Helper.getImei(ctx, "") + " is NOT YET ACTIVATED. Please contact IT support",
+            "OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    if (strRef[0].equals("getdeviceprofile")) {
+                        showBranchDialog("reinit");
+                    } else {
+                        postBranchImei();
                     }
-                }, false) );
+                }
+            }, false)
+        );
     }
 
     private void alertDataSyncError() {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Data Sync Error","Data Sync Error, please contact IT support",
-                "CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
+            "Data Sync Error","Data Sync Error, please contact IT support",
+            "CLOSE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAndRemoveTask();
+                }
+            }, false) );
+    }
+
+
+    private JSONObject g_jsonobject;
+    private Storage storageinit;
+    private class checkAppConfig extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            String strDbID = params[0];
+            try {
+                InputStream ins = getResources().openRawResource(
+                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
+                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
+                storageinit = StorageOptions.newBuilder()
+                    .setCredentials(credentials).setClock(NanoClock.getDefaultClock())
+                    .setProjectId(GlobalConstants.GCP_PROJECTID).build().getService();
+                try {
+                    BlobId blobId = BlobId.of(GlobalConstants.GCP_REFERENCE, "config.log");
+                    Blob blob = storageinit.get(blobId);
+                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
+                    return "Success|" + new String(bytes, "UTF-8") + "|" + strDbID;
+                } catch (Exception e) {
+                    return "Error| exception = " + e.getLocalizedMessage();
+                }
+            } catch (IOException io) {
+                return "Error| io";
+            } catch (RuntimeException e) {
+                return "Error| io";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            String[] resMsg = result.split("\\|");
+            if (resMsg[0].equals("Success")) {
+                try {
+                    String strDatabaseId = resMsg[2];
+                    JSONArray objArr = new JSONArray(resMsg[1]);
+                    if (objArr.length() > 0) {
+                        Boolean isSuccess = false;
+                        for (int i = 0; i < objArr.length(); i++) {
+                            JSONObject rowObj = objArr.getJSONObject(i);
+                            if (rowObj.getString("database_id").equals(strDatabaseId)) {
+                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObj.getString("server_url"));
+                                sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObj.getString("local_url"));
+                                sp.saveData(SharedKey.DATABASE.getKey(), rowObj.getString("cn"));
+                                sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
+                                sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObj.getString("main_branch"));
+                                sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObj.getInt("old_sku_validation"));
+                                sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObj.getInt("reference_employee_validation"));
+                                sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObj.getInt("preload_items"));
+                                sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObj.getInt("saved_product_items"));
+                                sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
+                                sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
+                                sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
+                                sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
+                                sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), rowObj.getString("support_setup"));
+                                isSuccess = true;
+                            }
+                        }
+                        if (!isSuccess) {
+                            alertDataSyncError();
+                        } else {
+//                            Toast.makeText(ctx, "SUCCESS", Toast.LENGTH_SHORT).show();
+
+                            JSONArray objArrY = new JSONArray(g_jsonobject.getString("dtuser"));
+                            JSONObject objy = new JSONObject(objArrY.get(0).toString());
+                            sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
+                            sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
+                            String strFN = objy.getString("FirstName") + "|" +
+                                    objy.getString("MiddleName") + "|" +
+                                    objy.getString("LastName");
+                            String[] arrFN = strFN.split("\\|");
+                            if (arrFN.length > 0) {
+                                strFN = "";
+                                for (int k = 0; k < arrFN.length; k++) {
+                                    if (!String.valueOf(arrFN[k]).trim().equals(""))
+                                        strFN = strFN + arrFN[k] + " ";
+                                }
+                                sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
+                            }
+
+                            String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey());
+                            if (strImeiId.equals("")) {
+                                getDeviceProfile("init");
+                            } else {
+                                proceedNormal();
+                            }
+
+                            Helper.dismissSpinnerDialog(loader);
+                            loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
+                        }
+                    } else {
+                        alertDataSyncError();
                     }
-                }, false) );
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    alertDataSyncError();
+                }
+            } else {
+                alertDataSyncError();
+            }
+        }
+        @Override
+        protected void onPreExecute() { Log.d("gcpe", "Task Upload Starting"); }
+        @Override
+        protected void onProgressUpdate(Integer... values) { Log.d("gcpu", "Running " + + values[0]); }
     }
 }

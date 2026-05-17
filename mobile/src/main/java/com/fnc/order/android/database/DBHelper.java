@@ -12,6 +12,7 @@ import com.fnc.order.android.enumeration.UserslistKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
 import com.fnc.order.android.enumeration.aItemlistKey;
 import com.fnc.order.android.enumeration.aStaffsKey;
+import com.fnc.order.android.utilities.Helper;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -25,8 +26,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + File.separator;
 
     public DBHelper(Context context) {
-        super(context, DBPath + context.getPackageName() + File.separator + DbConstants.DB_NAME,
-                null, DbConstants.DB_VERSION);
+        super(context, Helper.getProjectPath(context) + DbConstants.DB_NAME, null, DbConstants.DB_VERSION);
     }
 
     @Override
@@ -49,6 +49,7 @@ public class DBHelper extends SQLiteOpenHelper {
     protected LinkedList<OrderKey> setOrderFields() {
         LinkedList<OrderKey> fields = new LinkedList<>();
         fields.add(OrderKey.QUANTITY);
+        fields.add(OrderKey.FREE);
         fields.add(OrderKey.ITEM_RECID);
         fields.add(OrderKey.ITEM_NAME);
         fields.add(OrderKey.UNIT_NAME);

@@ -4,6 +4,7 @@ import com.fnc.order.android.database.DataType;
 
 public enum OrderKey {
     QUANTITY("quantity", DataType.INTEGER),
+    FREE("free", DataType.INTEGER),
     ITEM_RECID("item_recid", DataType.INTEGER),
     ITEM_NAME("itemname", DataType.TEXT),
     UNIT_NAME("unitName", DataType.TEXT),

@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.daimajia.swipe.SwipeLayout;
 import com.fnc.order.android.R;
+import com.fnc.order.android.constants.GlobalConstants;
+import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.datacontroller.DcOrder;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.model.Itemlist;
@@ -39,7 +41,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
 
     private OrderlistAdapter.OnItemClickListener onListenerClickListener;
     public interface OnItemClickListener {
-        void onItemClick(View view, int actionId);
+        void onItemClick(View view, int actionId, int flag);
     }
     public void setOnItemClickListener(final OrderlistAdapter.OnItemClickListener onListenerClickListener) {
         this.onListenerClickListener = onListenerClickListener;
@@ -54,20 +56,16 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
     }
 
     private class ViewHolder {
-        private TextView cell_qty;
-        private TextView cell_description;
-        private TextView cell_price;
-        private TextView cell_total;
-        private TextView cell_unit;
+        private TextView cell_qty, cell_fqty, cell_description, cell_price, cell_total, cell_unit;
         private SwipeLayout swipeLayout;
-        private MaterialRippleLayout btn_delete;
-        private MaterialRippleLayout btn_remarks;
+        private MaterialRippleLayout btn_delete, btn_remarks;
         private LinearLayout item_box;
 
         public ViewHolder(View v) {
             swipeLayout = (SwipeLayout)v.findViewById(R.id.swipe_layout);
 
             cell_qty = (TextView) v.findViewById(R.id.cell_qty);
+            cell_fqty = (TextView) v.findViewById(R.id.cell_fqty);
             cell_description = (TextView) v.findViewById(R.id.cell_description);
             cell_price = (TextView) v.findViewById(R.id.cell_price);
             cell_total = (TextView) v.findViewById(R.id.cell_total);
@@ -98,43 +96,29 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
         }
 
         holder.cell_qty.setText(iRs.getQuantity());
-        /*if (iRs.getQuantity().equals("")) {
-            Log.d("TAGX", "1");
-            holder.cell_qty.setText(iRs.getQuantity());
-        } else {
-            String refQty = iRs.getQuantity();
-            DecimalFormat df = new DecimalFormat("#,###,###");
-            if (!refQty.contains(".")) {
-                Log.d("TAGX", "2");
-                int u_qty = Integer.parseInt(iRs.getQuantity());
-                holder.cell_qty.setText(String.valueOf(df.format(u_qty)));
-            } else {
-                String[] strSplit = refQty.split("\\.");
-                int isplit0 = Integer.parseInt(strSplit[0]);
-                if (strSplit.length > 1) {
-                    if (strSplit[1].length() > 1) {
-                        Log.d("TAGX", "4");
-                        double refD = Double.parseDouble(String.valueOf(isplit0) + "." + strSplit[1]);
-                        DecimalFormat dfd = new DecimalFormat("#,###,###.##");
-                        holder.cell_qty.setText(String.valueOf(dfd.format(refD)));
-                    } else {
-                        Log.d("TAGX", "5");
-                        holder.cell_qty.setText(String.valueOf(df.format(isplit0) + "." + strSplit[1]));
-                    }
-                } else {
-                    Log.d("TAGX", "6");
-                    holder.cell_qty.setText(String.valueOf(df.format(isplit0))+".");
-                }
-            }
-        }*/
         holder.cell_qty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 if (onListenerClickListener != null) {
-                    onListenerClickListener.onItemClick(v, position);
+                    onListenerClickListener.onItemClick(v, position, 0);
                 }
             }
         });
+
+        holder.cell_fqty.setText(iRs.getFree());
+        if (SharedData.getInstance(context).getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
+            holder.cell_fqty.setVisibility(View.GONE);
+        } else {
+            holder.cell_fqty.setVisibility(View.VISIBLE);
+            holder.cell_fqty.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    if (onListenerClickListener != null) {
+                        onListenerClickListener.onItemClick(v, position,1);
+                    }
+                }
+            });
+        }
 
         holder.cell_unit.setText(iRs.getUnitName());
 
@@ -171,19 +155,21 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             @Override
             public void onClick(final View v) {
                 if (onListenerClickListener != null) {
-                    onListenerClickListener.onItemClick(v, position);
+                    onListenerClickListener.onItemClick(v, position, 0);
                 }
             }
         });
 
         if (iRs.getOldSku().equals("null")) {
             holder.cell_qty.setTextColor(context.getResources().getColor(R.color.orange_2));
+            holder.cell_fqty.setTextColor(context.getResources().getColor(R.color.orange_2));
             holder.cell_unit.setTextColor(context.getResources().getColor(R.color.orange_2));
             holder.cell_description.setTextColor(context.getResources().getColor(R.color.orange_2));
             holder.cell_price.setTextColor(context.getResources().getColor(R.color.orange_2));
             holder.cell_total.setTextColor(context.getResources().getColor(R.color.orange_2));
         } else {
             holder.cell_qty.setTextColor(context.getResources().getColor(R.color.gray_8));
+            holder.cell_fqty.setTextColor(context.getResources().getColor(R.color.gray_8));
             holder.cell_unit.setTextColor(context.getResources().getColor(R.color.gray_8));
             holder.cell_description.setTextColor(context.getResources().getColor(R.color.gray_8));
             holder.cell_price.setTextColor(context.getResources().getColor(R.color.gray_8));
@@ -192,6 +178,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
 
         if (iRs.getIsError() == 1) {
             holder.cell_qty.setTextColor(context.getResources().getColor(R.color.red_2));
+            holder.cell_fqty.setTextColor(context.getResources().getColor(R.color.red_2));
             holder.cell_unit.setTextColor(context.getResources().getColor(R.color.red_2));
             holder.cell_description.setTextColor(context.getResources().getColor(R.color.red_2));
             holder.cell_price.setTextColor(context.getResources().getColor(R.color.red_2));
@@ -199,12 +186,14 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             if (this.curPos == position) {
                 holder.cell_qty.setTextColor(context.getResources().getColor(R.color.green_5));
                 holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
+                holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_total.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
             } else {
                 holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
+                holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
@@ -214,6 +203,7 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             if (this.curPos == position) {
                 holder.cell_qty.setTextColor(context.getResources().getColor(R.color.green_5));
                 holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_qty));
+                holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected_fqty));
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background_selected));
@@ -221,6 +211,8 @@ public class OrderlistAdapter extends ArrayAdapter<Order> {
             } else {
                 holder.cell_qty.setTextColor(context.getResources().getColor(R.color.black));
                 holder.cell_qty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
+                holder.cell_fqty.setTextColor(context.getResources().getColor(R.color.black));
+                holder.cell_fqty.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
                 holder.cell_unit.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
                 holder.cell_description.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));
                 holder.cell_price.setBackground(ContextCompat.getDrawable(context, R.drawable.cell_background));

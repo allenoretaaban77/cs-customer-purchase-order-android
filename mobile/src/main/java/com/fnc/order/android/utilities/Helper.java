@@ -19,6 +19,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
@@ -54,6 +55,7 @@ import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.API;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
+import com.fnc.order.android.enumeration.aStaffsKey;
 import com.fnc.order.android.fragment.CustomerFragment;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
@@ -95,6 +97,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -407,12 +410,23 @@ public class Helper {
         return SharedData.getInstance(ctx).getData(SharedKey.CURRENT_PAGE.getKey());
     }
 
-    public static String getImei(Context ctx) {
-//        return "353800100565635";
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            return getImeiNew(ctx); // + "70";
+    public static String getImei(Context ctx, String strBranchId) {
+        SharedData sp = SharedData.getInstance(ctx);
+        String strImeiId = sp.getData(SharedKey.IMEI_ID.getKey()), resStrImeiId = "";
+        if (strImeiId.equals("")) {
+            if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.P) {
+//                sp.saveData("ref_device_id", "CO-82EC1E7D-79EC-4D70-BCBC-E5AE06EE3C66");
+                sp.saveData("ref_device_id", "CO-" + UUID.randomUUID().toString().toUpperCase());
+                resStrImeiId = sp.getData("ref_device_id");
+            } else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.P || android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                resStrImeiId = getImeiNew(ctx).trim();
+            } else {
+                resStrImeiId = getImeiOld(ctx).trim();
+            }
+            sp.saveData(SharedKey.IMEI_ID.getKey(), resStrImeiId);
+            return resStrImeiId;
         } else {
-            return getImeiOld(ctx);
+            return strImeiId;
         }
     }
     @TargetApi(Build.VERSION_CODES.M)
@@ -478,34 +492,40 @@ public class Helper {
     }
 
     public static void insertDefaultStaffs(Context ctx) {
-        DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add dev
+        DcStaffs.getInstance(ctx).deleteStaffsViaId(SharedKey.SUPPORT_EMP_ID.getKey());
         DcStaffs.getInstance(ctx).insertStaffs(Helper.adminStaff(ctx)); // add admin
     }
 
     public static void updateAdministratorPassword(Context ctx) {
-        DcStaffs.getInstance(ctx).deleteStaffsViaId("1910454835");
-        DcStaffs.getInstance(ctx).insertStaffs(Helper.defaultStaff(ctx)); // add dev
+        /*SharedData sp = SharedData.getInstance(ctx);
+        aStaffsKey kArr[] = { aStaffsKey.EMPNO , aStaffsKey.PASS};
+        String[] vArr =  {  "", "" };
+        DcStaffs.getInstance(ctx).updateStaff(
+            aStaffsKey.EMPID.getKey(), sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
+
+        );*/
     }
 
     private static aStaffs defaultStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(1910454835, "-2", "administrator", "jparallag@fncnathaniel.com",
-            "IT Support", Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
-            1912072415, "P@ssw0rd" + Helper.getReqDate(0, ""),
+        aStaffs cs = new aStaffs(1910454835L, "-2", "administrator", "aoaban@nathaniels.com.ph",
+            "IT Support", Long.parseLong(sp.getData(SharedKey.BRANCH_ID.getKey())),
+            1912072415L, "P@ssw0rd" + Helper.getReqDate(0, ""),
             "true", "true");
         return cs;
     }
 
     private static aStaffs adminStaff(Context ctx) {
         SharedData sp = SharedData.getInstance(ctx);
-        aStaffs cs = new aStaffs(-777,
-                "-2",
-                sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
-                sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
-                sp.getData(SharedKey.REF_ADMIN_FULLNAME.getKey()),
-                Integer.parseInt(sp.getData(SharedKey.BRANCH_ID.getKey())),
-                1912072415, sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey()),
-                "true", "true");
+        aStaffs cs = new aStaffs(
+            Long.parseLong(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey())),
+            sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()),
+            sp.getData(SharedKey.SUPPORT_USER.getKey()),
+            sp.getData(SharedKey.REF_ADMIN_USER.getKey()),
+            sp.getData(SharedKey.REF_ADMIN_FULLNAME.getKey()),
+            Long.parseLong(sp.getData(SharedKey.BRANCH_ID.getKey())),
+            1912072415L, sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()),
+            "true", "true");
         return cs;
     }
 
@@ -557,8 +577,8 @@ public class Helper {
 
     public static LinkedList<aBranchlist> checkBranchProfile(Context ctx) {
         return DcBranchlist.getInstance(ctx).searchBranchFilterMultiple(
-                aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
-                new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx) }
+            aBranchlistKey.BRANCHID.getKey() + " = ? AND " + aBranchlistKey.DEVICEID.getKey() + " = ? ",
+            new String[] { SharedData.getInstance(ctx).getData(SharedKey.BRANCH_ID.getKey()), Helper.getImei(ctx, "") }
         );
     }
 
@@ -577,6 +597,19 @@ public class Helper {
     public static String getDateLongInteger() {
         Long dtLong = new Date().getTime();
         return String.valueOf(dtLong);
+    }
+
+    public static String getProjectPath(Context ctx) {
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.P) {
+            return ctx.getExternalFilesDir(null).toString() + File.separator;
+        } else {
+            return Environment.getExternalStorageDirectory().toString() + File.separator + "Android"
+                + File.separator + "data" + File.separator + ctx.getPackageName() + File.separator;
+        }
+    }
+
+    public static String getFilePath(Context ctx) {
+        return getProjectPath(ctx)  + "gcf" + File.separator;
     }
 
 }

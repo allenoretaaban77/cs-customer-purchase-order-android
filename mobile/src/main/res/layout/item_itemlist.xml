@@ -67,8 +67,24 @@
                 style="@style/tblCellTextView">
             </TextView>
             <TextView
-                android:textSize="15sp"
-                android:layout_width="100dp"
+                android:layout_width="50dp"
+                android:background="@color/transparent"
+                android:focusable="true"
+                android:maxLines="1"
+                android:fontFamily="@font/medium"
+                android:digits="1234567890."
+                android:inputType="numberDecimal"
+                android:textSize="19sp"
+                android:imeOptions="actionNext"
+                android:maxLength="10"
+                android:gravity="right|center_vertical"
+                android:id="@+id/cell_fqty"
+                android:layout_column="0"
+                style="@style/tblCellTextView">
+            </TextView>
+            <TextView
+                android:textSize="12sp"
+                android:layout_width="70dp"
                 android:paddingLeft="7dp"
                 android:gravity="center|center_vertical"
                 android:id="@+id/cell_unit"
