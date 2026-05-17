@@ -19,9 +19,11 @@ public class OrderedlistQueryBuilder {
         values.put(OrderedKey.JSON.getKey(), ordered.getJson());
         values.put(OrderedKey.JSON_COMPLETE.getKey(), ordered.getJsonComplete());
         values.put(OrderedKey.GRAND_TOTAL.getKey(), ordered.getGrandtotal());
+        values.put(OrderedKey.GRAND_TOTAL_CNT.getKey(), ordered.getGrandtotalcount());
         values.put(OrderedKey.DATETIME.getKey(), ordered.getDateTime());
         values.put(OrderedKey.STATUS.getKey(), ordered.getStatus());
         values.put(OrderedKey.REF_RECID.getKey(), ordered.getReferenceRecid());
+        values.put(OrderedKey.DELIVERY_DATE_DEFAULT.getKey(), ordered.getDeliver_date_default());
         return values;
     }
 }

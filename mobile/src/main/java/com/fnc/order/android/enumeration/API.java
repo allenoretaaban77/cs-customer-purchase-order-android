@@ -9,6 +9,7 @@ public enum API {
     GET_USERS("api/getCoUser"),
     GET_CUSTOMERS("api/getcoCustomerList"),
     GET_ITEMLIST("api/getcoItemlist"),
+    GET_ITEMLIST_SRP("api/postcoItemsrp"),
     GET_EMPLOYEES("api/getEmployeeByPosition"),
     GET_VERIFIED("api/getVerified_linkOldEmployeeNo"),
     POST_UPDATE_EMPLOYEE("api/updateRefEmployeeID"),

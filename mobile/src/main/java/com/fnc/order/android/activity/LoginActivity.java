@@ -136,14 +136,9 @@ public class LoginActivity extends BaseActivity {
         // massive
 //        usernameText.setText("office");
 //        passwordEText.setText("Office");
-
         // commi
 //        usernameText.setText("12105");
 //        passwordEText.setText("746265");
-
-        // og
-//        usernameText.setText("12350");
-//        passwordEText.setText("0114");
     }
 
     private void initListeners(){
@@ -265,19 +260,20 @@ public class LoginActivity extends BaseActivity {
         tvVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BounceView.addAnimTo(Helper.okCancelDialog(ctx, "Update App Config",
+                BounceView.addAnimTo(Helper.okDialog(ctx, "Update App Config",
                     "Device ID: " + sp.getData(SharedKey.IMEI_ID.getKey()) +
                     "\r\nClient Name: " + sp.getData(SharedKey.DATABASEID.getKey()) +
                     "\r\nClient Server: " + sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()) +
-                    "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()) +
-                    "\r\n\r\nThis will update system settings.  Are you sure you want to continue?",
-                    "Yes", new DialogInterface.OnClickListener() {
+                    "\r\nBranch Name: " + sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()),
+//                    "\r\n\r\nThis will update system settings.  Are you sure you want to continue?",
+                    /*"Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             updateloader = Helper.showSpinnerDialog(ctx, "", "Getting possible update... Please wait..."); updateloader.show();
                             clientSignin(String.valueOf(sp.getData(SharedKey.REF_ADMIN_USER.getKey())), String.valueOf(sp.getData(SharedKey.REF_ADMIN_PASSWORD.getKey())));
                         }
-                    }, "No", null, false)
+                    }, */
+                    "Close", null, false)
                 );
 
                 /*alertDialogSettingsAuth = actionDialog(ctx, "SETTINGS",
@@ -1339,7 +1335,7 @@ public class LoginActivity extends BaseActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
-            if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
+            if(sp.getInt(SharedKey.PER_AGENT_SETUP.getKey()) == 0) {
                 params.put("agentid", "");
             } else {
                 params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
@@ -1369,13 +1365,14 @@ public class LoginActivity extends BaseActivity {
                     DcMenulist.getInstance(ctx).emptyMenulist();
                     for (int i = 0; i < objArr.length(); i++) {
                         JSONObject obj = objArr.getJSONObject(i);
-                        MenuList mlList = new MenuList();
-                        mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
-                        mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
+
                         String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
-                        mlList.setCustomerName(strCustomerName);
-                        mlList.setRecordCount(0);
-                        mlList.setRemarks("");
+                        MenuList mlList = new MenuList(
+                            obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
+                            obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
+                            strCustomerName,
+                            "", 0, ""
+                        );
                         if (!strCustomerName.equals("")) {
                             if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
                                 mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
@@ -1384,6 +1381,7 @@ public class LoginActivity extends BaseActivity {
                             }
                             DcMenulist.getInstance(ctx).insertMenulist(mlList);
                         }
+
                     }
                 }
             } catch (JSONException e) {
@@ -1463,24 +1461,50 @@ public class LoginActivity extends BaseActivity {
                                         }, false) );
                                 }
 
-                                String referenceDate = rowObj.getString("debug_date");
-                                if (!referenceDate.equals("")) { new googleCloudUploadProc().execute(""); }
+                                String strConf = rowObj.getString("config");
+                                JSONArray objArrConf = new JSONArray(strConf);
+                                String strDatabaseId = sp.getData(SharedKey.DATABASEID.getKey());
+                                for (int j = 0; j < objArrConf.length(); j++) {
+                                    JSONObject rowObjConf = objArrConf.getJSONObject(j);
+                                    if (rowObjConf.getString("database_id").equals(strDatabaseId)) {
+                                        sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
+                                        sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
+                                        sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
+                                        sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
+                                        sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObjConf.getString("main_branch"));
+                                        sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObjConf.getInt("old_sku_validation"));
+                                        sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObjConf.getInt("reference_employee_validation"));
+                                        sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObjConf.getInt("preload_items"));
+                                        sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObjConf.getInt("saved_product_items"));
+                                        sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
+                                        sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
+                                        sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObjConf.getString("support_employee_id"));
+                                        sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObjConf.getString("support_ref_employee_id"));
+                                        sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), rowObjConf.getInt("show_price_column_on_order"));
+                                        sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), rowObjConf.getInt("show_total_column_on_order"));
+                                        sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), rowObjConf.getInt("show_free_column_on_order"));
+                                        sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), rowObjConf.getInt("compute_quantity_only"));
+                                        sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
+                                        sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
+                                        sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
 
-                                String referenceCN = rowObj.getString("domain_db");
-                                String referenceCNDefault = rowObj.getString("domain_db_default");
-                                String refCN = Helper.checkBranchProfile(ctx).get(0).getDescription();
-                                JSONArray objArrDB = new JSONArray(referenceCN);
-                                Boolean isSwitchedCN = false;
-                                if (objArrDB.length() > 0) {
-                                    for (int j = 0; j < objArrDB.length(); j++) {
-                                        JSONObject rowObjDB = objArrDB.getJSONObject(j);
-                                        if (rowObjDB.getString("cn").equals(refCN)) {
-                                            isSwitchedCN = true;
-                                            SharedData.getInstance(ctx).saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjDB.getString("domain"));
+                                        if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
+                                            sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
+                                            sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
+                                            sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
                                         }
-                                    }
-                                    if(!isSwitchedCN) {
-                                        SharedData.getInstance(ctx).saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), referenceCNDefault);
+
+                                        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+                                            if (Helper.getScrRatio(ctx) > 0.6) {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                            } else {
+                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                            }
+                                        } else {
+                                            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                        }
+
+                                        Helper.insertDefaultStaffs(ctx);
                                     }
                                 }
 
@@ -1508,281 +1532,12 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    private class googleCloudUploadProc extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                InputStream ins = getResources().openRawResource(
-                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
-                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
-                storageinit = StorageOptions.newBuilder()
-                    .setCredentials(credentials)
-                    .setClock(NanoClock.getDefaultClock())
-                    .setProjectId(GlobalConstants.GCP_PROJECTID)
-                    .build()
-                    .getService();
-
-                try {
-                    Blob blob = null;
-
-                    BlobId blobId = BlobId.of(GlobalConstants.GCP_BUCKET_TARGET_FOR_VERSION,
-                            "Ordered/" + Helper.getBranchCode(ctx) + "/" + Helper.getDateLongInteger() + ".txt");
-                    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").build();
-
-                    LinkedList<Ordered> aCRs = DcOrdered.getInstance(ctx).getOrderedlist();
-                    if (aCRs.size() >  0) {
-                        String uploadString = "";
-                        LinkedHashMap<String, Object> paramsArray = new LinkedHashMap();
-
-                        for (int hx = 0; hx < aCRs.size(); hx++) {
-                            Ordered aCRsx = aCRs.get(hx);
-                            LinkedHashMap<String, Object> detailMap = new LinkedHashMap();
-
-                            ArrayList<HashMap> detailsArrayList = new ArrayList();
-                            detailMap.put(OrderedKey.CUSTOMER_INTEG_RECID.getKey(), aCRsx.getCustomerIntegRecid());
-                            detailMap.put(OrderedKey.CUSTOMER_RECID.getKey(), aCRsx.getCustomerRecid());
-                            detailMap.put(OrderedKey.CUSTOMER_NAME.getKey(), aCRsx.getCustomerName());
-                            detailMap.put(OrderedKey.DELIVERY_DATE.getKey(), aCRsx.getDeliveryDate());
-                            detailMap.put(OrderedKey.CREATED_BY.getKey(), aCRsx.getCreatedBy());
-                            detailMap.put(OrderedKey.REMARKS.getKey(), aCRsx.getRemarks());
-                            detailMap.put(OrderedKey.REF_EMPLOYEE_NO.getKey(), aCRsx.getReferenceEmployeeNo());
-                            detailMap.put(OrderedKey.JSON.getKey(), aCRsx.getJson());
-                            detailMap.put(OrderedKey.JSON_COMPLETE.getKey(), aCRsx.getJsonComplete());
-                            detailMap.put(OrderedKey.GRAND_TOTAL.getKey(), aCRsx.getGrandtotal());
-                            detailMap.put(OrderedKey.DATETIME.getKey(), aCRsx.getDateTime());
-                            detailMap.put(OrderedKey.STATUS.getKey(), aCRsx.getStatus());
-                            detailMap.put(OrderedKey.REF_RECID.getKey(), aCRsx.getReferenceRecid());
-                            detailsArrayList.add(detailMap);
-
-                            paramsArray.put(String.valueOf(aCRsx.getReferenceRecid()), detailsArrayList);
-                        }
-
-                        uploadString = new JSONObject(paramsArray).toString();
-                        if (!uploadString.trim().equals("")) {
-                            blob = storageinit.create(blobInfo, uploadString.getBytes(UTF_8));
-                        }
-                    }
-                    return "Success: Upload reference = " + blob.getBlobId();
-                } catch (Exception e) {
-//                    DcChecklist.getInstance(getApplicationContext()).updateChecklistIsSent(checklistId, 2);
-                    return "Error: exception = " + e.getLocalizedMessage();
-                }
-            } catch (IOException io) {
-//                DcChecklist.getInstance(getApplicationContext()).updateChecklistIsSent(checklistId, 2);
-                return "Error: io";
-            }
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d("dsxs gcp",  result);
-        }
-        @Override
-        protected void onPreExecute() {
-            Log.d("dsxs gcpe", "Task Upload Starting");
-        }
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            Log.d("dsxs gcpu", "Running " + + values[0]);
-        }
-    }
-
-    private JSONObject g_jsonobject;
-    private class checkAppConfig extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            String strDbID = params[0];
-            try {
-                InputStream ins = getResources().openRawResource(
-                        getResources().getIdentifier(GlobalConstants.GCP_CREDENTIAL, "raw", ctx.getPackageName()));
-                GoogleCredentials credentials = GoogleCredentials.fromStream(ins);
-                storageinit = StorageOptions.newBuilder()
-                        .setCredentials(credentials).setClock(NanoClock.getDefaultClock())
-                        .setProjectId(GlobalConstants.GCP_PROJECTID).build().getService();
-                try {
-                    BlobId blobId = BlobId.of(GlobalConstants.GCP_REFERENCE, "config.log");
-                    Blob blob = storageinit.get(blobId);
-                    byte[] bytes =  blob.getContent(Blob.BlobSourceOption.generationMatch());
-                    return "Success|" + new String(bytes, "UTF-8") + "|" + strDbID;
-                } catch (Exception e) {
-                    return "Error| exception = " + e.getLocalizedMessage();
-                }
-            } catch (IOException io) {
-                return "Error| io";
-            } catch (RuntimeException e) {
-                return "Error| io";
-            }
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            String[] resMsg = result.split("\\|");
-            if (resMsg[0].equals("Success")) {
-                try {
-                    String strDatabaseId = resMsg[2];
-                    JSONArray objArr = new JSONArray(resMsg[1]);
-                    if (objArr.length() > 0) {
-                        Boolean isSuccess = false;
-                        for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject rowObj = objArr.getJSONObject(i);
-                            if (rowObj.getString("database_id").equals(strDatabaseId)) {
-                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObj.getString("server_url"));
-                                sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObj.getString("local_url"));
-                                sp.saveData(SharedKey.DATABASE.getKey(), rowObj.getString("cn"));
-                                sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
-                                sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObj.getString("main_branch"));
-                                sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObj.getInt("old_sku_validation"));
-                                sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObj.getInt("reference_employee_validation"));
-                                sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObj.getInt("preload_items"));
-                                sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObj.getInt("saved_product_items"));
-                                sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
-                                sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
-                                sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
-                                sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
-                                sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), rowObj.getString("support_setup"));
-                                isSuccess = true;
-                                Helper.insertDefaultStaffs(ctx);
-                            }
-                        }
-                        if (!isSuccess) {
-                            alertDataSyncError();
-                        } else {
-//                            Toast.makeText(ctx, "SUCCESS", Toast.LENGTH_SHORT).show();
-
-                            JSONArray objArrY = new JSONArray(g_jsonobject.getString("dtuser"));
-                            JSONObject objy = new JSONObject(objArrY.get(0).toString());
-                            sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
-                            sp.saveData(SharedKey.REF_ADMIN_PASSWORD.getKey(), objy.getString("Password"));
-                            String strFN = objy.getString("FirstName") + "|" +
-                                    objy.getString("MiddleName") + "|" +
-                                    objy.getString("LastName");
-                            String[] arrFN = strFN.split("\\|");
-                            if (arrFN.length > 0) {
-                                strFN = "";
-                                for (int k = 0; k < arrFN.length; k++) {
-                                    if (!String.valueOf(arrFN[k]).trim().equals(""))
-                                        strFN = strFN + arrFN[k] + " ";
-                                }
-                                sp.saveData(SharedKey.REF_ADMIN_FULLNAME.getKey(), strFN.trim());
-                            }
-
-                            if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()))) {
-                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
-                            } else {
-                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
-                            }
-
-                            if (updateloader == null & updateloader.isShowing()) updateloader.dismiss();
-                            Toast.makeText(ctx, "Update success!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        alertDataSyncError();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    alertDataSyncError();
-                }
-            } else {
-                alertDataSyncError();
-            }
-        }
-        @Override
-        protected void onPreExecute() { Log.d("gcpe", "Task Upload Starting"); }
-        @Override
-        protected void onProgressUpdate(Integer... values) { Log.d("gcpu", "Running " + + values[0]); }
-    }
-
     private void alertDataSyncError() {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
             "Data Sync Error","Data Sync Error, please contact IT support",
             "CLOSE", null, false)
         );
-    }
-
-    private void clientSignin(String strUsername, String strPassword) {
-//        strUsername = "admin@backoffice.com"; strPassword = "admin123";
-        if (Helper.isNetworkAvailable(this)) {
-            if(strUsername.matches("")){
-                BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Error","Please enter username.", "CLOSE",
-                        null, false) ); return;
-            }
-            if(strPassword.matches("")){
-                BounceView.addAnimTo( Helper.okDialog( ctx,
-                        "Error","Please enter password.", "CLOSE",
-                        null, false) ); return;
-            }
-
-            HashMap<String, String> params = new HashMap<>();
-            params.put("logdb", ServerConstants.LOGDB);
-            params.put("userid", strUsername);
-            params.put("pass", strPassword);
-            VolleyInteractor vil = new VolleyInteractor();
-            vil.registerCallback(new VolleyCallback() {
-                @Override
-                public void onRequestSuccess(final String response, String type) {
-                    if (type.equals("login")) {
-                        Helper.dismissSpinnerDialog(updateloader);
-                        try {
-                            JSONObject obj = new JSONObject(response);
-                            if (obj.getString("dtcompany").equals("[]")) {
-                                BounceView.addAnimTo( Helper.okDialog( ctx,
-                                    "Initialization Error","Invalid credentials",
-                                    "CLOSE", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    }, false)
-                                );
-                            } else {
-                                JSONArray objArr = new JSONArray(obj.getString("dtcompany"));
-                                JSONObject objx = new JSONObject(objArr.get(0).toString());
-                                if (objx.getString("DatabaseID").equals("")) {
-                                    BounceView.addAnimTo( Helper.okDialog( ctx,
-                                        "Initialization Error","Invalid credentials",
-                                        "CLOSE", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }, false)
-                                    );
-                                } else {
-                                    g_jsonobject = obj;
-                                    new checkAppConfig().execute(objx.getString("DatabaseID"));
-                                }
-                            }
-                        } catch (JSONException e) {
-                            BounceView.addAnimTo( Helper.okDialog( ctx,
-                                "Initialization Error","Invalid credentials",
-                                "CLOSE", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        alertDialog.show();
-                                    }
-                                }, false)
-                            );
-                        }
-                    }
-                }
-                @Override
-                public void onRequestFail(VolleyError response, String type) { alertDataSyncError(); }
-            });
-            vil.login(ctx, params, "");
-
-        } else {
-            Helper.dismissSpinnerDialog(loader);
-            BounceView.addAnimTo( Helper.okDialog(ctx,
-                    "Error on Internet Connection","This update requires live data.  Please check your connection!", "CLOSE",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finishAndRemoveTask();
-                        }
-                    }, false)
-            );
-        }
     }
 }
 

@@ -1,6 +1,7 @@
 package com.fnc.order.android.adapters;
 
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import com.balysv.materialripple.MaterialRippleLayout;
 import com.fnc.order.android.R;
 import com.fnc.order.android.enumeration.SharedKey;
+import com.fnc.order.android.utilities.Helper;
 import com.fnc.order.android.utilities.SharedData;
 
 import org.w3c.dom.Text;
@@ -63,6 +65,11 @@ public class AlphaGridAdapter extends BaseAdapter {
         }
 
         vh.tv_alpha.setText(alphaStringArray.get(position));
+        if (Helper.getScrRatio(ctx) > 0.6) {
+            vh.tv_alpha.setTextSize(TypedValue.COMPLEX_UNIT_SP, 85);
+        } else {
+            vh.tv_alpha.setTextSize(TypedValue.COMPLEX_UNIT_SP, 67);
+        }
         vh.mrl_box.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(final View v){

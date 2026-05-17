@@ -474,7 +474,7 @@
 
                                 <TextView
                                     style="@style/tblCellTextViewHeader"
-                                    android:layout_width="100dp"
+                                    android:layout_width="90dp"
                                     android:layout_column="0"
                                     android:text="Quantity" />
 
@@ -604,12 +604,27 @@
                                             android:layout_margin="1dp"
                                             android:layout_height="match_parent"
                                             style="@style/tblCellTextViewHeader"
-                                            android:layout_width="120dp"
+                                            android:layout_width="80dp"
                                             android:layout_column="0"
                                             android:textSize="20sp"
-                                            android:text="Grand Total:" />
+                                            android:text="Total:" />
 
                                         <TextView
+                                            android:visibility="gone"
+                                            android:id="@+id/tv_grandtotal_count"
+                                            android:fontFamily="@font/medium"
+                                            android:textSize="23sp"
+                                            android:paddingLeft="10dp"
+                                            android:gravity="center|left"
+                                            android:layout_height="match_parent"
+                                            style="@style/tblCellTextViewHeaderWhite"
+                                            android:layout_width="150dp"
+                                            android:layout_column="1"
+                                            android:layout_weight="1"
+                                            android:text="0.00" />
+
+                                        <TextView
+                                            android:visibility="gone"
                                             android:id="@+id/tv_grandtotal"
                                             android:fontFamily="@font/medium"
                                             android:textSize="23sp"
@@ -625,7 +640,7 @@
                                         <RelativeLayout
                                             android:layout_margin="1dp"
                                             style="@style/btnTransparentStyle"
-                                            android:layout_width="160dp">
+                                            android:layout_width="90dp">
                                             <com.balysv.materialripple.MaterialRippleLayout
                                                 android:id="@+id/btn_submit"
                                                 android:layout_width="match_parent"

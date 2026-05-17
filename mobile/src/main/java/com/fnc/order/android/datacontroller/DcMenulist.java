@@ -138,13 +138,14 @@ public class DcMenulist extends DBHelper {
     }
 
     private MenuList setMenulist(Cursor c) {
-        MenuList menulist = new MenuList();
-        menulist.setCustomerName(c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_NAME.getKey())));
-        menulist.setRecordCount(c.getInt(c.getColumnIndex(MenulistKey.RECORD_COUNT.getKey())));
-        menulist.setRemarks(c.getString(c.getColumnIndex(MenulistKey.REMARKS.getKey())));
-        menulist.setCustomerID(c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_ID.getKey())));
-        menulist.setCustomerIntegrationId(c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_INTEG_ID.getKey())));
-        menulist.setAlphachar(c.getString(c.getColumnIndex(MenulistKey.ALPHA_CHAR.getKey())));
+        MenuList menulist = new MenuList(
+            c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_ID.getKey())),
+            c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_INTEG_ID.getKey())),
+            c.getString(c.getColumnIndex(MenulistKey.CUSTOMER_NAME.getKey())),
+            c.getString(c.getColumnIndex(MenulistKey.REMARKS.getKey())),
+            c.getInt(c.getColumnIndex(MenulistKey.RECORD_COUNT.getKey())),
+            c.getString(c.getColumnIndex(MenulistKey.ALPHA_CHAR.getKey()))
+        );
         return menulist;
     }
 

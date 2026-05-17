@@ -2,6 +2,7 @@ package com.fnc.order.android.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -20,9 +21,13 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,6 +77,7 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
     private Boolean flagItemClicked = false;
     private ItemlistAdapterRv adapter;
     private TextView tv_no_data;
+    private LinearLayout main_container;
 
     public static SearchItemFragment searchInstance(){
         SearchItemFragment dialogFragment = new SearchItemFragment();
@@ -79,11 +85,21 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rv = inflater.inflate(R.layout.dialog_search_item, container, false);
         ctx = rv.getContext();
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         rv.setFocusableInTouchMode(true);
         rv.requestFocus();
@@ -114,6 +130,13 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
         et_item_name = (EditText) v.findViewById(R.id.et_item_name);
         tv_no_data = (TextView) v.findViewById(R.id.tv_no_data);
         rvItems = (RecyclerView) v.findViewById(R.id.itemrecyclerview);
+
+        LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ll_content_box_main.getLayoutParams();
+        int iMrgnTP =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 200 ;
+        int iMrgnLR =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 100 ;
+        params.setMargins(iMrgnLR, iMrgnTP, iMrgnLR, iMrgnTP);
+        ll_content_box_main.setLayoutParams(params);
     }
 
     private Boolean flagTaskRun = false; private Handler m_handler; private Runnable m_runnable;
@@ -375,8 +398,8 @@ public class SearchItemFragment extends DialogFragment implements VolleyCallback
                         }
                     } else {
                         alertDialog = Helper.okDialog(ctx,
-                                "Error","Please select an item/s", "OK",
-                                null, false);
+                            "Error","Please select an item/s", "OK",
+                            null, false);
                         BounceView.addAnimTo(alertDialog);
                     }
                 }

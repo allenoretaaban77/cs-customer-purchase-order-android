@@ -7,14 +7,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,13 +33,10 @@ import com.fnc.order.android.callback.VolleyCallback;
 import com.fnc.order.android.constants.GlobalConstants;
 import com.fnc.order.android.constants.ServerConstants;
 import com.fnc.order.android.R;
-import com.fnc.order.android.database.DbConstants;
 import com.fnc.order.android.datacontroller.DcBranchlist;
-import com.fnc.order.android.datacontroller.DcOrdered;
 import com.fnc.order.android.datacontroller.DcStaffs;
 import com.fnc.order.android.enumeration.SharedKey;
 import com.fnc.order.android.enumeration.aBranchlistKey;
-import com.fnc.order.android.model.Ordered;
 import com.fnc.order.android.model.aBranchlist;
 import com.fnc.order.android.model.aStaffs;
 import com.fnc.order.android.services.OrdersService;
@@ -61,7 +55,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -71,9 +64,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import hari.bounceview.BounceView;
-import io.opencensus.resource.Resource;
-
-import static com.fnc.order.android.database.DBHelper.DBPath;
 
 public class SplashActivity extends BaseActivity {
 
@@ -109,16 +99,23 @@ public class SplashActivity extends BaseActivity {
         if(sp.getData(SharedKey.DATABASE.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASE.getKey(), "");
         if(sp.getData(SharedKey.DATABASEID.getKey()).trim().equals("")) sp.saveData(SharedKey.DATABASEID.getKey(), "");
         if(sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals("")) sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), "");
-        if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 1);
-        if(sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), 1);
-        if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 1);
+        if(sp.getInt(SharedKey.SKU_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), 0);
+        if(sp.getInt(SharedKey.REF_EMP_VALIDATION.getKey()) == -1) sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), 0);
+        if(sp.getInt(SharedKey.PRELOAD_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), 0);
         if(sp.getInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey()) == -1) sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), 0);
 
         if(sp.getData(SharedKey.SUPPORT_USER.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_USER.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_PASSWORD.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), "");
         if(sp.getData(SharedKey.SUPPORT_REF_EMP_ID.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), "");
-        if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).trim().equals("")) sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), "");
+
+        if(sp.getInt(SharedKey.SHOW_PRICE_COL.getKey()) == -1) sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
+        if(sp.getInt(SharedKey.SHOW_TOTAL_COL.getKey()) == -1) sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
+        if(sp.getInt(SharedKey.SHOW_FREE_COL.getKey()) == -1) sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), 0);
+        if(sp.getInt(SharedKey.COMPUTE_QTY_ONLY.getKey()) == -1) sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 0);
+        if(sp.getInt(SharedKey.SHOW_SEARCH_PRICE.getKey()) == -1) sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), 0);
+        if(sp.getInt(SharedKey.PER_AGENT_SETUP.getKey()) == -1) sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), 0);
+        if(sp.getInt(SharedKey.ENABLE_REPORT_TYPE.getKey()) == -1) sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), 0);
 
         Log.d("asasa", android.os.Build.MODEL);
 
@@ -149,6 +146,7 @@ public class SplashActivity extends BaseActivity {
                     }
 
                     startProcedure();
+//                    Helper.isTablet(ctx);
                 } catch(SecurityException e) {
                     e.printStackTrace();
                 } finally {
@@ -178,15 +176,15 @@ public class SplashActivity extends BaseActivity {
         if(strCN.equals("")) {
             if (Helper.isNetworkAvailable(this)) {
                 alertDialog = actionDialog( ctx, "APP START-UP",
-                        "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
-                        "Username", "Password", "Branch",
-                        "SUBMIT", new View.OnClickListener() {
-                            public void onClick(View v) {
-                                loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
-                                clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
-                                    ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
-                            }
-                        }, "", null, 0
+                    "Please enter your ADMIN ACCOUNT CREDENTIALS to initialize this app.",
+                    "Username", "Password", "Branch",
+                    "SUBMIT", new View.OnClickListener() {
+                        public void onClick(View v) {
+                            loader = Helper.showSpinnerDialog(ctx, "", "Posting... Please wait..."); loader.show();
+                            clientSignin(((EditText) alertDialog.findViewById(R.id.et_edittext1)).getText().toString(),
+                                ((EditText) alertDialog.findViewById(R.id.et_edittext2)).getText().toString());
+                        }
+                    }, "", null, 0
                 );
                 EditText etPassword = (EditText) alertDialog.findViewById(R.id.et_edittext2);
 //                etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
@@ -361,8 +359,12 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void proceedNormal() {
-        if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(sp.getData(SharedKey.BRANCH_DESCRIPTION.getKey()))) {
-            sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+        if (Helper.checkBranchProfile(ctx).get(0).getDescription().equals(SharedData.getInstance(ctx).getData(SharedKey.REF_MAIN_BRANCH.getKey()))) {
+            if (Helper.getScrRatio(ctx) > 0.6) {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+            } else {
+                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+            }
         } else {
             sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
         }
@@ -602,7 +604,11 @@ public class SplashActivity extends BaseActivity {
                                             sp.saveData(SharedKey.BRANCH_DESCRIPTION.getKey(), ablRsx.getDescription().trim());
 
                                             if (sp.getData(SharedKey.REF_MAIN_BRANCH.getKey()).trim().equals(ablRsx.getDescription().trim())) {
-                                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                                if (Helper.getScrRatio(ctx) > 0.6) {
+                                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.LOCAL_SERVER_URL.getKey()));
+                                                } else {
+                                                    sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
+                                                }
                                             } else {
                                                 sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), sp.getData(SharedKey.DOMAIN_SERVER_URL.getKey()));
                                             }
@@ -676,7 +682,7 @@ public class SplashActivity extends BaseActivity {
                                 alertReferenceBranchesNotFound();
                             }
                         } catch (JSONException e) {
-                            alertDataSyncError();
+                            alertDataSyncError("Device Profile Error.");
                             e.printStackTrace();
                         }
                     }
@@ -725,45 +731,24 @@ public class SplashActivity extends BaseActivity {
                     }, false)
                 );
             } catch (JSONException e) {
-                alertDataSyncError();
+                alertDataSyncError("Pre-requisite Error.");
                 e.printStackTrace();
             }
         }
     }
 
     private void volleyRequestFail(VolleyError response, String type){
-//    public void onRequestFail(VolleyError response, String type){
-        alertDataSyncError();
-        /*if (type.equals("login")) {
-            BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Initialization Failed","Please contact IT support.",
-                "CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
-                    }
-                }, false) );
+        String strMsg = "";
+        if (type.equals("login")) {
+            strMsg = "Login Request Error.";
         }
         if (type.equals("getdeviceprofile")) {
-            BounceView.addAnimTo( Helper.okDialog( ctx,
-                "Unrecognized Device", getString(R.string.unrecognized_device),
-                "CLOSE", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finishAndRemoveTask();
-                    }
-                }, false) );
+            strMsg = "Pre-requisite Request Error.";
         }
-        if (type.equals("getprerequisite")) {
-            BounceView.addAnimTo(Helper.okDialog(ctx,
-                    "Unrecognized Device", getString(R.string.unrecognized_device),
-                    "CLOSE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finishAndRemoveTask();
-                        }
-                    }, false));
-        }*/
+        if (type.equals("getdeviceprofile")) {
+            strMsg = "Device Profile Request Error.";
+        }
+        alertDataSyncError(strMsg);
     }
 
     private AlertDialog actionDialog(final Context activity, String title, String message,
@@ -902,10 +887,10 @@ public class SplashActivity extends BaseActivity {
         );
     }
 
-    private void alertDataSyncError() {
+    private void alertDataSyncError(String strMsg) {
         Helper.dismissSpinnerDialog(loader);
         BounceView.addAnimTo( Helper.okDialog( ctx,
-            "Data Sync Error","Data Sync Error, please contact IT support",
+            "Data Sync Error", strMsg + " Please contact IT support.",
             "CLOSE", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -913,7 +898,6 @@ public class SplashActivity extends BaseActivity {
                 }
             }, false) );
     }
-
 
     private JSONObject g_jsonobject;
     private Storage storageinit;
@@ -952,30 +936,41 @@ public class SplashActivity extends BaseActivity {
                     if (objArr.length() > 0) {
                         Boolean isSuccess = false;
                         for (int i = 0; i < objArr.length(); i++) {
-                            JSONObject rowObj = objArr.getJSONObject(i);
-                            if (rowObj.getString("database_id").equals(strDatabaseId)) {
-                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObj.getString("server_url"));
-                                sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObj.getString("local_url"));
-                                sp.saveData(SharedKey.DATABASE.getKey(), rowObj.getString("cn"));
+                            JSONObject rowObjConf = objArr.getJSONObject(i);
+                            if (rowObjConf.getString("database_id").equals(strDatabaseId)) {
+                                sp.saveData(SharedKey.DOMAIN_SERVER_URL.getKey(), rowObjConf.getString("server_url"));
+                                sp.saveData(SharedKey.LOCAL_SERVER_URL.getKey(), rowObjConf.getString("local_url"));
+                                sp.saveData(SharedKey.DATABASE.getKey(), rowObjConf.getString("cn"));
                                 sp.saveData(SharedKey.DATABASEID.getKey(), strDatabaseId);
-                                sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObj.getString("main_branch"));
-                                sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObj.getInt("old_sku_validation"));
-                                sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObj.getInt("reference_employee_validation"));
-                                sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObj.getInt("preload_items"));
-                                sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObj.getInt("saved_product_items"));
-                                sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObj.getString("support_user"));
-                                sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObj.getString("support_password"));
-                                sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObj.getString("support_employee_id"));
-                                sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObj.getString("support_ref_employee_id"));
-                                sp.saveData(SharedKey.SUPPORT_SETUP.getKey(), rowObj.getString("support_setup"));
+                                sp.saveData(SharedKey.REF_MAIN_BRANCH.getKey(), rowObjConf.getString("main_branch"));
+                                sp.saveInt(SharedKey.SKU_VALIDATION.getKey(), rowObjConf.getInt("old_sku_validation"));
+                                sp.saveInt(SharedKey.REF_EMP_VALIDATION.getKey(), rowObjConf.getInt("reference_employee_validation"));
+                                sp.saveInt(SharedKey.PRELOAD_ITEMS.getKey(), rowObjConf.getInt("preload_items"));
+                                sp.saveInt(SharedKey.SAVE_PRODUCT_ITEMS.getKey(), rowObjConf.getInt("saved_product_items"));
+                                sp.saveData(SharedKey.SUPPORT_USER.getKey(), rowObjConf.getString("support_user"));
+                                sp.saveData(SharedKey.SUPPORT_PASSWORD.getKey(), rowObjConf.getString("support_password"));
+                                sp.saveData(SharedKey.SUPPORT_EMP_ID.getKey(), rowObjConf.getString("support_employee_id"));
+                                sp.saveData(SharedKey.SUPPORT_REF_EMP_ID.getKey(), rowObjConf.getString("support_ref_employee_id"));
+                                sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), rowObjConf.getInt("show_price_column_on_order"));
+                                sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), rowObjConf.getInt("show_total_column_on_order"));
+                                sp.saveInt(SharedKey.SHOW_FREE_COL.getKey(), rowObjConf.getInt("show_free_column_on_order"));
+                                sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), rowObjConf.getInt("compute_quantity_only"));
+                                sp.saveInt(SharedKey.SHOW_SEARCH_PRICE.getKey(), rowObjConf.getInt("show_price_on_search"));
+                                sp.saveInt(SharedKey.PER_AGENT_SETUP.getKey(), rowObjConf.getInt("per_agent_setup"));
+                                sp.saveInt(SharedKey.ENABLE_REPORT_TYPE.getKey(), rowObjConf.getInt("enable_report_type"));
+
+                                if (Helper.getScrRatio(ctx) < 0.6) { // modify price and total
+                                    sp.saveInt(SharedKey.SHOW_PRICE_COL.getKey(), 0);
+                                    sp.saveInt(SharedKey.SHOW_TOTAL_COL.getKey(), 0);
+                                    sp.saveInt(SharedKey.COMPUTE_QTY_ONLY.getKey(), 1);
+                                }
+
                                 isSuccess = true;
                             }
                         }
                         if (!isSuccess) {
-                            alertDataSyncError();
+                            alertDataSyncError("App Config Error L1.");
                         } else {
-//                            Toast.makeText(ctx, "SUCCESS", Toast.LENGTH_SHORT).show();
-
                             JSONArray objArrY = new JSONArray(g_jsonobject.getString("dtuser"));
                             JSONObject objy = new JSONObject(objArrY.get(0).toString());
                             sp.saveData(SharedKey.REF_ADMIN_USER.getKey(), objy.getString("Email"));
@@ -1004,14 +999,14 @@ public class SplashActivity extends BaseActivity {
                             loader = Helper.showSpinnerDialog(ctx, "", "Updating... Please wait..."); loader.show();
                         }
                     } else {
-                        alertDataSyncError();
+                        alertDataSyncError("App Config Error L2.");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    alertDataSyncError();
+                    alertDataSyncError("App Config Error L3.");
                 }
             } else {
-                alertDataSyncError();
+                alertDataSyncError("App Config Error L4.");
             }
         }
         @Override

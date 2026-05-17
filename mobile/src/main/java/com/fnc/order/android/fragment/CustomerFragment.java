@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.CornerPathEffect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -185,7 +186,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                layout.setLayoutParams( new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, Math.round(Helper.convertDpToPixel(ctx, 580f))) );
+                layout.setLayoutParams( new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT ));
             }
         }, 300);
     }
@@ -195,7 +197,8 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                layout.setLayoutParams( new FrameLayout.LayoutParams( FrameLayout.LayoutParams.MATCH_PARENT, Math.round(Helper.convertDpToPixel(ctx, 640f))) );
+                layout.setLayoutParams( new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT  ));
             }
         }, 100);
     }
@@ -270,6 +273,11 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         containerbdl = (BackdropLayout) v.findViewById(R.id.containerbdl);
 
         LinearLayout ll_content_box_main = (LinearLayout) v.findViewById(R.id.ll_content_box_main);
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) ll_content_box_main.getLayoutParams();
+        int iMrgnTP =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 200 ;
+        int iMrgnLR =  Helper.getScrRatio(ctx) < 0.6 ? 10 : 100 ;
+        params.setMargins(iMrgnLR, iMrgnTP, iMrgnLR, iMrgnTP);
+        ll_content_box_main.setLayoutParams(params);
         ll_content_box_main.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -510,7 +518,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
             HashMap<String, String> params = new HashMap<>();
             params.put("cn", SharedData.getInstance(ctx).getData(SharedKey.DATABASE.getKey()));
             params.put("customer", stringSearch);
-            if(sp.getData(SharedKey.SUPPORT_SETUP.getKey()).equals(GlobalConstants.SUPPORT_SETUP)) {
+            if(sp.getInt(SharedKey.PER_AGENT_SETUP.getKey()) == 0) {
                 params.put("agentid", "");
             } else {
                 params.put("agentid", SharedData.getInstance(ctx).getData(SharedKey.REF_EMP_ID.getKey()));
@@ -548,15 +556,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
         showSpinnerDialog();
         final LinkedList<MenuList> mlRSx = DcMenulist.getInstance(ctx).getAllMenulist(isAlpha, stringSearch);
         if (mlRSx.size() == 0) {
-            MenuList mlList = new MenuList();
-            mlList.setCustomerID("0000000");
-            mlList.setCustomerIntegrationId("0000000");
-            mlList.setCustomerName("No Record Found");
-            mlList.setRecordCount(0);
-            mlList.setRemarks("");
-            mlList.setAlphachar("");
-            mlRSx.add(mlList);
+            mlRSx.add(new MenuList("0000000", "0000000", "No Record Found", "", 0, ""));
         }
+
+        // add bottom filler
+        mlRSx.add(new MenuList("0000000", "0000000", "", "", 0, ""));
+
         adapter = new MenuStoresAdapter(ctx, mlRSx);
         listview.setAdapter(adapter);
         if (mlRSx.size() > 0) {
@@ -607,13 +612,16 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     if(objArr.length() > 0) {
                         for (int i = 0; i < objArr.length(); i++) {
                             JSONObject obj = objArr.getJSONObject(i);
-                            MenuList mlList = new MenuList();
-                            mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
-                            mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
+
                             String strCustomerName = obj.getString(MenulistKey.CUSTOMER_NAME.getKey());
-                            mlList.setCustomerName(strCustomerName);
-                            mlList.setRecordCount(0);
-                            mlList.setRemarks("");
+                            MenuList mlList = new MenuList(
+                                obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
+                                obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
+                                strCustomerName,
+                                "",
+                                0,
+                                ""
+                            );
                             if (!strCustomerName.equals("")) {
                                 if (String.valueOf(strCustomerName.charAt(0)).equals("0")) {
                                     mlList.setAlphachar(String.valueOf(strCustomerName.charAt(5)).toUpperCase());
@@ -623,6 +631,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                                 DcMenulist.getInstance(ctx).insertMenulist(mlList);
                             }
                             publishProgress(i+1);
+
                         }
                     }
                     return "Task Completed.";
@@ -758,12 +767,12 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                     for (int i = 0; i < objArr.length(); i++) {
                         try {
                             JSONObject obj = objArr.getJSONObject(i);
-                            MenuList mlList = new MenuList();
-                            mlList.setCustomerID(obj.getString(MenulistKey.CUSTOMER_ID.getKey()));
-                            mlList.setCustomerIntegrationId(obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()));
-                            mlList.setCustomerName(obj.getString(MenulistKey.CUSTOMER_NAME.getKey()));
-                            mlList.setRecordCount(0);
-                            mlList.setRemarks("");
+                            MenuList mlList = new MenuList(
+                                obj.getString(MenulistKey.CUSTOMER_ID.getKey()),
+                                obj.getString(MenulistKey.CUSTOMER_INTEG_ID.getKey()),
+                                obj.getString(MenulistKey.CUSTOMER_NAME.getKey()),
+                                "", 0, ""
+                            );
                             mlRS.add(mlList);
                         } catch (JSONException e) {
                             dismissSpinnerDialog();
@@ -771,13 +780,7 @@ public class CustomerFragment extends Fragment implements VolleyCallback{
                         }
                     }
                 }else{
-                    MenuList mlList = new MenuList();
-                    mlList.setCustomerID("0000000");
-                    mlList.setCustomerIntegrationId("0000000");
-                    mlList.setCustomerName("No Record Found");
-                    mlList.setRecordCount(0);
-                    mlList.setRemarks("");
-                    mlRS.add(mlList);
+                    mlRS.add(new MenuList("0000000", "0000000", "No Record Found", "", 0, ""));
                 }
             }
         } catch (JSONException e) {

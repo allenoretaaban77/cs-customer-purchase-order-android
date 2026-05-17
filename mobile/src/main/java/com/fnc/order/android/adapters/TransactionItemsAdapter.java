@@ -67,6 +67,7 @@ public class TransactionItemsAdapter extends ArrayAdapter<Order> {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         TransactionItemsAdapter.ViewHolder holder;
+        DecimalFormat df = new DecimalFormat("#,###,###.00");
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -86,14 +87,14 @@ public class TransactionItemsAdapter extends ArrayAdapter<Order> {
 
         if (!iRs.getSellingPrice().equals("null")) {
             double u_price = Double.parseDouble(iRs.getSellingPrice());
-            DecimalFormat df = new DecimalFormat("#.00");
             holder.cell_price.setText(df.format(u_price).equals(".00") ? "0.00" : df.format(u_price));
         } else {
             holder.cell_price.setText("0.00");
         }
 
         if (!iRs.getTotal().equals("null")) {
-            holder.cell_total.setText(iRs.getTotal());
+            double u_total = Double.parseDouble(iRs.getTotal());
+            holder.cell_total.setText(df.format(u_total).equals(".00") ? "0.00" : df.format(u_total));
         } else {
             holder.cell_total.setText("0.00");
         }

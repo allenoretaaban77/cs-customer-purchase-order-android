@@ -29,7 +29,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:textSize="19sp"
+                android:textSize="@dimen/header_text_size"
                 android:text="SETTINGS"/>
         </RelativeLayout>
 
@@ -49,27 +49,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/medium"
-                android:textSize="17sp" />
+                android:textSize="@dimen/default_text_size" />
 
             <LinearLayout
                 android:id="@+id/ll_signin_box"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <LinearLayout
-                    android:paddingBottom="5dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
                     <TextView
                         android:id="@+id/tv_label1"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="3dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginRight="10dp"
+                        android:fontFamily="@font/medium"
                         android:text="Domain :"
                         android:textColor="@color/gray_6"
+                        android:textSize="@dimen/default_text_size"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="5dp"/>
+                    <TextView
+                        android:gravity="center_vertical"
+                        android:id="@+id/tv_label2"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginRight="10dp"
                         android:fontFamily="@font/medium"
-                        android:textSize="16sp" />
+                        android:text="Connection :"
+                        android:textColor="@color/gray_6"
+                        android:textSize="@dimen/default_text_size" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
                     <EditText
                         android:id="@+id/et_edittext1"
                         android:layout_width="match_parent"
@@ -84,27 +102,13 @@
                         android:maxLines="2"
                         android:paddingLeft="7dp"
                         android:paddingTop="0dp"
-                        android:paddingBottom="0dp"
                         android:paddingRight="5dp"
+                        android:paddingBottom="0dp"
                         android:textColor="@color/brown_5"
                         android:textColorHint="@color/gray_4"
                         android:fontFamily="@font/regular"
-                        android:textSize="17sp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:paddingBottom="5dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:id="@+id/tv_label2"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="3dp"
-                        android:text="Connection :"
-                        android:textColor="@color/gray_6"
-                        android:fontFamily="@font/medium"
-                        android:textSize="16sp" />
+                        android:textSize="@dimen/default_text_size"
+                        android:layout_marginBottom="5dp"/>
                     <EditText
                         android:id="@+id/et_edittext2"
                         android:layout_width="match_parent"
@@ -122,7 +126,8 @@
                         android:textColor="@color/brown_5"
                         android:textColorHint="@color/gray_4"
                         android:fontFamily="@font/regular"
-                        android:textSize="17sp" />
+                        android:textSize="@dimen/default_text_size"
+                        android:layout_marginBottom="0dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -141,7 +146,7 @@
                     <TextView
                         android:layout_marginLeft="10dp"
                         android:gravity="center|left"
-                        android:textSize="16sp"
+                        android:textSize="@dimen/default_text_size"
                         android:fontFamily="@font/regular"
                         android:hint="Select branch...."
                         android:id="@+id/tv_branchdescription"
@@ -197,7 +202,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <Button
-                    android:textSize="20sp"
+                    android:textSize="@dimen/header_text_size"
                     android:fontFamily="@font/medium"
                     android:background="@android:color/transparent"
                     android:id="@+id/btn_update"

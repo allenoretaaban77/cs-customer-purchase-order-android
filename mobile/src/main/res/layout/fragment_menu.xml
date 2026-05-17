@@ -15,207 +15,142 @@
         android:layout_centerInParent="true"
         android:src="@drawable/po1" />
 
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/ll_content_box_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent">
+
+        <RelativeLayout
+            android:id="@+id/rl_header_box"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:background="@drawable/background_round_border">
+            <TextView
+                android:gravity="center"
+                android:textAlignment="center"
+                android:layout_centerInParent="true"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:fontFamily="@font/regular"
+                android:textSize="20sp"
+                android:text="CUSTOMER LIST"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/ll_version_box"
+                android:layout_alignParentRight="true"
+                android:layout_width="75dp"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:textAlignment="center"
+                        android:id="@+id/tv_version"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/gray_6"
+                        android:layout_gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:fontFamily="@font/regular"
+                        android:textSize="12sp"
+                        android:text="0.0.0"/>
+                </LinearLayout>
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/btn_menu"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent">
+                    <Button
+                        android:layout_margin="12dp"
+                        android:backgroundTint="@color/gray_5"
+                        android:background="@drawable/baseline_menu_24"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/ll_content_box_main"
+            android:id="@+id/ll_content_box"
+            android:layout_marginTop="3dp"
             style="@style/layoutStyleMenu"
             android:orientation="vertical"
-            android:layout_gravity="center"
-            android:background="@android:color/transparent"
-            android:layout_height="wrap_content">
+            android:background="@drawable/background_round_border"
+            android:padding="7dp">
 
-            <RelativeLayout
-                android:id="@+id/rl_header_box"
+            <com.roacult.backdrop.BackdropLayout
+                android:id="@+id/containerbdl"
+                app:front_layout="@id/includedFront"
+                app:back_layout="@id/includedBack"
+                app:peekHeight="56dp"
+                app:animationDuration="400"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:orientation="horizontal"
-                android:background="@drawable/background_round_border">
-                <TextView
-                    android:gravity="center"
-                    android:textAlignment="center"
-                    android:layout_centerInParent="true"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:layout_height="match_parent"
-                    android:layout_width="match_parent"
-                    android:fontFamily="@font/regular"
-                    android:textSize="20sp"
-                    android:text="CUSTOMER LIST"/>
+                android:layout_height="match_parent">
+
+                <include
+                    android:id="@+id/includedBack"
+                    layout="@layout/header_customer_fragment"/>
+
                 <LinearLayout
-                    android:orientation="horizontal"
-                    android:id="@+id/ll_version_box"
-                    android:layout_alignParentRight="true"
-                    android:layout_width="75dp"
-                    android:layout_height="match_parent">
-                    <LinearLayout
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-                        <TextView
-                            android:textAlignment="center"
-                            android:id="@+id/tv_version"
-                            android:layout_alignParentRight="true"
-                            android:textColor="@color/gray_6"
-                            android:layout_gravity="center"
-                            android:layout_height="wrap_content"
-                            android:layout_width="match_parent"
-                            android:fontFamily="@font/regular"
-                            android:textSize="12sp"
-                            android:text="0.0.0"/>
-                    </LinearLayout>
-                    <com.balysv.materialripple.MaterialRippleLayout
-                        android:layout_marginRight="10dp"
-                        android:id="@+id/btn_menu"
-                        android:layout_width="50dp"
-                        android:layout_height="match_parent">
-                        <Button
-                            android:layout_margin="12dp"
-                            android:backgroundTint="@color/gray_5"
-                            android:background="@drawable/baseline_menu_24"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"/>
-                    </com.balysv.materialripple.MaterialRippleLayout>
-                </LinearLayout>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_content_box"
-                android:layout_marginTop="3dp"
-                style="@style/layoutStyleMenu"
-                android:orientation="vertical"
-                android:background="@drawable/background_round_border"
-                android:padding="7dp">
-
-                <com.roacult.backdrop.BackdropLayout
-                    android:id="@+id/containerbdl"
-                    app:front_layout="@id/includedFront"
-                    app:back_layout="@id/includedBack"
-                    app:peekHeight="56dp"
-                    app:animationDuration="400"
+                    android:background="@drawable/background_green_3_border"
+                    android:id="@+id/includedFront"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
-                    <include
-                        android:id="@+id/includedBack"
-                        layout="@layout/header_customer_fragment"/>
-
                     <LinearLayout
+                        android:id="@+id/storelistview_box"
+                        android:visibility="gone"
                         android:background="@drawable/background_green_3_border"
-                        android:id="@+id/includedFront"
-                        android:orientation="vertical"
+                        android:layout_height="match_parent"
                         android:layout_width="match_parent"
-                        android:layout_height="640dp">
-                        <LinearLayout
-                            android:id="@+id/storelistview_box"
-                            android:visibility="gone"
-                            android:background="@drawable/background_green_3_border"
-                            android:layout_height="match_parent"
-                            android:layout_width="match_parent"
-                            android:orientation="horizontal">
-                            <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-                                android:id="@+id/storelistview"
-                                android:layout_marginTop="7dp"
-                                android:divider="#00000000"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent" />
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/alphagridview_box"
-                            android:visibility="gone"
-                            android:background="@drawable/background_green_3_border"
-                            android:layout_height="match_parent"
-                            android:layout_width="match_parent"
-                            android:orientation="vertical">
-                            <ProgressBar
-                                android:visibility="gone"
-                                android:id="@+id/progressBar"
-                                android:minHeight="5dp"
-                                android:maxHeight="5dp"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                style="@android:style/Widget.ProgressBar.Horizontal"/>
-                            <GridView
-                                android:layout_margin="10dp"
-                                android:verticalSpacing="10dp"
-                                android:horizontalSpacing="10dp"
-                                android:numColumns="4"
-                                xmlns:android="http://schemas.android.com/apk/res/android"
-                                android:id="@+id/alphagridview"
-                                android:layout_marginTop="7dp"
-                                android:divider="#00000000"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent" />
-                        </LinearLayout>
+                        android:orientation="horizontal">
+                        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:id="@+id/storelistview"
+                            android:layout_marginTop="7dp"
+                            android:divider="#00000000"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent" />
                     </LinearLayout>
-
-                </com.roacult.backdrop.BackdropLayout>
-
-                <!--com.liaoinstan.springview.widget.SpringView
-                    app:type="follow"
-                    android:id="@+id/mysv"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:header="@layout/header_customer_fragment">
-
                     <LinearLayout
-                        android:orientation="vertical"
+                        android:id="@+id/alphagridview_box"
+                        android:visibility="gone"
+                        android:background="@drawable/background_green_3_border"
+                        android:layout_height="match_parent"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <LinearLayout
-                            android:id="@+id/storelistview_box"
+                        android:orientation="vertical">
+                        <ProgressBar
                             android:visibility="gone"
-                            android:background="@drawable/background_green_3_border"
-                            android:layout_height="match_parent"
+                            android:id="@+id/progressBar"
+                            android:minHeight="5dp"
+                            android:maxHeight="5dp"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            style="@android:style/Widget.ProgressBar.Horizontal"/>
+                        <GridView
+                            android:layout_margin="10dp"
+                            android:verticalSpacing="10dp"
+                            android:horizontalSpacing="10dp"
+                            android:numColumns="4"
+                            xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:id="@+id/alphagridview"
+                            android:layout_marginTop="7dp"
+                            android:divider="#00000000"
                             android:layout_width="match_parent"
-                            android:orientation="horizontal">
-                            <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-                                android:id="@+id/storelistview"
-                                android:layout_marginTop="7dp"
-                                android:divider="#00000000"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/alphagridview_box"
-                            android:background="@drawable/background_green_3_border"
-                            android:layout_height="match_parent"
-                            android:layout_width="match_parent"
-                            android:orientation="vertical">
-                            <ProgressBar
-                                android:visibility="gone"
-                                android:id="@+id/progressBar"
-                                android:minHeight="5dp"
-                                android:maxHeight="5dp"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                style="@android:style/Widget.ProgressBar.Horizontal"/>
-                            <GridView
-                                android:layout_margin="10dp"
-                                android:verticalSpacing="10dp"
-                                android:horizontalSpacing="10dp"
-                                android:numColumns="4"
-                                xmlns:android="http://schemas.android.com/apk/res/android"
-                                android:id="@+id/alphagridview"
-                                android:layout_marginTop="7dp"
-                                android:divider="#00000000"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent" />
-
-                        </LinearLayout>
-
+                            android:layout_height="match_parent" />
                     </LinearLayout>
+                </LinearLayout>
 
-                </com.liaoinstan.springview.widget.SpringView-->
-
-            </LinearLayout>
+            </com.roacult.backdrop.BackdropLayout>
 
         </LinearLayout>
 
-    </ScrollView>
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

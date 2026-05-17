@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@drawable/background_round_border_inner_transparent"
-    android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/transparent"
+    android:layout_gravity="center"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <RelativeLayout
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        android:id="@+id/ll_content_box_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center">
 
         <LinearLayout
             android:layout_height="wrap_content"
-            style="@style/layoutStyleMenu"
-            android:layout_width="750dp"
+            android:layout_width="match_parent"
             android:orientation="horizontal"
             android:background="@drawable/background_round_border">
             <TextView
@@ -26,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:fontFamily="@font/regular"
                 android:textSize="20sp"
-                android:text="TRANSACTION ITEMS"/>
+                android:text="TRANSACTION SUMMARY"/>
             <LinearLayout
                 android:layout_margin="5dp"
                 android:layout_alignParentRight="true"
@@ -50,17 +52,16 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginTop="50dp"
-            style="@style/layoutStyleMenu"
-            android:layout_width="750dp"
+            android:layout_marginTop="5dp"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
             android:background="@drawable/background_round_border"
             android:padding="5dp">
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-
                 <TableLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -75,14 +76,14 @@
                             android:text="Description" />
                         <TextView
                             style="@style/tblCellTextViewHeader"
-                            android:layout_width="80dp"
+                            android:layout_width="70dp"
                             android:layout_column="1"
                             android:text="Price" />
                         <TextView
                             style="@style/tblCellTextViewHeader"
-                            android:layout_width="90dp"
+                            android:layout_width="60dp"
                             android:layout_column="2"
-                            android:text="Quantity" />
+                            android:text="QTY" />
                         <TextView
                             style="@style/tblCellTextViewHeader"
                             android:layout_width="80dp"
@@ -91,24 +92,117 @@
                     </TableRow>
                 </TableLayout>
             </RelativeLayout>
-
             <LinearLayout
+                android:paddingRight="1dp"
+                android:paddingLeft="1dp"
                 android:layout_marginTop="2dp"
                 android:id="@+id/alphagridview_box"
                 android:background="@drawable/background_green_3_border"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:orientation="vertical">
-
                 <ListView xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/list_view"
                     android:divider="#00000000"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+                <LinearLayout
+                    android:id="@+id/item_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ffffff">
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:textStyle="bold"
+                            android:gravity="center|right"
+                            android:lineHeight="16sp"
+                            android:textSize="16sp"
+                            android:paddingTop="5dp"
+                            android:paddingRight="5dp"
+                            android:paddingLeft="5dp"
+                            style="@style/tblCellTextView"
+                            android:layout_weight="1"
+                            android:layout_column="0"
+                            android:text="Grand Total: " />
+                        <TextView
+                            android:gravity="center"
+                            android:lineHeight="16sp"
+                            android:textSize="16sp"
+                            android:paddingTop="5dp"
+                            android:paddingLeft="5dp"
+                            android:textStyle="bold"
+                            android:id="@+id/tv_cell_grand_total_count"
+                            style="@style/tblCellTextView"
+                            android:layout_width="60dp"
+                            android:text="0.00" />
+                        <TextView
+                            android:gravity="center|right"
+                            android:lineHeight="16sp"
+                            android:textSize="16sp"
+                            android:paddingTop="5dp"
+                            android:paddingLeft="5dp"
+                            android:textStyle="bold"
+                            android:id="@+id/tv_cell_grand_total"
+                            style="@style/tblCellTextView"
+                            android:layout_width="80dp"
+                            android:text="0.00" />
+                    </TableRow>
+                </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
 
-    </RelativeLayout>
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_cmdbox"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_marginEnd="2dp"
+                android:layout_weight="1"
+                style="@style/btnTransparentStyle">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:textSize="20sp"
+                        android:fontFamily="@font/medium"
+                        android:background="@android:color/transparent"
+                        android:id="@+id/btn_cancel"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="CANCEL"
+                        android:textColor="@color/white"
+                        android:textAllCaps="false"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginStart="2dp"
+                android:layout_weight="1"
+                style="@style/btnTransparentStyle">
+                <com.balysv.materialripple.MaterialRippleLayout
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:textSize="20sp"
+                        android:fontFamily="@font/medium"
+                        android:background="@android:color/transparent"
+                        android:id="@+id/btn_post"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="POST"
+                        android:textColor="@color/white"
+                        android:textAllCaps="false"/>
+                </com.balysv.materialripple.MaterialRippleLayout>
+            </LinearLayout>
+        </LinearLayout>
 
-</ScrollView>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -20,7 +20,8 @@ public class GlobalConstants {
     public static final String SBMERCHANT_DEVICE_TOKEN = "DEVICE_TOKEN";
     public static final String ARB_NOTIF_RECEIVE = "NOTIF_RECEIVE";
 
-    public static String DATE_FORMAT_GCP = "yyHHmmsssSS";
+//    public static String DATE_FORMAT_GCP = "yyHHmmsssSS";
+    public static String DATE_FORMAT_GCP = "yyMMddHHmmssSS";
     public static String DATE_FORMAT = "MMMM d, yyyy";
     public static String DATE_REF_FORMAT = "yyyy-MM-dd";
     public static String DATE_FORMAT_POST = "M/dd/yyyy HH:mm:ss";

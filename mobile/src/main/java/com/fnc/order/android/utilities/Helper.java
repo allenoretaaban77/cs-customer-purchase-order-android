@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -25,6 +26,7 @@ import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,6 +34,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -371,6 +374,12 @@ public class Helper {
         return monthNumber + day;
     }
 
+    public static double getScrRatio(Context ctx) { // if >= to 0.6 the tab
+        double refMult = Double.parseDouble(String.valueOf(Helper.getScreenDimension(ctx, "w"))) /
+                Double.parseDouble(String.valueOf(Helper.getScreenDimension(ctx, "h")));
+        return refMult;
+    }
+
     public static int getScreenDimension(Context ctx, String strSide) {
         WindowManager wm = (WindowManager) ctx.getSystemService(WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -391,11 +400,13 @@ public class Helper {
     }
 
     public static int getDialogWidth(Context ctx) {
+        Double tWidth = 0.0;
         if (Helper.getScreenDimension(ctx, "w") >= 1200) {
-            return 800;
+            tWidth = Helper.getScreenDimension(ctx, "w") * 0.7;
         } else {
-            return 500;
+            tWidth = Helper.getScreenDimension(ctx, "w") * 0.90;
         }
+        return (int)Math.round(tWidth);
     }
 
     public static void changePage(Context ctx, FragmentManager fm, Fragment fr,
@@ -537,6 +548,12 @@ public class Helper {
         String monthNumber  = (String) DateFormat.format("MM",   date); // 06
         String year         = (String) DateFormat.format("yyyy", date); // 2019
         switch (type) {
+            case 7:
+                String[] dArr = dateSample.split(" ");
+                String[] dArrx = dArr[0].split("/");
+                String sM = dArrx[0].length() > 1 ? dArrx[0] : "0" + dArrx[0] ;
+                String sD = dArrx[1].length() > 1 ? dArrx[1] : "0" + dArrx[1] ;
+                return dArrx[2] + "-" + sM + "-" + sD;
             case 5:
                 java.text.DateFormat dfy = new SimpleDateFormat(GlobalConstants.DATE_FORMAT_GCP);
                 return dfy.format(date);
@@ -610,6 +627,12 @@ public class Helper {
 
     public static String getFilePath(Context ctx) {
         return getProjectPath(ctx)  + "gcf" + File.separator;
+    }
+
+    public static boolean isTablet(Context context) {
+        boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
+        boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+        return (xlarge || large);
     }
 
 }

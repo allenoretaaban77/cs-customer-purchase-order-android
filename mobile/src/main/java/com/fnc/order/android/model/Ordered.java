@@ -13,9 +13,11 @@ public class Ordered implements Serializable {
     private String json;
     private String json_complete;
     private String grandtotal;
+    private String grandtotalcount;
     private String datetime;
     private int status;
     private String reference_recid;
+    private String deliver_date_default;
 
     public String getCustomerIntegRecid() { return customer_integ_recid; }
     public void setCustomerIntegRecid(String customer_integ_recid) { this.customer_integ_recid = customer_integ_recid; }
@@ -60,10 +62,11 @@ public class Ordered implements Serializable {
     }
     public void setJsonComplete(String json_complete) { this.json_complete = json_complete; }
 
-    public String getGrandtotal() {
-        return grandtotal;
-    }
+    public String getGrandtotal() { return grandtotal; }
     public void setGrandtotal(String grandtotal) { this.grandtotal = grandtotal; }
+
+    public String getGrandtotalcount() { return grandtotalcount; }
+    public void setGrandtotalcount(String grandtotalcount) { this.grandtotalcount = grandtotalcount; }
 
     public String getDateTime() {
         return datetime;
@@ -79,5 +82,10 @@ public class Ordered implements Serializable {
         return reference_recid;
     }
     public void setReferenceRecid(String reference_recid) { this.reference_recid = reference_recid; }
+
+    public String getDeliver_date_default() {
+        return deliver_date_default;
+    }
+    public void setDeliver_date_default(String deliver_date_default) { this.deliver_date_default = deliver_date_default; }
 
 }
