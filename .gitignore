@@ -16,3 +16,4 @@
 /mobile/release/*
 .idea/runConfigurations.xml
 .idea/vcs.xml
+credentials.json
